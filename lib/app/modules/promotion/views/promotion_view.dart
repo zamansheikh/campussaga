@@ -61,7 +61,6 @@ class PromotionView extends GetView<PromotionController> {
             children: [
               Expanded(
                 child: FirebaseAnimatedList(
-                  reverse: true,
                   query: controller.postRef,
                   itemBuilder: (context, snapshot, animation, index) {
                     return Column(
@@ -138,7 +137,7 @@ class PromotionView extends GetView<PromotionController> {
                       Expanded(
                         child: Text(
                           snapshot.child("postDescription").value.toString(),
-                          maxLines: 4,
+                          maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
