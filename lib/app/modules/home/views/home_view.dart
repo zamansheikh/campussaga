@@ -61,7 +61,6 @@ class HomeView extends GetView<HomeController> {
             children: [
               Expanded(
                 child: FirebaseAnimatedList(
-                  reverse: true,
                   query: controller.postRef,
                   itemBuilder: (context, snapshot, animation, index) {
                     return Column(
