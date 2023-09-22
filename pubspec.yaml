@@ -1,0 +1,90 @@
+name: campus_saga
+description: A new Flutter project.
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get:
+  percent_indicator: ^4.2.3
+  cupertino_icons: ^1.0.2
+  flutter_launcher_icons: "^0.13.1"
+  rename: ^2.1.1
+  dropdown_button2: ^2.3.9
+  firebase_core: ^2.15.1
+  firebase_auth: ^4.9.0
+  firebase_storage: ^11.2.6
+  cloud_firestore: ^4.9.1
+  image_picker: ^1.0.4
+  firebase_database: ^10.2.6
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/Campus_Saga_Icon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  remove_alpha_ios: true # default false
+  web:
+    generate: false
+    image_path: "assets/icon/app_icon.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: false
+    image_path: "assets/icon/app_icon.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: false
+    image_path: "assets/icon/app_icon.png"
+  
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/images/
+    - assets/temp/
+    - assets/models/
+    # - assets/svg/
+    # - assets/icon/
+
+  fonts:
+    - family: Urbanist
+      fonts:
+        - asset: assets/fonts/Urbanist-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Urbanist-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Urbanist-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Urbanist-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Urbanist-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Urbanist-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Urbanist-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Urbanist-SemiBold.ttf
+          weight: 600
+
+    - family: Boogaloo
+      fonts:
+        - asset: assets/fonts/Boogaloo-Regular.ttf
+          weight: 400
+
+# For details regarding fonts from package dependencies,
+# see https://flutter.dev/custom-fonts/#from-packages
