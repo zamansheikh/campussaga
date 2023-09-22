@@ -1,0 +1,69 @@
+[
+    {
+      "id": "1",
+      "name": "Daffodil International University",
+      "logoUrl": "https://en.wikipedia.org/wiki/Daffodil_International_University#/media/File:Daffodil_International_University_(logo).jpg",
+      "totalPosts": 5000,
+      "totalSolvedPosts": 3500,
+      "totalUpvotes": 8000,
+      "totalResponseTime": 15,
+      "score": 4.5,
+      "totalScore": 9000
+    },
+    {
+      "id": "2",
+      "name": "North South University (NSU)",
+      "logoUrl": "https://en.wikipedia.org/wiki/North_South_University#/media/File:North_South_University_Monogram.svg",
+      "totalPosts": 6000,
+      "totalSolvedPosts": 4000,
+      "totalUpvotes": 10000,
+      "totalResponseTime": 12,
+      "score": 4.7,
+      "totalScore": 9500
+    },
+    {
+      "id": "3",
+      "name": "BRAC University",
+      "logoUrl": "https://en.wikipedia.org/wiki/BRAC_University#/media/File:Brac_University_Logo.png",
+      "totalPosts": 5500,
+      "totalSolvedPosts": 3800,
+      "totalUpvotes": 8500,
+      "totalResponseTime": 14,
+      "score": 4.6,
+      "totalScore": 9200
+    },
+    {
+      "id": "4",
+      "name": "University of Dhaka",
+      "logoUrl": "https://en.wikipedia.org/wiki/University_of_Dhaka#/media/File:Dhaka_University_logo.svg",
+      "totalPosts": 7000,
+      "totalSolvedPosts": 4800,
+      "totalUpvotes": 11000,
+      "totalResponseTime": 13,
+      "score": 4.8,
+      "totalScore": 9800
+    },
+    {
+      "id": "5",
+      "name": "Bangladesh University of Engineering and Technology (BUET)",
+      "logoUrl": "https://en.wikipedia.org/wiki/Bangladesh_University_of_Engineering_and_Technology#/media/File:BUET_LOGO.svg",
+      "totalPosts": 4500,
+      "totalSolvedPosts": 3200,
+      "totalUpvotes": 7500,
+      "totalResponseTime": 16,
+      "score": 4.4,
+      "totalScore": 8800
+    },
+    {
+      "id": "6",
+      "name": "Khulna University",
+      "logoUrl": "https://en.wikipedia.org/wiki/Khulna_University#/media/File:Khulna_University_Logo.svg",
+      "totalPosts": 4800,
+      "totalSolvedPosts": 3500,
+      "totalUpvotes": 7800,
+      "totalResponseTime": 14,
+      "score": 4.6,
+      "totalScore": 9100
+    }
+  ]
+  

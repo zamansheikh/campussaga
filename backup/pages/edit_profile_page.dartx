@@ -1,0 +1,151 @@
+
+import 'package:flutter/material.dart';
+
+enum Gender { none, male, female, other }
+
+class EditProfilePage extends StatefulWidget {
+  EditProfilePage({super.key});
+
+  @override
+  State<EditProfilePage> createState() => _EditProfilePageState();
+}
+
+class _EditProfilePageState extends State<EditProfilePage> {
+  var gender = Gender.none;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: ToolBar(appBarName: "Edit Profile"),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: UserAvater(
+                      size: 120,
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.all(Radius.circular(6)),
+                      ),
+                      child: Icon(Icons.edit),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              AppTextField(hint: 'First Name'),
+              SizedBox(height: 8),
+              AppTextField(hint: 'Last Name'),
+              SizedBox(height: 8),
+              AppTextField(hint: AppStrings.phoneNumber),
+              SizedBox(height: 8),
+              AppTextField(hint: AppStrings.loaction),
+              SizedBox(height: 8),
+              AppTextField(hint: AppStrings.birthDay),
+              SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.only(left: 12, right: 12, top: 6),
+                decoration: BoxDecoration(
+                    color: AppColors.fieldColor,
+                    borderRadius: const BorderRadius.all(Radius.circular(8))),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppStrings.gender,
+                      style: AppText.body1.copyWith(fontSize: 12),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile(
+                            title: const Text(AppStrings.male),
+                            value: Gender.male,
+                            groupValue: gender,
+                            contentPadding: EdgeInsets.zero,
+                            visualDensity: const VisualDensity(
+                              horizontal: VisualDensity.minimumDensity,
+                              vertical: VisualDensity.minimumDensity,
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                gender = Gender.male;
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile(
+                            title: const Text(AppStrings.female),
+                            value: Gender.female,
+                            groupValue: gender,
+                            contentPadding: EdgeInsets.zero,
+                            visualDensity: const VisualDensity(
+                              horizontal: VisualDensity.minimumDensity,
+                              vertical: VisualDensity.minimumDensity,
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                gender = Gender.female;
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile(
+                            title: const Text(AppStrings.other),
+                            value: Gender.other,
+                            groupValue: gender,
+                            contentPadding: EdgeInsets.zero,
+                            visualDensity: const VisualDensity(
+                              horizontal: VisualDensity.minimumDensity,
+                              vertical: VisualDensity.minimumDensity,
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                gender = Gender.other;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              Container(
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(8),
+                  ),
+                ),
+                alignment: Alignment.center,
+                width: double.infinity,
+                child: Text(
+                  "Save",
+                  style: AppText.subtitle1.copyWith(color: AppColors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

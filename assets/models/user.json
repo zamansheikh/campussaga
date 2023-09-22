@@ -1,0 +1,65 @@
+[
+    {
+        "name": "Alice Johnson",
+        "phoneNumber": "555-1234",
+        "password": "password123",
+        "gender": "female",
+        "university": "ABC University",
+        "department": "Computer Science",
+        "isVerified": true
+    },
+    {
+        "name": "Bob Smith",
+        "phoneNumber": "555-5678",
+        "password": "securepass",
+        "gender": "male",
+        "university": "XYZ University",
+        "department": "Engineering",
+        "isVerified": true
+    },
+    {
+        "name": "Charlie Brown",
+        "phoneNumber": "555-9876",
+        "password": "mysecretpass",
+        "gender": "male",
+        "university": "DEF College",
+        "department": "Business",
+        "isVerified": false
+    },
+    {
+        "name": "David Lee",
+        "phoneNumber": "555-4321",
+        "password": "strongpassword",
+        "gender": "male",
+        "university": "GHI University",
+        "department": "Psychology",
+        "isVerified": true
+    },
+    {
+        "name": "Ella Davis",
+        "phoneNumber": "555-8765",
+        "password": "p@ssw0rd",
+        "gender": "female",
+        "university": "JKL College",
+        "department": "Mathematics",
+        "isVerified": true
+    },
+    {
+        "name": "Frank White",
+        "phoneNumber": "555-6543",
+        "password": "pass123",
+        "gender": "male",
+        "university": "MNO College",
+        "department": "Art",
+        "isVerified": false
+    },
+    {
+        "name": "Grace Miller",
+        "phoneNumber": "555-7890",
+        "password": "secretpassword",
+        "gender": "female",
+        "university": "PQR University",
+        "department": "Biology",
+        "isVerified": true
+    }
+]
