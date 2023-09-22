@@ -59,7 +59,7 @@ class AddPostController extends GetxController {
       File? image = postProviderRef.pickedImage;
       String userImageUrl =
           info.child('profileInfo').child('profilePhoto').value.toString();
-      String postPictureUrl = await postProviderRef.uploadToStorage(image!);
+      String postPictureUrl = await postProviderRef.uploadPostToStorage(image!);
       await databaseRef
           .child(postType())
           .child(DateTime.now().millisecondsSinceEpoch.toString())
@@ -81,6 +81,9 @@ class AddPostController extends GetxController {
         "Success",
         "Post Added",
       );
+      postHeadingController.text = '';
+      postDescriptionController.text = '';
+      postProviderRef.pickedImage = null;
     }
   }
 
@@ -109,6 +112,9 @@ class AddPostController extends GetxController {
         "Success",
         "Post Added",
       );
+      postHeadingController.text = '';
+      postDescriptionController.text = '';
+      postProviderRef.pickedImage = null;
     }
   }
 }
