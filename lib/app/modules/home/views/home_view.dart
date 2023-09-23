@@ -105,47 +105,41 @@ class HomeView extends GetView<HomeController> {
                 onChanged: (bool? newValue) {
                   // Implement logic for handling checkbox state change.
                 },
+                fillColor: snapshot.child("isSolved").value as bool
+                    ? MaterialStateProperty.all(Colors.green)
+                    : MaterialStateProperty.all(Colors.red),
               ),
             ],
           ),
           Container(
             padding: EdgeInsets.all(5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InkWell(
-                  onTap: () async {
-                    await controller.getData(snapshot);
-                    Get.to(() => HomeReadMoreView());
-                  },
-                  child: Text(
+            child: InkWell(
+              onTap: () async {
+                await controller.getData(snapshot);
+                Get.to(() => HomeReadMoreView());
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                     snapshot.child("postHeading").value.toString(),
-                    style: TextStyle(fontSize: 20),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () async {
-                          await controller.getData(snapshot);
-                          Get.to(() => HomeReadMoreView());
-                        },
+                  SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Expanded(
                         child: Text(
                           snapshot.child("postDescription").value.toString(),
+                          style: TextStyle(fontWeight: FontWeight.bold),
                           maxLines: 4,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        await controller.getData(snapshot);
-                        Get.to(() => HomeReadMoreView());
-                      },
-                      child: ClipRRect(
+                      SizedBox(width: 3),
+                      ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Image.network(
                           snapshot.child("imageUrl").value.toString(),
@@ -154,53 +148,55 @@ class HomeView extends GetView<HomeController> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                    ),
-                    Column(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            //Change Upvote
-                          },
-                          icon: Icon(Icons.arrow_upward),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            //Change Downvote
-                          },
-                          icon: Icon(Icons.arrow_downward),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                LinearPercentIndicator(
-                  percent: .9, //!Calulate the percentage
-                  progressColor: Color(0xFF207BFF),
-                ),
-              ],
+                      Column(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              print(snapshot.child("time").value.toString());
+                              controller.upVote(
+                                  snapshot.child("time").value.toString());
+                            },
+                            icon: Icon(Icons.arrow_upward, color: Colors.green),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              controller.downVote(
+                                  snapshot.child("time").value.toString());
+                              // controller.downVote();
+                            },
+                            icon: Icon(Icons.arrow_downward, color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  LinearPercentIndicator(
+                    percent: controller.getUpVotePercentage(
+                        snapshot.child("upvotes").value.toString(),
+                        snapshot.child("downvotes").value.toString()),
+                    progressColor: Color(0xFF207BFF),
+                  ),
+                ],
+              ),
             ),
           ),
-
-          IconButton(
-            onPressed: () {
-              controller.isExpanded[index] = !controller.isExpanded[index];
-            },
-            icon: controller.isExpanded[index]
-                ? Icon(Icons.keyboard_arrow_down)
-                : Icon(Icons.keyboard_arrow_up),
-          ),
-
-          //add a condition here, if controller.isExpanded == true , only then show the column,
-          if (controller.isExpanded[index])
-            controller.isExpanded[index]
-                ? Column(
+          Obx(
+            () => Column(
+              children: [
+                Visibility(
+                  visible: controller.isExpanded[index],
+                  child: Column(
                     children: [
                       Divider(thickness: 2),
-                      Text("Solved"),
+                      Text("Are you agree with the Admins Feedback?",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                       SizedBox(height: 5),
                       LinearPercentIndicator(
-                        percent: .9, //controller.votingParcentis(index),
+                        percent: controller.adminFeedBackPercentage(
+                          snapshot.child("trueVotes").value.toString(),
+                          snapshot.child("falseVotes").value.toString(),
+                        ),
                         progressColor: Colors.green,
                         backgroundColor: Colors.red,
                       ),
@@ -209,7 +205,8 @@ class HomeView extends GetView<HomeController> {
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              // Implement 'Yes' button logic.
+                              controller.trueVote(
+                                  snapshot.child("time").value.toString());
                             },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -222,7 +219,8 @@ class HomeView extends GetView<HomeController> {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              // Implement 'No' button logic.
+                              controller.falseVote(
+                                  snapshot.child("time").value.toString());
                             },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -236,33 +234,28 @@ class HomeView extends GetView<HomeController> {
                         ],
                       ),
                       Divider(thickness: 2),
-                      Text("Authority's Comment"),
+                      Text("Admins Feed Back",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Divider(thickness: 2),
+                      Text(snapshot.child("adminFeedback").value.toString()),
                       SizedBox(height: 5),
-                      Text("Admins Feed Back"),
-                      controller.isExpanded[index]
-                          ? IconButton(
-                              onPressed: () {
-                                controller.isExpanded[index] =
-                                    !controller.isExpanded[index];
-                              },
-                              icon: Icon(Icons.keyboard_arrow_up),
-                            )
-                          : SizedBox(),
                     ],
-                  )
-                : SizedBox()
-          else
-            SizedBox(
-              child: controller.isExpanded[index]
-                  ? IconButton(
-                      onPressed: () {
-                        controller.isExpanded[index] =
-                            !controller.isExpanded[index];
-                      },
-                      icon: Icon(Icons.keyboard_arrow_up),
-                    )
-                  : SizedBox(),
-            )
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    snapshot.child("isSolved").value as bool
+                        ? controller.isExpanded[index] =
+                            !controller.isExpanded[index]
+                        : false;
+                  },
+                  child: controller.isExpanded[index]
+                      ? Icon(Icons.keyboard_arrow_up)
+                      : Icon(Icons.keyboard_arrow_down),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
