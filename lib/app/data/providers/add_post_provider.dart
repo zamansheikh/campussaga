@@ -21,9 +21,9 @@ class PostProvider extends GetxController {
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickImage != null) {
       Get.snackbar("Success", "Image Picked");
+      _pickedImage = Rx<File?>(File(pickImage.path));
+      update();
     }
-    _pickedImage = Rx<File?>(File(pickImage!.path));
-    update();
   }
 
   //getters
