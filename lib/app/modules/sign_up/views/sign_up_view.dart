@@ -32,8 +32,8 @@ class SignUpView extends GetView<SignUpController> {
           },
           title: "Sign Up"),
       body: Container(
-        height: Get.height,
-        width: Get.width,
+        // height: Get.height,
+        // width: Get.width,
         padding: EdgeInsets.only(
           top: 15,
           left: 15,
