@@ -177,6 +177,26 @@ class HomeView extends GetView<HomeController> {
                         snapshot.child("downvotes").value.toString()),
                     progressColor: Color(0xFF207BFF),
                   ),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        Text(
+                          "Upvotes: " +
+                              snapshot.child("upvotes").value.toString() +
+                              " ",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Spacer(),
+                        Text(
+                          "Downvotes: " +
+                              snapshot.child("downvotes").value.toString(),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
