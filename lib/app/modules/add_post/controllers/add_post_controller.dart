@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:campus_saga/app/data/providers/add_post_provider.dart';
 import 'package:campus_saga/app/modules/profile/controllers/profile_controller.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AddPostController extends GetxController {
@@ -15,7 +15,7 @@ class AddPostController extends GetxController {
   RxInt maxLine = 4.obs;
   RxInt maxtLineAlloded = 7.obs;
   final count = 0.obs;
-
+  RxBool isPosting = false.obs;
   // void maxLineCalculate(var lines) {
   //   maxLine.value =
   //       ((lines.length < 4) ? 4 : lines.length) > maxtLineAlloded.value
@@ -51,14 +51,15 @@ class AddPostController extends GetxController {
 
   void addPost() async {
     try {
+      isPosting.value = true;
       DatabaseReference databaseRef = FirebaseDatabase.instance.ref('posts');
       ProfileController profileController = ProfileController.instance;
 
       final info = await profileController.profileRef.get();
-      print(info.child('profileInfo').child('profilePhoto').value.toString());
+      // print(info.child('profileInfo').child('profilePhoto').value.toString());
       final time = DateTime.now().millisecondsSinceEpoch.toString();
 
-      File? image = postProviderRef.pickedImage;
+      File? image = postProviderRef.pickedImage.value;
 
       if (formKey.currentState!.validate()) {
         if (postDescriptionController.text.isNotEmpty &&
@@ -86,18 +87,20 @@ class AddPostController extends GetxController {
             'adminFeedback': "",
             'userAgreesToFeedback': "",
           });
-          Get.snackbar(
-            "Success",
-            "Post Added",
-          );
+          Get.snackbar("Success", "Post Added", backgroundColor: Colors.white);
           postHeadingController.text = '';
           postDescriptionController.text = '';
-          postProviderRef.pickedImage = null;
+          postProviderRef.pickedImage.value = null;
+          isPosting.value = false;
         } else {
-          Get.snackbar("Error", "Please fill all the fields");
+          Get.snackbar("Error", "Please fill all the fields",
+              backgroundColor: Colors.white);
+          isPosting.value = false;
         }
       }
+      isPosting.value = false;
     } catch (e) {
+      isPosting.value = false;
       print(e);
     }
   }
@@ -108,7 +111,7 @@ class AddPostController extends GetxController {
       DatabaseReference databaseRef =
           FirebaseDatabase.instance.ref('university');
       if (formKey.currentState!.validate()) {
-        File? image = postProviderRef.pickedImage;
+        File? image = postProviderRef.pickedImage.value;
 
         if (postDescriptionController.text.isNotEmpty &&
             postHeadingController.text.isNotEmpty &&
@@ -136,7 +139,7 @@ class AddPostController extends GetxController {
           );
           postHeadingController.text = '';
           postDescriptionController.text = '';
-          postProviderRef.pickedImage = null;
+          postProviderRef.pickedImage.value = null;
         } else {
           Get.snackbar("Error", "Please fill all the fields");
         }
