@@ -5,12 +5,14 @@ class TextEdittingField extends StatelessWidget {
   final String labelText;
   final IconData icon;
   final bool isObscure;
-  const TextEdittingField(
+  bool showPass;
+  TextEdittingField(
       {super.key,
       this.controller,
       required this.labelText,
       required this.icon,
-      this.isObscure = false});
+      this.isObscure = false,
+      this.showPass = false});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +21,16 @@ class TextEdittingField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: labelText,
         prefixIcon: Icon(icon),
+        suffixIcon: Visibility(
+          visible: isObscure,
+          child: IconButton(
+              onPressed: () {
+                this.showPass = !showPass;
+              },
+              icon: showPass
+                  ? Icon(Icons.visibility_off)
+                  : Icon(Icons.visibility)),
+        ),
         labelStyle: const TextStyle(fontSize: 20),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -33,8 +45,7 @@ class TextEdittingField extends StatelessWidget {
           // ),
         ),
       ),
-      obscureText: isObscure,
-      
+      obscureText: !showPass,
     );
   }
 }

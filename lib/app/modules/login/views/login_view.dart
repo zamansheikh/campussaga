@@ -57,6 +57,11 @@ class LoginView extends GetView<LoginController> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              CircleAvatar(
+                radius: 70,
+                child: Image.asset("assets/icon/Campus_Saga_Icon.png"),
+                backgroundColor: Colors.white,
+              ),
               SizedBox(height: 20),
               TextEdittingField(
                 controller: controller.emailController,
@@ -95,16 +100,25 @@ class LoginView extends GetView<LoginController> {
               SizedBox(height: 20),
               SizedBox(
                 width: Get.width,
-                child: ElevatedButton(
-                  onPressed: () {
-                    authController.logInUser(controller.emailController.text,
-                        controller.passwordController.text);
-                  },
-                  child: Text(
-                    "Log In",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
+                child: authController.isLoading.value
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStatePropertyAll(
+                          Color(0xFF207BFF),
+                        )),
+                        onPressed: () {
+                          authController.logInUser(
+                              controller.emailController.text,
+                              controller.passwordController.text);
+                        },
+                        child: Text(
+                          "Log In",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
               ),
             ],
           ),
