@@ -123,13 +123,16 @@ class SignUpView extends GetView<SignUpController> {
                   ),
                 ),
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    controller.registerAUser();
-                  },
-                  child: Text(
-                    "Sign Up",
-                    style: TextStyle(fontSize: 20),
+                SizedBox(
+                  width: Get.width,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      controller.registerAUser();
+                    },
+                    child: Text(
+                      "Sign Up",
+                      style: TextStyle(fontSize: 20),
+                    ),
                   ),
                 ),
               ],
