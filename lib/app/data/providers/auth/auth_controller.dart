@@ -6,6 +6,7 @@ import 'package:campus_saga/app/routes/app_pages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -56,8 +57,8 @@ class AuthController extends GetxController {
     final pickImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickImage != null) {
-      Get.snackbar("Success", "Image Picked");
-      _pickedImage = Rx<File?>(File(pickImage!.path));
+      Get.snackbar("Success", "Image Picked", backgroundColor: Colors.white);
+      _pickedImage = Rx<File?>(File(pickImage.path));
       update();
     }
   }
