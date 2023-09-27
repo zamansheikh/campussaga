@@ -29,6 +29,7 @@ class LoginView extends GetView<LoginController> {
           },
           title: "Log In"),
       body: Container(
+        alignment: Alignment.center,
         height: Get.height,
         width: Get.width,
         // alignment: Alignment.center,
@@ -52,10 +53,10 @@ class LoginView extends GetView<LoginController> {
             ),
           ],
         ),
-        child: Center(
+        child: SingleChildScrollView(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Spacer(),
               SizedBox(height: 20),
               TextEdittingField(
                 controller: controller.emailController,
@@ -92,17 +93,19 @@ class LoginView extends GetView<LoginController> {
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  authController.logInUser(controller.emailController.text,
-                      controller.passwordController.text);
-                },
-                child: Text(
-                  "Log In",
-                  style: TextStyle(fontSize: 20),
+              SizedBox(
+                width: Get.width,
+                child: ElevatedButton(
+                  onPressed: () {
+                    authController.logInUser(controller.emailController.text,
+                        controller.passwordController.text);
+                  },
+                  child: Text(
+                    "Log In",
+                    style: TextStyle(fontSize: 20),
+                  ),
                 ),
               ),
-              Spacer(),
             ],
           ),
         ),

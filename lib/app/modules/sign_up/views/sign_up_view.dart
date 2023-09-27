@@ -32,10 +32,9 @@ class SignUpView extends GetView<SignUpController> {
           },
           title: "Sign Up"),
       body: Container(
-        // height: Get.height,
-        // width: Get.width,
+        height: Get.height,
+        width: Get.width,
         padding: EdgeInsets.only(
-          top: 15,
           left: 15,
           right: 15,
         ),
@@ -54,12 +53,13 @@ class SignUpView extends GetView<SignUpController> {
             ),
           ],
         ),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: Container(
+            height: Get.height,
+            width: Get.width,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Spacer(),
                 InkWell(
                   onTap: () => authController.picImage(),
                   child: GetBuilder<AuthController>(
@@ -132,7 +132,6 @@ class SignUpView extends GetView<SignUpController> {
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
-                Spacer(),
               ],
             ),
           ),
