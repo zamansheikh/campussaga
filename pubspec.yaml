@@ -24,6 +24,7 @@ dependencies:
   cloud_firestore: ^4.9.1
   image_picker: ^1.0.4
   firebase_database: ^10.2.6
+  searchfield: ^0.8.4
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -58,6 +59,7 @@ flutter:
     - assets/images/
     - assets/temp/
     - assets/models/
+    - assets/icon/
     # - assets/svg/
     # - assets/icon/
 

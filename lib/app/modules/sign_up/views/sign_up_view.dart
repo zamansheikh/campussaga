@@ -5,6 +5,7 @@ import 'package:campus_saga/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:searchfield/searchfield.dart';
 
 import '../controllers/sign_up_controller.dart';
 
@@ -88,6 +89,34 @@ class SignUpView extends GetView<SignUpController> {
                   icon: Icons.email,
                 ),
                 SizedBox(height: 20),
+                SearchField(
+                  controller: controller.universityController,
+                  suggestions: controller.university
+                      .map((e) => SearchFieldListItem(
+                            e,
+                          ))
+                      .toList(),
+                  suggestionsDecoration: SuggestionDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.rectangle,
+                  ),
+                  searchInputDecoration: InputDecoration(
+                    hintText: "Search University",
+                    hintStyle: TextStyle(
+                      color: Colors.black,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
                 TextEdittingField(
                   controller: controller.emailController,
                   labelText: "Email",
@@ -125,14 +154,24 @@ class SignUpView extends GetView<SignUpController> {
                 SizedBox(height: 20),
                 SizedBox(
                   width: Get.width,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      controller.registerAUser();
-                    },
-                    child: Text(
-                      "Sign Up",
-                      style: TextStyle(fontSize: 20),
-                    ),
+                  child: Obx(
+                    () => authController.isLoading.value
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStatePropertyAll(
+                              Color(0xFF207BFF),
+                            )),
+                            onPressed: () {
+                              controller.registerAUser();
+                            },
+                            child: Text(
+                              "Sign Up",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ),
                   ),
                 ),
               ],

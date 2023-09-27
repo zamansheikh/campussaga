@@ -5,7 +5,6 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 import '../controllers/promotion_controller.dart';
