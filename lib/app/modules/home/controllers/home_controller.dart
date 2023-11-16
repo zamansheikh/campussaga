@@ -5,6 +5,14 @@ class HomeController extends GetxController {
   FirebaseDatabase database = FirebaseDatabase.instance;
   DatabaseReference postRef = FirebaseDatabase.instance.ref('posts/Issue');
 
+  // Future<DatabaseReference> getPostRef() async {
+  //   final user = authController.userId!;
+  //   final data = FirebaseDatabase.instance.ref('profile/$user/ProfileInfo');
+  //   DataSnapshot snapshot = await data.get();
+  //   String userUv = snapshot.child('university').value;
+  //   return FirebaseDatabase.instance.ref('posts/Issue/$userUv');
+  // }
+
   var postDetailsforMore;
   var postDetails;
   //create a boolean map , name isExpanded
@@ -37,7 +45,7 @@ class HomeController extends GetxController {
     super.onClose();
   }
 
-  getDataSnapShot(String time) async {
+  getDataSnapShot() async {
     try {
       DataSnapshot dataSnapshot = await postRef.get();
 
@@ -55,7 +63,7 @@ class HomeController extends GetxController {
 
   void upVote(String time) async {
     try {
-      await getDataSnapShot(time);
+      await getDataSnapShot();
       await postRef
           .child(time)
           .child("upvotes")
@@ -67,7 +75,7 @@ class HomeController extends GetxController {
 
   void downVote(String time) async {
     try {
-      await getDataSnapShot(time);
+      await getDataSnapShot();
       await postRef
           .child(time)
           .child("downvotes")
@@ -114,7 +122,7 @@ class HomeController extends GetxController {
 
   void trueVote(String time) async {
     try {
-      await getDataSnapShot(time);
+      await getDataSnapShot();
       await postRef
           .child(time)
           .child("trueVotes")
@@ -126,7 +134,7 @@ class HomeController extends GetxController {
 
   void falseVote(String time) async {
     try {
-      await getDataSnapShot(time);
+      await getDataSnapShot();
       await postRef
           .child(time)
           .child("falseVotes")
