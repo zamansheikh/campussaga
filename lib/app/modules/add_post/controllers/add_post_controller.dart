@@ -60,6 +60,8 @@ class AddPostController extends GetxController {
       final time = DateTime.now().millisecondsSinceEpoch.toString();
 
       File? image = postProviderRef.pickedImage.value;
+      String userUv =
+          info.child('profileInfo').child('university').value.toString();
 
       if (formKey.currentState!.validate()) {
         if (postDescriptionController.text.isNotEmpty &&
@@ -69,7 +71,7 @@ class AddPostController extends GetxController {
               info.child('profileInfo').child('profilePhoto').value.toString();
           String postPictureUrl =
               await postProviderRef.uploadPostToStorage(image!);
-          await databaseRef.child(postType()).child(time).set({
+          await databaseRef.child(postType()).child(userUv).child(time).set({
             'userId': info.child('profileInfo').child('uid').value.toString(),
             'postType': selectedPostType.value,
             'postHeading': postHeadingController.text,
