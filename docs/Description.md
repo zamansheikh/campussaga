@@ -1,4 +1,4 @@
-"Campus Saga: A Platform for Student Voice, University Engagement, and Transparent Rankings
+"Campus Saga: Your Voice Matters
 
 Campus Saga is an innovative social media platform designed to empower university students to raise their concerns, engage with their respective institutions, and stay informed about campus happenings. It offers three types of accounts: student, university administrator, and app administrator. Each account type holds distinct roles and responsibilities to ensure a well-structured and effective communication channel between students and university authorities.
 
