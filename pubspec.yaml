@@ -25,6 +25,10 @@ dependencies:
   image_picker: ^1.1.2
   firebase_database: ^11.1.4
   searchfield: ^1.1.7
+  get_it: ^8.0.1
+  flutter_bloc: ^8.1.6
+  dartz: ^0.10.1
+  equatable: ^2.0.5
 
 flutter_launcher_icons:
   android: "launcher_icon"
