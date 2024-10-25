@@ -5,12 +5,15 @@ class TextEdittingField extends StatelessWidget {
   final String labelText;
   final IconData icon;
   final bool isObscure;
-  const TextEdittingField(
-      {super.key,
-      this.controller,
-      required this.labelText,
-      required this.icon,
-      this.isObscure = false});
+  final bool showPass;
+  TextEdittingField({
+    Key? key,
+    this.controller,
+    required this.labelText,
+    required this.icon,
+    this.isObscure = false,
+    this.showPass = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,3 +40,4 @@ class TextEdittingField extends StatelessWidget {
     );
   }
 }
+
