@@ -6,6 +6,7 @@ import 'package:campus_saga/app/routes/app_pages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -14,6 +15,7 @@ class AuthController extends GetxController {
   FirebaseDatabase database = FirebaseDatabase.instance;
   DatabaseReference databaseRef = FirebaseDatabase.instance.ref('profile');
   String? userId;
+  RxBool isLoading = false.obs;
 
   // Rx Variables
   late Rx<User?> _firebaseUser;
@@ -56,10 +58,10 @@ class AuthController extends GetxController {
     final pickImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickImage != null) {
-      Get.snackbar("Success", "Image Picked");
+      Get.snackbar("Success", "Image Picked", backgroundColor: Colors.white);
+      _pickedImage = Rx<File?>(File(pickImage.path));
+      update();
     }
-    _pickedImage = Rx<File?>(File(pickImage!.path));
-    update();
   }
 
   //getters
@@ -117,9 +119,15 @@ class AuthController extends GetxController {
   // }
 
   void newRegister(
-      String userName, String email, String password, File? image) async {
+      {required String userName,
+      required String UvName,
+      required String email,
+      required String password,
+      required File? image}) async {
     try {
+      isLoading.value = true; // Start Loading
       if (userName.isNotEmpty &&
+          UvName.isNotEmpty &&
           email.isNotEmpty &&
           password.isNotEmpty &&
           image != null) {
@@ -138,29 +146,42 @@ class AuthController extends GetxController {
           'profilePhoto': downloadUrl,
           'uid': userId, // Use userId here
           'gender': "Not Specified",
-          'university': "N/A",
+          'university': UvName,
           'department': "N/A",
           'isVerified': false,
         });
+        Get.snackbar("Success", "Now you can login",
+            backgroundColor: Colors.white);
+        isLoading.value = false;
       } else {
-        Get.snackbar("Error Creating Account", "Please Enter All Info");
+        Get.snackbar("Error Creating Account", "Please Enter All Info",
+            backgroundColor: Colors.white);
+        isLoading.value = false;
       }
     } catch (e) {
-      Get.snackbar("Register Error!", e.toString());
+      Get.snackbar("Register Error!", e.toString(),
+          backgroundColor: Colors.white);
+      isLoading.value = false;
     }
   }
 
   void logInUser(String email, String password) async {
     try {
+      isLoading.value = true;
       if (email.isNotEmpty && password.isNotEmpty) {
         await firebaseAuth.signInWithEmailAndPassword(
             email: email, password: password);
         print("LogInSuccess");
+        isLoading.value = false;
       } else {
-        Get.snackbar("Error Logging In", e.toString());
+        Get.snackbar("Error Logging In", e.toString(),
+            backgroundColor: Colors.white);
+        isLoading.value = false;
       }
     } catch (e) {
-      Get.snackbar("Error Logging In", e.toString());
+      Get.snackbar("Error Logging In", e.toString(),
+          backgroundColor: Colors.white);
+      isLoading.value = false;
     }
   }
 
@@ -169,7 +190,8 @@ class AuthController extends GetxController {
       await firebaseAuth.signOut();
       Get.offAllNamed(Routes.LOGIN);
     } catch (e) {
-      Get.snackbar("Error Logging Out", e.toString());
+      Get.snackbar("Error Logging Out", e.toString(),
+          backgroundColor: Colors.white);
     }
   }
 }

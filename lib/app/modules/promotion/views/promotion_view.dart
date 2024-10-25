@@ -161,22 +161,36 @@ class PromotionView extends GetView<PromotionController> {
                   ),
                   SizedBox(height: 10),
                   LinearPercentIndicator(
-                    percent: .9, //!Calulate the percentage
+                    percent: snapshot.child("upvotes").value /
+                        (snapshot.child("upvotes").value +
+                            snapshot.child("downvotes").value),
                     progressColor: Color(0xFF207BFF),
                   ),
                   Row(
                     children: [
                       IconButton(
                         onPressed: () {
+                          controller
+                              .upVote(snapshot.child("time").value.toString());
                           //Change Upvote
                         },
                         icon: Icon(Icons.thumb_up),
                       ),
+                      Text(
+                        snapshot.child("upvotes").value.toString(),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       IconButton(
                         onPressed: () {
+                          controller.downVote(
+                              snapshot.child("time").value.toString());
                           //Change Downvote
                         },
                         icon: Icon(Icons.thumb_down),
+                      ),
+                      Text(
+                        snapshot.child("downvotes").value.toString(),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Center(
                         child: IconButton(

@@ -5,6 +5,8 @@ class LoginController extends GetxController {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  RxBool isPasswordVisible = false.obs;
+
   final count = 0.obs;
   @override
   void onInit() {
