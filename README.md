@@ -1,3 +1,4 @@
+
 ## Getting Started
 
 <div align="center">
@@ -8,7 +9,7 @@
 
 ### A satisfactory ranking platform for educational institutes.
 
-    Revolutionize university life with our app, enabling students to post, solve, and discuss academic challenges. Admins review and rate solutions, fostering collaboration. With MVC architecture and GetX state management, enjoy smooth navigation, user profiles, problem showcases, promotions, and university rankings!
+    Revolutionize university life with our app, enabling students to post, solve, and discuss academic challenges. Admins review and rate solutions, fostering collaboration. With Clean architecture and BloC state management, enjoy smooth navigation, user profiles, problem showcases, promotions, and university rankings!
 
 
 
