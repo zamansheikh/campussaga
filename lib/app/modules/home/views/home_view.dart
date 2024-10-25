@@ -106,8 +106,8 @@ class HomeView extends GetView<HomeController> {
                   // Implement logic for handling checkbox state change.
                 },
                 fillColor: snapshot.child("isSolved").value as bool
-                    ? MaterialStateProperty.all(Colors.green)
-                    : MaterialStateProperty.all(Colors.red),
+                    ? WidgetStateProperty.all(Colors.green)
+                    : WidgetStateProperty.all(Colors.red),
               ),
             ],
           ),

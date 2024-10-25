@@ -100,7 +100,7 @@ class SignUpView extends GetView<SignUpController> {
                     color: Colors.white,
                     shape: BoxShape.rectangle,
                   ),
-                  searchInputDecoration: InputDecoration(
+                  searchInputDecoration: SearchInputDecoration(
                     hintText: "Search University",
                     hintStyle: TextStyle(
                       color: Colors.black,
@@ -161,7 +161,7 @@ class SignUpView extends GetView<SignUpController> {
                           )
                         : ElevatedButton(
                             style: ButtonStyle(
-                                backgroundColor: MaterialStatePropertyAll(
+                                backgroundColor: WidgetStatePropertyAll(
                               Color(0xFF207BFF),
                             )),
                             onPressed: () {
