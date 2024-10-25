@@ -5,6 +5,7 @@ import 'package:campus_saga/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:searchfield/searchfield.dart';
 
 import '../controllers/sign_up_controller.dart';
 
@@ -35,7 +36,6 @@ class SignUpView extends GetView<SignUpController> {
         height: Get.height,
         width: Get.width,
         padding: EdgeInsets.only(
-          top: 15,
           left: 15,
           right: 15,
         ),
@@ -54,12 +54,13 @@ class SignUpView extends GetView<SignUpController> {
             ),
           ],
         ),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: Container(
+            height: Get.height,
+            width: Get.width,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Spacer(),
                 InkWell(
                   onTap: () => authController.picImage(),
                   child: GetBuilder<AuthController>(
@@ -86,6 +87,34 @@ class SignUpView extends GetView<SignUpController> {
                   controller: controller.userNameController,
                   labelText: "User Name",
                   icon: Icons.email,
+                ),
+                SizedBox(height: 20),
+                SearchField(
+                  controller: controller.universityController,
+                  suggestions: controller.university
+                      .map((e) => SearchFieldListItem(
+                            e,
+                          ))
+                      .toList(),
+                  suggestionsDecoration: SuggestionDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.rectangle,
+                  ),
+                  searchInputDecoration: SearchInputDecoration(
+                    hintText: "Search University",
+                    hintStyle: TextStyle(
+                      color: Colors.black,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
                 SizedBox(height: 20),
                 TextEdittingField(
@@ -123,16 +152,28 @@ class SignUpView extends GetView<SignUpController> {
                   ),
                 ),
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    controller.registerAUser();
-                  },
-                  child: Text(
-                    "Sign Up",
-                    style: TextStyle(fontSize: 20),
+                SizedBox(
+                  width: Get.width,
+                  child: Obx(
+                    () => authController.isLoading.value
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: WidgetStatePropertyAll(
+                              Color(0xFF207BFF),
+                            )),
+                            onPressed: () {
+                              controller.registerAUser();
+                            },
+                            child: Text(
+                              "Sign Up",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ),
                   ),
                 ),
-                Spacer(),
               ],
             ),
           ),

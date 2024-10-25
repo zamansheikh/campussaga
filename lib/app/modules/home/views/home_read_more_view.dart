@@ -13,7 +13,8 @@ class HomeReadMoreView extends GetView<HomeController> {
       extendBody: true,
       backgroundColor: Color(0xFF207BFF),
       appBar: PostViewBar(
-        title: controller.postDetails.child("postHeading").value.toString(),
+        title:
+            controller.postDetailsforMore.child("postHeading").value.toString(),
         leadingIcon: Icons.arrow_back,
         onPressedLeading: () => Get.back(),
       ),
@@ -49,7 +50,10 @@ class HomeReadMoreView extends GetView<HomeController> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Image.network(
-                    controller.postDetails.child("imageUrl").value.toString(),
+                    controller.postDetailsforMore
+                        .child("imageUrl")
+                        .value
+                        .toString(),
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) {
@@ -65,7 +69,10 @@ class HomeReadMoreView extends GetView<HomeController> {
                 height: 20,
               ),
               Text(
-                controller.postDetails.child("postHeading").value.toString(),
+                controller.postDetailsforMore
+                    .child("postHeading")
+                    .value
+                    .toString(),
                 style: TextStyle(
                   fontSize: 24, // Adjust the font size as needed
                   fontWeight: FontWeight.bold,
@@ -82,7 +89,7 @@ class HomeReadMoreView extends GetView<HomeController> {
                 height: 10,
               ),
               Text(
-                controller.postDetails
+                controller.postDetailsforMore
                     .child("postDescription")
                     .value
                     .toString(),

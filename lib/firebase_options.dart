@@ -52,6 +52,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '812644809997',
     projectId: 'campus-saga',
     authDomain: 'campus-saga.firebaseapp.com',
+    databaseURL: 'https://campus-saga-default-rtdb.firebaseio.com',
     storageBucket: 'campus-saga.appspot.com',
   );
 
@@ -60,6 +61,7 @@ class DefaultFirebaseOptions {
     appId: '1:812644809997:android:fd90905405e8f96793c444',
     messagingSenderId: '812644809997',
     projectId: 'campus-saga',
+    databaseURL: 'https://campus-saga-default-rtdb.firebaseio.com',
     storageBucket: 'campus-saga.appspot.com',
   );
 
@@ -68,6 +70,7 @@ class DefaultFirebaseOptions {
     appId: '1:812644809997:ios:a4376b051e6fa88b93c444',
     messagingSenderId: '812644809997',
     projectId: 'campus-saga',
+    databaseURL: 'https://campus-saga-default-rtdb.firebaseio.com',
     storageBucket: 'campus-saga.appspot.com',
     iosBundleId: 'com.decodersfamily.campusSaga',
   );

@@ -52,10 +52,9 @@ class AddPostView extends GetView<AddPostController> {
           ],
         ),
         child: Container(
-          padding: EdgeInsets.only(bottom: 60),
           child: SingleChildScrollView(
             child: Container(
-              padding: EdgeInsets.only(bottom: 5),
+              padding: EdgeInsets.only(bottom: 60),
               child: Column(
                 children: [
                   SizedBox(height: 10),
@@ -71,7 +70,30 @@ class AddPostView extends GetView<AddPostController> {
                     },
                     value: controller.selectedPostType.value,
                     dropdownColor: Colors.white.withOpacity(1),
+                    borderRadius: BorderRadius.all(Radius.circular(15)),
                     decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        // border when the field is focused
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(
+                          width: 3,
+                          color: Colors.black38,
+                        ),
+                      ),
+                      enabled: true,
+                      labelStyle: TextStyle(
+                        color: Colors.black38,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        // border when the field is enabled
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(
+                          width: 3,
+                          color: Colors.black38,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(.5),
                       labelText: "Post Type",
                       border: OutlineInputBorder(),
                     ),
@@ -83,6 +105,29 @@ class AddPostView extends GetView<AddPostController> {
                       TextField(
                         controller: controller.postHeadingController,
                         decoration: InputDecoration(
+                            labelStyle: TextStyle(
+                              color: Colors.black38,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              // border when the field is focused
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide(
+                                width: 3,
+                                color: Colors.black38,
+                              ),
+                            ),
+
+                            // enabled: true,
+                            enabledBorder: OutlineInputBorder(
+                              // border when the field is enabled
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide(
+                                width: 3,
+                                color: Colors.black38,
+                              ),
+                            ),
+                            fillColor: Colors.white.withOpacity(.5),
+                            filled: true,
                             labelText: "Title",
                             border: OutlineInputBorder(),
                             hintText: "Type a Title"),
@@ -93,8 +138,37 @@ class AddPostView extends GetView<AddPostController> {
                       TextField(
                         controller: controller.postDescriptionController,
                         decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(.5),
                           labelText: "Type a Description !",
-                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(
+                            color: Colors.black38,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              width: 10,
+                              color: Colors.black,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            // border when the field is focused
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              width: 3,
+                              color: Colors.black38,
+                            ),
+                          ),
+
+                          // enabled: true,
+                          enabledBorder: OutlineInputBorder(
+                            // border when the field is enabled
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              width: 3,
+                              color: Colors.black38,
+                            ),
+                          ),
                           hintText:
                               "Type a Description ! Describe your post in detail",
                         ),
@@ -109,43 +183,75 @@ class AddPostView extends GetView<AddPostController> {
                         child: GetBuilder<PostProvider>(
                           builder: (controller) {
                             return Container(
-                              width: Get.width,
-                              height: 250,
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 3, color: Colors.black38),
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: Colors.white.withOpacity(.4)),
-                              child: (postProvider.pickedImage == null)
-                                  ? Icon(Icons.add_a_photo_rounded)
-                                  : Image.file(postProvider.pickedImage!),
-                            );
+                                width: Get.width,
+                                height: 250,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 3, color: Colors.black38),
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: Colors.white.withOpacity(.5)),
+                                child: Obx(
+                                  () => Center(
+                                    child: Stack(
+                                      children: [
+                                        (postProvider.pickedImage.value == null)
+                                            ? Icon(Icons.add_a_photo_rounded)
+                                            : Image.file(
+                                                postProvider.pickedImage.value!,
+                                                fit: BoxFit.cover,
+                                              ),
+                                        Visibility(
+                                          visible:
+                                              postProvider.pickedImage.value !=
+                                                  null,
+                                          child: Positioned(
+                                              bottom: 0,
+                                              right: 0,
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  postProvider
+                                                      .pickedImage.value = null;
+                                                },
+                                                icon: Icon(
+                                                  Icons.delete_forever_rounded,
+                                                  color: Colors.red,
+                                                ),
+                                              )),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ));
                           },
                         ),
                       ),
                       SizedBox(
                         height: 10,
                       ),
-                      SizedBox(
-                          width: Get.width * .5,
-                          height: 40,
-                          child: ElevatedButton(
-                              onPressed: () {
-                                controller.addPost();
-                              },
-                              child: Text("Post Now"))),
+                      Obx(
+                        () => SizedBox(
+                            width: Get.width * .5,
+                            height: 40,
+                            child: controller.isPosting.value
+                                ? Center(child: CircularProgressIndicator())
+                                : ElevatedButton(
+                                    onPressed: () {
+                                      controller.addPost();
+                                    },
+                                    child: Text("Post Now"))),
+                      ),
                       SizedBox(
                         height: 10,
                       ),
-                      SizedBox(
-                        height: 40,
-                        width: Get.width * .5,
-                        child: ElevatedButton(
-                            onPressed: () {
-                              controller.addUniversity();
-                            },
-                            child: Text("Add University")),
-                      ),
+                      // SizedBox(
+                      //   height: 40,
+                      //   width: Get.width * .5,
+                      //   child: ElevatedButton(
+                      //       onPressed: () {
+                      //         controller.addUniversity();
+                      //       },
+                      //       child: Text("Add University")),
+                      // ),
                     ]),
                   )
                 ],
