@@ -106,7 +106,7 @@ class LoginView extends GetView<LoginController> {
                       )
                     : ElevatedButton(
                         style: ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll(
+                            backgroundColor: WidgetStatePropertyAll(
                           Color(0xFF207BFF),
                         )),
                         onPressed: () {
