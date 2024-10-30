@@ -29,6 +29,9 @@ import 'package:campus_saga/presentation/pages/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'presentation/bloc/auth/auth_bloc.dart';
+import 'presentation/bloc/post/post_bloc.dart';
+
 // import 'presentation/bloc/auth/auth_bloc.dart';
 // import 'presentation/bloc/post/post_bloc.dart';
 // import 'presentation/pages/auth/login_page.dart';
@@ -48,12 +51,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        // BlocProvider<AuthBloc>(
-        //   create: (_) => di.sl<AuthBloc>(),
-        // ),
-        // BlocProvider<PostBloc>(
-        //   create: (_) => di.sl<PostBloc>(),
-        // ),
+        BlocProvider<AuthBloc>(
+          create: (_) => di.sl<AuthBloc>(),
+        ),
+        BlocProvider<PostBloc>(
+          create: (_) => di.sl<PostBloc>(),
+        ),
       ],
       child: MaterialApp(
         title: 'Campus Saga',
