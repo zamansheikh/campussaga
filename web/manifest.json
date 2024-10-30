@@ -1,11 +1,11 @@
 {
-    "name": "campus_saga",
-    "short_name": "campus_saga",
+    "name": "Campus Saga",
+    "short_name": "Campus Saga",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Raise Your Voice",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -57,22 +57,20 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCpEnL2kGGQh6vVxcq2Yav2Emasq-aZgLQ',
-    appId: '1:812644809997:android:fd90905405e8f96793c444',
-    messagingSenderId: '812644809997',
-    projectId: 'campus-saga',
-    databaseURL: 'https://campus-saga-default-rtdb.firebaseio.com',
-    storageBucket: 'campus-saga.appspot.com',
+    apiKey: 'AIzaSyCkCxnJMh-Tvwt32wZFU-IBcdb7Em2ZAt4',
+    appId: '1:587775658076:android:f997b8c9b91b8752b47e99',
+    messagingSenderId: '587775658076',
+    projectId: 'campus-saga-final',
+    storageBucket: 'campus-saga-final.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDfOHrOPK9ADs-u0D9rAOq7hvRwBqTpUJQ',
-    appId: '1:812644809997:ios:a4376b051e6fa88b93c444',
-    messagingSenderId: '812644809997',
-    projectId: 'campus-saga',
-    databaseURL: 'https://campus-saga-default-rtdb.firebaseio.com',
-    storageBucket: 'campus-saga.appspot.com',
-    iosBundleId: 'com.decodersfamily.campusSaga',
+    apiKey: 'AIzaSyAskn_Lz92epWhK44BBDyo1Hq23-xk_YJQ',
+    appId: '1:587775658076:ios:64175719fd242286b47e99',
+    messagingSenderId: '587775658076',
+    projectId: 'campus-saga-final',
+    storageBucket: 'campus-saga-final.appspot.com',
+    iosBundleId: 'com.example.campusSaga',
   );
 
 }

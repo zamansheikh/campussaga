@@ -30,6 +30,7 @@ dependencies:
   dartz: ^0.10.1
   equatable: ^2.0.5
   icons_launcher: ^3.0.0
+  package_rename: ^1.7.1
 
 dev_dependencies:
   flutter_test:
@@ -79,3 +80,34 @@ icons_launcher:
       enable: true
     ios:
       enable: true
+
+package_rename_config:
+  android:
+    app_name: Campus Saga
+    package_name: com.decodersfamily.campus_saga
+    override_old_package: com.example.campus_saga
+    lang: kotlin
+
+  ios:
+    app_name: Campus Saga
+    bundle_name: campus_saga
+    package_name: com.decodersfamily.campus_saga
+
+  web:
+    app_name: Campus Saga
+    description: Raise Your Voice
+  linux:
+    app_name: Campus Saga
+    package_name: com.decodersfamily.campus_saga
+    exe_name: campus_saga-linux
+
+  windows:
+    app_name: Campus Saga
+    organization: OutdatedGuy
+    copyright_notice: Copyright ©️ 2024 DecodersFamily. All rights reserved.
+    exe_name: campus_saga-windows
+
+  macos:
+    app_name: Campus Saga
+    package_name: com.decodersfamily.campus_saga
+    copyright_notice: Copyright ©️ 2022 DecodersFamily . All rights reserved.
