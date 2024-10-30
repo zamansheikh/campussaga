@@ -19,3 +19,24 @@ class AuthRequested extends AuthEvent {
 }
 
 class AuthLogoutRequested extends AuthEvent {}
+
+class SignUpEvent extends AuthEvent {
+  final String username;
+  final String email;
+  final String password;
+  final String university;
+
+  SignUpEvent({
+    required this.username,
+    required this.email,
+    required this.password,
+    required this.university,
+  });
+}
+
+class SignInEvent extends AuthEvent {
+  final String email;
+  final String password;
+
+  SignInEvent({required this.email, required this.password});
+}

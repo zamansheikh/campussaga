@@ -60,6 +60,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Campus Saga',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
