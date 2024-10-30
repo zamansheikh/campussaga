@@ -25,30 +25,11 @@ dependencies:
   image_picker: ^1.1.2
   firebase_database: ^11.1.4
   searchfield: ^1.1.7
-  get_it: ^8.0.1
+  get_it: ^8.0.2
   flutter_bloc: ^8.1.6
   dartz: ^0.10.1
   equatable: ^2.0.5
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icon/Campus_Saga_Icon.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
-  remove_alpha_ios: true # default false
-  web:
-    generate: false
-    image_path: "assets/icon/app_icon.png"
-    background_color: "#hexcode"
-    theme_color: "#hexcode"
-  windows:
-    generate: false
-    image_path: "assets/icon/app_icon.png"
-    icon_size: 48 # min:48, max:256, default: 48
-  macos:
-    generate: false
-    image_path: "assets/icon/app_icon.png"
-  
+  icons_launcher: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -64,8 +45,6 @@ flutter:
     - assets/temp/
     - assets/models/
     - assets/icon/
-    # - assets/svg/
-    # - assets/icon/
 
   fonts:
     - family: Urbanist
@@ -92,5 +71,11 @@ flutter:
         - asset: assets/fonts/Boogaloo-Regular.ttf
           weight: 400
 
-# For details regarding fonts from package dependencies,
-# see https://flutter.dev/custom-fonts/#from-packages
+  # An image path is required for android and ios
+icons_launcher:
+  image_path: "assets/icon/Campus_Saga_Icon.png"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
