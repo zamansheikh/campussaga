@@ -1,7 +1,7 @@
 // lib/presentation/pages/splash/splash_screen.dart
 
+import 'package:campus_saga/core/injection_container.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import '../../../core/services/auth_service.dart';
 import '../auth/login_page.dart';
 import '../home/home_page.dart';
@@ -12,7 +12,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final AuthService _authService = GetIt.instance<AuthService>();
+  final AuthService _authService = sl<AuthService>();
 
   @override
   void initState() {
@@ -22,6 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _navigateBasedOnAuthStatus() async {
     bool isLoggedIn = await _authService.isUserLoggedIn();
+    print('isLoggedIn: $isLoggedIn');
     if (isLoggedIn) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => HomePage()),
