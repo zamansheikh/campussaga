@@ -1,5 +1,8 @@
 // lib/data/repositories/user_repository_impl.dart
 
+import 'dart:io';
+
+import 'package:campus_saga/core/usecases/usecase.dart';
 import 'package:campus_saga/data/models/user_model.dart';
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/user.dart';
@@ -38,6 +41,18 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<Either<Failure, void>> updateUserProfile(User user) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadUserImage(String userId, File image) {
+    // TODO: implement uploadUserImage
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future<Either<Failure, String>> signUpUser(UserParams user) {
+    // TODO: implement signUpUser
     throw UnimplementedError();
   }
 }

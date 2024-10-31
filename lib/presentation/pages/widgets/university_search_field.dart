@@ -16,11 +16,17 @@ class UniversitySearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SearchField(
+      maxSuggestionsInViewPort: 5,
       controller: controller,
       suggestions: universityList
           .map((university) => SearchFieldListItem(university))
           .toList(),
       searchInputDecoration: SearchInputDecoration(
+        prefixIcon: Icon(
+          Icons.school,
+          size: 20,
+          color: Colors.black,
+        ),
         hintText: "Search University",
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),

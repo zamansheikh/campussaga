@@ -59,7 +59,7 @@ class LoginPage extends StatelessWidget {
                       ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed('/sign-up');
+                    Navigator.of(context).pushNamed('/signup');
                   },
                   child: Text("Don't have an account? Sign Up"),
                 ),
