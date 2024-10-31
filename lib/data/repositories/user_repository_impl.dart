@@ -32,7 +32,8 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Either<Failure, void>> createUserProfile(User user) async {
     try {
-      await dataSource.createUser(user as UserModel);
+      UserModel userModel = UserModel.fromEntity(user);
+      await dataSource.createUser(userModel);
       return Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -45,14 +46,32 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<Either<Failure, String>> uploadUserImage(String userId, File image) {
-    // TODO: implement uploadUserImage
-    throw UnimplementedError();
+  Future<Either<Failure, String>> uploadUserImage(
+      String userId, File image) async {
+    try {
+      final imageUrl = await dataSource.uploadUserImage(image, userId);
+      return Right(imageUrl);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
-  
+
   @override
-  Future<Either<Failure, String>> signUpUser(UserParams user) {
-    // TODO: implement signUpUser
-    throw UnimplementedError();
+  Future<Either<Failure, String>> signUpUser(UserParams user) async {
+    try {
+      final right = await dataSource.signUpUser(user);
+      return Right(right);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> signOutUser() async {
+    try {
+      return Right(dataSource.signOutUser());
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 }

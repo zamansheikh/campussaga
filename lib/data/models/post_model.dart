@@ -35,4 +35,14 @@ class PostModel extends Post {
       'universityId': universityId,
     };
   }
+
+  static PostModel fromEntity(Post post) {
+    return PostModel(
+      id: post.id,
+      description: post.description,
+      userId: post.userId,
+      universityId: post.universityId,
+      timestamp: post.timestamp,
+    );
+  }
 }

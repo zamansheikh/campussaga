@@ -2,6 +2,7 @@
 
 import 'package:campus_saga/core/usecases/usecase.dart';
 import 'package:campus_saga/domain/usecases/create_user_profile.dart';
+import 'package:campus_saga/domain/usecases/sign_out_user.dart';
 import 'package:campus_saga/domain/usecases/sign_up_user.dart';
 import 'package:campus_saga/domain/usecases/upload_user_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,12 +16,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final UploadUserImage uploadUserImage;
   final SignUpUser signUpUser;
   final CreateUserProfile createUserProfile;
+  final SignOutUser signOutUser;
 
   AuthBloc({
     required this.getUserProfile,
     required this.uploadUserImage,
     required this.signUpUser,
     required this.createUserProfile,
+    required this.signOutUser,
   }) : super(AuthInitial()) {
     on<AuthRequested>((event, emit) async {
       emit(AuthLoading());
@@ -40,7 +43,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<SignUpEvent>((event, emit) async {
       emit(AuthLoading());
-      String imageUrl = "https://loremflickr.com/200/200?random=1";
 
       try {
         final isSignedUp = await signUpUser(
@@ -49,40 +51,42 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             password: event.password,
           ),
         );
-        isSignedUp.fold((failure) => emit(AuthFailure(failure.message)),
-            (userId) async {
-          //Update the database with the user's profile image and id
-          final isUploaded = await uploadUserImage(userId, event.image!);
-          isUploaded.fold(
-            (failure) {
-              createUserProfile(User(
-                id: userId,
-                name: event.username,
-                email: event.email,
-                universityId: event.university,
-                userType: UserType.student,
-                profilePictureUrl: imageUrl,
-              ));
-            },
-            (url) async {
-              createUserProfile(User(
-                id: userId,
-                name: event.username,
-                email: event.email,
-                universityId: event.university,
-                userType: UserType.student,
-                profilePictureUrl: url,
-              ));
-            },
-          );
-        });
 
-        emit(AuthSuccess());
-      } catch (_) {
+        await isSignedUp.fold(
+          (failure) async {
+            emit(AuthFailure(failure.message));
+          },
+          (userId) async {
+            final isUploaded = await uploadUserImage(userId, event.image!);
+            await isUploaded.fold(
+              (failure) async {
+                emit(AuthFailure(failure.message));
+              },
+              (imageUrl) async {
+                final isDatabaseUpdated = await createUserProfile(User(
+                  id: userId,
+                  name: event.username,
+                  email: event.email,
+                  universityId: event.university,
+                  userType: UserType.student,
+                  profilePictureUrl: imageUrl,
+                ));
+                await isDatabaseUpdated.fold(
+                  (failure) async {
+                    emit(AuthFailure(failure.message));
+                  },
+                  (_) async {
+                    emit(AuthSuccess());
+                  },
+                );
+              },
+            );
+          },
+        );
+      } catch (e) {
         emit(AuthFailure('Sign-up failed. Please try again.'));
       }
     });
-
     on<SignInEvent>((event, emit) async {
       emit(AuthLoading());
       try {
@@ -92,6 +96,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } catch (_) {
         emit(AuthFailure('Login failed. Incorrect credentials.'));
       }
+    });
+
+    on<SignOutEvent>((event, emit) async {
+      emit(AuthLoading());
+
+      final result = await signOutUser(NoParams());
+      result.fold((failure) {
+        emit(AuthFailure(failure.message));
+      }, (_) {
+        emit(AuthUnauthenticated());
+      });
+      await Future.delayed(Duration(seconds: 2));
+      emit(AuthUnauthenticated());
     });
   }
 }
