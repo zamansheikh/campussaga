@@ -13,4 +13,5 @@ abstract class UserRepository {
   Future<Either<Failure, void>> updateUserProfile(User user);
   Future<Either<Failure, String>> uploadUserImage(String userId, File image);
   Future<Either<Failure, String>> signUpUser(UserParams user);
+  Future<Either<Failure, void>> signOutUser();
 }

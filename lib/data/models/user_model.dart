@@ -28,7 +28,8 @@ class UserModel extends User {
       email: json['email'] as String,
       universityId: json['universityId'] as String,
       isVerified: json['isVerified'] as bool? ?? false,
-      userType: UserType.values.firstWhere((e) => e.toString() == 'UserType.${json['userType']}'),
+      userType: UserType.values
+          .firstWhere((e) => e.toString() == 'UserType.${json['userType']}'),
       profilePictureUrl: json['profilePictureUrl'] as String,
     );
   }
@@ -43,5 +44,17 @@ class UserModel extends User {
       'userType': userType.toString().split('.').last,
       'profilePictureUrl': profilePictureUrl,
     };
+  }
+
+  static UserModel fromEntity(User user) {
+    return UserModel(
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      universityId: user.universityId,
+      isVerified: user.isVerified,
+      userType: user.userType,
+      profilePictureUrl: user.profilePictureUrl,
+    );
   }
 }
