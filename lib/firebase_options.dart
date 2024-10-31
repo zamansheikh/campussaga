@@ -61,7 +61,7 @@ class DefaultFirebaseOptions {
     appId: '1:587775658076:android:f997b8c9b91b8752b47e99',
     messagingSenderId: '587775658076',
     projectId: 'campus-saga-final',
-    storageBucket: 'campus-saga-final.firebasestorage.app',
+    storageBucket: 'campus-saga-final.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
