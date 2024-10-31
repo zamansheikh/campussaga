@@ -8,3 +8,9 @@ abstract class UseCase<Type, Params> {
 }
 
 class NoParams {} // For use cases that don't require parameters
+
+class UserParams {
+  final String email;
+  final String password;
+  UserParams ({required this.email, required this.password});
+}

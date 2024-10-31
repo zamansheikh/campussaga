@@ -8,7 +8,18 @@ class UserModel extends User {
     required String name,
     required String email,
     required String universityId,
-  }) : super(id: id, name: name, email: email, universityId: universityId);
+    bool isVerified = false,
+    required UserType userType,
+    required String profilePictureUrl,
+  }) : super(
+          id: id,
+          name: name,
+          email: email,
+          universityId: universityId,
+          isVerified: isVerified,
+          userType: userType,
+          profilePictureUrl: profilePictureUrl,
+        );
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
@@ -16,6 +27,9 @@ class UserModel extends User {
       name: json['name'] as String,
       email: json['email'] as String,
       universityId: json['universityId'] as String,
+      isVerified: json['isVerified'] as bool? ?? false,
+      userType: UserType.values.firstWhere((e) => e.toString() == 'UserType.${json['userType']}'),
+      profilePictureUrl: json['profilePictureUrl'] as String,
     );
   }
 
@@ -25,6 +39,9 @@ class UserModel extends User {
       'name': name,
       'email': email,
       'universityId': universityId,
+      'isVerified': isVerified,
+      'userType': userType.toString().split('.').last,
+      'profilePictureUrl': profilePictureUrl,
     };
   }
 }

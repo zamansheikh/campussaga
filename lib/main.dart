@@ -1,4 +1,7 @@
 // lib/main.dart
+import 'package:campus_saga/presentation/pages/auth/login_page.dart';
+import 'package:campus_saga/presentation/pages/auth/register_page.dart';
+import 'package:campus_saga/presentation/pages/home/home_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/injection_container.dart' as di;
 import 'package:campus_saga/presentation/pages/splash/splash_screen.dart';
@@ -40,6 +43,12 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
+       routes: {
+          '/login': (context) => LoginPage(),
+          '/splash': (context) => SplashScreen(),
+          '/signup': (context) => RegisterPage(),
+          '/home': (context) => HomePage(),
+        },
         home: SplashScreen(), // Set SplashScreen as the initial route
       ),
     );
