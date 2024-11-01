@@ -2,6 +2,8 @@
 import 'package:campus_saga/presentation/pages/auth/login_page.dart';
 import 'package:campus_saga/presentation/pages/auth/register_page.dart';
 import 'package:campus_saga/presentation/pages/home/home_page.dart';
+import 'package:campus_saga/presentation/pages/home/issue_page.dart';
+import 'package:campus_saga/presentation/pages/post/create_post_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/injection_container.dart' as di;
 import 'package:campus_saga/presentation/pages/splash/splash_screen.dart';
@@ -48,6 +50,8 @@ class MyApp extends StatelessWidget {
           '/splash': (context) => SplashScreen(),
           '/signup': (context) => RegisterPage(),
           '/home': (context) => HomePage(),
+          '/issue': (context) => IssuePage(),
+          '/post': (context) => CreatePostPage(),
         },
         home: SplashScreen(), // Set SplashScreen as the initial route
       ),

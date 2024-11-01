@@ -26,7 +26,7 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<Either<Failure, Post>> createPost(Post post) async {
     try {
-      await dataSource.createPost(post as PostModel);
+      await dataSource.createPost(PostModel.fromEntity(post));
       return Right(post);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
