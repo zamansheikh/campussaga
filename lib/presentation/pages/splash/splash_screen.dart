@@ -1,6 +1,9 @@
 // lib/presentation/pages/splash/splash_screen.dart
 
 import 'package:campus_saga/core/injection_container.dart';
+import 'package:campus_saga/main.dart';
+import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:flutter/material.dart';
 import '../../../core/services/auth_service.dart';
 import '../auth/login_page.dart';
@@ -21,9 +24,12 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateBasedOnAuthStatus() async {
-    bool isLoggedIn = await _authService.isUserLoggedIn();
-    print('isLoggedIn: $isLoggedIn');
-    if (isLoggedIn) {
+    final currentUser = await _authService.isUserLoggedIn();
+    print('isLoggedIn: ${currentUser?.email}');
+    if (currentUser != null) {
+      
+      sl<AuthBloc>().add(AuthRequested(currentUser.uid));
+      print("AuthState: ${sl<AuthBloc>().state}");
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => HomePage()),
       );
