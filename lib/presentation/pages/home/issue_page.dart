@@ -1,4 +1,4 @@
-import 'package:campus_saga/domain/entities/post.dart';
+import 'package:campus_saga/core/constants/dummypost.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
@@ -55,7 +55,8 @@ class _IssuePageState extends State<IssuePage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16.0, vertical: 8.0),
                         child: PostCard(
-                          post: post1, // Replace with actual post data
+                          post: dummyPostGenerate(
+                              state.user), // Replace with actual post data
                           user: state.user,
                         ),
                       );
@@ -84,10 +85,14 @@ class _IssuePageState extends State<IssuePage> {
 
   void _addDummyIssue() {
     // Dummy post data
-    BlocProvider.of<PostBloc>(context).add(
-      PostCreated(
-        post1,
-      ),
-    );
+    if (BlocProvider.of<AuthBloc>(context).state is AuthAuthenticated) {
+      final user =
+          BlocProvider.of<AuthBloc>(context).state as AuthAuthenticated;
+      BlocProvider.of<PostBloc>(context).add(
+        PostCreated(
+          dummyPostGenerate(user.user), // Replace with actual post data
+        ),
+      );
+    }
   }
 }

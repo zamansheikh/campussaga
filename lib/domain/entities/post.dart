@@ -48,21 +48,3 @@ class Post extends Equatable {
         feedback,
       ];
 }
-
-final post1 = Post(
-  id: '1',
-  userId: '1',
-  universityId: '1',
-  postTitle: lorem(paragraphs: 1, words: 15),
-  description: lorem(paragraphs: 3, words: 200),
-  timestamp: DateTime.now(),
-  imageUrls: [
-    "https://loremflickr.com/200/200?random=2",
-    "https://loremflickr.com/200/200?random=3",
-    "https://loremflickr.com/200/200?random=4",
-  ],
-  trueVotes: 10,
-  falseVotes: 5,
-  comments: [comment1, comment2],
-  feedback: feedback1,
-);
