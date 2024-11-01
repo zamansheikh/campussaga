@@ -1,5 +1,7 @@
 // lib/presentation/pages/auth/login_page.dart
 
+import 'dart:math';
+
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/pages/widgets/text_editing_field.dart';
 import 'package:flutter/material.dart';
@@ -19,10 +21,17 @@ class LoginPage extends StatelessWidget {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
-            Navigator.of(context).pushReplacementNamed('/home');
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Logged In Successfully")));
           } else if (state is AuthFailure) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.message)));
+          } else if (state is AuthAuthenticated) {
+            Navigator.of(context).pushReplacementNamed('/home');
+          } else if (state is AuthUnauthenticated) {
+            //call logOut Event
+            BlocProvider.of<AuthBloc>(context).add(SignOutEvent());
+            Navigator.of(context).pushReplacementNamed('/login');
           }
         },
         builder: (context, state) {

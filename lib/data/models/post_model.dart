@@ -5,12 +5,14 @@ import '../../domain/entities/post.dart';
 class PostModel extends Post {
   const PostModel({
     required String id,
+    required String postTitle,
     required String description,
     required String userId,
     required String universityId,
     required DateTime timestamp,
   }) : super(
           id: id,
+          postTitle: postTitle,
           description: description,
           userId: userId,
           universityId: universityId,
@@ -20,6 +22,7 @@ class PostModel extends Post {
   factory PostModel.fromJson(Map<String, dynamic> json) {
     return PostModel(
       id: json['id'] as String,
+      postTitle: json['postTitle'] as String,
       description: json['description'] as String,
       userId: json['userId'] as String,
       universityId: json['universityId'] as String,
@@ -30,6 +33,7 @@ class PostModel extends Post {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'postTitle': postTitle,
       'description': description,
       'userId': userId,
       'universityId': universityId,
@@ -39,6 +43,7 @@ class PostModel extends Post {
   static PostModel fromEntity(Post post) {
     return PostModel(
       id: post.id,
+      postTitle: post.postTitle,
       description: post.description,
       userId: post.userId,
       universityId: post.universityId,
