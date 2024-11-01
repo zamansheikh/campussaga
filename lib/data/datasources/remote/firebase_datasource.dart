@@ -3,6 +3,8 @@
 import 'dart:io';
 
 import 'package:campus_saga/core/usecases/usecase.dart';
+import 'package:campus_saga/data/models/comment_model.dart';
+import 'package:campus_saga/data/models/feedback_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -27,13 +29,42 @@ class FirebaseDataSource {
     return null;
   }
 
-
   Future<void> createUser(UserModel user) async {
     await firestore.collection('users').doc(user.id).set(user.toJson());
   }
 
   Future<void> createPost(PostModel post) async {
-    await firestore.collection('posts').add(post.toJson());
+    //create doc baseed on the post id
+    await firestore.collection('posts').doc(post.id).set(post.toJson());
+  }
+
+  Future<void> createFeedback(
+      String postId, String authorityId, String message) async {
+    final feedback = FeedbackModel(
+      id: postId,
+      authorityId: authorityId,
+      postId: postId,
+      message: message,
+      timestamp: DateTime.now(),
+    );
+
+    await firestore.collection('posts').doc(postId).update({
+      'feedback': feedback.toJson(),
+    });
+  }
+
+  Future<void> createComment(String postId, String userId, String text) async {
+    final comment = CommentModel(
+      id: postId,
+      userId: userId,
+      postId: postId,
+      text: text,
+      timestamp: DateTime.now(),
+    );
+
+    await firestore.collection('posts').doc(postId).update({
+      'comments': FieldValue.arrayUnion([comment.toJson()]),
+    });
   }
 
   Future<List<PostModel>> fetchPosts(String universityId) async {
@@ -64,7 +95,6 @@ class FirebaseDataSource {
     }
   }
 
-  
   Future<String> signUpUser(UserParams user) async {
     final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
       email: user.email,

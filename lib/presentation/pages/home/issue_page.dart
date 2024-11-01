@@ -1,9 +1,11 @@
 import 'package:campus_saga/core/constants/dummypost.dart';
+import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
 import 'package:campus_saga/presentation/bloc/post/post_event.dart';
+import 'package:campus_saga/presentation/bloc/post/post_state.dart';
 import 'package:campus_saga/presentation/pages/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +18,24 @@ class IssuePage extends StatefulWidget {
 }
 
 class _IssuePageState extends State<IssuePage> {
+  @override
+  void initState() {
+    Future.delayed(
+        Duration(
+          seconds: 2,
+        ), () {
+      BlocProvider.of<PostBloc>(context).add(FetchPosts(
+        (sl<AuthBloc>().state as AuthAuthenticated)
+            .user
+            .universityId
+            .split('@')
+            .last
+            .trim(),
+      ));
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,25 +65,39 @@ class _IssuePageState extends State<IssuePage> {
         },
         builder: (context, state) {
           if (state is AuthAuthenticated) {
-            return Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: 10, // Placeholder count for posts
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
-                        child: PostCard(
-                          post: dummyPostGenerate(
-                              state.user), // Replace with actual post data
-                          user: state.user,
+            return BlocBuilder<PostBloc, PostState>(
+              builder: (context, poststate) {
+                if (poststate is PostLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (poststate is PostsFetched) {
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: poststate
+                              .posts.length, // Placeholder count for posts
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 8.0),
+                              child: PostCard(
+                                user: state.user,
+                                post: poststate.posts[index],
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+                      ),
+                    ],
+                  );
+                } else {
+                  return const Center(
+                    child: Text("No Posts Found"),
+                  );
+                }
+              },
             );
           } else {
             return const Center(

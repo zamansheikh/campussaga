@@ -17,7 +17,8 @@ class PostRepositoryImpl implements PostRepository {
       String universityId) async {
     try {
       final posts = await dataSource.fetchPosts(universityId);
-      return Right(posts);
+      final postFromEntity = posts.map((post) => post.toEntity()).toList();
+      return Right(postFromEntity);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
