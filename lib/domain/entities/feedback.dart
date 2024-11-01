@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_lorem/flutter_lorem.dart';
 
 class Feedback extends Equatable {
   final String id;
@@ -34,14 +33,3 @@ class Feedback extends Equatable {
         timestamp,
       ];
 }
-
-final feedback1 = Feedback(
-  id: '1',
-  authorityId: '1',
-  postId: '1',
-  message: lorem(paragraphs: 2, words: 40),
-  timestamp: DateTime.now(),
-  resolved: true,
-  agreeCount: 10,
-  disagreeCount: 5,
-);
