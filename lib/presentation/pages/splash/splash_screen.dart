@@ -1,7 +1,5 @@
 // lib/presentation/pages/splash/splash_screen.dart
-
 import 'package:campus_saga/core/injection_container.dart';
-import 'package:campus_saga/main.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:flutter/material.dart';
