@@ -66,6 +66,17 @@ class UserRepositoryImpl implements UserRepository {
     }
   }
 
+  //sign in
+  @override
+  Future<Either<Failure, String>> signInUser(UserParams user) async {
+    try {
+      final right = await dataSource.signInUser(user);
+      return Right(right);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
   @override
   Future<Either<Failure, void>> signOutUser() async {
     try {

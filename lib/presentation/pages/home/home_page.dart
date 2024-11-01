@@ -1,40 +1,70 @@
-import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
-import 'package:campus_saga/presentation/pages/widgets/post_card.dart';
+import 'package:campus_saga/presentation/pages/home/issue_page.dart';
+import 'package:campus_saga/presentation/pages/post/create_post_page.dart';
+import 'package:campus_saga/presentation/pages/profile/profile_page.dart';
+import 'package:campus_saga/presentation/pages/promotion/promotion_page.dart';
+import 'package:campus_saga/presentation/pages/ranking/ranking_page.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/auth/auth_state.dart';
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
-class HomePage extends StatelessWidget {
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+  List<Widget> pages = [];
+  @override
+  void initState() {
+    pages = [
+      IssuePage(),
+      PromotionPage(),
+      CreatePostPage(),
+      RankingPage(),
+      ProfilePage(),
+    ];
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              // Dispatch the logout event
-              BlocProvider.of<AuthBloc>(context).add(SignOutEvent());
-            },
+      body: IndexedStack(
+        index: _currentIndex,
+        children: pages,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.black,
+        type: BottomNavigationBarType.fixed,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star),
+            label: "Promotion",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: "Create Post",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.leaderboard),
+            label: "Ranking",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Profile",
           ),
         ],
-      ),
-      body: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthUnauthenticated) {
-            // Navigate to the login page or any other appropriate action
-            Navigator.of(context).pushReplacementNamed('/login');
-          }
-        },
-        child: ListView.builder(
-          itemCount: 10, // Placeholder count for posts
-          itemBuilder: (context, index) {
-            return PostCard(postId: 'post_$index'); // Dummy postId
-          },
-        ),
       ),
     );
   }

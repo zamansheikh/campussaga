@@ -27,14 +27,6 @@ class FirebaseDataSource {
     return null;
   }
 
-  Future<String> signUpUser(UserParams user) async {
-    final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
-      email: user.email,
-      password: user.password,
-    );
-
-    return userCredential.user!.uid;
-  }
 
   Future<void> createUser(UserModel user) async {
     await firestore.collection('users').doc(user.id).set(user.toJson());
@@ -70,6 +62,25 @@ class FirebaseDataSource {
     } catch (e) {
       throw Exception('Image upload failed');
     }
+  }
+
+  
+  Future<String> signUpUser(UserParams user) async {
+    final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
+      email: user.email,
+      password: user.password,
+    );
+
+    return userCredential.user!.uid;
+  }
+
+  Future<String> signInUser(UserParams user) async {
+    final userCredential = await firebaseAuth.signInWithEmailAndPassword(
+      email: user.email,
+      password: user.password,
+    );
+
+    return userCredential.user!.uid;
   }
 
   //logOut
