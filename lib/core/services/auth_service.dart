@@ -7,8 +7,8 @@ class AuthService {
 
   User? get currentUser => _firebaseAuth.currentUser;
 
-  Future<bool> isUserLoggedIn() async {
-    return currentUser != null;
+  Future<User?> isUserLoggedIn() async {
+    return currentUser;
   }
 
   Future<void> signOut() async {

@@ -1,4 +1,3 @@
-
 import 'package:campus_saga/domain/entities/post.dart';
 import 'package:campus_saga/domain/entities/user.dart';
 
@@ -8,7 +7,8 @@ class PostCard extends StatelessWidget {
   final Post post;
   final User user;
 
-  const PostCard({Key? key, required this.post, required this.user}) : super(key: key);
+  const PostCard({Key? key, required this.post, required this.user})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -107,9 +107,8 @@ class PostCard extends StatelessWidget {
               ),
             ],
 
-
             //this section only visible to university authority
-            if( user.userType == UserType.university) ...[
+            if (user.userType == UserType.university && user.isVerified) ...[
               const SizedBox(height: 8.0),
               // Action buttons for resolve and report
               Row(
@@ -130,25 +129,6 @@ class PostCard extends StatelessWidget {
                 ],
               ),
             ],
-
-            // Action buttons for resolve and report
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    // Resolve action - TODO: handle resolve functionality
-                  },
-                  child: const Text("Resolve"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // Report action - TODO: handle report functionality
-                  },
-                  child: const Text("Reject"),
-                ),
-              ],
-            ),
           ],
         ),
       ),
