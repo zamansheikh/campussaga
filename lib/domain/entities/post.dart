@@ -1,7 +1,6 @@
 import 'package:campus_saga/domain/entities/comment.dart';
 import 'package:campus_saga/domain/entities/feedback.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_lorem/flutter_lorem.dart';
 
 class Post extends Equatable {
   final String id;
