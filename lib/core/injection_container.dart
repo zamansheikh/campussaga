@@ -6,6 +6,7 @@ import 'package:campus_saga/data/repositories/user_repository_impl.dart';
 import 'package:campus_saga/domain/repositories/post_repository.dart';
 import 'package:campus_saga/domain/repositories/user_repository.dart';
 import 'package:campus_saga/domain/usecases/create_user_profile.dart';
+import 'package:campus_saga/domain/usecases/fetch_posts.dart';
 import 'package:campus_saga/domain/usecases/sign_in_user.dart';
 import 'package:campus_saga/domain/usecases/sign_out_user.dart';
 import 'package:campus_saga/domain/usecases/sign_up_user.dart';
@@ -53,6 +54,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => CreateUserProfile(sl()));
   sl.registerLazySingleton(() => SignOutUser(sl()));
   sl.registerLazySingleton(() => SignInUser(sl()));
+  sl.registerLazySingleton(() => FetchPostsUsecase(sl()));
 
   // BLoCs
   sl.registerLazySingleton(() => AuthBloc(
@@ -65,6 +67,7 @@ Future<void> init() async {
       ));
   sl.registerFactory(() => PostBloc(
         createPost: sl(),
+        fetchPosts: sl(),
       ));
 
   //Auth Service

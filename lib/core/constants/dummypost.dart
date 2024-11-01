@@ -2,21 +2,21 @@ import 'package:campus_saga/domain/entities/comment.dart';
 import 'package:campus_saga/domain/entities/feedback.dart';
 import 'package:campus_saga/domain/entities/post.dart';
 import 'package:flutter_lorem/flutter_lorem.dart';
-import 'package:uuid/v4.dart';
-
+import 'package:uuid/uuid.dart';
 import '../../domain/entities/user.dart';
 
 Post dummyPostGenerate(User user) {
-  final postId = UuidV4().toString();
+  var uuid = Uuid();
+  final postId = uuid.v1();
   final feedback1 = Feedback(
-    id: UuidV4().toString(),
+    id: uuid.v1(),
     postId: postId,
     message: 'Feedback message',
-    authorityId: 'authorityId',
+    authorityId: user.id,
     timestamp: DateTime.now(),
   );
   final comment1 = Comment(
-    id: UuidV4().toString(),
+    id: uuid.v1(),
     userId: user.id,
     postId: postId,
     text: 'Comment text',

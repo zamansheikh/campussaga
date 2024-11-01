@@ -123,4 +123,21 @@ class PostModel extends Post {
       feedback: feedback ?? this.feedback,
     );
   }
+
+  Post toEntity() {
+    return Post(
+      id: id,
+      userId: userId,
+      universityId: universityId,
+      postTitle: postTitle,
+      description: description,
+      isResolved: isResolved,
+      timestamp: timestamp,
+      imageUrls: imageUrls,
+      trueVotes: trueVotes,
+      falseVotes: falseVotes,
+      comments: comments,
+      feedback: feedback,
+    );
+  }
 }
