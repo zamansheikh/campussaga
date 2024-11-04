@@ -1,6 +1,3 @@
-import 'package:campus_saga/core/injection_container.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:flutter/material.dart';
 
 class PromotionPage extends StatefulWidget {
@@ -30,12 +27,7 @@ class _PromotionPageState extends State<PromotionPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => sl<AuthBloc>().add(SignOutEvent()),
-          ),
-        ],
+       
       ),
     );
   }

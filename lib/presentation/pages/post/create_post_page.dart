@@ -1,7 +1,5 @@
 import 'package:campus_saga/core/constants/dummypost.dart';
-import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
 import 'package:campus_saga/presentation/bloc/post/post_event.dart';
@@ -65,12 +63,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => sl<AuthBloc>().add(SignOutEvent()),
-          ),
-        ],
+        
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
