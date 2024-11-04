@@ -1,7 +1,6 @@
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/domain/entities/post.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
 import 'package:campus_saga/presentation/pages/widgets/post_card.dart';
@@ -53,12 +52,7 @@ class _IssuePageState extends State<IssuePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => sl<AuthBloc>().add(SignOutEvent()),
-          ),
-        ],
+        
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: sl<AuthBloc>(),

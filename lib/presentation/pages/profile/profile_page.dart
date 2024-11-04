@@ -1,6 +1,4 @@
-import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_saga/domain/entities/user.dart';
@@ -33,12 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => sl<AuthBloc>().add(SignOutEvent()),
-          ),
-        ],
+       
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
