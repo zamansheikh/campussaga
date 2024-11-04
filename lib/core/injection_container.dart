@@ -13,6 +13,7 @@ import 'package:campus_saga/domain/usecases/sign_up_user.dart';
 import 'package:campus_saga/domain/usecases/upload_post_images.dart';
 import 'package:campus_saga/domain/usecases/upload_user_image.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
 import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -69,9 +70,10 @@ Future<void> init() async {
       ));
   sl.registerLazySingleton(() => PostBloc(
         createPost: sl(),
-        fetchPosts: sl(),
         uploadPostImages: sl(),
       ));
+
+  sl.registerLazySingleton(() => IssueBloc(fetchPosts: sl()));
 
   //Auth Service
   sl.registerLazySingleton(() => AuthService());

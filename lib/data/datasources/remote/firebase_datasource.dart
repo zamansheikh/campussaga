@@ -2,7 +2,7 @@
 
 import 'dart:io';
 import 'dart:math';
-
+import 'package:path/path.dart' as p;
 import 'package:campus_saga/core/usecases/usecase.dart';
 import 'package:campus_saga/data/models/comment_model.dart';
 import 'package:campus_saga/data/models/feedback_model.dart';
@@ -100,10 +100,8 @@ class FirebaseDataSource {
         .collection('posts')
         .where('universityId', isEqualTo: universityId)
         .orderBy('trueVotes', descending: true)
-        .limit(1)
+        .limit(4)
         .get();
-        print("topVotedPostsSnapshot: ${topVotedPostsSnapshot.docs}");
-
     final topVotedPosts = topVotedPostsSnapshot.docs
         .map((doc) => PostModel.fromJson(doc.data()))
         .toList();
@@ -157,11 +155,14 @@ class FirebaseDataSource {
   }
 
   Future<List<String>> uploadPostImages(
-      String userId, List<File> images) async {
+      String postId, List<File> images) async {
+    print("uploadPostImages: $images");
     final urls = <String>[];
     for (final image in images) {
-      final ref =
-          firebaseStorage.ref().child('post_images').child('$userId.jpg');
+      final ref = firebaseStorage
+          .ref()
+          .child('post_images')
+          .child('$postId-${p.basename(image.path)}.jpg');
       await ref.putFile(image);
       urls.add(await ref.getDownloadURL());
     }

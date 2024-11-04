@@ -21,12 +21,3 @@ class PostCreated extends PostEvent {
   @override
   List<Object?> get props => [post,images];
 }
-
-class FetchPosts extends PostEvent {
-  final String universityId;
-
-  const FetchPosts(this.universityId);
-
-  @override
-  List<Object?> get props => [universityId];
-}

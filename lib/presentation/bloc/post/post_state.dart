@@ -10,32 +10,23 @@ abstract class PostState extends Equatable {
   List<Object?> get props => [];
 }
 
-class PostInitial extends PostState {}
+class PostingInitial extends PostState {}
 
-class PostLoading extends PostState {}
+class PostingLoading extends PostState {}
 
-class PostCreatedSuccess extends PostState {
+class PostingSuccess extends PostState {
   final Post post;
 
-  const PostCreatedSuccess(this.post);
+  const PostingSuccess(this.post);
 
   @override
   List<Object?> get props => [post];
 }
 
-class PostsFetched extends PostState {
-  final List<Post> posts;
-
-  const PostsFetched(this.posts);
-
-  @override
-  List<Object?> get props => [posts];
-}
-
-class PostFailure extends PostState {
+class PostingFailure extends PostState {
   final String message;
 
-  const PostFailure(this.message);
+  const PostingFailure(this.message);
 
   @override
   List<Object?> get props => [message];

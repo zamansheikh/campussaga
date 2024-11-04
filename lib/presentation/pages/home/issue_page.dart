@@ -3,9 +3,7 @@ import 'package:campus_saga/domain/entities/post.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
-import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
-import 'package:campus_saga/presentation/bloc/post/post_event.dart';
-import 'package:campus_saga/presentation/bloc/post/post_state.dart';
+import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
 import 'package:campus_saga/presentation/pages/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,7 +28,7 @@ class _IssuePageState extends State<IssuePage> {
       final String universityId =
           state.user.universityId.split('@').last.trim();
       print("Fetching posts for university: $universityId");
-      sl<PostBloc>().add(FetchPosts(universityId));
+      sl<IssueBloc>().add(FetchIssueEvent(universityId));
     }
   }
 
@@ -60,15 +58,15 @@ class _IssuePageState extends State<IssuePage> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          return BlocBuilder<PostBloc, PostState>(
-            bloc: sl<PostBloc>(),
-            builder: (context, postState) {
-              print("Post state: ${postState.runtimeType}");
-              if (postState is PostLoading) {
+          return BlocBuilder<IssueBloc, IssueState>(
+            bloc: sl<IssueBloc>(),
+            builder: (context, issueState) {
+              print("Post state: ${issueState.runtimeType}");
+              if (issueState is IssueLoading) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (postState is PostFailure) {
+              if (issueState is IssueFailure) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -76,7 +74,7 @@ class _IssuePageState extends State<IssuePage> {
                       const Icon(Icons.error_outline,
                           size: 64, color: Colors.red),
                       const SizedBox(height: 16),
-                      Text(postState.message),
+                      Text(issueState.message),
                       ElevatedButton(
                         onPressed: _fetchPosts,
                         child: const Text('Retry'),
@@ -86,7 +84,7 @@ class _IssuePageState extends State<IssuePage> {
                 );
               }
 
-              if (postState is PostsFetched && postState.posts.isEmpty) {
+              if (issueState is IssueLoaded && issueState.posts.isEmpty) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -106,17 +104,71 @@ class _IssuePageState extends State<IssuePage> {
                 );
               }
 
-              if (postState is PostsFetched) {
+              if (issueState is IssueLoaded) {
                 return RefreshIndicator(
                   onRefresh: () async => _fetchPosts(),
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: postState.posts.length,
+                    itemCount: issueState.posts.length,
                     itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return Column(
+                          children: [
+                            Text(
+                              "Latest Issues",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            Divider(),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: PostCard(
+                                post: issueState.posts[index],
+                                user: authState.user,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      if (index == 2) {
+                        return Column(
+                          children: [
+                            Text(
+                              "Trending Issues",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            Divider(),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: PostCard(
+                                post: issueState.posts[index],
+                                user: authState.user,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      if (index == 7) {
+                        return Column(
+                          children: [
+                            Text(
+                              "Popular Issues",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            Divider(),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: PostCard(
+                                post: issueState.posts[index],
+                                user: authState.user,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: PostCard(
-                          post: postState.posts[index],
+                          post: issueState.posts[index],
                           user: authState.user,
                         ),
                       );
