@@ -71,6 +71,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => PostBloc(
         createPost: sl(),
         uploadPostImages: sl(),
+        issueBloc: sl(),
       ));
 
   sl.registerLazySingleton(() => IssueBloc(fetchPosts: sl()));

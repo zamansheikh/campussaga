@@ -36,6 +36,9 @@ dependencies:
   flutter_lorem: ^2.0.0
   cached_network_image: ^3.4.1
   timeago: ^3.7.0
+  connectivity_plus: ^6.1.0
+  easy_url_launcher: ^0.0.7
+  toastification: ^2.3.0
 
 dev_dependencies:
   flutter_test:

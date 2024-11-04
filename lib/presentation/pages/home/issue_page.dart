@@ -38,7 +38,21 @@ class _IssuePageState extends State<IssuePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Latest Issues"),
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
+        ),
+        centerTitle: true,
+        title: Text(
+          "Campus Saga",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -118,7 +132,11 @@ class _IssuePageState extends State<IssuePage> {
                               "Latest Issues",
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
-                            Divider(),
+                            Divider(
+                              color: Colors.grey[300],
+                              indent: 20,
+                              endIndent: 20,
+                            ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: PostCard(
@@ -136,7 +154,11 @@ class _IssuePageState extends State<IssuePage> {
                               "Trending Issues",
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
-                            Divider(),
+                            Divider(
+                              color: Colors.grey[300],
+                              indent: 20,
+                              endIndent: 20,
+                            ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: PostCard(
@@ -151,10 +173,14 @@ class _IssuePageState extends State<IssuePage> {
                         return Column(
                           children: [
                             Text(
-                              "Popular Issues",
+                              "Other Issues",
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
-                            Divider(),
+                            Divider(
+                              color: Colors.grey[300],
+                              indent: 20,
+                              endIndent: 20,
+                            ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: PostCard(

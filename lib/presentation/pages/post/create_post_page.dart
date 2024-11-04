@@ -1,5 +1,7 @@
 import 'package:campus_saga/core/constants/dummypost.dart';
+import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
 import 'package:campus_saga/presentation/bloc/post/post_event.dart';
@@ -47,7 +49,29 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Create Post")),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
+        ),
+        centerTitle: true,
+        title: Text(
+          "Campus Saga",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => sl<AuthBloc>().add(SignOutEvent()),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -74,7 +98,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
             const SizedBox(height: 16),
             Text(
               "Selected Images:",
-              style: Theme.of(context).textTheme.displayMedium,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 8),
             if (selectedImages.isNotEmpty)
@@ -180,7 +204,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             },
                             child: const Padding(
                               padding: EdgeInsets.symmetric(
-                                  vertical: 16.0, horizontal: 40.0),
+                                  vertical: 10.0, horizontal: 40.0),
                               child:
                                   Text("Post", style: TextStyle(fontSize: 16)),
                             ),
