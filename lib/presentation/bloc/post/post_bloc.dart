@@ -1,8 +1,6 @@
 // lib/presentation/bloc/post/post_bloc.dart
-
 import 'package:campus_saga/data/models/post_model.dart';
 import 'package:campus_saga/domain/entities/post.dart';
-import 'package:campus_saga/domain/usecases/fetch_posts.dart';
 import 'package:campus_saga/domain/usecases/upload_post_images.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'post_event.dart';
@@ -11,29 +9,25 @@ import '../../../domain/usecases/create_post.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
   final CreatePost createPost;
-  final FetchPostsUsecase fetchPosts;
   final UploadPostImages uploadPostImages;
 
   PostBloc({
     required this.createPost,
-    required this.fetchPosts,
     required this.uploadPostImages,
-  }) : super(PostInitial()) {
-    // In post_bloc.dart
+  }) : super(PostingInitial()) {
     on<PostCreated>((event, emit) async {
-      List<Post> posts = [];
-      if (state is PostsFetched) {
-        posts = (state as PostsFetched).posts;
-      }
+      // List<Post> posts = [];
+      // if (state is PostsLoaded) {
+      //   posts = (state as PostsLoaded).posts;
+      // }
       try {
-        emit(PostLoading());
-
+        emit(PostingLoading());
         List<String> imageUrls = [];
         if (event.images != null) {
           final imageResult =
-              await uploadPostImages("post_images", event.images!);
+              await uploadPostImages("${event.post.id}", event.images!);
           await imageResult.fold(
-            (failure) async => emit(PostFailure(failure.message)),
+            (failure) async => emit(PostingFailure(failure.message)),
             (images) async {
               imageUrls = images;
             },
@@ -46,27 +40,17 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
         final result = await createPost(post);
         await result.fold(
-          (failure) async => emit(PostFailure(failure.message)),
+          (failure) async => emit(PostingFailure(failure.message)),
           (createdPost) async {
-            posts.add(createdPost);
-            emit(PostsFetched(posts));
+            emit(PostingSuccess(createdPost));
+            // posts.elementAt(0);
+            // posts = posts.toSet().toList();
+            // emit(PostsLoaded(posts));
           },
         );
       } catch (e) {
-        emit(PostFailure(e.toString()));
+        emit(PostingFailure(e.toString()));
       }
-    });
-
-    on<FetchPosts>((event, emit) async {
-      emit(PostLoading());
-      final result = await fetchPosts(event.universityId);
-      result.fold(
-        (failure) => emit(PostFailure(failure.message)),
-        (posts) {
-          print("Posts fetched successfully!");
-          emit(PostsFetched(posts));
-        },
-      );
     });
   }
 }

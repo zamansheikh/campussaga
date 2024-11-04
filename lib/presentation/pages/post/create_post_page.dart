@@ -137,12 +137,30 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   final user = state.user;
                   return BlocConsumer<PostBloc, PostState>(
                     listener: (postcontext, poststate) {
-                      if (poststate is PostsFetched) {
-                        // Navigator.of(context).pop();
+                      if (poststate is PostingSuccess) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Post created successfully"),
+                          ),
+                        );
+                        widget._handlePostCreated();
+                        //Clear the all TextFields and selectedImages
+                        titleController.clear();
+                        descriptionController.clear();
+                        setState(() {
+                          selectedImages.clear();
+                        });
+                      } else if (poststate is PostingFailure) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                "Post creation failed: ${poststate.message}"),
+                          ),
+                        );
                       }
                     },
                     builder: (postcontext, poststate) {
-                      if (poststate is PostLoading) {
+                      if (poststate is PostingLoading) {
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
@@ -159,7 +177,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 post,
                                 selectedImages,
                               ));
-                              widget._handlePostCreated();
                             },
                             child: const Padding(
                               padding: EdgeInsets.symmetric(
