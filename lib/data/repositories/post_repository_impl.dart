@@ -19,9 +19,8 @@ class PostRepositoryImpl implements PostRepository {
       String universityId) async {
     print("fetching posts for universityId: $universityId");
     try {
-      final posts = await dataSource.fetchPosts(universityId);
+      final posts = await dataSource.getTimelinePosts(universityId);
       final postFromEntity = posts.map((post) => post.toEntity()).toList();
-      print("posts fetched: $postFromEntity");
       return Right(postFromEntity);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -52,7 +51,7 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<Either<Failure, List<Post>>> fetchPosts(String universityId) async {
     try {
-      final posts = await dataSource.fetchPosts(universityId);
+      final posts = await dataSource.getTimelinePosts(universityId);
       return Right(posts.map((post) => post.toEntity()).toList());
     } catch (e) {
       return Left(ServerFailure(e.toString()));

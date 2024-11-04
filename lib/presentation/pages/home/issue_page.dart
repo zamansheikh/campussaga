@@ -63,7 +63,7 @@ class _IssuePageState extends State<IssuePage> {
           return BlocBuilder<PostBloc, PostState>(
             bloc: sl<PostBloc>(),
             builder: (context, postState) {
-              print("Post state: $postState");
+              print("Post state: ${postState.runtimeType}");
               if (postState is PostLoading) {
                 return const Center(child: CircularProgressIndicator());
               }
@@ -129,10 +129,6 @@ class _IssuePageState extends State<IssuePage> {
             },
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/create-post'),
-        child: const Icon(Icons.add),
       ),
     );
   }

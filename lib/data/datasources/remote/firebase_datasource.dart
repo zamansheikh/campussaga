@@ -1,6 +1,7 @@
 // lib/data/datasources/remote/firebase_datasource.dart
 
 import 'dart:io';
+import 'dart:math';
 
 import 'package:campus_saga/core/usecases/usecase.dart';
 import 'package:campus_saga/data/models/comment_model.dart';
@@ -71,11 +72,71 @@ class FirebaseDataSource {
     final querySnapshot = await firestore
         .collection('posts')
         .where('universityId', isEqualTo: universityId)
+        .orderBy('timestamp', descending: true)
         .get();
 
     return querySnapshot.docs
         .map((doc) => PostModel.fromJson(doc.data()))
         .toList();
+  }
+
+  Future<List<PostModel>> getTimelinePosts(String universityId) async {
+    List<PostModel> timelinePosts = [];
+    // 1. Get the latest 2 posts by timestamp
+    final latestPostsSnapshot = await firestore
+        .collection('posts')
+        .where('universityId', isEqualTo: universityId)
+        .orderBy('timestamp', descending: true)
+        .limit(2)
+        .get();
+
+    final latestPosts = latestPostsSnapshot.docs
+        .map((doc) => PostModel.fromJson(doc.data()))
+        .toList();
+    timelinePosts.addAll(latestPosts);
+
+    // 2. Get the top 4 posts by trueVotes
+    final topVotedPostsSnapshot = await firestore
+        .collection('posts')
+        .where('universityId', isEqualTo: universityId)
+        .orderBy('trueVotes', descending: true)
+        .limit(1)
+        .get();
+        print("topVotedPostsSnapshot: ${topVotedPostsSnapshot.docs}");
+
+    final topVotedPosts = topVotedPostsSnapshot.docs
+        .map((doc) => PostModel.fromJson(doc.data()))
+        .toList();
+    timelinePosts.addAll(topVotedPosts);
+
+    // 3. Get a random post
+    final randomPostSnapshot = await firestore
+        .collection('posts')
+        .where('universityId', isEqualTo: universityId)
+        .get();
+    if (randomPostSnapshot.size > 0) {
+      final randomIndex = Random().nextInt(randomPostSnapshot.size);
+      final randomPost =
+          PostModel.fromJson(randomPostSnapshot.docs[randomIndex].data());
+      timelinePosts.add(randomPost);
+    }
+
+    // 4. Get the remaining posts sorted by timestamp (newer to older)
+    final remainingPostsSnapshot = await firestore
+        .collection('posts')
+        .where('universityId', isEqualTo: universityId)
+        .orderBy('timestamp', descending: true)
+        .startAfterDocument(latestPostsSnapshot.docs.isNotEmpty
+            ? latestPostsSnapshot.docs.last
+            : topVotedPostsSnapshot.docs.last)
+        .get();
+
+    final remainingPosts = remainingPostsSnapshot.docs
+        .map((doc) => PostModel.fromJson(doc.data()))
+        .toList();
+    timelinePosts.addAll(remainingPosts);
+
+    return timelinePosts;
   }
 
   Future<void> updatePostStatus(String postId, bool isResolved) async {
@@ -95,11 +156,12 @@ class FirebaseDataSource {
     }
   }
 
-
-  Future<List<String>> uploadPostImages(String userId, List<File> images) async {
+  Future<List<String>> uploadPostImages(
+      String userId, List<File> images) async {
     final urls = <String>[];
     for (final image in images) {
-      final ref = firebaseStorage.ref().child('post_images').child('$userId.jpg');
+      final ref =
+          firebaseStorage.ref().child('post_images').child('$userId.jpg');
       await ref.putFile(image);
       urls.add(await ref.getDownloadURL());
     }
