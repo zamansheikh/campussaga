@@ -7,6 +7,7 @@ import 'package:campus_saga/presentation/pages/ranking/ranking_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
+  
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -19,7 +20,13 @@ class _HomePageState extends State<HomePage> {
     pages = [
       IssuePage(),
       PromotionPage(),
-      CreatePostPage(),
+      CreatePostPage(
+        onPostCreated: () {
+          setState(() {
+            _currentIndex = 0; // Navigate to IssuePage
+          });
+        },
+      ),
       RankingPage(),
       ProfilePage(),
     ];

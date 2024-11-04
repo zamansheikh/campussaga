@@ -10,6 +10,7 @@ import 'package:campus_saga/presentation/pages/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'core/injection_container.dart';
 import 'presentation/bloc/auth/auth_bloc.dart';
 import 'presentation/bloc/post/post_bloc.dart';
 
@@ -33,10 +34,10 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (_) => di.sl<AuthBloc>(),
+          create: (_) => sl<AuthBloc>(),
         ),
         BlocProvider<PostBloc>(
-          create: (_) => di.sl<PostBloc>(),
+          create: (_) => sl<PostBloc>(),
         ),
       ],
       child: MaterialApp(
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-       routes: {
+        routes: {
           '/login': (context) => LoginPage(),
           '/splash': (context) => SplashScreen(),
           '/signup': (context) => RegisterPage(),
