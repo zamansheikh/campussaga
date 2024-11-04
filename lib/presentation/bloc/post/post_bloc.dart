@@ -19,33 +19,6 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     required this.fetchPosts,
     required this.uploadPostImages,
   }) : super(PostInitial()) {
-    // on<PostCreated>((event, emit) async {
-    //   if (state is PostsFetched) {
-    //     final posts = (state as PostsFetched).posts;
-    //     emit(PostLoading());
-    //     if (event.images != null) {
-    //       final result = await uploadPostImages("post_images", event.images!);
-    //       result.fold(
-    //         (failure) => emit(PostFailure(failure.message)),
-    //         (images) async {
-    //           Post post = PostModel.fromEntity(event.post)
-    //               .copyWith(imageUrls: images)
-    //               .toEntity();
-    //           final result = await createPost(post);
-    //           result.fold(
-    //             (failure) => emit(PostFailure(failure.message)),
-    //             (post) async{
-    //               posts.add(post);
-    //               emit(PostCreatedSuccess(post));
-    //               // emit(PostsFetched(posts));
-    //             },
-    //           );
-    //         },
-    //       );
-    //     }
-    //   }
-    // });
-
     // In post_bloc.dart
     on<PostCreated>((event, emit) async {
       List<Post> posts = [];
@@ -90,8 +63,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       result.fold(
         (failure) => emit(PostFailure(failure.message)),
         (posts) {
-          print("printting post: $posts");
-
+          print("Posts fetched successfully!");
           emit(PostsFetched(posts));
         },
       );

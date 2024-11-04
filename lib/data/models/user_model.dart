@@ -1,6 +1,6 @@
 // lib/data/models/user_model.dart
 
-import '../../domain/entities/user.dart';
+import 'package:campus_saga/domain/entities/user.dart';
 
 class UserModel extends User {
   const UserModel({
@@ -11,6 +11,29 @@ class UserModel extends User {
     bool isVerified = false,
     required UserType userType,
     required String profilePictureUrl,
+    int postCount = 0,
+    int commentCount = 0,
+    int resolvedIssuesCount = 0,
+    int receivedVotesCount = 0,
+    int givenVotesCount = 0,
+    double reputationScore = 0.0,
+    UserBadge currentBadge = UserBadge.newbie,
+    List<AchievementType> achievements = const [],
+    int streakDays = 0,
+    Map<String, int> activityLog = const {},
+    String? studentId,
+    DateTime? dateOfBirth,
+    String? phoneNumber,
+    List<String>? clubNames,
+    Department? department,
+    int? batch,
+    double? cgpa,
+    String? currentSemester,
+    String? bloodGroup,
+    String? address,
+    String? guardianPhone,
+    List<String>? skills,
+    List<String>? interests,
   }) : super(
           id: id,
           name: name,
@@ -19,6 +42,29 @@ class UserModel extends User {
           isVerified: isVerified,
           userType: userType,
           profilePictureUrl: profilePictureUrl,
+          postCount: postCount,
+          commentCount: commentCount,
+          resolvedIssuesCount: resolvedIssuesCount,
+          receivedVotesCount: receivedVotesCount,
+          givenVotesCount: givenVotesCount,
+          reputationScore: reputationScore,
+          currentBadge: currentBadge,
+          achievements: achievements,
+          streakDays: streakDays,
+          activityLog: activityLog,
+          studentId: studentId,
+          dateOfBirth: dateOfBirth,
+          phoneNumber: phoneNumber,
+          clubNames: clubNames,
+          department: department,
+          batch: batch,
+          cgpa: cgpa,
+          currentSemester: currentSemester,
+          bloodGroup: bloodGroup,
+          address: address,
+          guardianPhone: guardianPhone,
+          skills: skills,
+          interests: interests,
         );
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -28,9 +74,50 @@ class UserModel extends User {
       email: json['email'] as String,
       universityId: json['universityId'] as String,
       isVerified: json['isVerified'] as bool? ?? false,
-      userType: UserType.values
-          .firstWhere((e) => e.toString() == 'UserType.${json['userType']}'),
+      userType: UserType.values.firstWhere(
+        (e) => e.toString() == 'UserType.${json['userType']}',
+      ),
       profilePictureUrl: json['profilePictureUrl'] as String,
+      postCount: json['postCount'] as int? ?? 0,
+      commentCount: json['commentCount'] as int? ?? 0,
+      resolvedIssuesCount: json['resolvedIssuesCount'] as int? ?? 0,
+      receivedVotesCount: json['receivedVotesCount'] as int? ?? 0,
+      givenVotesCount: json['givenVotesCount'] as int? ?? 0,
+      reputationScore: (json['reputationScore'] as num?)?.toDouble() ?? 0.0,
+      currentBadge: UserBadge.values.firstWhere(
+        (e) => e.toString() == 'UserBadge.${json['currentBadge']}',
+        orElse: () => UserBadge.newbie,
+      ),
+      achievements: (json['achievements'] as List<dynamic>?)
+              ?.map((e) => AchievementType.values.firstWhere(
+                    (type) => type.toString() == 'AchievementType.$e',
+                  ))
+              .toList() ??
+          [],
+      streakDays: json['streakDays'] as int? ?? 0,
+      activityLog: (json['activityLog'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, v as int),
+          ) ??
+          {},
+      studentId: json['studentId'] as String?,
+      dateOfBirth: json['dateOfBirth'] != null
+          ? DateTime.parse(json['dateOfBirth'] as String)
+          : null,
+      phoneNumber: json['phoneNumber'] as String?,
+      clubNames: (json['clubNames'] as List<dynamic>?)?.cast<String>(),
+      department: json['department'] != null
+          ? Department.values.firstWhere(
+              (e) => e.toString() == 'Department.${json['department']}',
+            )
+          : null,
+      batch: json['batch'] as int?,
+      cgpa: (json['cgpa'] as num?)?.toDouble(),
+      currentSemester: json['currentSemester'] as String?,
+      bloodGroup: json['bloodGroup'] as String?,
+      address: json['address'] as String?,
+      guardianPhone: json['guardianPhone'] as String?,
+      skills: (json['skills'] as List<dynamic>?)?.cast<String>(),
+      interests: (json['interests'] as List<dynamic>?)?.cast<String>(),
     );
   }
 
@@ -43,10 +130,34 @@ class UserModel extends User {
       'isVerified': isVerified,
       'userType': userType.toString().split('.').last,
       'profilePictureUrl': profilePictureUrl,
+      'postCount': postCount,
+      'commentCount': commentCount,
+      'resolvedIssuesCount': resolvedIssuesCount,
+      'receivedVotesCount': receivedVotesCount,
+      'givenVotesCount': givenVotesCount,
+      'reputationScore': reputationScore,
+      'currentBadge': currentBadge.toString().split('.').last,
+      'achievements':
+          achievements.map((e) => e.toString().split('.').last).toList(),
+      'streakDays': streakDays,
+      'activityLog': activityLog,
+      'studentId': studentId,
+      'dateOfBirth': dateOfBirth?.toIso8601String(),
+      'phoneNumber': phoneNumber,
+      'clubNames': clubNames,
+      'department': department?.toString().split('.').last,
+      'batch': batch,
+      'cgpa': cgpa,
+      'currentSemester': currentSemester,
+      'bloodGroup': bloodGroup,
+      'address': address,
+      'guardianPhone': guardianPhone,
+      'skills': skills,
+      'interests': interests,
     };
   }
 
-  static UserModel fromEntity(User user) {
+  factory UserModel.fromEntity(User user) {
     return UserModel(
       id: user.id,
       name: user.name,
@@ -55,6 +166,95 @@ class UserModel extends User {
       isVerified: user.isVerified,
       userType: user.userType,
       profilePictureUrl: user.profilePictureUrl,
+      postCount: user.postCount,
+      commentCount: user.commentCount,
+      resolvedIssuesCount: user.resolvedIssuesCount,
+      receivedVotesCount: user.receivedVotesCount,
+      givenVotesCount: user.givenVotesCount,
+      reputationScore: user.reputationScore,
+      currentBadge: user.currentBadge,
+      achievements: user.achievements,
+      streakDays: user.streakDays,
+      activityLog: user.activityLog,
+      studentId: user.studentId,
+      dateOfBirth: user.dateOfBirth,
+      phoneNumber: user.phoneNumber,
+      clubNames: user.clubNames,
+      department: user.department,
+      batch: user.batch,
+      cgpa: user.cgpa,
+      currentSemester: user.currentSemester,
+      bloodGroup: user.bloodGroup,
+      address: user.address,
+      guardianPhone: user.guardianPhone,
+      skills: user.skills,
+      interests: user.interests,
+    );
+  }
+
+  UserModel copyWith({
+    String? id,
+    String? name,
+    String? email,
+    String? universityId,
+    bool? isVerified,
+    UserType? userType,
+    String? profilePictureUrl,
+    int? postCount,
+    int? commentCount,
+    int? resolvedIssuesCount,
+    int? receivedVotesCount,
+    int? givenVotesCount,
+    double? reputationScore,
+    UserBadge? currentBadge,
+    List<AchievementType>? achievements,
+    int? streakDays,
+    Map<String, int>? activityLog,
+    String? studentId,
+    DateTime? dateOfBirth,
+    String? phoneNumber,
+    List<String>? clubNames,
+    Department? department,
+    int? batch,
+    double? cgpa,
+    String? currentSemester,
+    String? bloodGroup,
+    String? address,
+    String? guardianPhone,
+    List<String>? skills,
+    List<String>? interests,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      universityId: universityId ?? this.universityId,
+      isVerified: isVerified ?? this.isVerified,
+      userType: userType ?? this.userType,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      postCount: postCount ?? this.postCount,
+      commentCount: commentCount ?? this.commentCount,
+      resolvedIssuesCount: resolvedIssuesCount ?? this.resolvedIssuesCount,
+      receivedVotesCount: receivedVotesCount ?? this.receivedVotesCount,
+      givenVotesCount: givenVotesCount ?? this.givenVotesCount,
+      reputationScore: reputationScore ?? this.reputationScore,
+      currentBadge: currentBadge ?? this.currentBadge,
+      achievements: achievements ?? this.achievements,
+      streakDays: streakDays ?? this.streakDays,
+      activityLog: activityLog ?? this.activityLog,
+      studentId: studentId ?? this.studentId,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      clubNames: clubNames ?? this.clubNames,
+      department: department ?? this.department,
+      batch: batch ?? this.batch,
+      cgpa: cgpa ?? this.cgpa,
+      currentSemester: currentSemester ?? this.currentSemester,
+      bloodGroup: bloodGroup ?? this.bloodGroup,
+      address: address ?? this.address,
+      guardianPhone: guardianPhone ?? this.guardianPhone,
+      skills: skills ?? this.skills,
+      interests: interests ?? this.interests,
     );
   }
 }
