@@ -1,5 +1,7 @@
 // lib/data/repositories/post_repository_impl.dart
 
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/post.dart';
 import '../../domain/repositories/post_repository.dart';
@@ -15,9 +17,11 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<Either<Failure, List<Post>>> getPostsByUniversity(
       String universityId) async {
+    print("fetching posts for universityId: $universityId");
     try {
       final posts = await dataSource.fetchPosts(universityId);
       final postFromEntity = posts.map((post) => post.toEntity()).toList();
+      print("posts fetched: $postFromEntity");
       return Right(postFromEntity);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -49,7 +53,18 @@ class PostRepositoryImpl implements PostRepository {
   Future<Either<Failure, List<Post>>> fetchPosts(String universityId) async {
     try {
       final posts = await dataSource.fetchPosts(universityId);
-      return Right(posts);
+      return Right(posts.map((post) => post.toEntity()).toList());
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<String>>> uploadPostImages(
+      String userId, List<File> image) async {
+    try {
+      final urls = await dataSource.uploadPostImages(userId, image);
+      return Right(urls);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

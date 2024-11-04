@@ -1,5 +1,7 @@
 // lib/presentation/bloc/post/post_event.dart
 
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import '../../../domain/entities/post.dart';
 
@@ -12,11 +14,12 @@ abstract class PostEvent extends Equatable {
 
 class PostCreated extends PostEvent {
   final Post post;
+  final List<File>? images;
 
-  const PostCreated(this.post);
+  const PostCreated(this.post, this.images);
 
   @override
-  List<Object?> get props => [post];
+  List<Object?> get props => [post,images];
 }
 
 class FetchPosts extends PostEvent {

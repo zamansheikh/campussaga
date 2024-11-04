@@ -95,6 +95,17 @@ class FirebaseDataSource {
     }
   }
 
+
+  Future<List<String>> uploadPostImages(String userId, List<File> images) async {
+    final urls = <String>[];
+    for (final image in images) {
+      final ref = firebaseStorage.ref().child('post_images').child('$userId.jpg');
+      await ref.putFile(image);
+      urls.add(await ref.getDownloadURL());
+    }
+    return urls;
+  }
+
   Future<String> signUpUser(UserParams user) async {
     final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
       email: user.email,

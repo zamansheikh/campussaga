@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_lorem/flutter_lorem.dart';
 
 class Comment extends Equatable {
   final String id;
@@ -19,19 +18,3 @@ class Comment extends Equatable {
   @override
   List<Object?> get props => [id, userId, postId, text, timestamp];
 }
-
-final comment1 = Comment(
-  id: '1',
-  userId: '1',
-  postId: '1',
-  text: lorem(paragraphs: 1, words: 20),
-  timestamp: DateTime.now(),
-);
-
-final comment2 = Comment(
-  id: '2',
-  userId: '2',
-  postId: '1',
-  text: lorem(paragraphs: 1, words: 20),
-  timestamp: DateTime.now(),
-);
