@@ -1,4 +1,6 @@
+import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_saga/domain/entities/user.dart';
@@ -16,7 +18,27 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profile"),
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
+        ),
+        centerTitle: true,
+        title: Text(
+          "Campus Saga",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => sl<AuthBloc>().add(SignOutEvent()),
+          ),
+        ],
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
