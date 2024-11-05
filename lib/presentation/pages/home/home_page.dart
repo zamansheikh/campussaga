@@ -136,7 +136,7 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: const Icon(Icons.system_update),
               title: Text(
-                  '${CURRENT_VERSION == _currentVersion ? 'Up to date' : 'Update Available v$_currentVersion'}'),
+                  '${CURRENT_VERSION == _currentVersion ? 'Up to date' : '$_currentVersion'}'),
               onTap: () {
                 checkUpdateFromGithub(context);
                 Navigator.pop(context);

@@ -5,6 +5,7 @@ import 'package:campus_saga/core/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:connectivity_plus/connectivity_plus.dart';
+
 Future<String> checkUpdateFromGithub(BuildContext context) async {
   try {
     // Check internet connectivity first
@@ -17,11 +18,12 @@ Future<String> checkUpdateFromGithub(BuildContext context) async {
           ),
         );
       }
-      return "No internet connection";
+      return "Please connect internet!";
     }
 
     // If connected, proceed to check for updates
-    String url = "https://api.github.com/repos/$OWNER_NAME/$REPO_NAME/releases/latest";
+    String url =
+        "https://api.github.com/repos/$OWNER_NAME/$REPO_NAME/releases/latest";
 
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
@@ -29,7 +31,7 @@ Future<String> checkUpdateFromGithub(BuildContext context) async {
       String latestVersion = data['tag_name'];
       String downloadUrl = data['assets'][0]['browser_download_url'];
       String releaseNote = data['body'];
-      
+
       if (latestVersion != CURRENT_VERSION) {
         if (context.mounted) {
           await showDialog(
@@ -38,10 +40,9 @@ Future<String> checkUpdateFromGithub(BuildContext context) async {
               return AlertDialog(
                 title: const Text('Update Available'),
                 content: Text(
-                  'A new version of the app is available. Please update to the latest version.\n\n'
-                  'Please uninstall the old version before installing the new version\n\n'
-                  'Release Note:\n$releaseNote'
-                ),
+                    'A new version of the app is available. Please update to the latest version.\n\n'
+                    'Please uninstall the old version before installing the new version\n\n'
+                    'Release Note:\n$releaseNote'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -75,12 +76,13 @@ Future<String> checkUpdateFromGithub(BuildContext context) async {
   } on SocketException catch (e) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Network error: Could not connect to the server'),
+        SnackBar(
+          content: Text(
+              'Network error: Could not connect to the server : ${e.toString()}'),
         ),
       );
     }
-    return "Network error: ${e.message}";
+    return "Network error!";
   } catch (error) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
