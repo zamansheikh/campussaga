@@ -5,10 +5,10 @@ import '../../core/errors/failures.dart';
 import '../../core/usecases/usecase.dart';
 import '../repositories/post_repository.dart';
 
-class AddVote extends UseCase<void, AddVoteParams> {
+class AddVoteUsecase extends UseCase<void, AddVoteParams> {
   final PostRepository repository;
 
-  AddVote(this.repository);
+  AddVoteUsecase(this.repository);
 
   @override
   Future<Either<Failure, void>> call(AddVoteParams params) async {

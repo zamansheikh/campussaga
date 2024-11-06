@@ -23,7 +23,7 @@ Post postGenerate(
 }
 
 Promotion promotionGenerate(
-    User user, String promotionTitle, String description) {
+    User user, String promotionTitle, String description, String clubName, String eventLink, DateTime expiryDate) {
   var uuid = Uuid();
   final promotionId = uuid.v1();
   final freshPromotion = Promotion(
@@ -32,16 +32,14 @@ Promotion promotionGenerate(
     universityId: user.universityId.split('@').last.trim(),
     promotionTitle: promotionTitle,
     description: description,
-    clubName: 'Science Club',
+    clubName: clubName,
     timestamp: DateTime.now(),
-    expiryDate: DateTime.now().add(Duration(days: 2)),
+    expiryDate:  expiryDate,
     imageUrls: [
-      'https://picsum.photos/seed/150/400/200',
-      'https://picsum.photos/seed/151/400/200',
     ],
     likes: 25,
     dislikes: 5,
-    eventLink: 'https://zamansheikh.com',
+    eventLink: eventLink,
   );
   return freshPromotion;
 }

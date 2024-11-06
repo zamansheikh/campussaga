@@ -27,9 +27,9 @@ class _HomePageState extends State<HomePage> {
       IssuePage(),
       PromotionPage(),
       CreatePostPage(
-        onPostCreated: () {
+        onPostCreated: (index) {
           setState(() {
-            _currentIndex = 0; // Navigate to IssuePage
+            _currentIndex = index; // Navigate to IssuePage
           });
         },
       ),

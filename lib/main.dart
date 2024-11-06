@@ -1,4 +1,5 @@
 // lib/main.dart
+import 'package:campus_saga/presentation/bloc/promotion/promotion_bloc.dart';
 import 'package:campus_saga/presentation/pages/admin/admin_page.dart';
 import 'package:campus_saga/presentation/pages/auth/login_page.dart';
 import 'package:campus_saga/presentation/pages/auth/register_page.dart';
@@ -41,6 +42,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<PostBloc>(
           create: (_) => sl<PostBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => sl<PromotionBloc>(),
         ),
       ],
       child: MaterialApp(

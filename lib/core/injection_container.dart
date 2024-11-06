@@ -5,6 +5,11 @@ import 'package:campus_saga/data/repositories/post_repository_impl.dart';
 import 'package:campus_saga/data/repositories/user_repository_impl.dart';
 import 'package:campus_saga/domain/repositories/post_repository.dart';
 import 'package:campus_saga/domain/repositories/user_repository.dart';
+import 'package:campus_saga/domain/usecases/add_comment_usecase.dart';
+import 'package:campus_saga/domain/usecases/add_feedback_usecase.dart';
+import 'package:campus_saga/domain/usecases/add_universtity_usecase.dart';
+import 'package:campus_saga/domain/usecases/add_vote_usecase.dart';
+import 'package:campus_saga/domain/usecases/create_promotion.dart';
 import 'package:campus_saga/domain/usecases/create_user_profile.dart';
 import 'package:campus_saga/domain/usecases/fetch_posts.dart';
 import 'package:campus_saga/domain/usecases/sign_in_user.dart';
@@ -15,6 +20,7 @@ import 'package:campus_saga/domain/usecases/upload_user_image.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
 import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
+import 'package:campus_saga/presentation/bloc/promotion/promotion_bloc.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -58,6 +64,12 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SignInUser(sl()));
   sl.registerLazySingleton(() => FetchPostsUsecase(sl()));
   sl.registerLazySingleton(() => UploadPostImages(sl()));
+  sl.registerLazySingleton(() => CreatePostUsecase (sl()));
+  sl.registerLazySingleton(() => AddCommentUsecase (sl()));
+  sl.registerLazySingleton(() => AddFeedbackUsecase (sl()));
+  sl.registerLazySingleton(() => AddUniverstityUsecase (sl()));
+  sl.registerLazySingleton(() => AddVoteUsecase (sl()));
+
 
   // BLoCs
   sl.registerLazySingleton(() => AuthBloc(
@@ -73,6 +85,10 @@ Future<void> init() async {
         uploadPostImages: sl(),
         issueBloc: sl(),
       ));
+
+  sl.registerLazySingleton(() => PromotionBloc(uploadPostImages: sl(),
+    createPromotion: sl(),
+  ));
 
   sl.registerLazySingleton(() => IssueBloc(fetchPosts: sl()));
 
