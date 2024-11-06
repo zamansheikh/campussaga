@@ -1,5 +1,3 @@
-// lib/domain/entities/university.dart
-
 import 'package:equatable/equatable.dart';
 
 class University extends Equatable {
@@ -7,11 +5,17 @@ class University extends Equatable {
   final String name;
   final String location;
   final bool isPublic;
-  final double researchScore; // Public score, 40%
-  final double qsRankingScore; // QS Ranking, 40%
-  final int totalPosts; // App activity metric
-  final int totalSolvedPosts; // App activity metric
-  final int interactions; // App activity metric (e.g., likes, comments)
+  final double researchScore;
+  final double qsRankingScore;
+  final int totalPosts;
+  final int totalSolvedPosts;
+  final int interactions;
+  final int studentCount;
+  final int facultyCount;
+  final int programsOffered;
+  final int establishmentYear;
+  final double academicScore;
+  final double satisfactionScore;
 
   const University({
     required this.id,
@@ -23,6 +27,12 @@ class University extends Equatable {
     this.totalPosts = 0,
     this.totalSolvedPosts = 0,
     this.interactions = 0,
+    this.studentCount = 0,
+    this.facultyCount = 0,
+    this.programsOffered = 0,
+    this.establishmentYear = 0,
+    this.academicScore = 0.0,
+    this.satisfactionScore = 0.0,
   });
 
   // Calculate the total ranking score with 80% public data and 20% app activity.
@@ -43,5 +53,11 @@ class University extends Equatable {
         totalPosts,
         totalSolvedPosts,
         interactions,
+        studentCount,
+        facultyCount,
+        programsOffered,
+        establishmentYear,
+        academicScore,
+        satisfactionScore,
       ];
 }

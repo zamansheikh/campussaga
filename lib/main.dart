@@ -1,9 +1,11 @@
 // lib/main.dart
+import 'package:campus_saga/presentation/pages/admin/admin_page.dart';
 import 'package:campus_saga/presentation/pages/auth/login_page.dart';
 import 'package:campus_saga/presentation/pages/auth/register_page.dart';
 import 'package:campus_saga/presentation/pages/home/home_page.dart';
 import 'package:campus_saga/presentation/pages/home/issue_page.dart';
 import 'package:campus_saga/presentation/pages/post/create_post_page.dart';
+import 'package:campus_saga/presentation/pages/ranking/ranking_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/injection_container.dart' as di;
@@ -55,6 +57,8 @@ class MyApp extends StatelessWidget {
           '/home': (context) => HomePage(),
           '/issue': (context) => IssuePage(),
           '/post': (context) => CreatePostPage(),
+          '/admin': (context) => AdminPage(),
+          '/ranking': (context) => RankingPage(),
         },
         home: SplashScreen(),
       ),
