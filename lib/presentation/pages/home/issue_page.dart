@@ -1,5 +1,6 @@
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/domain/entities/post.dart';
+import 'package:campus_saga/domain/entities/user.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
@@ -15,6 +16,7 @@ class IssuePage extends StatefulWidget {
 }
 
 class _IssuePageState extends State<IssuePage> {
+  var userState = null;
   @override
   void initState() {
     super.initState();
@@ -24,6 +26,9 @@ class _IssuePageState extends State<IssuePage> {
   void _fetchPosts() {
     final state = sl<AuthBloc>().state;
     if (state is AuthAuthenticated) {
+      setState(() {
+        userState = state.user;
+      });
       final String universityId =
           state.user.universityId.split('@').last.trim();
       print("Fetching posts for university: $universityId");
@@ -52,7 +57,6 @@ class _IssuePageState extends State<IssuePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: sl<AuthBloc>(),
@@ -202,6 +206,22 @@ class _IssuePageState extends State<IssuePage> {
           );
         },
       ),
+      floatingActionButton: (userState != null)
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (userState.userType == UserType.admin)
+                  FloatingActionButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/admin', arguments: {
+                        'user': userState,
+                      });
+                    },
+                    child: const Icon(Icons.admin_panel_settings),
+                  ),
+              ],
+            )
+          : null,
     );
   }
 }

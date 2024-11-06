@@ -1,218 +1,186 @@
+import 'package:campus_saga/domain/entities/university.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class RankingPage extends StatefulWidget {
-  const RankingPage({super.key});
+  const RankingPage({Key? key}) : super(key: key);
 
   @override
   State<RankingPage> createState() => _RankingPageState();
 }
 
 class _RankingPageState extends State<RankingPage> {
-  // Example list of university data - this will usually come from a data source
-  List<Map<String, dynamic>> universities = [
-    {
-      'name': 'University A',
-      'location': 'City X',
-      'researchScore': 85.0,
-      'qsRankingScore': 90.0,
-      'totalPosts': 120,
-      'totalSolvedPosts': 80,
-      'interactions': 300,
-      'isPublic': true,
-    },
-    {
-      'name': 'University B',
-      'location': 'City Y',
-      'researchScore': 75.0,
-      'qsRankingScore': 85.0,
-      'totalPosts': 100,
-      'totalSolvedPosts': 60,
-      'interactions': 250,
-      'isPublic': false,
-    },
-    // Add more universities as needed
+  List<University> universities = [
+    University(
+      id: '1',
+      name: 'Daffodil International University',
+      location: 'Dhaka, Bangladesh',
+      isPublic: false,
+      researchScore: 75.0,
+      qsRankingScore: 70.0,
+      totalPosts: 100,
+      totalSolvedPosts: 80,
+      interactions: 200,
+      studentCount: 25000,
+      facultyCount: 800,
+      programsOffered: 50,
+      establishmentYear: 2002,
+      academicScore: 85.0,
+      satisfactionScore: 90.0,
+    ),
+    University(
+      id: '2',
+      name: 'North South University',
+      location: 'Dhaka, Bangladesh',
+      isPublic: false,
+      researchScore: 80.0,
+      qsRankingScore: 75.0,
+      totalPosts: 120,
+      totalSolvedPosts: 90,
+      interactions: 250,
+      studentCount: 20000,
+      facultyCount: 600,
+      programsOffered: 40,
+      establishmentYear: 1993,
+      academicScore: 80.0,
+      satisfactionScore: 85.0,
+    ),
+    University(
+      id: '3',
+      name: 'University of Dhaka',
+      location: 'Dhaka, Bangladesh',
+      isPublic: true,
+      researchScore: 85.0,
+      qsRankingScore: 80.0,
+      totalPosts: 150,
+      totalSolvedPosts: 120,
+      interactions: 300,
+      studentCount: 30000,
+      facultyCount: 1000,
+      programsOffered: 60,
+      establishmentYear: 1921,
+      academicScore: 90.0,
+      satisfactionScore: 95.0,
+    ),
   ];
 
-  List<Map<String, dynamic>> filteredUniversities = [];
   String searchQuery = '';
-  bool showPublicOnly = true;
+  String filter = 'All Universities';
+  bool showMetrics = true;
 
-  @override
-  void initState() {
-    super.initState();
-    filteredUniversities =
-        universities; // Initial display shows all universities
-  }
+  List<University> get filteredUniversities {
+    List<University> filtered = universities.where((university) {
+      return university.name.toLowerCase().contains(searchQuery.toLowerCase());
+    }).toList();
 
-  void updateSearchResults() {
-    setState(() {
-      filteredUniversities = universities.where((university) {
-        final matchesSearch = university['name']
-            .toLowerCase()
-            .contains(searchQuery.toLowerCase());
-        final matchesFilter =
-            showPublicOnly ? university['isPublic'] : !university['isPublic'];
-        return matchesSearch && matchesFilter;
-      }).toList();
-    });
-  }
+    if (filter == 'Public Universities') {
+      filtered = filtered.where((university) => university.isPublic).toList();
+    } else if (filter == 'Private Universities') {
+      filtered = filtered.where((university) => !university.isPublic).toList();
+    }
 
-  double calculateRankingScore(Map<String, dynamic> university) {
-    double publicScore = 0.8 *
-        ((0.5 * university['researchScore']) +
-            (0.5 * university['qsRankingScore']));
-    double appActivityScore = 0.2 *
-        (university['totalPosts'] * 0.5 +
-            university['totalSolvedPosts'] * 0.3 +
-            university['interactions'] * 0.2);
-    return publicScore + appActivityScore;
+    return filtered;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
-        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
         centerTitle: true,
         title: Text(
-          "Rankings",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
+          'University Rankings',
+          style: GoogleFonts.poppins(
+            fontSize: 20,
             fontWeight: FontWeight.bold,
+            color: Colors.purple,
           ),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Search University',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+            const SizedBox(height: 8),
+            Text(
+              'University Rankings 2023',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              onChanged: (value) {
-                searchQuery = value;
-                updateSearchResults();
-              },
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 4),
+            Text(
+              'Explore top universities based on academic excellence, research output, and student satisfaction.',
+              style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Filter by Type:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-                // Wrap the DropdownButton with a Container for decoration
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      canvasColor: Colors.white,
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: ButtonTheme(
-                        alignedDropdown: true,
-                        child: DropdownButton<bool>(
-                          value: showPublicOnly,
-                          borderRadius: BorderRadius.circular(8),
-                          items: [
-                            DropdownMenuItem(
-                              value: true,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                child: Text("Public"),
-                              ),
-                            ),
-                            DropdownMenuItem(
-                              value: false,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                child: Text("Private"),
-                              ),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            setState(() {
-                              showPublicOnly = value!;
-                              updateSearchResults();
-                            });
-                          },
-                        ),
+                Expanded(
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Search universities',
+                      prefixIcon: Icon(Icons.search, color: Colors.grey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
                       ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
                     ),
                   ),
-                )
+                ),
+                const SizedBox(width: 8),
+                DropdownButton<String>(
+                  value: filter,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'All Universities',
+                      child: Text('All Universities'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Public Universities',
+                      child: Text('Public Universities'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Private Universities',
+                      child: Text('Private Universities'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      filter = value!;
+                    });
+                  },
+                  underline: Container(),
+                  icon: Icon(Icons.arrow_drop_down, color: Colors.grey),
+                  style: GoogleFonts.poppins(color: Colors.black, fontSize: 14),
+                ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
                 itemCount: filteredUniversities.length,
                 itemBuilder: (context, index) {
                   final university = filteredUniversities[index];
-                  final rankingScore = calculateRankingScore(university);
-
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            university['name'],
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            'Location: ${university['location']}',
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Research Score: ${university['researchScore']}',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          Text(
-                            'QS Ranking Score: ${university['qsRankingScore']}',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'App Activity Score: ${university['totalPosts']} posts, '
-                            '${university['totalSolvedPosts']} solved posts, '
-                            '${university['interactions']} interactions',
-                            style: TextStyle(color: Colors.grey[700]),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Total Ranking Score: ${rankingScore.toStringAsFixed(2)}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  return UniversityCard(
+                    university: university,
+                    rank: index + 1,
+                    showMetrics: showMetrics,
+                    onToggleView: () {
+                      setState(() {
+                        showMetrics = !showMetrics;
+                      });
+                    },
                   );
                 },
               ),
@@ -220,6 +188,119 @@ class _RankingPageState extends State<RankingPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class UniversityCard extends StatelessWidget {
+  final University university;
+  final int rank;
+  final bool showMetrics;
+  final VoidCallback onToggleView;
+
+  const UniversityCard({
+    Key? key,
+    required this.university,
+    required this.rank,
+    required this.showMetrics,
+    required this.onToggleView,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              university.name,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              'Rank: #$rank',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 8),
+            ToggleButtons(
+              children: [Text('Metrics'), Text('Details')],
+              onPressed: (index) => onToggleView(),
+              isSelected: [showMetrics, !showMetrics],
+              selectedColor: Colors.black,
+              color: Colors.grey,
+              fillColor: Colors.grey[200],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            const SizedBox(height: 8),
+            if (showMetrics) ...[
+              _buildMetricRow(
+                  'Academic', university.academicScore, Colors.green),
+              _buildMetricRow(
+                  'Research', university.researchScore, Colors.orange),
+              _buildMetricRow(
+                  'Satisfaction', university.satisfactionScore, Colors.blue),
+            ] else ...[
+              Row(
+                children: [
+                  _buildDetailItem(
+                      Icons.group, '${university.studentCount} Students'),
+                  _buildDetailItem(
+                      Icons.person, '${university.facultyCount} Faculty'),
+                  _buildDetailItem(
+                      Icons.book, '${university.programsOffered} Programs'),
+                  _buildDetailItem(Icons.calendar_today,
+                      'Est. ${university.establishmentYear}'),
+                ],
+              )
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetricRow(String label, double score, Color color) {
+    return Row(
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(fontSize: 14),
+        ),
+        Expanded(
+          child: LinearProgressIndicator(
+            value: score / 100,
+            color: color,
+            backgroundColor: color.withOpacity(0.2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '${score.toStringAsFixed(0)}%',
+          style: GoogleFonts.poppins(fontSize: 14),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailItem(IconData icon, String label) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.grey[600]),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
+        ),
+      ],
     );
   }
 }
