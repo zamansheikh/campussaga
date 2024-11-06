@@ -2,6 +2,12 @@
 
 import 'dart:io';
 
+import 'package:campus_saga/data/models/comment_model.dart';
+import 'package:campus_saga/data/models/feedback_model.dart';
+import 'package:campus_saga/data/models/university_model.dart';
+import 'package:campus_saga/domain/entities/comment.dart';
+import 'package:campus_saga/domain/entities/feedback.dart';
+import 'package:campus_saga/domain/entities/university.dart';
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/post.dart';
 import '../../domain/repositories/post_repository.dart';
@@ -64,6 +70,50 @@ class PostRepositoryImpl implements PostRepository {
     try {
       final urls = await dataSource.uploadPostImages(userId, image);
       return Right(urls);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> addComment(
+      String postId, Comment comment) async {
+    try {
+      await dataSource.addComment(postId, CommentModel.fromEntity(comment));
+      return Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> addFeedback(
+      String postId, AuthorityFeedback feedback) async {
+    try {
+      dataSource.addFeedback(
+          postId, AuthorityFeedbackModel.fromEntity(feedback));
+      return Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> addVote(
+      String postId, String userId, bool isTrueVote) async {
+    try {
+      await dataSource.addVote(postId, userId, isTrueVote);
+      return Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> addUniversity(University university)async {
+    try {
+      final result = await dataSource.addUniversity(UniversityModel.fromEntity(university));
+      return Right(result);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

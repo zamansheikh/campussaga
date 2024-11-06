@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'dart:math';
+import 'package:campus_saga/data/models/university_model.dart';
 import 'package:path/path.dart' as p;
 import 'package:campus_saga/core/usecases/usecase.dart';
 import 'package:campus_saga/data/models/comment_model.dart';
@@ -137,6 +138,37 @@ class FirebaseDataSource {
     return timelinePosts;
   }
 
+  //Add commnet to a specific post
+  Future<void> addComment(String postId, CommentModel comment) async {
+    await firestore.collection('posts').doc(postId).update({
+      'comments': FieldValue.arrayUnion([comment.toJson()]),
+    });
+  }
+  
+  //add feedback to a specific post
+  Future<void> addFeedback(String postId, AuthorityFeedbackModel feedback) async {
+    await firestore.collection('posts').doc(postId).update({
+      'feedback': feedback.toJson(),
+    });
+  }
+
+  //Add a vote to a specific post
+  Future<void> addVote(String postId, String userId, bool isTrueVote) async {
+    await firestore.collection('posts').doc(postId).update({
+      'votes': FieldValue.arrayUnion([userId]),
+    });
+
+    if (isTrueVote) {
+      await firestore.collection('posts').doc(postId).update({
+        'trueVotes': FieldValue.increment(1),
+      });
+    } else {
+      await firestore.collection('posts').doc(postId).update({
+        'falseVotes': FieldValue.increment(1),
+      });
+    }
+  }
+
   Future<void> updatePostStatus(String postId, bool isResolved) async {
     await firestore.collection('posts').doc(postId).update({
       'isResolved': isResolved,
@@ -191,4 +223,15 @@ class FirebaseDataSource {
   Future<void> signOutUser() async {
     await firebaseAuth.signOut();
   }
+
+
+  //Add university
+  Future<void> addUniversity(UniversityModel university) async {
+    try {
+      await firestore.collection('universities').doc(university.id).set(university.toJson());
+    } catch (e) {
+      throw Exception('University creation failed');
+    }
+  }
+  
 }
