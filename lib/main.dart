@@ -5,6 +5,7 @@ import 'package:campus_saga/presentation/pages/home/home_page.dart';
 import 'package:campus_saga/presentation/pages/home/issue_page.dart';
 import 'package:campus_saga/presentation/pages/post/create_post_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'core/injection_container.dart' as di;
 import 'package:campus_saga/presentation/pages/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
         title: 'Campus Saga',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
           primarySwatch: Colors.blue,
         ),
         routes: {

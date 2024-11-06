@@ -56,14 +56,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
         ),
         centerTitle: true,
         title: Text(
-          "Campus Saga",
+          "Posting",
           style: TextStyle(
             color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
-        
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
