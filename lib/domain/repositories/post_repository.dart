@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:campus_saga/domain/entities/comment.dart';
 import 'package:campus_saga/domain/entities/feedback.dart';
+import 'package:campus_saga/domain/entities/promotion.dart';
 import 'package:campus_saga/domain/entities/university.dart';
 import 'package:dartz/dartz.dart';
 import '../entities/post.dart';
@@ -23,4 +24,7 @@ abstract class PostRepository {
   Future<Either<Failure, void>> addVote(String postId, String userId, bool isTrueVote);
   //add university to university collection
   Future<Either<Failure, void>> addUniversity(University university);
+
+  //Create a promotion post
+  Future<Either<Failure, Promotion>> createPromotion(Promotion promotion);
 }

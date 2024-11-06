@@ -1,7 +1,5 @@
 // lib/presentation/bloc/post/post_event.dart
-
 import 'dart:io';
-
 import 'package:equatable/equatable.dart';
 import '../../../domain/entities/post.dart';
 

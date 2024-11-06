@@ -4,13 +4,14 @@ import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
 import 'package:campus_saga/presentation/bloc/post/post_event.dart';
 import 'package:campus_saga/presentation/bloc/post/post_state.dart';
+import 'package:campus_saga/presentation/bloc/promotion/promotion_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class CreatePostPage extends StatefulWidget {
-  final VoidCallback? onPostCreated;
+  final void Function(int index)? onPostCreated;
 
   const CreatePostPage({Key? key, this.onPostCreated}) : super(key: key);
 
@@ -21,6 +22,8 @@ class CreatePostPage extends StatefulWidget {
 class _CreatePostPageState extends State<CreatePostPage> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController eventLinkController = TextEditingController();
+  final TextEditingController clubNameController = TextEditingController();
   final List<File> selectedImages = [];
   String? postType;
 
@@ -40,10 +43,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
     });
   }
 
-  void handlePostCreation() {
-    widget.onPostCreated?.call();
+  void handlePostCreation(int index) {
+    widget.onPostCreated?.call(index);
     titleController.clear();
     descriptionController.clear();
+    eventLinkController.clear();
+    clubNameController.clear();
     setState(() {
       selectedImages.clear();
       postType = null;
@@ -129,6 +134,24 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 border: OutlineInputBorder(),
               ),
             ),
+            if (postType == "Promotional") ...[
+              const SizedBox(height: 16),
+              TextField(
+                controller: clubNameController,
+                decoration: const InputDecoration(
+                  labelText: "Club Name",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: eventLinkController,
+                decoration: const InputDecoration(
+                  labelText: "Event Link",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             Text(
               "Attachment",
@@ -193,31 +216,73 @@ class _CreatePostPageState extends State<CreatePostPage> {
               builder: (authcontext, state) {
                 if (state is AuthAuthenticated) {
                   final user = state.user;
-                  return BlocConsumer<PostBloc, PostState>(
-                    listener: (postcontext, poststate) {
-                      if (poststate is PostingSuccess) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Post created successfully"),
-                          ),
-                        );
-                        handlePostCreation();
-                      } else if (poststate is PostingFailure) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                "Post creation failed: ${poststate.message}"),
-                          ),
-                        );
-                      }
-                    },
-                    builder: (postcontext, poststate) {
-                      if (poststate is PostingLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      } else {
-                        return Center(
+                  return MultiBlocListener(
+                    listeners: [
+                      BlocListener<PostBloc, PostState>(
+                        listener: (postcontext, poststate) {
+                          if (poststate is PostingSuccess) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Post created successfully"),
+                              ),
+                            );
+                            handlePostCreation(0);
+                          } else if (poststate is PostingFailure) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    "Post creation failed: ${poststate.message}"),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      BlocListener<PromotionBloc, PromotionState>(
+                        listener: (promotioncontext, promotionstate) {
+                          if (promotionstate is PromotionPostingSuccess) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Promotion created successfully"),
+                              ),
+                            );
+                            handlePostCreation(1);
+                          } else if (promotionstate
+                              is PromotionPostingFailure) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    "Promotion creation failed: ${promotionstate.message}"),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                    child: Column(
+                      children: [
+                        BlocBuilder<PostBloc, PostState>(
+                          builder: (postcontext, poststate) {
+                            if (poststate is PostingLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        ),
+                        BlocBuilder<PromotionBloc, PromotionState>(
+                          builder: (promotioncontext, promotionstate) {
+                            if (promotionstate is PromotionPostingLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        ),
+                        Center(
                           child: ElevatedButton(
                             onPressed: () async {
                               if (postType == "Problem") {
@@ -233,10 +298,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   user,
                                   titleController.text,
                                   descriptionController.text,
+                                  clubNameController.text,
+                                  eventLinkController.text,
+                                  DateTime.now().add(const Duration(days: 7)),
                                 );
-                                // BlocProvider.of<PostBloc>(context)
-                                //     .add(PostCreated(promotion, selectedImages));
+                                BlocProvider.of<PromotionBloc>(context).add(
+                                    PromotionPostCreated(
+                                        promotion, selectedImages));
                                 print("Promotional post");
+                                
                               }
                             },
                             child: const Padding(
@@ -246,9 +316,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   style: TextStyle(fontSize: 16)),
                             ),
                           ),
-                        );
-                      }
-                    },
+                        ),
+                      ],
+                    ),
                   );
                 } else {
                   return const Center(

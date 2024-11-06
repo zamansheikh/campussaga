@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'dart:math';
+import 'package:campus_saga/data/models/promotion_model.dart';
 import 'package:campus_saga/data/models/university_model.dart';
 import 'package:path/path.dart' as p;
 import 'package:campus_saga/core/usecases/usecase.dart';
@@ -38,6 +39,12 @@ class FirebaseDataSource {
   Future<void> createPost(PostModel post) async {
     //create doc baseed on the post id
     await firestore.collection('posts').doc(post.id).set(post.toJson());
+  }
+
+  //Create a promotion post
+  Future<void> createPromotion(PromotionModel promotion) async {
+    //create doc baseed on the post id
+    await firestore.collection('promotion').doc(promotion.id).set(promotion.toJson());
   }
 
   Future<void> createFeedback(

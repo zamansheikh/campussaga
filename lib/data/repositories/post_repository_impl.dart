@@ -4,9 +4,11 @@ import 'dart:io';
 
 import 'package:campus_saga/data/models/comment_model.dart';
 import 'package:campus_saga/data/models/feedback_model.dart';
+import 'package:campus_saga/data/models/promotion_model.dart';
 import 'package:campus_saga/data/models/university_model.dart';
 import 'package:campus_saga/domain/entities/comment.dart';
 import 'package:campus_saga/domain/entities/feedback.dart';
+import 'package:campus_saga/domain/entities/promotion.dart';
 import 'package:campus_saga/domain/entities/university.dart';
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/post.dart';
@@ -110,10 +112,22 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<Either<Failure, void>> addUniversity(University university)async {
+  Future<Either<Failure, void>> addUniversity(University university) async {
     try {
-      final result = await dataSource.addUniversity(UniversityModel.fromEntity(university));
+      final result = await dataSource
+          .addUniversity(UniversityModel.fromEntity(university));
       return Right(result);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Promotion>> createPromotion(
+      Promotion promotion) async {
+    try {
+      await dataSource.createPromotion(PromotionModel.fromEntity(promotion));
+      return Right(promotion);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
