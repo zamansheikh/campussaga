@@ -24,14 +24,13 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         centerTitle: true,
         title: Text(
-          "Campus Saga",
+          "User Profile",
           style: TextStyle(
             color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
-       
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
