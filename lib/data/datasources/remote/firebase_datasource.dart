@@ -41,7 +41,7 @@ class FirebaseDataSource {
 
   Future<void> createFeedback(
       String postId, String authorityId, String message) async {
-    final feedback = FeedbackModel(
+    final feedback = AuthorityFeedbackModel(
       id: postId,
       authorityId: authorityId,
       postId: postId,

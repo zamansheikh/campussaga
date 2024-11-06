@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Feedback extends Equatable {
+class AuthorityFeedback extends Equatable {
   final String id;
   final String authorityId; // University authority who provided the feedback
   final String postId;
@@ -10,7 +10,7 @@ class Feedback extends Equatable {
   final int disagreeCount; // Disagree votes for resolved feedback
   final DateTime timestamp;
 
-  const Feedback({
+  const AuthorityFeedback({
     required this.id,
     required this.authorityId,
     required this.postId,

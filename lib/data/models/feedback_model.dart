@@ -1,7 +1,7 @@
 // feedback_model.dart
 import 'package:campus_saga/domain/entities/feedback.dart';
 
-class FeedbackModel {
+class AuthorityFeedbackModel {
   final String id;
   final String authorityId;
   final String postId;
@@ -11,7 +11,7 @@ class FeedbackModel {
   final int disagreeCount;
   final DateTime timestamp;
 
-  const FeedbackModel({
+  const AuthorityFeedbackModel({
     required this.id,
     required this.authorityId,
     required this.postId,
@@ -22,7 +22,7 @@ class FeedbackModel {
     required this.timestamp,
   });
 
-  factory FeedbackModel.fromJson(Map<String, dynamic> json) => FeedbackModel(
+  factory AuthorityFeedbackModel.fromJson(Map<String, dynamic> json) => AuthorityFeedbackModel(
         id: json['id'] as String,
         authorityId: json['authorityId'] as String,
         postId: json['postId'] as String,
@@ -44,7 +44,7 @@ class FeedbackModel {
         'timestamp': timestamp.toIso8601String(),
       };
 
-  factory FeedbackModel.fromEntity(Feedback entity) => FeedbackModel(
+  factory AuthorityFeedbackModel.fromEntity(AuthorityFeedback entity) => AuthorityFeedbackModel(
         id: entity.id,
         authorityId: entity.authorityId,
         postId: entity.postId,
@@ -55,7 +55,7 @@ class FeedbackModel {
         timestamp: entity.timestamp,
       );
 
-  Feedback toEntity() => Feedback(
+  AuthorityFeedback toEntity() => AuthorityFeedback(
         id: id,
         authorityId: authorityId,
         postId: postId,
@@ -66,7 +66,7 @@ class FeedbackModel {
         timestamp: timestamp,
       );
 
-  FeedbackModel copyWith({
+  AuthorityFeedbackModel copyWith({
     String? id,
     String? authorityId,
     String? postId,
@@ -76,7 +76,7 @@ class FeedbackModel {
     int? disagreeCount,
     DateTime? timestamp,
   }) =>
-      FeedbackModel(
+      AuthorityFeedbackModel(
         id: id ?? this.id,
         authorityId: authorityId ?? this.authorityId,
         postId: postId ?? this.postId,

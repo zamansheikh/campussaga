@@ -9,24 +9,30 @@ class PromotionModel extends Promotion {
     required String universityId,
     required String promotionTitle,
     required String description,
+    required String clubName,
     required DateTime timestamp,
+    DateTime? expiryDate,
     List<String> imageUrls = const [],
-    int trueVotes = 0,
-    int falseVotes = 0,
-    Set<String> trueVoterIds = const {},
-    Set<String> falseVoterIds = const {},
+    String? eventLink,
+    int likes = 0,
+    int dislikes = 0,
+    Set<String> likeVoterIds = const {},
+    Set<String> dislikeVoterIds = const {},
   }) : super(
           id: id,
           userId: userId,
           universityId: universityId,
           promotionTitle: promotionTitle,
           description: description,
+          clubName: clubName,
           timestamp: timestamp,
+          expiryDate: expiryDate,
           imageUrls: imageUrls,
-          trueVotes: trueVotes,
-          falseVotes: falseVotes,
-          trueVoterIds: trueVoterIds,
-          falseVoterIds: falseVoterIds,
+          eventLink: eventLink,
+          likes: likes,
+          dislikes: dislikes,
+          likeVoterIds: likeVoterIds,
+          dislikeVoterIds: dislikeVoterIds,
         );
 
   factory PromotionModel.fromJson(Map<String, dynamic> json) {
@@ -36,21 +42,15 @@ class PromotionModel extends Promotion {
       universityId: json['universityId'] as String,
       promotionTitle: json['promotionTitle'] as String,
       description: json['description'] as String,
+      clubName: json['clubName'] as String,
       timestamp: DateTime.parse(json['timestamp'] as String),
-      imageUrls: (json['imageUrls'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [],
-      trueVotes: json['trueVotes'] as int? ?? 0,
-      falseVotes: json['falseVotes'] as int? ?? 0,
-      trueVoterIds: (json['trueVoterIds'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toSet() ??
-          {},
-      falseVoterIds: (json['falseVoterIds'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toSet() ??
-          {},
+      expiryDate: json['expiryDate'] != null ? DateTime.parse(json['expiryDate'] as String) : null,
+      imageUrls: (json['imageUrls'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      eventLink: json['eventLink'] as String?,
+      likes: json['likes'] as int? ?? 0,
+      dislikes: json['dislikes'] as int? ?? 0,
+      likeVoterIds: (json['likeVoterIds'] as List<dynamic>?)?.map((e) => e as String).toSet() ?? {},
+      dislikeVoterIds: (json['dislikeVoterIds'] as List<dynamic>?)?.map((e) => e as String).toSet() ?? {},
     );
   }
 
@@ -61,12 +61,15 @@ class PromotionModel extends Promotion {
       'universityId': universityId,
       'promotionTitle': promotionTitle,
       'description': description,
+      'clubName': clubName,
       'timestamp': timestamp.toIso8601String(),
+      'expiryDate': expiryDate?.toIso8601String(),
       'imageUrls': imageUrls,
-      'trueVotes': trueVotes,
-      'falseVotes': falseVotes,
-      'trueVoterIds': trueVoterIds.toList(),
-      'falseVoterIds': falseVoterIds.toList(),
+      'eventLink': eventLink,
+      'likes': likes,
+      'dislikes': dislikes,
+      'likeVoterIds': likeVoterIds.toList(),
+      'dislikeVoterIds': dislikeVoterIds.toList(),
     };
   }
 
@@ -77,12 +80,15 @@ class PromotionModel extends Promotion {
       universityId: promotion.universityId,
       promotionTitle: promotion.promotionTitle,
       description: promotion.description,
+      clubName: promotion.clubName,
       timestamp: promotion.timestamp,
+      expiryDate: promotion.expiryDate,
       imageUrls: promotion.imageUrls,
-      trueVotes: promotion.trueVotes,
-      falseVotes: promotion.falseVotes,
-      trueVoterIds: promotion.trueVoterIds,
-      falseVoterIds: promotion.falseVoterIds,
+      eventLink: promotion.eventLink,
+      likes: promotion.likes,
+      dislikes: promotion.dislikes,
+      likeVoterIds: promotion.likeVoterIds,
+      dislikeVoterIds: promotion.dislikeVoterIds,
     );
   }
 
@@ -93,12 +99,15 @@ class PromotionModel extends Promotion {
       universityId: universityId,
       promotionTitle: promotionTitle,
       description: description,
+      clubName: clubName,
       timestamp: timestamp,
+      expiryDate: expiryDate,
       imageUrls: imageUrls,
-      trueVotes: trueVotes,
-      falseVotes: falseVotes,
-      trueVoterIds: trueVoterIds,
-      falseVoterIds: falseVoterIds,
+      eventLink: eventLink,
+      likes: likes,
+      dislikes: dislikes,
+      likeVoterIds: likeVoterIds,
+      dislikeVoterIds: dislikeVoterIds,
     );
   }
 
@@ -108,12 +117,15 @@ class PromotionModel extends Promotion {
     String? universityId,
     String? promotionTitle,
     String? description,
+    String? clubName,
     DateTime? timestamp,
+    DateTime? expiryDate,
     List<String>? imageUrls,
-    int? trueVotes,
-    int? falseVotes,
-    Set<String>? trueVoterIds,
-    Set<String>? falseVoterIds,
+    String? eventLink,
+    int? likes,
+    int? dislikes,
+    Set<String>? likeVoterIds,
+    Set<String>? dislikeVoterIds,
   }) {
     return PromotionModel(
       id: id ?? this.id,
@@ -121,12 +133,15 @@ class PromotionModel extends Promotion {
       universityId: universityId ?? this.universityId,
       promotionTitle: promotionTitle ?? this.promotionTitle,
       description: description ?? this.description,
+      clubName: clubName ?? this.clubName,
       timestamp: timestamp ?? this.timestamp,
+      expiryDate: expiryDate ?? this.expiryDate,
       imageUrls: imageUrls ?? this.imageUrls,
-      trueVotes: trueVotes ?? this.trueVotes,
-      falseVotes: falseVotes ?? this.falseVotes,
-      trueVoterIds: trueVoterIds ?? this.trueVoterIds,
-      falseVoterIds: falseVoterIds ?? this.falseVoterIds,
+      eventLink: eventLink ?? this.eventLink,
+      likes: likes ?? this.likes,
+      dislikes: dislikes ?? this.dislikes,
+      likeVoterIds: likeVoterIds ?? this.likeVoterIds,
+      dislikeVoterIds: dislikeVoterIds ?? this.dislikeVoterIds,
     );
   }
 }

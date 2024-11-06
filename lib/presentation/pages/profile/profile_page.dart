@@ -1,4 +1,5 @@
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_saga/domain/entities/user.dart';
@@ -31,6 +32,14 @@ class _ProfilePageState extends State<ProfilePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              // Navigate to notifications page
+            },
+          ),
+        ],
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -62,6 +71,40 @@ class _ProfilePageState extends State<ProfilePage> {
                     // Student Details (if applicable)
                     if (user.userType == UserType.student)
                       _buildStudentDetails(user),
+
+                    // Logout Button
+                    const SizedBox(height: 24.0),
+                    //edit profile button
+                    CustomButton(
+                      color: Colors.indigoAccent,
+                      text: "Edit Profile",
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/edit-profile');
+                      },
+                    ),
+                    CustomButton(
+                      color: Colors.green,
+                      text: "Terms and Conditions",
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pushNamed('/terms-and-conditions');
+                      },
+                    ),
+                    CustomButton(
+                      color: Colors.blue,
+                      text: "About Us",
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/about-us');
+                      },
+                    ),
+
+                    CustomButton(
+                      color: Colors.red,
+                      text: "Logout",
+                      onPressed: () {
+                        BlocProvider.of<AuthBloc>(context).add(SignOutEvent());
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -339,5 +382,39 @@ class _ProfilePageState extends State<ProfilePage> {
       case UserType.admin:
         return "Admin";
     }
+  }
+}
+
+class CustomButton extends StatelessWidget {
+  final Color? color;
+  final String text;
+  final Function()? onPressed;
+
+  const CustomButton({
+    Key? key,
+    this.color,
+    required this.text,
+    this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor:
+              color ?? Colors.red, // Use provided color or default to red
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0), // Border radius
+          ),
+        ),
+        onPressed: onPressed,
+        child: Text(
+          text, // Use provided text or default to "Button"
+          style: const TextStyle(color: Colors.white), // Text color
+        ),
+      ),
+    );
   }
 }
