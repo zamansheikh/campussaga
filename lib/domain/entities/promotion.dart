@@ -6,12 +6,15 @@ class Promotion extends Equatable {
   final String universityId;
   final String promotionTitle;
   final String description;
+  final String clubName;
   final DateTime timestamp;
+  final DateTime? expiryDate;
   final List<String> imageUrls;
-  final int trueVotes;
-  final int falseVotes;
-  final Set<String> trueVoterIds; // Track users who voted true
-  final Set<String> falseVoterIds; // Track users who voted false
+  final String? eventLink;
+  final int likes;
+  final int dislikes;
+  final Set<String> likeVoterIds; // Track users who voted true
+  final Set<String> dislikeVoterIds; // Track users who voted false
 
   const Promotion({
     required this.id,
@@ -19,29 +22,32 @@ class Promotion extends Equatable {
     required this.universityId,
     required this.promotionTitle,
     required this.description,
+    required this.clubName,
     required this.timestamp,
+    this.expiryDate,
     this.imageUrls = const [],
-    this.trueVotes = 0,
-    this.falseVotes = 0,
-    this.trueVoterIds = const {},
-    this.falseVoterIds = const {},
+    this.eventLink,
+    this.likes = 0,
+    this.dislikes = 0,
+    this.likeVoterIds = const {},
+    this.dislikeVoterIds = const {},
   });
 
-  bool hasUserVotedTrue(String userId) => trueVoterIds.contains(userId);
-  bool hasUserVotedFalse(String userId) => falseVoterIds.contains(userId);
+  bool hasUserVotedTrue(String userId) => likeVoterIds.contains(userId);
+  bool hasUserVotedFalse(String userId) => dislikeVoterIds.contains(userId);
 
   Promotion toggleTrueVote(String voterId) {
     if (hasUserVotedTrue(voterId)) {
       return copyWith(
-        trueVotes: trueVotes - 1,
-        trueVoterIds: Set<String>.from(trueVoterIds)..remove(voterId),
+        likes: likes - 1,
+        likeVoterIds: Set<String>.from(likeVoterIds)..remove(voterId),
       );
     } else {
       return copyWith(
-        trueVotes: trueVotes + 1,
-        falseVotes: hasUserVotedFalse(voterId) ? falseVotes - 1 : falseVotes,
-        trueVoterIds: Set<String>.from(trueVoterIds)..add(voterId),
-        falseVoterIds: Set<String>.from(falseVoterIds)..remove(voterId),
+        likes: likes + 1,
+        dislikes: hasUserVotedFalse(voterId) ? dislikes - 1 : dislikes,
+        likeVoterIds: Set<String>.from(likeVoterIds)..add(voterId),
+        dislikeVoterIds: Set<String>.from(dislikeVoterIds)..remove(voterId),
       );
     }
   }
@@ -49,15 +55,15 @@ class Promotion extends Equatable {
   Promotion toggleFalseVote(String voterId) {
     if (hasUserVotedFalse(voterId)) {
       return copyWith(
-        falseVotes: falseVotes - 1,
-        falseVoterIds: Set<String>.from(falseVoterIds)..remove(voterId),
+        dislikes: dislikes - 1,
+        dislikeVoterIds: Set<String>.from(dislikeVoterIds)..remove(voterId),
       );
     } else {
       return copyWith(
-        falseVotes: falseVotes + 1,
-        trueVotes: hasUserVotedTrue(voterId) ? trueVotes - 1 : trueVotes,
-        falseVoterIds: Set<String>.from(falseVoterIds)..add(voterId),
-        trueVoterIds: Set<String>.from(trueVoterIds)..remove(voterId),
+        dislikes: dislikes + 1,
+        likes: hasUserVotedTrue(voterId) ? likes - 1 : likes,
+        dislikeVoterIds: Set<String>.from(dislikeVoterIds)..add(voterId),
+        likeVoterIds: Set<String>.from(likeVoterIds)..remove(voterId),
       );
     }
   }
@@ -68,12 +74,15 @@ class Promotion extends Equatable {
     String? universityId,
     String? promotionTitle,
     String? description,
+    String? clubName,
     DateTime? timestamp,
+    DateTime? expiryDate,
     List<String>? imageUrls,
-    int? trueVotes,
-    int? falseVotes,
-    Set<String>? trueVoterIds,
-    Set<String>? falseVoterIds,
+    String? eventLink,
+    int? likes,
+    int? dislikes,
+    Set<String>? likeVoterIds,
+    Set<String>? dislikeVoterIds,
   }) {
     return Promotion(
       id: id ?? this.id,
@@ -81,12 +90,15 @@ class Promotion extends Equatable {
       universityId: universityId ?? this.universityId,
       promotionTitle: promotionTitle ?? this.promotionTitle,
       description: description ?? this.description,
+      clubName: clubName ?? this.clubName,
       timestamp: timestamp ?? this.timestamp,
+      expiryDate: expiryDate ?? this.expiryDate,
       imageUrls: imageUrls ?? this.imageUrls,
-      trueVotes: trueVotes ?? this.trueVotes,
-      falseVotes: falseVotes ?? this.falseVotes,
-      trueVoterIds: trueVoterIds ?? this.trueVoterIds,
-      falseVoterIds: falseVoterIds ?? this.falseVoterIds,
+      eventLink: eventLink ?? this.eventLink,
+      likes: likes ?? this.likes,
+      dislikes: dislikes ?? this.dislikes,
+      likeVoterIds: likeVoterIds ?? this.likeVoterIds,
+      dislikeVoterIds: dislikeVoterIds ?? this.dislikeVoterIds,
     );
   }
 
@@ -97,11 +109,14 @@ class Promotion extends Equatable {
         universityId,
         promotionTitle,
         description,
+        clubName,
         timestamp,
+        expiryDate,
         imageUrls,
-        trueVotes,
-        falseVotes,
-        trueVoterIds,
-        falseVoterIds,
+        eventLink,
+        likes,
+        dislikes,
+        likeVoterIds,
+        dislikeVoterIds,
       ];
 }

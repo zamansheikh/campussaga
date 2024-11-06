@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:campus_saga/domain/entities/post.dart';
 import 'package:campus_saga/domain/entities/user.dart';
+import 'package:campus_saga/presentation/pages/widgets/comments_widget.dart';
+import 'package:campus_saga/presentation/pages/widgets/feedback_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -11,8 +13,8 @@ class PostCard extends StatelessWidget {
   final VoidCallback? onReject;
 
   const PostCard({
-    Key? key, 
-    required this.post, 
+    Key? key,
+    required this.post,
     required this.user,
     this.onResolve,
     this.onReject,
@@ -29,30 +31,42 @@ class PostCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with timestamp
+            // Header with username and timestamp
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Text(
-                    post.postTitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
+                CircleAvatar(
+                  backgroundColor: Colors.grey[300],
+                  child: const Icon(Icons.person, color: Colors.white),
                 ),
-                Text(
-                  timeago.format(post.timestamp),
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Anonymous",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      timeago.format(post.timestamp),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    ),
+                  ],
                 ),
               ],
             ),
+            const SizedBox(height: 12.0),
+
+            // Post Title
+            Text(
+              post.postTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
             const SizedBox(height: 8.0),
 
-            // Description
+            // Post Description
             Text(
               post.description,
-              maxLines: 6,
+              maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(color: Colors.grey[700]),
             ),
@@ -69,12 +83,13 @@ class PostCard extends StatelessWidget {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: GestureDetector(
-                        onTap: () => _showFullImage(context, post.imageUrls[index]),
+                        onTap: () =>
+                            _showFullImage(context, post.imageUrls[index]),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8.0),
                           child: CachedNetworkImage(
                             imageUrl: post.imageUrls[index],
-                            width: 150,
+                            width: 250,
                             fit: BoxFit.cover,
                             placeholder: (context, url) => Container(
                               color: Colors.grey[200],
@@ -95,29 +110,75 @@ class PostCard extends StatelessWidget {
               ),
             const SizedBox(height: 12.0),
 
-            // Voting Counts with interaction
+            // Voting and Comment Actions
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _VoteButton(
-                  icon: Icons.thumb_up,
-                  color: Colors.green,
-                  count: post.trueVotes,
-                  label: "True",
-                  onPressed: () {}, // TODO: Implement voting
-                ),
-                const SizedBox(width: 16.0),
-                _VoteButton(
-                  icon: Icons.thumb_down,
-                  color: Colors.red,
-                  count: post.falseVotes,
-                  label: "False",
-                  onPressed: () {}, // TODO: Implement voting
+                Wrap(
+                  spacing: 8.0,
+                  children: [
+                    _VoteButton(
+                      icon: Icons.thumb_up,
+                      color: Colors.green,
+                      count: post.trueVotes,
+                      label: "Agree",
+                      onPressed: () {}, // Implement agree voting
+                    ),
+                    _VoteButton(
+                      icon: Icons.thumb_down,
+                      color: Colors.red,
+                      count: post.falseVotes,
+                      label: "Disagree",
+                      onPressed: () {}, // Implement disagree voting
+                    ),
+                  ],
                 ),
               ],
             ),
+
+            CommentsWidget(
+              comments: post.comments,
+              onAddComment: (newComment) {
+                // Handle adding the new comment
+              },
+            ),
+            Visibility(
+                child: FeedbackWidget(
+                    onAddFeedback: (value) {}, buttonName: "Add Feedback"),
+                visible: post.feedback != null),
+            Visibility(
+                child: FeedbackWidget(
+                    onAddFeedback: (value) {},
+                    buttonName: "Authority is not reponed yet"),
+                visible: post.feedback == null),
+
             const SizedBox(height: 12.0),
 
-            // Rest of the widget remains the same...
+            // Issue Resolution Section
+            const Text("Is this issue resolved?"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: onResolve,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[100],
+                    foregroundColor: Colors.green[800],
+                  ),
+                  icon: const Icon(Icons.check),
+                  label: const Text("Yes"),
+                ),
+                ElevatedButton.icon(
+                  onPressed: onReject,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[100],
+                    foregroundColor: Colors.red[800],
+                  ),
+                  icon: const Icon(Icons.close),
+                  label: const Text("No"),
+                ),
+              ],
+            ),
           ],
         ),
       ),

@@ -15,7 +15,7 @@ class PostModel {
   final int trueVotes;
   final int falseVotes;
   final List<CommentModel> comments;
-  final FeedbackModel? feedback;
+  final AuthorityFeedbackModel? feedback;
 
   const PostModel({
     required this.id,
@@ -49,7 +49,7 @@ class PostModel {
             [],
         feedback: json['feedback'] == null
             ? null
-            : FeedbackModel.fromJson(json['feedback'] as Map<String, dynamic>),
+            : AuthorityFeedbackModel.fromJson(json['feedback'] as Map<String, dynamic>),
       );
 
   Map<String, dynamic> toJson() => {
@@ -79,7 +79,7 @@ class PostModel {
         trueVotes: entity.trueVotes,
         falseVotes: entity.falseVotes,
         comments: entity.comments.map((comment) => CommentModel.fromEntity(comment)).toList(),
-        feedback: entity.feedback != null ? FeedbackModel.fromEntity(entity.feedback!) : null,
+        feedback: entity.feedback != null ? AuthorityFeedbackModel.fromEntity(entity.feedback!) : null,
       );
 
   Post toEntity() => Post(
@@ -109,7 +109,7 @@ class PostModel {
     int? trueVotes,
     int? falseVotes,
     List<CommentModel>? comments,
-    FeedbackModel? feedback,
+    AuthorityFeedbackModel? feedback,
   }) =>
       PostModel(
         id: id ?? this.id,

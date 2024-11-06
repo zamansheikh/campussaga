@@ -14,7 +14,7 @@ class Post extends Equatable {
   final int trueVotes;
   final int falseVotes;
   final List<Comment> comments;
-  final Feedback? feedback;
+  final AuthorityFeedback? feedback;
   final Set<String> trueVoterIds; // Track users who voted true
   final Set<String> falseVoterIds; // Track users who voted false
 
@@ -82,7 +82,7 @@ class Post extends Equatable {
     int? trueVotes,
     int? falseVotes,
     List<Comment>? comments,
-    Feedback? feedback,
+    AuthorityFeedback? feedback,
     Set<String>? trueVoterIds,
     Set<String>? falseVoterIds,
   }) {

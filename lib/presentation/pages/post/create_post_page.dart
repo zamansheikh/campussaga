@@ -13,11 +13,6 @@ class CreatePostPage extends StatefulWidget {
   final VoidCallback? onPostCreated;
 
   const CreatePostPage({Key? key, this.onPostCreated}) : super(key: key);
-  // In your post creation success logic:
-  void _handlePostCreated() {
-    // Call the callback if provided
-    onPostCreated?.call();
-  }
 
   @override
   State<CreatePostPage> createState() => _CreatePostPageState();
@@ -27,6 +22,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final List<File> selectedImages = [];
+  String? postType;
 
   Future<void> pickImages() async {
     final picker = ImagePicker();
@@ -44,6 +40,16 @@ class _CreatePostPageState extends State<CreatePostPage> {
     });
   }
 
+  void handlePostCreation() {
+    widget.onPostCreated?.call();
+    titleController.clear();
+    descriptionController.clear();
+    setState(() {
+      selectedImages.clear();
+      postType = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +62,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         ),
         centerTitle: true,
         title: Text(
-          "Posting",
+          "Create Post",
           style: TextStyle(
             color: Colors.black,
             fontSize: 24,
@@ -69,11 +75,48 @@ class _CreatePostPageState extends State<CreatePostPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              "Create a New Post",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Theme(
+              data: Theme.of(context).copyWith(
+                canvasColor: Colors.white,
+              ),
+              child: DropdownButtonFormField<String>(
+                value: postType,
+                items: ["Problem", "Promotional"].map((type) {
+                  return DropdownMenuItem<String>(
+                    value: type,
+                    child: Container(
+                      width: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(type),
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    postType = value;
+                  });
+                },
+                decoration: const InputDecoration(
+                  labelText: "Post Type",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: titleController,
               decoration: const InputDecoration(
                 labelText: "Post Title",
-                hintText: "Enter the post title",
                 border: OutlineInputBorder(),
               ),
             ),
@@ -82,14 +125,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
               controller: descriptionController,
               maxLines: 5,
               decoration: const InputDecoration(
-                labelText: "Post Description",
-                hintText: "Describe the issue or share information",
+                labelText: "Description",
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
             Text(
-              "Selected Images:",
+              "Attachment",
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 8),
@@ -159,13 +201,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             content: Text("Post created successfully"),
                           ),
                         );
-                        widget._handlePostCreated();
-                        //Clear the all TextFields and selectedImages
-                        titleController.clear();
-                        descriptionController.clear();
-                        setState(() {
-                          selectedImages.clear();
-                        });
+                        handlePostCreation();
                       } else if (poststate is PostingFailure) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -184,21 +220,30 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         return Center(
                           child: ElevatedButton(
                             onPressed: () async {
-                              final post = postGenerate(
+                              if (postType == "Problem") {
+                                final post = postGenerate(
                                   user,
                                   titleController.text,
-                                  descriptionController.text);
-                              BlocProvider.of<PostBloc>(context)
-                                  .add(PostCreated(
-                                post,
-                                selectedImages,
-                              ));
+                                  descriptionController.text,
+                                );
+                                BlocProvider.of<PostBloc>(context)
+                                    .add(PostCreated(post, selectedImages));
+                              } else if (postType == "Promotional") {
+                                final promotion = promotionGenerate(
+                                  user,
+                                  titleController.text,
+                                  descriptionController.text,
+                                );
+                                // BlocProvider.of<PostBloc>(context)
+                                //     .add(PostCreated(promotion, selectedImages));
+                                print("Promotional post");
+                              }
                             },
                             child: const Padding(
                               padding: EdgeInsets.symmetric(
                                   vertical: 10.0, horizontal: 40.0),
-                              child:
-                                  Text("Post", style: TextStyle(fontSize: 16)),
+                              child: Text("Create Post",
+                                  style: TextStyle(fontSize: 16)),
                             ),
                           ),
                         );

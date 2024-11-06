@@ -20,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   String _currentVersion = CURRENT_VERSION;
   int _currentIndex = 0;
   List<Widget> pages = [];
+
   @override
   void initState() {
     pages = [
@@ -35,10 +36,7 @@ class _HomePageState extends State<HomePage> {
       RankingPage(),
       ProfilePage(),
     ];
-    Future.delayed(
-        Duration(
-          seconds: 5,
-        ), () async {
+    Future.delayed(Duration(seconds: 5), () async {
       _currentVersion = await checkUpdateFromGithub(context);
       setState(() {
         _currentVersion = _currentVersion;
@@ -50,6 +48,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      onDrawerChanged: (isOpen) {
+        if (isOpen) {
+          FocusScope.of(context)
+              .unfocus(); // Dismiss keyboard when drawer opens
+        }
+      },
       drawer: Drawer(
         child: Column(
           children: [
@@ -128,6 +132,14 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pop(context);
               },
             ),
+            // Switch Campus
+            ListTile(
+              leading: const Icon(Icons.school),
+              title: const Text('Switch Campus'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
 
             const Spacer(),
             const Divider(),
@@ -169,26 +181,13 @@ class _HomePageState extends State<HomePage> {
           });
         },
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
+              icon: Icon(Icons.campaign), label: 'Promotions'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.star),
-            label: "Promotion",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: "Create Post",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.leaderboard),
-            label: "Ranking",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Profile",
-          ),
+              icon: Icon(Icons.add_circle_outline), label: 'Add Post'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Rankings'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

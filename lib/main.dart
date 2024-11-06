@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
           '/issue': (context) => IssuePage(),
           '/post': (context) => CreatePostPage(),
         },
-        home: SplashScreen(), // Set SplashScreen as the initial route
+        home: SplashScreen(),
       ),
     );
   }

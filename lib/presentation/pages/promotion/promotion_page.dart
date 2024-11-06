@@ -1,3 +1,4 @@
+import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/domain/entities/promotion.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,13 +19,16 @@ class _PromotionPageState extends State<PromotionPage> {
       universityId: 'uni1',
       promotionTitle: 'Scholarship Program',
       description: 'Get a scholarship for excellent academic performance.',
+      clubName: 'Science Club',
       timestamp: DateTime.now(),
+      expiryDate: DateTime.now().add(Duration(days: 2)),
       imageUrls: [
-        'https://via.placeholder.com/150',
-        'https://via.placeholder.com/150'
+        'https://picsum.photos/seed/150/400/200',
+        'https://picsum.photos/seed/151/400/200',
       ],
-      trueVotes: 25,
-      falseVotes: 5,
+      likes: 25,
+      dislikes: 5,
+      eventLink: 'https://zamansheikh.com',
     ),
     Promotion(
       id: '2',
@@ -32,10 +36,13 @@ class _PromotionPageState extends State<PromotionPage> {
       universityId: 'uni2',
       promotionTitle: 'New Research Opportunity',
       description: 'Join our upcoming research project in AI technology.',
+      clubName: 'AI Club',
       timestamp: DateTime.now().subtract(Duration(days: 2)),
-      imageUrls: ['https://via.placeholder.com/150'],
-      trueVotes: 40,
-      falseVotes: 10,
+      expiryDate: DateTime.now().add(Duration(days: 5)),
+      imageUrls: ['https://picsum.photos/seed/100/400/200'],
+      likes: 40,
+      dislikes: 10,
+      eventLink: 'https://zamansheikh.com',
     ),
   ];
 
@@ -78,10 +85,28 @@ class _PromotionPageState extends State<PromotionPage> {
         itemCount: promotions.length,
         itemBuilder: (context, index) {
           final promotion = promotions[index];
-          return PromotionCard(
-            promotion: promotion,
+          final timeLeft = promotion.expiryDate != null
+              ? promotion.expiryDate!
+                  .difference(DateTime.now())
+                  .inHours
+                  .toString()
+              : null;
+
+          return PromotionCardNew(
+            club: promotion.clubName,
+            title: promotion.promotionTitle,
+            imageUrl: promotion.imageUrls.isNotEmpty
+                ? promotion.imageUrls.first
+                : 'https://placehold.co/600x400',
+            date: DateFormat.yMMMd().format(promotion.timestamp),
+            timeLeft: timeLeft,
             onTrueVote: () => toggleTrueVote(promotion),
             onFalseVote: () => toggleFalseVote(promotion),
+            likes: promotion.likes,
+            dislikes: promotion.dislikes,
+            hasUserVotedTrue: promotion.hasUserVotedTrue('user1'),
+            hasUserVotedFalse: promotion.hasUserVotedFalse('user1'),
+            eventLink: promotion.eventLink,
           );
         },
       ),
@@ -89,117 +114,19 @@ class _PromotionPageState extends State<PromotionPage> {
   }
 }
 
-class PromotionCard extends StatelessWidget {
-  final Promotion promotion;
-  final VoidCallback onTrueVote;
-  final VoidCallback onFalseVote;
-
-  const PromotionCard({
-    required this.promotion,
-    required this.onTrueVote,
-    required this.onFalseVote,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              promotion.promotionTitle,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              promotion.description,
-              style: const TextStyle(fontSize: 16, color: Colors.black54),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Posted on ${DateFormat.yMMMd().format(promotion.timestamp)}',
-              style: const TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            promotion.imageUrls.isNotEmpty
-                ? SizedBox(
-                    height: 120,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: promotion.imageUrls.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Image.network(
-                            promotion.imageUrls[index],
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
-                    ),
-                  )
-                : const SizedBox(),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.thumb_up,
-                        color: promotion.hasUserVotedTrue('user1')
-                            ? Colors.blue
-                            : Colors.grey,
-                      ),
-                      onPressed: onTrueVote,
-                    ),
-                    Text('${promotion.trueVotes}'),
-                    const SizedBox(width: 16),
-                    IconButton(
-                      icon: Icon(
-                        Icons.thumb_down,
-                        color: promotion.hasUserVotedFalse('user1')
-                            ? Colors.red
-                            : Colors.grey,
-                      ),
-                      onPressed: onFalseVote,
-                    ),
-                    Text('${promotion.falseVotes}'),
-                  ],
-                ),
-                const Text(
-                  'Vote on Promotion',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
 class PromotionCardNew extends StatelessWidget {
   final String club;
   final String title;
   final String imageUrl;
   final String date;
-  final int? timeLeft;
+  final String? timeLeft;
+  final VoidCallback onTrueVote;
+  final VoidCallback onFalseVote;
+  final int likes;
+  final int dislikes;
+  final bool hasUserVotedTrue;
+  final bool hasUserVotedFalse;
+  final String? eventLink;
 
   const PromotionCardNew({
     Key? key,
@@ -208,6 +135,13 @@ class PromotionCardNew extends StatelessWidget {
     required this.imageUrl,
     required this.date,
     this.timeLeft,
+    required this.onTrueVote,
+    required this.onFalseVote,
+    required this.likes,
+    required this.dislikes,
+    required this.hasUserVotedTrue,
+    required this.hasUserVotedFalse,
+    this.eventLink,
   }) : super(key: key);
 
   @override
@@ -245,7 +179,8 @@ class PromotionCardNew extends StatelessWidget {
                 if (timeLeft != null) ...[
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.orange.shade100,
                       borderRadius: BorderRadius.circular(16),
@@ -257,14 +192,40 @@ class PromotionCardNew extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: Implement learn more action
-                    },
-                    child: const Text('Learn More'),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.thumb_up,
+                            color: hasUserVotedTrue ? Colors.blue : Colors.grey,
+                          ),
+                          onPressed: onTrueVote,
+                        ),
+                        Text('$likes'),
+                        const SizedBox(width: 16),
+                        IconButton(
+                          icon: Icon(
+                            Icons.thumb_down,
+                            color: hasUserVotedFalse ? Colors.red : Colors.grey,
+                          ),
+                          onPressed: onFalseVote,
+                        ),
+                        Text('$dislikes'),
+                      ],
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Open the event link
+                        eventLink != null
+                            ? launchURL(eventLink!)
+                            : print('No event link provided');
+                      },
+                      child: const Text('Learn More'),
+                    ),
+                  ],
                 ),
               ],
             ),
