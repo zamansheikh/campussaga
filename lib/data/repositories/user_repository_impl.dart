@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:campus_saga/core/usecases/usecase.dart';
 import 'package:campus_saga/data/models/user_model.dart';
+import 'package:campus_saga/data/models/varification_status_model.dart';
+import 'package:campus_saga/domain/entities/varification_status.dart';
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/user_repository.dart';
@@ -82,6 +84,50 @@ class UserRepositoryImpl implements UserRepository {
     try {
       return Right(dataSource.signOutUser());
     } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<String>>> uploadVerificationImages(
+      String userId, List<File> image) async {
+    try {
+      final urls = await dataSource.uploadVerificationImages(userId, image);
+      return Right(urls);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Verification>> varificationRequest(Verification verification)async {
+     try {
+      await dataSource.addVarificationRequest(VerificationStatusModel.fromEntity(verification));
+      return Right(verification);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, List<Verification>>> getPendingVerificaionByUniversity(String universityId)async {
+    try{
+      final pendingList =await dataSource.getPendingVerificaionByUniversity(universityId);
+      return Right(pendingList);
+
+
+    }catch(e){
+      return Left(ServerFailure(e.toString()));
+    }
+
+  }
+  
+  @override
+  Future<Either<Failure, void>> updateVerificationStatus(Verification verification)async {
+    try{
+      dataSource.updateVerificationStatus(VerificationStatusModel.fromEntity(verification));
+      return Right(null);
+    }catch(e){
       return Left(ServerFailure(e.toString()));
     }
   }

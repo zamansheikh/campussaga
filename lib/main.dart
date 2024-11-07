@@ -1,6 +1,11 @@
 // lib/main.dart
+import 'package:campus_saga/presentation/bloc/admin/admin_bloc.dart';
 import 'package:campus_saga/presentation/bloc/promotion/promotion_bloc.dart';
+import 'package:campus_saga/presentation/bloc/varify/varification_bloc.dart';
+import 'package:campus_saga/presentation/bloc/verify_user/verify_user_bloc.dart';
+import 'package:campus_saga/presentation/pages/admin/add_university_page.dart';
 import 'package:campus_saga/presentation/pages/admin/admin_page.dart';
+import 'package:campus_saga/presentation/pages/admin/user_verify_page.dart';
 import 'package:campus_saga/presentation/pages/auth/login_page.dart';
 import 'package:campus_saga/presentation/pages/auth/register_page.dart';
 import 'package:campus_saga/presentation/pages/home/home_page.dart';
@@ -46,6 +51,15 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => sl<PromotionBloc>(),
         ),
+        BlocProvider(
+          create: (_) => sl<AdminBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => sl<VarificationBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => sl<VerifyUserBloc>(),
+        ),
       ],
       child: MaterialApp(
         title: 'Campus Saga',
@@ -63,6 +77,8 @@ class MyApp extends StatelessWidget {
           '/post': (context) => CreatePostPage(),
           '/admin': (context) => AdminPage(),
           '/ranking': (context) => RankingPage(),
+          '/addUniversity': (context) => AddUniversityPage(),
+          '/userVerification': (context) => UserVerifyPage(),
         },
         home: SplashScreen(),
       ),

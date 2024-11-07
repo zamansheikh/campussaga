@@ -10,13 +10,13 @@ class UniversityModel extends University {
     required double qsRankingScore,
     int totalPosts = 0,
     int totalSolvedPosts = 0,
-    int interactions = 0,
+    int agrees = 0,
+    int disagrees = 0,
     int studentCount = 0,
     int facultyCount = 0,
     int programsOffered = 0,
     int establishmentYear = 0,
     double academicScore = 0.0,
-    double satisfactionScore = 0.0,
   }) : super(
           id: id,
           name: name,
@@ -26,13 +26,13 @@ class UniversityModel extends University {
           qsRankingScore: qsRankingScore,
           totalPosts: totalPosts,
           totalSolvedPosts: totalSolvedPosts,
-          interactions: interactions,
+          agrees: agrees,
+          disagrees: disagrees,
           studentCount: studentCount,
           facultyCount: facultyCount,
           programsOffered: programsOffered,
           establishmentYear: establishmentYear,
           academicScore: academicScore,
-          satisfactionScore: satisfactionScore,
         );
 
   factory UniversityModel.fromJson(Map<String, dynamic> json) {
@@ -45,13 +45,13 @@ class UniversityModel extends University {
       qsRankingScore: (json['qsRankingScore'] as num).toDouble(),
       totalPosts: json['totalPosts'] as int? ?? 0,
       totalSolvedPosts: json['totalSolvedPosts'] as int? ?? 0,
-      interactions: json['interactions'] as int? ?? 0,
+      agrees: json['agrees'] as int? ?? 0,
+      disagrees: json['disagrees'] as int? ?? 0,
       studentCount: json['studentCount'] as int? ?? 0,
       facultyCount: json['facultyCount'] as int? ?? 0,
       programsOffered: json['programsOffered'] as int? ?? 0,
       establishmentYear: json['establishmentYear'] as int? ?? 0,
       academicScore: (json['academicScore'] as num?)?.toDouble() ?? 0.0,
-      satisfactionScore: (json['satisfactionScore'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -65,13 +65,13 @@ class UniversityModel extends University {
       'qsRankingScore': qsRankingScore,
       'totalPosts': totalPosts,
       'totalSolvedPosts': totalSolvedPosts,
-      'interactions': interactions,
+      'agrees': agrees,
+      'disagrees': disagrees,
       'studentCount': studentCount,
       'facultyCount': facultyCount,
       'programsOffered': programsOffered,
       'establishmentYear': establishmentYear,
       'academicScore': academicScore,
-      'satisfactionScore': satisfactionScore,
     };
   }
 
@@ -85,13 +85,13 @@ class UniversityModel extends University {
       qsRankingScore: university.qsRankingScore,
       totalPosts: university.totalPosts,
       totalSolvedPosts: university.totalSolvedPosts,
-      interactions: university.interactions,
+      agrees: university.agrees,
+      disagrees: university.disagrees,
       studentCount: university.studentCount,
       facultyCount: university.facultyCount,
       programsOffered: university.programsOffered,
       establishmentYear: university.establishmentYear,
       academicScore: university.academicScore,
-      satisfactionScore: university.satisfactionScore,
     );
   }
 
@@ -105,13 +105,13 @@ class UniversityModel extends University {
       qsRankingScore: qsRankingScore,
       totalPosts: totalPosts,
       totalSolvedPosts: totalSolvedPosts,
-      interactions: interactions,
+      agrees: agrees,
+      disagrees: disagrees,
       studentCount: studentCount,
       facultyCount: facultyCount,
       programsOffered: programsOffered,
       establishmentYear: establishmentYear,
       academicScore: academicScore,
-      satisfactionScore: satisfactionScore,
     );
   }
 
@@ -124,13 +124,13 @@ class UniversityModel extends University {
     double? qsRankingScore,
     int? totalPosts,
     int? totalSolvedPosts,
-    int? interactions,
+    int? agrees,
+    int? disagrees,
     int? studentCount,
     int? facultyCount,
     int? programsOffered,
     int? establishmentYear,
     double? academicScore,
-    double? satisfactionScore,
   }) {
     return UniversityModel(
       id: id ?? this.id,
@@ -141,13 +141,13 @@ class UniversityModel extends University {
       qsRankingScore: qsRankingScore ?? this.qsRankingScore,
       totalPosts: totalPosts ?? this.totalPosts,
       totalSolvedPosts: totalSolvedPosts ?? this.totalSolvedPosts,
-      interactions: interactions ?? this.interactions,
+      agrees: agrees ?? this.agrees,
+      disagrees: disagrees ?? this.disagrees,
       studentCount: studentCount ?? this.studentCount,
       facultyCount: facultyCount ?? this.facultyCount,
       programsOffered: programsOffered ?? this.programsOffered,
       establishmentYear: establishmentYear ?? this.establishmentYear,
       academicScore: academicScore ?? this.academicScore,
-      satisfactionScore: satisfactionScore ?? this.satisfactionScore,
     );
   }
 }

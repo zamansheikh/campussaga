@@ -1,6 +1,7 @@
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
+import 'package:campus_saga/presentation/pages/profile/verification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_saga/domain/entities/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -138,6 +139,26 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
           ],
         ),
+        if (!user.isVerified)
+          Column(
+            children: [
+              const SizedBox(height: 16.0),
+              SizedBox(
+                width: 150,
+                child: CustomButton(
+                    text: "Verify",
+                    onPressed: () {
+                      //materialPageRoute
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => VerificationPage(
+                                    user: user,
+                                  )));
+                    }),
+              ),
+            ],
+          ),
         const SizedBox(height: 16.0),
         Text(
           user.name,

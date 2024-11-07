@@ -4,6 +4,8 @@ import 'dart:io';
 import 'dart:math';
 import 'package:campus_saga/data/models/promotion_model.dart';
 import 'package:campus_saga/data/models/university_model.dart';
+import 'package:campus_saga/data/models/varification_status_model.dart';
+import 'package:campus_saga/domain/entities/varification_status.dart';
 import 'package:path/path.dart' as p;
 import 'package:campus_saga/core/usecases/usecase.dart';
 import 'package:campus_saga/data/models/comment_model.dart';
@@ -41,10 +43,22 @@ class FirebaseDataSource {
     await firestore.collection('posts').doc(post.id).set(post.toJson());
   }
 
+  //addVarificationRequest
+  Future<void> addVarificationRequest(
+      VerificationStatusModel verification) async {
+    await firestore
+        .collection('verification')
+        .doc(verification.userUuid)
+        .set(verification.toJson());
+  }
+
   //Create a promotion post
   Future<void> createPromotion(PromotionModel promotion) async {
     //create doc baseed on the post id
-    await firestore.collection('promotion').doc(promotion.id).set(promotion.toJson());
+    await firestore
+        .collection('promotion')
+        .doc(promotion.id)
+        .set(promotion.toJson());
   }
 
   Future<void> createFeedback(
@@ -151,9 +165,10 @@ class FirebaseDataSource {
       'comments': FieldValue.arrayUnion([comment.toJson()]),
     });
   }
-  
+
   //add feedback to a specific post
-  Future<void> addFeedback(String postId, AuthorityFeedbackModel feedback) async {
+  Future<void> addFeedback(
+      String postId, AuthorityFeedbackModel feedback) async {
     await firestore.collection('posts').doc(postId).update({
       'feedback': feedback.toJson(),
     });
@@ -208,6 +223,22 @@ class FirebaseDataSource {
     return urls;
   }
 
+  //upload varification images
+  Future<List<String>> uploadVerificationImages(
+      String postId, List<File> images) async {
+    print("uploadVerificationImages: $images");
+    final urls = <String>[];
+    for (final image in images) {
+      final ref = firebaseStorage
+          .ref()
+          .child('varification_images')
+          .child('$postId-${p.basename(image.path)}.jpg');
+      await ref.putFile(image);
+      urls.add(await ref.getDownloadURL());
+    }
+    return urls;
+  }
+
   Future<String> signUpUser(UserParams user) async {
     final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
       email: user.email,
@@ -231,14 +262,43 @@ class FirebaseDataSource {
     await firebaseAuth.signOut();
   }
 
-
   //Add university
   Future<void> addUniversity(UniversityModel university) async {
     try {
-      await firestore.collection('universities').doc(university.id).set(university.toJson());
+      await firestore
+          .collection('universities')
+          .doc(university.id)
+          .set(university.toJson());
     } catch (e) {
       throw Exception('University creation failed');
     }
   }
-  
+
+  //get getPendingVerificaionByUniversity
+  Future<List<VerificationStatusModel>> getPendingVerificaionByUniversity(
+      String universityId) async {
+    try {
+      final querySnapshot = await firestore
+          .collection("verification")
+          .where('status', isEqualTo: "pending")
+          .orderBy('timestamp', descending: true)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => VerificationStatusModel.fromJson(doc.data()))
+          .toList();
+    } catch (e) {
+      throw Exception("Failed to Loead Pending Verifications");
+    }
+  }
+
+  void updateVerificationStatus(VerificationStatusModel verification) async {
+    await firestore
+        .collection('verification')
+        .doc(verification.userUuid)
+        .update(verification.toJson());
+    await firestore.collection('users').doc(verification.userUuid).update({
+      'isVerified': verification.status == VerificationStatus.verified,
+    });
+  }
 }

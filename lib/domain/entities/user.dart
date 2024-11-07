@@ -29,6 +29,7 @@ class User extends Equatable {
   final bool isVerified;
   final UserType userType;
   final String profilePictureUrl;
+  final String? gender;
 
   // Engagement metrics
   final int postCount;
@@ -62,6 +63,7 @@ class User extends Equatable {
     required this.name,
     required this.email,
     required this.universityId,
+    this.gender ,
     this.isVerified = false,
     required this.userType,
     required this.profilePictureUrl,
@@ -99,6 +101,7 @@ class User extends Equatable {
         universityId,
         isVerified,
         userType,
+        gender,
         profilePictureUrl,
         postCount,
         commentCount,
