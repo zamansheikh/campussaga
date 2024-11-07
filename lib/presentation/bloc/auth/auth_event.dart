@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:campus_saga/domain/entities/user.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class AuthEvent extends Equatable {
@@ -18,6 +19,15 @@ class AuthRequested extends AuthEvent {
 
   @override
   List<Object?> get props => [userId];
+}
+
+class AuthUpdateRequested extends AuthEvent {
+  final User user;
+
+  const AuthUpdateRequested(this.user);
+
+  @override
+  List<Object?> get props => [user];
 }
 
 class AuthLogoutRequested extends AuthEvent {}

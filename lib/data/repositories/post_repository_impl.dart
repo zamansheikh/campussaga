@@ -132,4 +132,15 @@ class PostRepositoryImpl implements PostRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+  
+  @override
+  Future<Either<Failure, List<Promotion>>> getPromotionByUniversity(String universityId) async{
+    try {
+      final promotions = await dataSource.getPromotionByUniversity(universityId);
+      final promotionFromEntity = promotions.map((promotion) => promotion.toEntity()).toList();
+      return Right(promotionFromEntity);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

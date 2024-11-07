@@ -1,6 +1,8 @@
+import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
+import 'package:campus_saga/presentation/pages/profile/update_profile_page.dart';
 import 'package:campus_saga/presentation/pages/profile/verification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_saga/domain/entities/user.dart';
@@ -80,22 +82,26 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.indigoAccent,
                       text: "Edit Profile",
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/edit-profile');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    UpdateProfilePage(user: user)));
                       },
                     ),
                     CustomButton(
                       color: Colors.green,
                       text: "Terms and Conditions",
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pushNamed('/terms-and-conditions');
+                      onPressed: () async {
+                        launchURL(
+                            "https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md");
                       },
                     ),
                     CustomButton(
                       color: Colors.blue,
                       text: "About Us",
-                      onPressed: () {
-                        Navigator.of(context).pushNamed('/about-us');
+                      onPressed: () async {
+                        launchURL("https://zamansheikh.com");
                       },
                     ),
 
