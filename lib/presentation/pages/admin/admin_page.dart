@@ -37,7 +37,10 @@ class _AdminPageState extends State<AdminPage> {
               children: [
                 CustomButton(
                   text: "Add University",
-                  onPressed: () {},
+                  onPressed: () {
+                    //pushnamed
+                    Navigator.pushNamed(context, '/addUniversity');
+                  },
                 ),
                 const SizedBox(height: 16),
                 CustomButton(
@@ -48,6 +51,13 @@ class _AdminPageState extends State<AdminPage> {
                 CustomButton(
                   text: "Add Admin",
                   onPressed: () {},
+                ),
+                const SizedBox(height: 16),
+                CustomButton(
+                  text: "User Verification",
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/userVerification');
+                  },
                 ),
               ],
             )),

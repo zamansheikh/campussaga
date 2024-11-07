@@ -20,13 +20,13 @@ class _RankingPageState extends State<RankingPage> {
       qsRankingScore: 70.0,
       totalPosts: 100,
       totalSolvedPosts: 80,
-      interactions: 200,
+      agrees: 200,
+      disagrees: 20,
       studentCount: 25000,
       facultyCount: 800,
       programsOffered: 50,
       establishmentYear: 2002,
       academicScore: 85.0,
-      satisfactionScore: 90.0,
     ),
     University(
       id: '2',
@@ -37,13 +37,14 @@ class _RankingPageState extends State<RankingPage> {
       qsRankingScore: 75.0,
       totalPosts: 120,
       totalSolvedPosts: 90,
-      interactions: 250,
+      agrees: 500,
+      disagrees: 20,
       studentCount: 20000,
       facultyCount: 600,
       programsOffered: 40,
       establishmentYear: 1993,
       academicScore: 80.0,
-      satisfactionScore: 85.0,
+      
     ),
     University(
       id: '3',
@@ -54,13 +55,13 @@ class _RankingPageState extends State<RankingPage> {
       qsRankingScore: 80.0,
       totalPosts: 150,
       totalSolvedPosts: 120,
-      interactions: 300,
+       agrees: 3000,
+      disagrees: 2000,
       studentCount: 30000,
       facultyCount: 1000,
       programsOffered: 60,
       establishmentYear: 1921,
       academicScore: 90.0,
-      satisfactionScore: 95.0,
     ),
   ];
 
@@ -247,7 +248,7 @@ class UniversityCard extends StatelessWidget {
               _buildMetricRow(
                   'Research', university.researchScore, Colors.orange),
               _buildMetricRow(
-                  'Satisfaction', university.satisfactionScore, Colors.blue),
+                  'Satisfaction', university.satisfactionPercentage, Colors.blue),
             ] else ...[
               Row(
                 children: [
