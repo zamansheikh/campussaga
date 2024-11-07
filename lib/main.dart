@@ -1,5 +1,6 @@
 // lib/main.dart
 import 'package:campus_saga/presentation/bloc/admin/admin_bloc.dart';
+import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
 import 'package:campus_saga/presentation/bloc/promotion/promotion_bloc.dart';
 import 'package:campus_saga/presentation/bloc/varify/varification_bloc.dart';
 import 'package:campus_saga/presentation/bloc/verify_user/verify_user_bloc.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => sl<VerifyUserBloc>(),
         ),
+        BlocProvider(create: (_) => sl<AdsBloc>()),
       ],
       child: MaterialApp(
         title: 'Campus Saga',

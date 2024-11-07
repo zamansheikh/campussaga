@@ -102,6 +102,18 @@ class FirebaseDataSource {
         .toList();
   }
 
+  Future<List<PromotionModel>> getPromotionByUniversity(String universityId) async {
+    final querySnapshot = await firestore
+        .collection('promotion')
+        // .where('universityId', isEqualTo: universityId)
+        .orderBy('timestamp', descending: true)
+        .get();
+
+    return querySnapshot.docs
+        .map((doc) => PromotionModel.fromJson(doc.data()))
+        .toList();
+  }
+
   Future<List<PostModel>> getTimelinePosts(String universityId) async {
     List<PostModel> timelinePosts = [];
     // 1. Get the latest 2 posts by timestamp

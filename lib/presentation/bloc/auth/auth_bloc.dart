@@ -134,5 +134,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await Future.delayed(Duration(seconds: 2));
       emit(AuthUnauthenticated());
     });
+
+    on<AuthUpdateRequested>((event, emit) async {
+      emit(AuthLoading());
+
+      final result = await createUserProfile(event.user);
+      result.fold(
+        (failure) => emit(AuthUpdateFailure(failure.message)),
+        (user) => emit(AuthAuthenticated(event.user)),
+      );
+    });
   }
 }

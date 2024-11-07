@@ -107,7 +107,7 @@ class _VerificationPageState extends State<VerificationPage> {
               Text('Date of Birth: ${widget.user.dateOfBirth}'),
               Text('Department: ${widget.user.department}'),
               Text('Gender: ${widget.user.gender}'),
-              Text('User UUID: ${widget.user.studentId}'),
+              Text('User UUID: ${widget.user.id}'),
               Text('University Email: ${widget.user.email}'),
               SizedBox(height: 20),
             ],
@@ -153,10 +153,37 @@ class _VerificationPageState extends State<VerificationPage> {
                   );
                   return;
                 }
+                // Check if required user information fields are null
+                final missingFields = <String>[];
+                if (widget.user.phoneNumber == null ||
+                    widget.user.phoneNumber!.isEmpty) {
+                  missingFields.add("Phone Number");
+                }
+                if (widget.user.dateOfBirth == null) {
+                  missingFields.add("Date of Birth");
+                }
+                if (widget.user.department == null) {
+                  missingFields.add("Department");
+                }
+                if (widget.user.gender == null || widget.user.gender!.isEmpty) {
+                  missingFields.add("Gender");
+                }
+                if (missingFields.isNotEmpty) {
+                  final missingFieldsText = missingFields.join(", ");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'The following fields are missing: $missingFieldsText. '
+                        'Please update them from the profile edit page.',
+                      ),
+                    ),
+                  );
+                  return;
+                }
                 final verificationEntity = Verification(
                   userUuid: widget.user.id,
                   universityEmail: widget.user.email,
-                  universityIdCardPhotoUrl: "widget.user.profilePictureUrl",
+                  universityIdCardPhotoUrl: "",
                   profilePhotoUrl: '',
                   status: VerificationStatus.pending,
                   phoneNumber: '',

@@ -14,6 +14,7 @@ import 'package:campus_saga/domain/usecases/create_user_profile.dart';
 import 'package:campus_saga/domain/usecases/create_varification_request_usecase.dart';
 import 'package:campus_saga/domain/usecases/fetch_pending_verification_usecase.dart';
 import 'package:campus_saga/domain/usecases/fetch_posts.dart';
+import 'package:campus_saga/domain/usecases/fetch_promotion_usecase.dart';
 import 'package:campus_saga/domain/usecases/sign_in_user.dart';
 import 'package:campus_saga/domain/usecases/sign_out_user.dart';
 import 'package:campus_saga/domain/usecases/sign_up_user.dart';
@@ -22,6 +23,7 @@ import 'package:campus_saga/domain/usecases/upload_post_images.dart';
 import 'package:campus_saga/domain/usecases/upload_user_image.dart';
 import 'package:campus_saga/domain/usecases/upload_verification_images_usecase.dart';
 import 'package:campus_saga/presentation/bloc/admin/admin_bloc.dart';
+import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
 import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
@@ -80,6 +82,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => CreateVarificationRequestUsecase(sl()));
   sl.registerLazySingleton(() => FetchPendingVerificationUsecase(sl()));
   sl.registerLazySingleton(() => UpdateVerificationStatusUsecase(sl()));
+  sl.registerLazySingleton(() => FetchPromotionUsecase(sl()));
 
   // BLoCs
   sl.registerLazySingleton(() => AuthBloc(
@@ -113,6 +116,8 @@ Future<void> init() async {
         fetchPendingVerificationUsecase: sl(),
         updateVerificationStatusUsecase: sl(),
       ));
+
+  sl.registerLazySingleton(() => AdsBloc(fetchPromotionUsecase: sl()));
   //Auth Service
   sl.registerLazySingleton(() => AuthService());
 }
