@@ -16,6 +16,7 @@ abstract class PostRepository {
   Future<Either<Failure, List<String>>> uploadPostImages(String userId, List<File> image);
   //Add a comment to a specific post
   Future<Either<Failure, void>> addComment(Post post);
+  Future<Either<Failure, void>> updateIssuePost(Post post);
   //Add feedback to a specific post
   Future<Either<Failure, void>> addFeedback(Post post);
   //Add a vote to a specific post

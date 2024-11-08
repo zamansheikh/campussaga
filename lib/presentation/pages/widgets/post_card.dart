@@ -95,14 +95,24 @@ class _PostCardState extends State<PostCard> {
                       color: Colors.green,
                       count: post.trueVotes,
                       label: "Vote this",
-                      onPressed: () {}, // Implement agree voting
+                      onPressed: () {
+                        setState(() {
+                          post = post.toggleTrueVote(widget.user.id);
+                        });
+                        sl<IssueBloc>().add(UpdatePostEvent(post));
+                      }, // Implement agree voting
                     ),
                     _VoteButton(
                       icon: Icons.thumb_down,
                       color: Colors.red,
                       count: post.falseVotes,
                       label: "Report this",
-                      onPressed: () {}, // Implement disagree voting
+                      onPressed: () {
+                        setState(() {
+                          post = post.toggleFalseVote(widget.user.id);
+                        });
+                        sl<IssueBloc>().add(UpdatePostEvent(post));
+                      }, // Implement disagree voting
                     ),
                   ],
                 ),
@@ -265,7 +275,12 @@ class _PostCardState extends State<PostCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      post = post.toggleAgreeVote(widget.user.id);
+                    });
+                    sl<IssueBloc>().add(UpdatePostEvent(post));
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[100],
                     foregroundColor: Colors.green[800],
@@ -285,7 +300,12 @@ class _PostCardState extends State<PostCard> {
                 ),
 
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      post = post.toggleDisagreeVote(widget.user.id);
+                    });
+                    sl<IssueBloc>().add(UpdatePostEvent(post));
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red[100],
                     foregroundColor: Colors.red[800],
