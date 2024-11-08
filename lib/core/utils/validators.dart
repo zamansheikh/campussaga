@@ -10,7 +10,7 @@ class Validators {
   }
 
   static bool isValidPassword(String password) {
-    return password.length >= 8;
+    return password.length >= 6;
   }
 
   static bool isNonEmpty(String value) {
