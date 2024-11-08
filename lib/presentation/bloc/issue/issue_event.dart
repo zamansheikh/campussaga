@@ -31,3 +31,11 @@ class AddAFeedbackEvent extends IssueEvent {
   @override
   List<Object> get props => [post];
 }
+
+class UpdatePostEvent extends IssueEvent {
+  final Post post;
+  UpdatePostEvent(this.post);
+
+  @override
+  List<Object> get props => [post];
+}

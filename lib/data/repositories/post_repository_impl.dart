@@ -152,4 +152,15 @@ class PostRepositoryImpl implements PostRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+  
+  @override
+  Future<Either<Failure, void>> updateIssuePost(Post post)async {
+     try {
+      final postModel = PostModel.fromEntity(post);
+      await dataSource.updateIssuePost(postModel);
+      return Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

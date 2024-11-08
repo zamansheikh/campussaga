@@ -19,6 +19,7 @@ import 'package:campus_saga/domain/usecases/fetch_university_usecase.dart';
 import 'package:campus_saga/domain/usecases/sign_in_user.dart';
 import 'package:campus_saga/domain/usecases/sign_out_user.dart';
 import 'package:campus_saga/domain/usecases/sign_up_user.dart';
+import 'package:campus_saga/domain/usecases/update_issue_post_usecase.dart';
 import 'package:campus_saga/domain/usecases/update_verification_status_usecase.dart';
 import 'package:campus_saga/domain/usecases/upload_post_images.dart';
 import 'package:campus_saga/domain/usecases/upload_user_image.dart';
@@ -86,7 +87,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => UpdateVerificationStatusUsecase(sl()));
   sl.registerLazySingleton(() => FetchPromotionUsecase(sl()));
   sl.registerLazySingleton(() => FetchUniversityUsecase(sl()));
-
+  sl.registerLazySingleton(() => UpdateIssuePostUsecase(sl()));
   // BLoCs
   sl.registerLazySingleton(() => AuthBloc(
         getUserProfile: sl(),
@@ -111,6 +112,7 @@ Future<void> init() async {
         addCommentUsecase: sl(),
         fetchPosts: sl(),
         addFeedbackUsecase: sl(),
+        updateIssuePostUsecase: sl(),
       ));
 
   sl.registerLazySingleton(() => AdminBloc(sl()));

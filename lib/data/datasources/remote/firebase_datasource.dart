@@ -195,6 +195,10 @@ class FirebaseDataSource {
     });
   }
 
+  Future<void> updateIssuePost(PostModel post) async {
+    await firestore.collection('posts').doc(post.id).update(post.toJson());
+  }
+
   //Add a vote to a specific post
   Future<void> addVote(String postId, String userId, bool isTrueVote) async {
     await firestore.collection('posts').doc(postId).update({
@@ -257,7 +261,6 @@ class FirebaseDataSource {
     }
     return urls;
   }
-
 
   Future<List<String>> uploadVerificationImages(
       String postId, List<File> images) async {
