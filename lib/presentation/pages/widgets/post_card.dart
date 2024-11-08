@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:campus_saga/core/injection_container.dart';
+import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/domain/entities/comment.dart';
+import 'package:campus_saga/domain/entities/feedback.dart';
 import 'package:campus_saga/domain/entities/post.dart';
 import 'package:campus_saga/domain/entities/user.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
@@ -166,13 +168,74 @@ class _PostCardState extends State<PostCard> {
             ),
             Visibility(
                 child: FeedbackWidget(
-                    onAddFeedback: (value) {}, buttonName: "Add Feedback"),
+                    onAddFeedback: (value) {
+                      final feedback = AuthorityFeedback(
+                        id: Uuid().v4(),
+                        authorityId: widget.user.id,
+                        postId: post.id,
+                        message: value,
+                        timestamp: DateTime.now(),
+                      );
+                      setState(() {
+                        post = post.copyWith(feedback: feedback);
+                      });
+                      sl<IssueBloc>().add(AddAFeedbackEvent(post));
+                    },
+                    buttonName: "View Feedback"),
                 visible: post.feedback != null),
-            Visibility(
+            if (widget.user.userType == UserType.university)
+              Visibility(
                 child: FeedbackWidget(
-                    onAddFeedback: (value) {},
-                    buttonName: "Authority is not reponed yet"),
-                visible: post.feedback == null),
+                  onAddFeedback: (value) {
+                    final feedback = AuthorityFeedback(
+                      id: Uuid().v4(),
+                      authorityId: widget.user.id,
+                      postId: post.id,
+                      message: value,
+                      timestamp: DateTime.now(),
+                    );
+                    setState(() {
+                      post = post.copyWith(feedback: feedback);
+                    });
+                    sl<IssueBloc>().add(AddAFeedbackEvent(post));
+                  },
+                  buttonName: "Add Feedback",
+                ),
+                replacement: FeedbackWidget(
+                  onAddFeedback: (value) {
+                    final feedback = AuthorityFeedback(
+                      id: Uuid().v4(),
+                      authorityId: widget.user.id,
+                      postId: post.id,
+                      message: value,
+                      timestamp: DateTime.now(),
+                    );
+                    setState(() {
+                      post = post.copyWith(feedback: feedback);
+                    });
+                    sl<IssueBloc>().add(AddAFeedbackEvent(post));
+                  },
+                  buttonName: "Already Responded",
+                ),
+                visible: post.feedback == null,
+              )
+            else
+              Visibility(
+                child: FeedbackWidget(
+                  onAddFeedback: (value) {
+                    //show a toast
+                    fToast(context, message: "You are not an Authority 😒");
+                  },
+                  buttonName: "View Feedback",
+                ),
+                replacement: FeedbackWidget(
+                    onAddFeedback: (_) {
+                      //show a toast
+                      fToast(context, message: "You are not an Authority 😒");
+                    },
+                    buttonName: "Authority is not responded yet"),
+                visible: post.feedback != null,
+              ),
 
             const SizedBox(height: 12.0),
 

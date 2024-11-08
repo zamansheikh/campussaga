@@ -1,6 +1,7 @@
 // lib/presentation/bloc/post/post_bloc.dart
 import 'package:campus_saga/domain/entities/post.dart';
 import 'package:campus_saga/domain/usecases/add_comment_usecase.dart';
+import 'package:campus_saga/domain/usecases/add_feedback_usecase.dart';
 import 'package:campus_saga/domain/usecases/fetch_posts.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,9 +12,11 @@ part 'issue_state.dart';
 class IssueBloc extends Bloc<IssueEvent, IssueState> {
   final FetchPostsUsecase fetchPosts;
   final AddCommentUsecase addCommentUsecase;
+  final AddFeedbackUsecase addFeedbackUsecase;
   IssueBloc({
     required this.fetchPosts,
     required this.addCommentUsecase,
+    required this.addFeedbackUsecase,
   }) : super(IssueInitial()) {
     on<FetchIssueEvent>((event, emit) async {
       emit(IssueLoading());
@@ -31,6 +34,24 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
     on<AddACommentEvent>((event, emit) async {
       final previousPosts = (state as IssueLoaded).posts;
       final result = await addCommentUsecase(event.post);
+      result.fold(
+        (failure) => emit(IssueLoaded(previousPosts)),
+        (_) {
+          print("Comment added successfully!");
+          final updatedPosts = previousPosts.map((post) {
+            if (post.id == event.post.id) {
+              //update this post directly from event.post
+              post = event.post;
+            }
+            return post;
+          }).toList();
+          emit(IssueLoaded(updatedPosts));
+        },
+      );
+    });
+    on<AddAFeedbackEvent>((event, emit) async {
+      final previousPosts = (state as IssueLoaded).posts;
+      final result = await addFeedbackUsecase(event.post);
       result.fold(
         (failure) => emit(IssueLoaded(previousPosts)),
         (_) {

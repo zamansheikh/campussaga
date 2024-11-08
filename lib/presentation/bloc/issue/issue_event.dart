@@ -7,7 +7,6 @@ sealed class IssueEvent extends Equatable {
   List<Object> get props => [];
 }
 
-
 class FetchIssueEvent extends IssueEvent {
   final String universityId;
 
@@ -20,6 +19,14 @@ class FetchIssueEvent extends IssueEvent {
 class AddACommentEvent extends IssueEvent {
   final Post post;
   AddACommentEvent(this.post);
+
+  @override
+  List<Object> get props => [post];
+}
+
+class AddAFeedbackEvent extends IssueEvent {
+  final Post post;
+  AddAFeedbackEvent(this.post);
 
   @override
   List<Object> get props => [post];

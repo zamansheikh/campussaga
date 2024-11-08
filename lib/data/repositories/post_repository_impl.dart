@@ -1,13 +1,8 @@
 // lib/data/repositories/post_repository_impl.dart
 
 import 'dart:io';
-
-import 'package:campus_saga/data/models/comment_model.dart';
-import 'package:campus_saga/data/models/feedback_model.dart';
 import 'package:campus_saga/data/models/promotion_model.dart';
 import 'package:campus_saga/data/models/university_model.dart';
-import 'package:campus_saga/domain/entities/comment.dart';
-import 'package:campus_saga/domain/entities/feedback.dart';
 import 'package:campus_saga/domain/entities/promotion.dart';
 import 'package:campus_saga/domain/entities/university.dart';
 import 'package:dartz/dartz.dart';
@@ -78,8 +73,7 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<Either<Failure, void>> addComment(
-      Post post) async {
+  Future<Either<Failure, void>> addComment(Post post) async {
     try {
       final postModel = PostModel.fromEntity(post);
       await dataSource.updatePostComments(postModel);
@@ -90,11 +84,10 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<Either<Failure, void>> addFeedback(
-      String postId, AuthorityFeedback feedback) async {
+  Future<Either<Failure, void>> addFeedback(Post post) async {
     try {
-      dataSource.addFeedback(
-          postId, AuthorityFeedbackModel.fromEntity(feedback));
+      final postModel = PostModel.fromEntity(post);
+      await dataSource.updatePostFeedback(postModel);
       return Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -133,23 +126,27 @@ class PostRepositoryImpl implements PostRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
-  
+
   @override
-  Future<Either<Failure, List<Promotion>>> getPromotionByUniversity(String universityId) async{
+  Future<Either<Failure, List<Promotion>>> getPromotionByUniversity(
+      String universityId) async {
     try {
-      final promotions = await dataSource.getPromotionByUniversity(universityId);
-      final promotionFromEntity = promotions.map((promotion) => promotion.toEntity()).toList();
+      final promotions =
+          await dataSource.getPromotionByUniversity(universityId);
+      final promotionFromEntity =
+          promotions.map((promotion) => promotion.toEntity()).toList();
       return Right(promotionFromEntity);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
-  
+
   @override
-  Future<Either<Failure, List<University>>> fetchAllUniversity() async{
+  Future<Either<Failure, List<University>>> fetchAllUniversity() async {
     try {
       final universities = await dataSource.getAllUniversity();
-      final universityFromEntity = universities.map((university) => university.toEntity()).toList();
+      final universityFromEntity =
+          universities.map((university) => university.toEntity()).toList();
       return Right(universityFromEntity);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

@@ -110,6 +110,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => IssueBloc(
         addCommentUsecase: sl(),
         fetchPosts: sl(),
+        addFeedbackUsecase: sl(),
       ));
 
   sl.registerLazySingleton(() => AdminBloc(sl()));
