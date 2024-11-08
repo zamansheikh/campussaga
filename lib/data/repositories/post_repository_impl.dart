@@ -79,9 +79,10 @@ class PostRepositoryImpl implements PostRepository {
 
   @override
   Future<Either<Failure, void>> addComment(
-      String postId, Comment comment) async {
+      Post post) async {
     try {
-      await dataSource.addComment(postId, CommentModel.fromEntity(comment));
+      final postModel = PostModel.fromEntity(post);
+      await dataSource.updatePostComments(postModel);
       return Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -139,6 +140,17 @@ class PostRepositoryImpl implements PostRepository {
       final promotions = await dataSource.getPromotionByUniversity(universityId);
       final promotionFromEntity = promotions.map((promotion) => promotion.toEntity()).toList();
       return Right(promotionFromEntity);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, List<University>>> fetchAllUniversity() async{
+    try {
+      final universities = await dataSource.getAllUniversity();
+      final universityFromEntity = universities.map((university) => university.toEntity()).toList();
+      return Right(universityFromEntity);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

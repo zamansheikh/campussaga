@@ -302,11 +302,19 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   eventLinkController.text,
                                   DateTime.now().add(const Duration(days: 7)),
                                 );
+                                if (selectedImages.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          "Please select at least one image"),
+                                    ),
+                                  );
+                                  return;
+                                }
                                 BlocProvider.of<PromotionBloc>(context).add(
                                     PromotionPostCreated(
                                         promotion, selectedImages));
                                 print("Promotional post");
-                                
                               }
                             },
                             child: const Padding(

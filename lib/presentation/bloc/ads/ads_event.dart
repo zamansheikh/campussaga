@@ -8,8 +8,8 @@ sealed class AdsEvent extends Equatable {
 }
 
 
-final class FetchAds extends AdsEvent {
-  const FetchAds();
+final class FetchAdsEvent extends AdsEvent {
+  const FetchAdsEvent();
 
   @override
   List<Object> get props => [];

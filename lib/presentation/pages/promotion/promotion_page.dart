@@ -1,6 +1,11 @@
+import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/domain/entities/promotion.dart';
+import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
+import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class PromotionPage extends StatefulWidget {
@@ -12,39 +17,26 @@ class PromotionPage extends StatefulWidget {
 
 class _PromotionPageState extends State<PromotionPage> {
   // Example list of promotions - normally this data would come from a backend or database
-  List<Promotion> promotions = [
-    Promotion(
-      id: '1',
-      userId: 'user1',
-      universityId: 'uni1',
-      promotionTitle: 'Scholarship Program',
-      description: 'Get a scholarship for excellent academic performance.',
-      clubName: 'Science Club',
-      timestamp: DateTime.now(),
-      expiryDate: DateTime.now().add(Duration(days: 2)),
-      imageUrls: [
-        'https://picsum.photos/seed/150/400/200',
-        'https://picsum.photos/seed/151/400/200',
-      ],
-      likes: 25,
-      dislikes: 5,
-      eventLink: 'https://zamansheikh.com',
-    ),
-    Promotion(
-      id: '2',
-      userId: 'user2',
-      universityId: 'uni2',
-      promotionTitle: 'New Research Opportunity',
-      description: 'Join our upcoming research project in AI technology.',
-      clubName: 'AI Club',
-      timestamp: DateTime.now().subtract(Duration(days: 2)),
-      expiryDate: DateTime.now().add(Duration(days: 5)),
-      imageUrls: ['https://picsum.photos/seed/100/400/200'],
-      likes: 40,
-      dislikes: 10,
-      eventLink: 'https://zamansheikh.com',
-    ),
-  ];
+  List<Promotion> promotions = [];
+  var userState = null;
+  @override
+  void initState() {
+    super.initState();
+    _fetchAds();
+  }
+
+  void _fetchAds() {
+    final state = sl<AuthBloc>().state;
+    if (state is AuthAuthenticated) {
+      setState(() {
+        userState = state.user;
+      });
+      final String universityId =
+          state.user.universityId.split('@').last.trim();
+      print("Fetching posts for university: $universityId");
+      sl<AdsBloc>().add(FetchAdsEvent());
+    }
+  }
 
   void toggleTrueVote(Promotion promotion) {
     setState(() {
@@ -80,34 +72,90 @@ class _PromotionPageState extends State<PromotionPage> {
           ),
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: promotions.length,
-        itemBuilder: (context, index) {
-          final promotion = promotions[index];
-          final timeLeft = promotion.expiryDate != null
-              ? promotion.expiryDate!
-                  .difference(DateTime.now())
-                  .inHours
-                  .toString()
-              : null;
+      body: BlocConsumer<AdsBloc, AdsState>(
+        listener: (context, state) {
+          // TODO: implement listener
+        },
+        builder: (context, state) {
+          if (state is AdsError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(state.message),
+                  ElevatedButton(
+                    onPressed: _fetchAds,
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+          if (state is AdsLoaded && state.promotions.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.post_add, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    "No posts yet",
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                  Text(
+                    "Be the first to create a post!",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            );
+          }
 
-          return PromotionCardNew(
-            club: promotion.clubName,
-            title: promotion.promotionTitle,
-            imageUrl: promotion.imageUrls.isNotEmpty
-                ? promotion.imageUrls.first
-                : 'https://placehold.co/600x400',
-            date: DateFormat.yMMMd().format(promotion.timestamp),
-            timeLeft: timeLeft,
-            onTrueVote: () => toggleTrueVote(promotion),
-            onFalseVote: () => toggleFalseVote(promotion),
-            likes: promotion.likes,
-            dislikes: promotion.dislikes,
-            hasUserVotedTrue: promotion.hasUserVotedTrue('user1'),
-            hasUserVotedFalse: promotion.hasUserVotedFalse('user1'),
-            eventLink: promotion.eventLink,
-          );
+          if (state is AdsLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is AdsLoaded) {
+            promotions = state.promotions;
+
+            return RefreshIndicator(
+              onRefresh: () async => _fetchAds(),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: promotions.length,
+                itemBuilder: (context, index) {
+                  final promotion = promotions[index];
+                  final timeLeft = promotion.expiryDate != null
+                      ? promotion.expiryDate!
+                          .difference(DateTime.now())
+                          .inHours
+                          .toString()
+                      : null;
+
+                  return PromotionCardNew(
+                    club: promotion.clubName,
+                    title: promotion.promotionTitle,
+                    imageUrl: promotion.imageUrls.isNotEmpty
+                        ? promotion.imageUrls.first
+                        : 'https://placehold.co/600x400',
+                    date: DateFormat.yMMMd().format(promotion.timestamp),
+                    timeLeft: timeLeft,
+                    onTrueVote: () => toggleTrueVote(promotion),
+                    onFalseVote: () => toggleFalseVote(promotion),
+                    likes: promotion.likes,
+                    dislikes: promotion.dislikes,
+                    hasUserVotedTrue: promotion.hasUserVotedTrue('user1'),
+                    hasUserVotedFalse: promotion.hasUserVotedFalse('user1'),
+                    eventLink: promotion.eventLink,
+                  );
+                },
+              ),
+            );
+          }
+
+          return const Center(child: Text("Something went wrong"));
         },
       ),
     );

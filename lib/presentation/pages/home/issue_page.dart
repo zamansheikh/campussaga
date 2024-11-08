@@ -1,5 +1,4 @@
 import 'package:campus_saga/core/injection_container.dart';
-import 'package:campus_saga/domain/entities/post.dart';
 import 'package:campus_saga/domain/entities/user.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
@@ -35,9 +34,6 @@ class _IssuePageState extends State<IssuePage> {
       sl<IssueBloc>().add(FetchIssueEvent(universityId));
     }
   }
-
-  List<Post> posts = [];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

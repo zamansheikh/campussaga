@@ -102,7 +102,8 @@ class FirebaseDataSource {
         .toList();
   }
 
-  Future<List<PromotionModel>> getPromotionByUniversity(String universityId) async {
+  Future<List<PromotionModel>> getPromotionByUniversity(
+      String universityId) async {
     final querySnapshot = await firestore
         .collection('promotion')
         // .where('universityId', isEqualTo: universityId)
@@ -111,6 +112,14 @@ class FirebaseDataSource {
 
     return querySnapshot.docs
         .map((doc) => PromotionModel.fromJson(doc.data()))
+        .toList();
+  }
+
+  //getAllUniversity
+  Future<List<UniversityModel>> getAllUniversity() async {
+    final querySnapshot = await firestore.collection('universities').get();
+    return querySnapshot.docs
+        .map((doc) => UniversityModel.fromJson(doc.data()))
         .toList();
   }
 
@@ -209,6 +218,20 @@ class FirebaseDataSource {
     });
   }
 
+  Future<void> updatePostComments(PostModel post) async {
+    await firestore.collection('posts').doc(post.id).update(
+      {'comments': post.comments.map((c) => c.toJson()).toList()},
+    );
+  }
+
+  Future<void> updatePostFeedback(PostModel post) async {
+    if (post.feedback != null) {
+      await firestore.collection('posts').doc(post.id).update(
+        {'feedback': post.feedback!.toJson()},
+      );
+    }
+  }
+
   Future<String> uploadUserImage(File image, String userId) async {
     try {
       final ref =
@@ -235,7 +258,7 @@ class FirebaseDataSource {
     return urls;
   }
 
-  //upload varification images
+
   Future<List<String>> uploadVerificationImages(
       String postId, List<File> images) async {
     print("uploadVerificationImages: $images");

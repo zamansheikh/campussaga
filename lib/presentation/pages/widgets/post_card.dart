@@ -1,12 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:campus_saga/core/injection_container.dart';
+import 'package:campus_saga/domain/entities/comment.dart';
 import 'package:campus_saga/domain/entities/post.dart';
 import 'package:campus_saga/domain/entities/user.dart';
+import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
+import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
 import 'package:campus_saga/presentation/pages/widgets/comments_widget.dart';
 import 'package:campus_saga/presentation/pages/widgets/feedback_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:uuid/uuid.dart';
 
-class PostCard extends StatelessWidget {
+class PostCard extends StatefulWidget {
   final Post post;
   final User user;
   final VoidCallback? onResolve;
@@ -21,7 +26,13 @@ class PostCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  @override
   Widget build(BuildContext context) {
+    var post = this.widget.post;
     return Card(
       elevation: 4.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
@@ -138,8 +149,19 @@ class PostCard extends StatelessWidget {
 
             CommentsWidget(
               comments: post.comments,
-              onAddComment: (newComment) {
-                // Handle adding the new comment
+              onAddComment: (CommentText) {
+                final NewComment = Comment(
+                  text: CommentText,
+                  postId: post.id,
+                  id: Uuid().v4(),
+                  userId: widget.user.id,
+                  timestamp: DateTime.now(),
+                );
+                setState(() {
+                  post =
+                      post.copyWith(comments: [...post.comments, NewComment]);
+                });
+                sl<IssueBloc>().add(AddACommentEvent(post));
               },
             ),
             Visibility(
@@ -160,7 +182,7 @@ class PostCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ElevatedButton.icon(
-                  onPressed: onResolve,
+                  onPressed: widget.onResolve,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[100],
                     foregroundColor: Colors.green[800],
@@ -169,7 +191,7 @@ class PostCard extends StatelessWidget {
                   label: const Text("Yes"),
                 ),
                 ElevatedButton.icon(
-                  onPressed: onReject,
+                  onPressed: widget.onReject,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red[100],
                     foregroundColor: Colors.red[800],
