@@ -20,7 +20,7 @@ abstract class PostRepository {
   //Add a comment to a specific post
   Future<Either<Failure, void>> addComment(Post post);
   //Add feedback to a specific post
-  Future<Either<Failure, void>> addFeedback(String postId, AuthorityFeedback feedback);
+  Future<Either<Failure, void>> addFeedback(Post post);
   //Add a vote to a specific post
   Future<Either<Failure, void>> addVote(String postId, String userId, bool isTrueVote);
   //add university to university collection
