@@ -14,8 +14,14 @@ class PostModel {
   final List<String> imageUrls;
   final int trueVotes;
   final int falseVotes;
+  final int agree;
+  final int disagree;
   final List<CommentModel> comments;
   final AuthorityFeedbackModel? feedback;
+  final Set<String> trueVoterIds;
+  final Set<String> falseVoterIds;
+  final Set<String> agreeVoterIds;
+  final Set<String> disagreeVoterIds;
 
   const PostModel({
     required this.id,
@@ -28,8 +34,14 @@ class PostModel {
     this.imageUrls = const [],
     this.trueVotes = 0,
     this.falseVotes = 0,
+    this.agree = 0,
+    this.disagree = 0,
     this.comments = const [],
     this.feedback,
+    this.trueVoterIds = const {},
+    this.falseVoterIds = const {},
+    this.agreeVoterIds = const {},
+    this.disagreeVoterIds = const {},
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
@@ -40,16 +52,26 @@ class PostModel {
         description: json['description'] as String,
         isResolved: json['isResolved'] as bool? ?? false,
         timestamp: DateTime.parse(json['timestamp'] as String),
-        imageUrls: (json['imageUrls'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+        imageUrls: (json['imageUrls'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
         trueVotes: json['trueVotes'] as int? ?? 0,
         falseVotes: json['falseVotes'] as int? ?? 0,
+        agree: json['agree'] as int? ?? 0,
+        disagree: json['disagree'] as int? ?? 0,
         comments: (json['comments'] as List<dynamic>?)
                 ?.map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
                 .toList() ??
             [],
         feedback: json['feedback'] == null
             ? null
-            : AuthorityFeedbackModel.fromJson(json['feedback'] as Map<String, dynamic>),
+            : AuthorityFeedbackModel.fromJson(
+                json['feedback'] as Map<String, dynamic>),
+        trueVoterIds: Set<String>.from(json['trueVoterIds'] ?? []),
+        falseVoterIds: Set<String>.from(json['falseVoterIds'] ?? []),
+        agreeVoterIds: Set<String>.from(json['agreeVoterIds'] ?? []),
+        disagreeVoterIds: Set<String>.from(json['disagreeVoterIds'] ?? []),
       );
 
   Map<String, dynamic> toJson() => {
@@ -63,8 +85,14 @@ class PostModel {
         'imageUrls': imageUrls,
         'trueVotes': trueVotes,
         'falseVotes': falseVotes,
+        'agree': agree,
+        'disagree': disagree,
         'comments': comments.map((comment) => comment.toJson()).toList(),
         'feedback': feedback?.toJson(),
+        'trueVoterIds': trueVoterIds.toList(),
+        'falseVoterIds': falseVoterIds.toList(),
+        'agreeVoterIds': agreeVoterIds.toList(),
+        'disagreeVoterIds': disagreeVoterIds.toList(),
       };
 
   factory PostModel.fromEntity(Post entity) => PostModel(
@@ -78,8 +106,18 @@ class PostModel {
         imageUrls: entity.imageUrls,
         trueVotes: entity.trueVotes,
         falseVotes: entity.falseVotes,
-        comments: entity.comments.map((comment) => CommentModel.fromEntity(comment)).toList(),
-        feedback: entity.feedback != null ? AuthorityFeedbackModel.fromEntity(entity.feedback!) : null,
+        agree: entity.agree,
+        disagree: entity.disagree,
+        comments: entity.comments
+            .map((comment) => CommentModel.fromEntity(comment))
+            .toList(),
+        feedback: entity.feedback != null
+            ? AuthorityFeedbackModel.fromEntity(entity.feedback!)
+            : null,
+        trueVoterIds: entity.trueVoterIds,
+        falseVoterIds: entity.falseVoterIds,
+        agreeVoterIds: entity.agreeVoterIds,
+        disagreeVoterIds: entity.disagreeVoterIds,
       );
 
   Post toEntity() => Post(
@@ -93,8 +131,14 @@ class PostModel {
         imageUrls: imageUrls,
         trueVotes: trueVotes,
         falseVotes: falseVotes,
+        agree: agree,
+        disagree: disagree,
         comments: comments.map((comment) => comment.toEntity()).toList(),
         feedback: feedback?.toEntity(),
+        trueVoterIds: trueVoterIds,
+        falseVoterIds: falseVoterIds,
+        agreeVoterIds: agreeVoterIds,
+        disagreeVoterIds: disagreeVoterIds,
       );
 
   PostModel copyWith({
@@ -108,8 +152,14 @@ class PostModel {
     List<String>? imageUrls,
     int? trueVotes,
     int? falseVotes,
+    int? agree,
+    int? disagree,
     List<CommentModel>? comments,
     AuthorityFeedbackModel? feedback,
+    Set<String>? trueVoterIds,
+    Set<String>? falseVoterIds,
+    Set<String>? agreeVoterIds,
+    Set<String>? disagreeVoterIds,
   }) =>
       PostModel(
         id: id ?? this.id,
@@ -122,7 +172,13 @@ class PostModel {
         imageUrls: imageUrls ?? this.imageUrls,
         trueVotes: trueVotes ?? this.trueVotes,
         falseVotes: falseVotes ?? this.falseVotes,
+        agree: agree ?? this.agree,
+        disagree: disagree ?? this.disagree,
         comments: comments ?? this.comments,
         feedback: feedback ?? this.feedback,
+        trueVoterIds: trueVoterIds ?? this.trueVoterIds,
+        falseVoterIds: falseVoterIds ?? this.falseVoterIds,
+        agreeVoterIds: agreeVoterIds ?? this.agreeVoterIds,
+        disagreeVoterIds: disagreeVoterIds ?? this.disagreeVoterIds,
       );
 }

@@ -6,9 +6,9 @@ import 'package:campus_saga/domain/entities/feedback.dart';
 import 'package:campus_saga/domain/entities/post.dart';
 import 'package:campus_saga/domain/entities/user.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
-import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
 import 'package:campus_saga/presentation/pages/widgets/comments_widget.dart';
 import 'package:campus_saga/presentation/pages/widgets/feedback_widget.dart';
+import 'package:campus_saga/presentation/pages/widgets/prediction_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:uuid/uuid.dart';
@@ -16,15 +16,10 @@ import 'package:uuid/uuid.dart';
 class PostCard extends StatefulWidget {
   final Post post;
   final User user;
-  final VoidCallback? onResolve;
-  final VoidCallback? onReject;
-
   const PostCard({
     Key? key,
     required this.post,
     required this.user,
-    this.onResolve,
-    this.onReject,
   }) : super(key: key);
 
   @override
@@ -32,13 +27,38 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
+  // Method to calculate issue status based on timestamp and feedback
+  String _getIssueStatus() {
+    DateTime referenceTime =
+        widget.post.feedback?.timestamp ?? widget.post.timestamp;
+    final timeDifference = DateTime.now().difference(referenceTime);
+
+    if (timeDifference.inDays > 2) {
+      // If more than 2 days have passed, mark as resolved or not resolved
+      return (widget.post.trueVotes > widget.post.falseVotes)
+          ? "Solved"
+          : "Unsolved";
+    } else {
+      // If less than 2 days, show as inconclusive
+      return "Pending";
+    }
+  }
+
+  _calculatePercentage(int trueVotes, int falseVotes) {
+    final totalVotes = trueVotes + falseVotes;
+    if (totalVotes == 0) {
+      return 0.0;
+    }
+    return trueVotes / totalVotes;
+  }
+
   @override
   Widget build(BuildContext context) {
     var post = this.widget.post;
     return Card(
-      elevation: 4.0,
+      elevation: 2.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -65,10 +85,36 @@ class _PostCardState extends State<PostCard> {
                     ),
                   ],
                 ),
+                const SizedBox(width: 8),
+                Spacer(),
+                Wrap(
+                  direction: Axis.vertical,
+                  children: [
+                    _VoteButton(
+                      icon: Icons.thumb_up,
+                      color: Colors.green,
+                      count: post.trueVotes,
+                      label: "Vote this",
+                      onPressed: () {}, // Implement agree voting
+                    ),
+                    _VoteButton(
+                      icon: Icons.thumb_down,
+                      color: Colors.red,
+                      count: post.falseVotes,
+                      label: "Report this",
+                      onPressed: () {}, // Implement disagree voting
+                    ),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(height: 12.0),
-
+            LinearProgressIndicator(
+              value: _calculatePercentage(post.trueVotes, post.falseVotes),
+              backgroundColor: Colors.grey[400],
+              minHeight: 1,
+              valueColor: const AlwaysStoppedAnimation(Colors.green),
+            ),
+            const SizedBox(height: 4.0),
             // Post Title
             Text(
               post.postTitle,
@@ -123,66 +169,31 @@ class _PostCardState extends State<PostCard> {
               ),
             const SizedBox(height: 12.0),
 
-            // Voting and Comment Actions
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Wrap(
-                  spacing: 8.0,
-                  children: [
-                    _VoteButton(
-                      icon: Icons.thumb_up,
-                      color: Colors.green,
-                      count: post.trueVotes,
-                      label: "Agree",
-                      onPressed: () {}, // Implement agree voting
-                    ),
-                    _VoteButton(
-                      icon: Icons.thumb_down,
-                      color: Colors.red,
-                      count: post.falseVotes,
-                      label: "Disagree",
-                      onPressed: () {}, // Implement disagree voting
-                    ),
-                  ],
+                CommentsWidget(
+                  comments: post.comments,
+                  onAddComment: (CommentText) {
+                    final NewComment = Comment(
+                      text: CommentText,
+                      postId: post.id,
+                      id: Uuid().v4(),
+                      userId: widget.user.id,
+                      timestamp: DateTime.now(),
+                    );
+                    setState(() {
+                      post = post
+                          .copyWith(comments: [...post.comments, NewComment]);
+                    });
+                    sl<IssueBloc>().add(AddACommentEvent(post));
+                  },
                 ),
+                //PredictionWidget(),
+                PredictionWidget(post: post),
               ],
             ),
 
-            CommentsWidget(
-              comments: post.comments,
-              onAddComment: (CommentText) {
-                final NewComment = Comment(
-                  text: CommentText,
-                  postId: post.id,
-                  id: Uuid().v4(),
-                  userId: widget.user.id,
-                  timestamp: DateTime.now(),
-                );
-                setState(() {
-                  post =
-                      post.copyWith(comments: [...post.comments, NewComment]);
-                });
-                sl<IssueBloc>().add(AddACommentEvent(post));
-              },
-            ),
-            Visibility(
-                child: FeedbackWidget(
-                    onAddFeedback: (value) {
-                      final feedback = AuthorityFeedback(
-                        id: Uuid().v4(),
-                        authorityId: widget.user.id,
-                        postId: post.id,
-                        message: value,
-                        timestamp: DateTime.now(),
-                      );
-                      setState(() {
-                        post = post.copyWith(feedback: feedback);
-                      });
-                      sl<IssueBloc>().add(AddAFeedbackEvent(post));
-                    },
-                    buttonName: "View Feedback"),
-                visible: post.feedback != null),
             if (widget.user.userType == UserType.university)
               Visibility(
                 child: FeedbackWidget(
@@ -200,8 +211,10 @@ class _PostCardState extends State<PostCard> {
                     sl<IssueBloc>().add(AddAFeedbackEvent(post));
                   },
                   buttonName: "Add Feedback",
+                  feedback: post.feedback,
                 ),
                 replacement: FeedbackWidget(
+                  feedback: post.feedback,
                   onAddFeedback: (value) {
                     final feedback = AuthorityFeedback(
                       id: Uuid().v4(),
@@ -222,6 +235,7 @@ class _PostCardState extends State<PostCard> {
             else
               Visibility(
                 child: FeedbackWidget(
+                  feedback: post.feedback,
                   onAddFeedback: (value) {
                     //show a toast
                     fToast(context, message: "You are not an Authority 😒");
@@ -229,6 +243,7 @@ class _PostCardState extends State<PostCard> {
                   buttonName: "View Feedback",
                 ),
                 replacement: FeedbackWidget(
+                    feedback: post.feedback,
                     onAddFeedback: (_) {
                       //show a toast
                       fToast(context, message: "You are not an Authority 😒");
@@ -241,11 +256,16 @@ class _PostCardState extends State<PostCard> {
 
             // Issue Resolution Section
             const Text("Is this issue resolved?"),
+            LinearProgressIndicator(
+              value: _calculatePercentage(post.agree, post.disagree),
+              backgroundColor: Colors.grey[200],
+              valueColor: const AlwaysStoppedAnimation(Colors.green),
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton.icon(
-                  onPressed: widget.onResolve,
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[100],
                     foregroundColor: Colors.green[800],
@@ -253,8 +273,19 @@ class _PostCardState extends State<PostCard> {
                   icon: const Icon(Icons.check),
                   label: const Text("Yes"),
                 ),
+
+                // New button showing issue status
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(_getIssueStatus()),
+                ),
+
                 ElevatedButton.icon(
-                  onPressed: widget.onReject,
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red[100],
                     foregroundColor: Colors.red[800],

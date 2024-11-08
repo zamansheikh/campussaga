@@ -55,4 +55,6 @@ class SignInEvent extends AuthEvent {
   SignInEvent({required this.email, required this.password});
 }
 
+class AuthRefreshRequested extends AuthEvent {}
+
 class SignOutEvent extends AuthEvent {}

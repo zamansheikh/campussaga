@@ -1,3 +1,4 @@
+import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
@@ -53,66 +54,73 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (context, state) {
           if (state is AuthAuthenticated) {
             final User user = state.user;
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Profile Header
-                    _buildProfileHeader(user),
-                    const SizedBox(height: 24.0),
+            return RefreshIndicator(
+              onRefresh: () async {
+                sl<AuthBloc>().add(AuthRefreshRequested());
+                return Future.delayed(const Duration(seconds: 1));
+              },
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Profile Header
+                      _buildProfileHeader(user),
+                      const SizedBox(height: 24.0),
 
-                    // Engagement Metrics
-                    _buildEngagementMetrics(user),
-                    const SizedBox(height: 24.0),
+                      // Engagement Metrics
+                      _buildEngagementMetrics(user),
+                      const SizedBox(height: 24.0),
 
-                    // Achievements and Badges
-                    _buildAchievements(user),
-                    const SizedBox(height: 24.0),
+                      // Achievements and Badges
+                      _buildAchievements(user),
+                      const SizedBox(height: 24.0),
 
-                    // Student Details (if applicable)
-                    if (user.userType == UserType.student)
-                      _buildStudentDetails(user),
+                      // Student Details (if applicable)
+                      if (user.userType == UserType.student)
+                        _buildStudentDetails(user),
 
-                    // Logout Button
-                    const SizedBox(height: 24.0),
-                    //edit profile button
-                    CustomButton(
-                      color: Colors.indigoAccent,
-                      text: "Edit Profile",
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    UpdateProfilePage(user: user)));
-                      },
-                    ),
-                    CustomButton(
-                      color: Colors.green,
-                      text: "Terms and Conditions",
-                      onPressed: () async {
-                        launchURL(
-                            "https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md");
-                      },
-                    ),
-                    CustomButton(
-                      color: Colors.blue,
-                      text: "About Us",
-                      onPressed: () async {
-                        launchURL("https://zamansheikh.com");
-                      },
-                    ),
+                      // Logout Button
+                      const SizedBox(height: 24.0),
+                      //edit profile button
+                      CustomButton(
+                        color: Colors.indigoAccent,
+                        text: "Edit Profile",
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      UpdateProfilePage(user: user)));
+                        },
+                      ),
+                      CustomButton(
+                        color: Colors.green,
+                        text: "Terms and Conditions",
+                        onPressed: () async {
+                          launchURL(
+                              "https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md");
+                        },
+                      ),
+                      CustomButton(
+                        color: Colors.blue,
+                        text: "About Us",
+                        onPressed: () async {
+                          launchURL("https://zamansheikh.com");
+                        },
+                      ),
 
-                    CustomButton(
-                      color: Colors.red,
-                      text: "Logout",
-                      onPressed: () {
-                        BlocProvider.of<AuthBloc>(context).add(SignOutEvent());
-                      },
-                    ),
-                  ],
+                      CustomButton(
+                        color: Colors.red,
+                        text: "Logout",
+                        onPressed: () {
+                          BlocProvider.of<AuthBloc>(context)
+                              .add(SignOutEvent());
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );

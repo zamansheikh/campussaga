@@ -71,6 +71,14 @@ class _PromotionPageState extends State<PromotionPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              // Navigate to notifications page
+            },
+          ),
+        ],
       ),
       body: BlocConsumer<AdsBloc, AdsState>(
         listener: (context, state) {
