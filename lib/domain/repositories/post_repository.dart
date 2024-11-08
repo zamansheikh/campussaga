@@ -1,9 +1,6 @@
 // lib/domain/repositories/post_repository.dart
 
 import 'dart:io';
-
-import 'package:campus_saga/domain/entities/comment.dart';
-import 'package:campus_saga/domain/entities/feedback.dart';
 import 'package:campus_saga/domain/entities/promotion.dart';
 import 'package:campus_saga/domain/entities/university.dart';
 import 'package:dartz/dartz.dart';

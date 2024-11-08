@@ -34,6 +34,7 @@ class _IssuePageState extends State<IssuePage> {
       sl<IssueBloc>().add(FetchIssueEvent(universityId));
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,6 +54,14 @@ class _IssuePageState extends State<IssuePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              // Navigate to notifications page
+            },
+          ),
+        ],
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: sl<AuthBloc>(),

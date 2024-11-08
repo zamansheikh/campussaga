@@ -13,10 +13,14 @@ class Post extends Equatable {
   final List<String> imageUrls;
   final int trueVotes;
   final int falseVotes;
+  final int agree;
+  final int disagree;
   final List<Comment> comments;
   final AuthorityFeedback? feedback;
   final Set<String> trueVoterIds; // Track users who voted true
   final Set<String> falseVoterIds; // Track users who voted false
+  final Set<String> agreeVoterIds; // Track users who voted agree
+  final Set<String> disagreeVoterIds; // Track users who voted disagree
 
   const Post({
     required this.id,
@@ -29,14 +33,20 @@ class Post extends Equatable {
     this.imageUrls = const [],
     this.trueVotes = 0,
     this.falseVotes = 0,
+    this.agree = 0,
+    this.disagree = 0,
     this.comments = const [],
     this.feedback,
     this.trueVoterIds = const {},
     this.falseVoterIds = const {},
+    this.agreeVoterIds = const {},
+    this.disagreeVoterIds = const {},
   });
 
   bool hasUserVotedTrue(String userId) => trueVoterIds.contains(userId);
   bool hasUserVotedFalse(String userId) => falseVoterIds.contains(userId);
+  bool hasUserVotedAgree(String userId) => agreeVoterIds.contains(userId);
+  bool hasUserVotedDisagree(String userId) => disagreeVoterIds.contains(userId);
 
   Post toggleTrueVote(String voterId) {
     if (hasUserVotedTrue(voterId)) {
@@ -70,6 +80,38 @@ class Post extends Equatable {
     }
   }
 
+  Post toggleAgreeVote(String voterId) {
+    if (hasUserVotedAgree(voterId)) {
+      return copyWith(
+        agree: agree - 1,
+        agreeVoterIds: Set<String>.from(agreeVoterIds)..remove(voterId),
+      );
+    } else {
+      return copyWith(
+        agree: agree + 1,
+        disagree: hasUserVotedDisagree(voterId) ? disagree - 1 : disagree,
+        agreeVoterIds: Set<String>.from(agreeVoterIds)..add(voterId),
+        disagreeVoterIds: Set<String>.from(disagreeVoterIds)..remove(voterId),
+      );
+    }
+  }
+
+  Post toggleDisagreeVote(String voterId) {
+    if (hasUserVotedDisagree(voterId)) {
+      return copyWith(
+        disagree: disagree - 1,
+        disagreeVoterIds: Set<String>.from(disagreeVoterIds)..remove(voterId),
+      );
+    } else {
+      return copyWith(
+        disagree: disagree + 1,
+        agree: hasUserVotedAgree(voterId) ? agree - 1 : agree,
+        disagreeVoterIds: Set<String>.from(disagreeVoterIds)..add(voterId),
+        agreeVoterIds: Set<String>.from(agreeVoterIds)..remove(voterId),
+      );
+    }
+  }
+
   Post copyWith({
     String? id,
     String? userId,
@@ -81,10 +123,14 @@ class Post extends Equatable {
     List<String>? imageUrls,
     int? trueVotes,
     int? falseVotes,
+    int? agree,
+    int? disagree,
     List<Comment>? comments,
     AuthorityFeedback? feedback,
     Set<String>? trueVoterIds,
     Set<String>? falseVoterIds,
+    Set<String>? agreeVoterIds,
+    Set<String>? disagreeVoterIds,
   }) {
     return Post(
       id: id ?? this.id,
@@ -97,10 +143,14 @@ class Post extends Equatable {
       imageUrls: imageUrls ?? this.imageUrls,
       trueVotes: trueVotes ?? this.trueVotes,
       falseVotes: falseVotes ?? this.falseVotes,
+      agree: agree ?? this.agree,
+      disagree: disagree ?? this.disagree,
       comments: comments ?? this.comments,
       feedback: feedback ?? this.feedback,
       trueVoterIds: trueVoterIds ?? this.trueVoterIds,
       falseVoterIds: falseVoterIds ?? this.falseVoterIds,
+      agreeVoterIds: agreeVoterIds ?? this.agreeVoterIds,
+      disagreeVoterIds: disagreeVoterIds ?? this.disagreeVoterIds,
     );
   }
 
@@ -116,9 +166,13 @@ class Post extends Equatable {
         imageUrls,
         trueVotes,
         falseVotes,
+        agree,
+        disagree,
         comments,
         feedback,
         trueVoterIds,
         falseVoterIds,
+        agreeVoterIds,
+        disagreeVoterIds,
       ];
 }
