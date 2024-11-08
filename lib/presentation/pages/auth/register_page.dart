@@ -10,6 +10,7 @@ import 'package:campus_saga/presentation/pages/widgets/university_search_field.d
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:campus_saga/core/utils/validators.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -18,14 +19,11 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController nameController = TextEditingController();
-
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   final TextEditingController userNameController = TextEditingController();
-
   final TextEditingController universityController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   final List<String> universities = [
     'Daffodil International University @DIU',
@@ -67,8 +65,8 @@ class _RegisterPageState extends State<RegisterPage> {
   File? selectedImage;
 
   Future<void> pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 50);
     if (pickedFile != null) {
       setState(() {
         selectedImage = File(pickedFile.path);
@@ -91,7 +89,6 @@ class _RegisterPageState extends State<RegisterPage> {
           } else if (state is AuthAuthenticated) {
             Navigator.of(context).pushReplacementNamed('/home');
           } else if (state is AuthUnauthenticated) {
-            //call logOut Event
             BlocProvider.of<AuthBloc>(context).add(SignOutEvent());
             Navigator.of(context).pushReplacementNamed('/login');
           }
@@ -100,50 +97,83 @@ class _RegisterPageState extends State<RegisterPage> {
           return Padding(
             padding: EdgeInsets.all(16),
             child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  GestureDetector(
-                    onTap: pickImage,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: selectedImage != null
-                          ? FileImage(selectedImage!)
-                          : NetworkImage(
-                                  "https://loremflickr.com/200/200?random=2")
-                              as ImageProvider,
-                      child:
-                          selectedImage == null ? Icon(Icons.camera_alt) : null,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: pickImage,
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundImage: selectedImage != null
+                            ? FileImage(selectedImage!)
+                            : NetworkImage(
+                                    "https://loremflickr.com/200/200?random=2")
+                                as ImageProvider,
+                        child: selectedImage == null
+                            ? Icon(
+                                Icons.camera_alt,
+                                size: 35,
+                                color: Colors.white,
+                              )
+                            : null,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  TextEditingField(
-                    controller: userNameController,
-                    labelText: "User Name",
-                    icon: Icons.person,
-                  ),
-                  SizedBox(height: 20),
-                  UniversitySearchField(
-                    controller: universityController,
-                    universityList: universities,
-                  ),
-                  SizedBox(height: 20),
-                  TextEditingField(
-                    controller: emailController,
-                    labelText: "Email",
-                    icon: Icons.email,
-                  ),
-                  SizedBox(height: 20),
-                  TextEditingField(
-                    controller: passwordController,
-                    labelText: "Password",
-                    icon: Icons.lock,
-                    isObscure: true,
-                  ),
-                  SizedBox(height: 20),
-                  (state is AuthLoading)
-                      ? CircularProgressIndicator()
-                      : ElevatedButton(
-                          onPressed: () {
+                    SizedBox(height: 20),
+                    TextEditingField(
+                      controller: userNameController,
+                      labelText: "User Name",
+                      icon: Icons.person,
+                      validator: (value) {
+                        if (!Validators.isNonEmpty(value ?? '')) {
+                          return 'Username cannot be empty';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    UniversitySearchField(
+                      controller: universityController,
+                      universityList: universities,
+                      validator: (value) {
+                        if (!Validators.isNonEmpty(value ?? '')) {
+                          return 'Please select a university';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextEditingField(
+                      controller: emailController,
+                      labelText: "Email",
+                      icon: Icons.email,
+                      validator: (value) {
+                        if (!Validators.isValidEmail(value ?? '')) {
+                          return 'Enter a valid email';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextEditingField(
+                      controller: passwordController,
+                      labelText: "Password",
+                      icon: Icons.lock,
+                      isObscure: true,
+                      validator: (value) {
+                        if (!Validators.isValidPassword(value ?? '')) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    if (state is AuthLoading)
+                      CircularProgressIndicator()
+                    else
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
                             BlocProvider.of<AuthBloc>(context).add(
                               SignUpEvent(
                                 username: userNameController.text,
@@ -153,10 +183,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                 image: selectedImage,
                               ),
                             );
-                          },
-                          child: Text("Sign Up"),
-                        ),
-                ],
+                          }
+                        },
+                        child: Text("Sign Up"),
+                      ),
+                  ],
+                ),
               ),
             ),
           );

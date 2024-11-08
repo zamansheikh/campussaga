@@ -60,39 +60,67 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             emit(AuthFailure(failure.message));
           },
           (userId) async {
-            final isUploaded = await uploadUserImage(userId, event.image!);
-            await isUploaded.fold(
-              (failure) async {
-                emit(AuthFailure(failure.message));
-              },
-              (imageUrl) async {
-                final isDatabaseUpdated = await createUserProfile(User(
-                  id: userId,
-                  name: event.username,
-                  email: event.email,
-                  universityId: event.university,
-                  userType: UserType.student,
-                  profilePictureUrl: imageUrl,
-                ));
-                await isDatabaseUpdated.fold(
-                  (failure) async {
-                    emit(AuthFailure(failure.message));
-                  },
-                  (_) async {
-                    emit(AuthSuccess());
-                    final user = await getUserProfile(userId);
-                    user.fold(
-                      (failure) {
-                        emit(AuthUnauthenticated());
-                      },
-                      (user) {
-                        emit(AuthAuthenticated(user));
-                      },
-                    );
-                  },
-                );
-              },
-            );
+            if (event.image == null) {
+              final isDatabaseUpdated = await createUserProfile(User(
+                id: userId,
+                name: event.username,
+                email: event.email,
+                universityId: event.university,
+                userType: UserType.student,
+                profilePictureUrl: "https://loremflickr.com/200/200?random=2",
+              ));
+              await isDatabaseUpdated.fold(
+                (failure) async {
+                  emit(AuthFailure(failure.message));
+                },
+                (_) async {
+                  emit(AuthSuccess());
+                  final user = await getUserProfile(userId);
+                  user.fold(
+                    (failure) {
+                      emit(AuthUnauthenticated());
+                    },
+                    (user) {
+                      emit(AuthAuthenticated(user));
+                    },
+                  );
+                },
+              );
+            } else {
+              final isUploaded = await uploadUserImage(userId, event.image!);
+              await isUploaded.fold(
+                (failure) async {
+                  emit(AuthFailure(failure.message));
+                },
+                (imageUrl) async {
+                  final isDatabaseUpdated = await createUserProfile(User(
+                    id: userId,
+                    name: event.username,
+                    email: event.email,
+                    universityId: event.university,
+                    userType: UserType.student,
+                    profilePictureUrl: imageUrl,
+                  ));
+                  await isDatabaseUpdated.fold(
+                    (failure) async {
+                      emit(AuthFailure(failure.message));
+                    },
+                    (_) async {
+                      emit(AuthSuccess());
+                      final user = await getUserProfile(userId);
+                      user.fold(
+                        (failure) {
+                          emit(AuthUnauthenticated());
+                        },
+                        (user) {
+                          emit(AuthAuthenticated(user));
+                        },
+                      );
+                    },
+                  );
+                },
+              );
+            }
           },
         );
       } catch (e) {

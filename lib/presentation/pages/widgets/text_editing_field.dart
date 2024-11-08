@@ -7,6 +7,7 @@ class TextEditingField extends StatefulWidget {
   final String labelText;
   final IconData icon;
   final bool isObscure;
+  final String? Function(String?)? validator;
 
   const TextEditingField({
     Key? key,
@@ -14,6 +15,7 @@ class TextEditingField extends StatefulWidget {
     required this.labelText,
     required this.icon,
     this.isObscure = false,
+    this.validator,
   }) : super(key: key);
 
   @override
@@ -31,7 +33,7 @@ class _TextEditingFieldState extends State<TextEditingField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: widget.controller,
       decoration: InputDecoration(
         labelText: widget.labelText,
@@ -51,6 +53,7 @@ class _TextEditingFieldState extends State<TextEditingField> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
       ),
       obscureText: _isObscure,
+      validator: widget.validator,
     );
   }
 }
