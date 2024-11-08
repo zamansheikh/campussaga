@@ -12,7 +12,7 @@ class AdsBloc extends Bloc<AdsEvent, AdsState> {
   AdsBloc({
     required this.fetchPromotionUsecase,
   }) : super(AdsInitial()) {
-    on<FetchAds>((event, emit)async {
+    on<FetchAdsEvent>((event, emit)async {
       emit(AdsLoading());
       final result = await fetchPromotionUsecase("event.universityId");
       result.fold(

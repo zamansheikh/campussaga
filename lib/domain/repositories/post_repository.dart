@@ -18,7 +18,7 @@ abstract class PostRepository {
   Future<Either<Failure, List<Post>>> fetchPosts(String universityId);
   Future<Either<Failure, List<String>>> uploadPostImages(String userId, List<File> image);
   //Add a comment to a specific post
-  Future<Either<Failure, void>> addComment(String postId, Comment comment);
+  Future<Either<Failure, void>> addComment(Post post);
   //Add feedback to a specific post
   Future<Either<Failure, void>> addFeedback(String postId, AuthorityFeedback feedback);
   //Add a vote to a specific post
@@ -27,4 +27,6 @@ abstract class PostRepository {
   Future<Either<Failure, void>> addUniversity(University university);
   //Create a promotion post
   Future<Either<Failure, Promotion>> createPromotion(Promotion promotion);
+  //Fetch all universities
+  Future<Either<Failure, List<University>>> fetchAllUniversity();
 }

@@ -44,11 +44,19 @@ class University extends Equatable {
 
   // Calculate the satisfaction score as a percentage (0 to 100)
   double get satisfactionPercentage {
-    double likeDislikeRatio = agrees / (agrees + disagrees);
-    double solvePostRatio = totalSolvedPosts / totalPosts;
+    double likeDislikeRatio = 0.0;
+    double solvePostRatio = 0.0;
+  
+    if (agrees + disagrees > 0) {
+      likeDislikeRatio = agrees / (agrees + disagrees);
+    }
+  
+    if (totalPosts > 0) {
+      solvePostRatio = totalSolvedPosts / totalPosts;
+    }
+  
     return (likeDislikeRatio + solvePostRatio) / 2 * 100;
   }
-
   @override
   List<Object?> get props => [
     id,

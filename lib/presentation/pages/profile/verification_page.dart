@@ -25,7 +25,12 @@ class _VerificationPageState extends State<VerificationPage> {
   File? idCardFile;
 
   Future<void> _takeSelfie() async {
-    final image = await _picker.pickImage(source: ImageSource.camera);
+    final image = await _picker.pickImage(
+        preferredCameraDevice: CameraDevice.front,
+        source: ImageSource.camera,
+        imageQuality: 50,
+        maxWidth: 800,
+        maxHeight: 800);
     if (image != null) {
       setState(() {
         selfieImage = image;
@@ -35,7 +40,11 @@ class _VerificationPageState extends State<VerificationPage> {
   }
 
   Future<void> _takeIdCardPhoto() async {
-    final image = await _picker.pickImage(source: ImageSource.camera);
+    final image = await _picker.pickImage(
+      preferredCameraDevice: CameraDevice.rear,
+      source: ImageSource.camera,
+      imageQuality: 50,
+    );
     if (image != null) {
       setState(() {
         idCardImage = image;
@@ -64,7 +73,7 @@ class _VerificationPageState extends State<VerificationPage> {
               GestureDetector(
                 onTap: _takeSelfie,
                 child: Container(
-                  height: 150,
+                  height: 300,
                   width: double.infinity,
                   color: Colors.grey[300],
                   child: selfieImage == null
@@ -84,7 +93,7 @@ class _VerificationPageState extends State<VerificationPage> {
               GestureDetector(
                 onTap: _takeIdCardPhoto,
                 child: Container(
-                  height: 150,
+                  height: 200,
                   width: double.infinity,
                   color: Colors.grey[300],
                   child: idCardImage == null
@@ -206,4 +215,5 @@ class _VerificationPageState extends State<VerificationPage> {
       ),
     );
   }
+  //Write function to compress image file
 }

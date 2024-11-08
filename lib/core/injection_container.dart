@@ -15,6 +15,7 @@ import 'package:campus_saga/domain/usecases/create_varification_request_usecase.
 import 'package:campus_saga/domain/usecases/fetch_pending_verification_usecase.dart';
 import 'package:campus_saga/domain/usecases/fetch_posts.dart';
 import 'package:campus_saga/domain/usecases/fetch_promotion_usecase.dart';
+import 'package:campus_saga/domain/usecases/fetch_university_usecase.dart';
 import 'package:campus_saga/domain/usecases/sign_in_user.dart';
 import 'package:campus_saga/domain/usecases/sign_out_user.dart';
 import 'package:campus_saga/domain/usecases/sign_up_user.dart';
@@ -28,6 +29,7 @@ import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
 import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
 import 'package:campus_saga/presentation/bloc/promotion/promotion_bloc.dart';
+import 'package:campus_saga/presentation/bloc/university/university_bloc.dart';
 import 'package:campus_saga/presentation/bloc/varify/varification_bloc.dart';
 import 'package:campus_saga/presentation/bloc/verify_user/verify_user_bloc.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -83,6 +85,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => FetchPendingVerificationUsecase(sl()));
   sl.registerLazySingleton(() => UpdateVerificationStatusUsecase(sl()));
   sl.registerLazySingleton(() => FetchPromotionUsecase(sl()));
+  sl.registerLazySingleton(() => FetchUniversityUsecase(sl()));
 
   // BLoCs
   sl.registerLazySingleton(() => AuthBloc(
@@ -104,7 +107,10 @@ Future<void> init() async {
         createPromotion: sl(),
       ));
 
-  sl.registerLazySingleton(() => IssueBloc(fetchPosts: sl()));
+  sl.registerLazySingleton(() => IssueBloc(
+        addCommentUsecase: sl(),
+        fetchPosts: sl(),
+      ));
 
   sl.registerLazySingleton(() => AdminBloc(sl()));
   sl.registerLazySingleton(() => VarificationBloc(
@@ -118,6 +124,10 @@ Future<void> init() async {
       ));
 
   sl.registerLazySingleton(() => AdsBloc(fetchPromotionUsecase: sl()));
+
+  sl.registerLazySingleton(() => UniversityBloc(
+        fetchUniversityUsecase: sl(),
+      ));
   //Auth Service
   sl.registerLazySingleton(() => AuthService());
 }

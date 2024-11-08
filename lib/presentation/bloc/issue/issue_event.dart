@@ -16,3 +16,11 @@ class FetchIssueEvent extends IssueEvent {
   @override
   List<Object> get props => [universityId];
 }
+
+class AddACommentEvent extends IssueEvent {
+  final Post post;
+  AddACommentEvent(this.post);
+
+  @override
+  List<Object> get props => [post];
+}
