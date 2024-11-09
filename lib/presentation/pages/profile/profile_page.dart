@@ -38,6 +38,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        forceMaterialTransparency: true,
+        shadowColor: Colors.black,
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
@@ -88,19 +90,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
                       // Engagement Metrics
                       _buildEngagementMetrics(user),
-                      const SizedBox(height: 24.0),
 
                       // Achievements and Badges
                       _buildAchievements(user),
-                      const SizedBox(height: 24.0),
 
                       // Student Details (if applicable)
                       if (user.userType == UserType.student)
                         _buildStudentDetails(user),
 
-                      // Logout Button
-                      const SizedBox(height: 24.0),
                       //edit profile button
+                      const SizedBox(height: 10.0),
                       CustomButton(
                         color: Colors.indigoAccent,
                         text: "Edit Profile",
@@ -112,6 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       UpdateProfilePage(user: user)));
                         },
                       ),
+                      const SizedBox(height: 10.0),
                       CustomButton(
                         color: Colors.green,
                         text: "Terms and Conditions",
@@ -120,6 +120,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               "https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md");
                         },
                       ),
+                      const SizedBox(height: 10.0),
                       CustomButton(
                         color: Colors.blue,
                         text: "About Us",
@@ -127,7 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           launchURL("https://zamansheikh.com");
                         },
                       ),
-
+                      const SizedBox(height: 10.0),
                       CustomButton(
                         color: Colors.red,
                         text: "Logout",
@@ -173,24 +174,22 @@ class _ProfilePageState extends State<ProfilePage> {
         if (!user.isVerified)
           Column(
             children: [
-              const SizedBox(height: 16.0),
-              SizedBox(
-                width: 150,
-                child: CustomButton(
-                    text: "Verify",
-                    onPressed: () {
-                      //materialPageRoute
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => VerificationPage(
-                                    user: user,
-                                  )));
-                    }),
-              ),
+              const SizedBox(height: 12),
+              CustomButton(
+                  size: const Size(140, 40),
+                  color: Colors.blue,
+                  text: "Verify Account",
+                  onPressed: () {
+                    //materialPageRoute
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => VerificationPage(
+                                  user: user,
+                                )));
+                  }),
             ],
           ),
-        const SizedBox(height: 16.0),
         Text(
           user.name,
           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -235,23 +234,33 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 16.0),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildMetricItem(Icons.post_add, user.postCount, "Posts"),
-                _buildMetricItem(Icons.comment, user.commentCount, "Comments"),
-                _buildMetricItem(
-                    Icons.check_circle, user.resolvedIssuesCount, "Resolved"),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildMetricItem(
-                    Icons.thumb_up, user.receivedVotesCount, "Received Votes"),
-                _buildMetricItem(
-                    Icons.how_to_vote, user.givenVotesCount, "Given Votes"),
-                _buildMetricItem(Icons.star, user.streakDays, "Day Streak"),
+                Column(
+                  children: [
+                    _buildMetricItem(Icons.post_add, user.postCount, "Posts"),
+                    const SizedBox(height: 16.0),
+                    _buildMetricItem(
+                        Icons.comment, user.commentCount, "Comments"),
+                  ],
+                ),
+                Column(
+                  children: [
+                    _buildMetricItem(Icons.check_circle,
+                        user.resolvedIssuesCount, "Resolved"),
+                    const SizedBox(height: 16.0),
+                    _buildMetricItem(Icons.thumb_up, user.receivedVotesCount,
+                        "Received Votes"),
+                  ],
+                ),
+                Column(
+                  children: [
+                    _buildMetricItem(
+                        Icons.how_to_vote, user.givenVotesCount, "Given Votes"),
+                    const SizedBox(height: 16.0),
+                    _buildMetricItem(Icons.star, user.streakDays, "Day Streak"),
+                  ],
+                ),
               ],
             ),
           ],
@@ -277,7 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 _buildBadge(user.currentBadge),
               ],
             ),
-            const SizedBox(height: 16.0),
+            // const SizedBox(height: 16.0),
             Wrap(
               spacing: 8.0,
               runSpacing: 8.0,
@@ -330,6 +339,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildMetricItem(IconData icon, int value, String label) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Icon(icon, size: 24, color: Colors.blue),
         const SizedBox(height: 8),
@@ -457,6 +468,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
 class CustomButton extends StatelessWidget {
   final Color? color;
+  final Size? size;
   final String text;
   final Function()? onPressed;
 
@@ -465,12 +477,14 @@ class CustomButton extends StatelessWidget {
     this.color,
     required this.text,
     this.onPressed,
+    this.size,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
+      width: size?.width ?? double.infinity,
+      height: size?.height ?? 45,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor:

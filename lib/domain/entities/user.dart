@@ -2,23 +2,88 @@
 
 import 'package:equatable/equatable.dart';
 
-enum UserType { student, university, admin , ambassador}
+enum UserType { student, university, admin, ambassador }
 
 enum UserBadge { newbie, active, expert, hero, legend }
 
 enum AchievementType { postCreator, issueResolver, helpfulVoter, trendSetter }
 
 enum Department {
-  cse,
-  swe,
-  eee,
-  civil,
-  bba,
-  english,
-  law,
-  pharmacy,
-  architecture,
-  other
+  // Engineering & Technology
+  cse, // Computer Science and Engineering
+  swe, // Software Engineering
+  eee, // Electrical and Electronic Engineering
+  civil, // Civil Engineering
+  mechanical, // Mechanical Engineering
+  textile, // Textile Engineering
+  architecture, // Architecture
+  mechatronics, // Mechatronics Engineering
+  chemical, // Chemical Engineering
+  aeronautical, // Aeronautical Engineering
+  biomedical, // Biomedical Engineering
+  foodEngineering, // Food Engineering
+
+  // Natural Sciences
+  physics, // Physics
+  chemistry, // Chemistry
+  mathematics, // Mathematics
+  statistics, // Statistics
+  biology, // Biology
+  microbiology, // Microbiology
+  biotechnology, // Biotechnology
+  environmentalScience, // Environmental Science
+
+  // Business Studies
+  bba, // Business Administration
+  accounting, // Accounting
+  finance, // Finance
+  management, // Management
+  marketing, // Marketing
+  hrm, // Human Resource Management
+  tourismAndHospitality, // Tourism and Hospitality Management
+  internationalBusiness, // International Business
+
+  // Arts and Humanities
+  english, // English
+  bangla, // Bangla
+  history, // History
+  philosophy, // Philosophy
+  islamicStudies, // Islamic Studies
+  journalism, // Journalism and Mass Communication
+  mediaStudies, // Media Studies
+  fineArts, // Fine Arts
+
+  // Social Sciences
+  law, // Law
+  sociology, // Sociology
+  politicalScience, // Political Science
+  publicAdministration, // Public Administration
+  economics, // Economics
+  anthropology, // Anthropology
+  psychology, // Psychology
+
+  // Health Sciences
+  pharmacy, // Pharmacy
+  mbbs, // Bachelor of Medicine, Bachelor of Surgery
+  nursing, // Nursing
+  dentalSurgery, // Dental Surgery
+  publicHealth, // Public Health
+  physiotherapy, // Physiotherapy
+
+  // Agriculture and Related Fields
+  agriculture, // Agriculture
+  fisheries, // Fisheries
+  forestry, // Forestry
+  veterinaryScience, // Veterinary Science
+  foodAndNutrition, // Food and Nutrition
+
+  // Others
+  islamicTheology, // Islamic Theology
+  maritime, // Maritime Studies
+  actuarialScience, // Actuarial Science
+  libraryScience, // Library and Information Science
+
+  other, // For any department not listed
 }
 
 class User extends Equatable {

@@ -27,6 +27,8 @@ class _UserVerifyPageState extends State<UserVerifyPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        forceMaterialTransparency: true,
         title: const Text('User Verifications'),
       ),
       body: BlocConsumer<VerifyUserBloc, VerifyUserState>(

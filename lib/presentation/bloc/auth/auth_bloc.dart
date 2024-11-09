@@ -165,7 +165,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<AuthUpdateRequested>((event, emit) async {
       emit(AuthLoading());
-
       final result = await createUserProfile(event.user);
       result.fold(
         (failure) => emit(AuthUpdateFailure(failure.message)),

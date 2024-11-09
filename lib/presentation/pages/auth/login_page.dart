@@ -22,7 +22,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Log In")),
+      appBar: AppBar(
+        centerTitle: true,
+        forceMaterialTransparency: true,
+        title: Text(
+          "Log In",
+        ),
+      ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
