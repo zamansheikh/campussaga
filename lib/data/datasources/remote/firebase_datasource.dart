@@ -221,6 +221,10 @@ class FirebaseDataSource {
     await firestore.collection('posts').doc(post.id).update(post.toJson());
   }
 
+  Future<void> deleteIssue(PostModel post) async {
+    await firestore.collection('posts').doc(post.id).delete();
+  }
+
   Future<void> updatePromotion(PromotionModel promotion) async {
     await firestore
         .collection('promotion')

@@ -39,3 +39,11 @@ class UpdatePostEvent extends IssueEvent {
   @override
   List<Object> get props => [post];
 }
+
+class DeletePostEvent extends IssueEvent {
+  final Post post;
+  DeletePostEvent(this.post);
+
+  @override
+  List<Object> get props => [post];
+}

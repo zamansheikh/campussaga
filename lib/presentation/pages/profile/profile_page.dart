@@ -171,25 +171,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
           ],
         ),
-        if (!user.isVerified)
-          Column(
-            children: [
-              const SizedBox(height: 12),
-              CustomButton(
-                  size: const Size(140, 40),
-                  color: Colors.blue,
-                  text: "Verify Account",
-                  onPressed: () {
-                    //materialPageRoute
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => VerificationPage(
-                                  user: user,
-                                )));
-                  }),
-            ],
-          ),
         Text(
           user.name,
           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -199,7 +180,44 @@ class _ProfilePageState extends State<ProfilePage> {
           user.email,
           style: TextStyle(fontSize: 16, color: Colors.grey[600]),
         ),
-        const SizedBox(height: 8.0),
+        if (!user.isVerified)
+          Column(
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VerificationPage(user: user),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.shield, color: Colors.white),
+                label: const Text(
+                  "Please Verify Account",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent, // Background color
+                  foregroundColor: Colors.white, // Text and icon color
+                  minimumSize: const Size(100, 35), // Adjusted button size
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30), // Rounded corners
+                    side:
+                        BorderSide(color: Colors.blueAccent.shade100), // Border
+                  ),
+                  elevation: 2, // Subtle shadow effect
+                ),
+              ),
+            ],
+          ),
+        const SizedBox(height: 2.0),
         InkWell(
           onLongPress: () {
             copyToClipboard(user.id, "User ID copied to clipboard");

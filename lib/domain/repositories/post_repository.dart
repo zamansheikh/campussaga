@@ -17,6 +17,7 @@ abstract class PostRepository {
   //Add a comment to a specific post
   Future<Either<Failure, void>> addComment(Post post);
   Future<Either<Failure, void>> updateIssuePost(Post post);
+  Future<Either<Failure, void>> deleteIssue(Post post);
   Future<Either<Failure, void>> updatePromotion(Promotion promotion);
   //Add feedback to a specific post
   Future<Either<Failure, void>> addFeedback(Post post);
