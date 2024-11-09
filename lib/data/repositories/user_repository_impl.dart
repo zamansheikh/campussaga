@@ -3,8 +3,10 @@
 import 'dart:io';
 
 import 'package:campus_saga/core/usecases/usecase.dart';
+import 'package:campus_saga/data/models/role_change_model.dart';
 import 'package:campus_saga/data/models/user_model.dart';
 import 'package:campus_saga/data/models/varification_status_model.dart';
+import 'package:campus_saga/domain/entities/role_change.dart';
 import 'package:campus_saga/domain/entities/varification_status.dart';
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/user.dart';
@@ -100,34 +102,71 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<Either<Failure, Verification>> varificationRequest(Verification verification)async {
-     try {
-      await dataSource.addVarificationRequest(VerificationStatusModel.fromEntity(verification));
+  Future<Either<Failure, Verification>> varificationRequest(
+      Verification verification) async {
+    try {
+      await dataSource.addVarificationRequest(
+          VerificationStatusModel.fromEntity(verification));
       return Right(verification);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
-  
+
   @override
-  Future<Either<Failure, List<Verification>>> getPendingVerificaionByUniversity(String universityId)async {
-    try{
-      final pendingList =await dataSource.getPendingVerificaionByUniversity(universityId);
+  Future<Either<Failure, List<Verification>>> getPendingVerificaionByUniversity(
+      String universityId) async {
+    try {
+      final pendingList =
+          await dataSource.getPendingVerificaionByUniversity(universityId);
       return Right(pendingList);
-
-
-    }catch(e){
+    } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
-
   }
-  
+
   @override
-  Future<Either<Failure, void>> updateVerificationStatus(Verification verification)async {
-    try{
-      dataSource.updateVerificationStatus(VerificationStatusModel.fromEntity(verification));
+  Future<Either<Failure, void>> updateVerificationStatus(
+      Verification verification) async {
+    try {
+      dataSource.updateVerificationStatus(
+          VerificationStatusModel.fromEntity(verification));
       return Right(null);
-    }catch(e){
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> changeRoleRequest(
+      RoleChange role_change) async {
+    try {
+      dataSource.changeRoleRequest(RoleChangeModel.fromEntity(role_change));
+      return Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<RoleChange>>> loadAllRoleChangeRequest() async {
+    try {
+      final roleChangeList = await dataSource.loadAllRoleChangeRequest();
+      final roleChangeEnityList =
+          roleChangeList.map((e) => e.toEntity()).toList();
+      return Right(roleChangeEnityList);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateUserRole(
+      UserRoleParams userRoleParams) async {
+    try {
+      dataSource.updateUserRole(userRoleParams);
+      return Right(null);
+    } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }

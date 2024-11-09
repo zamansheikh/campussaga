@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:campus_saga/domain/entities/feedback.dart';
+import 'package:intl/intl.dart';
 
 class FeedbackWidget extends StatefulWidget {
   final AuthorityFeedback? feedback;
@@ -48,10 +49,15 @@ class _FeedbackWidgetState extends State<FeedbackWidget> {
                     const SizedBox(height: 16),
                     if (widget.feedback != null)
                       ListTile(
-                        title: Text(widget.feedback!.message),
-                        subtitle: Text(widget.feedback!.authorityId),
+                        title: Text(widget.feedback!.message,
+                            style:
+                                TextStyle(fontSize: 20, color: Colors.black)),
+                        subtitle: Text(
+                          "By: ${widget.feedback!.authorityId.substring(0, 5)}(Authority)",
+                        ),
                         trailing: Text(
-                          widget.feedback!.timestamp.toString(),
+                          DateFormat('yyyy-MM-dd – HH:mm')
+                              .format(widget.feedback!.timestamp),
                           style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       )

@@ -163,4 +163,14 @@ class PostRepositoryImpl implements PostRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+  
+  @override
+  Future<Either<Failure, void>> updatePromotion(Promotion promotion)async {
+    try {
+      await dataSource.updatePromotion(PromotionModel.fromEntity(promotion));
+      return Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

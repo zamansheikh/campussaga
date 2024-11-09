@@ -2,7 +2,7 @@
 
 import 'package:equatable/equatable.dart';
 
-enum UserType { student, university, admin }
+enum UserType { student, university, admin , ambassador}
 
 enum UserBadge { newbie, active, expert, hero, legend }
 

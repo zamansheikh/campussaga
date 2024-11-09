@@ -1,12 +1,15 @@
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/core/utils/utils.dart';
+import 'package:campus_saga/domain/entities/role_change.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
+import 'package:campus_saga/presentation/bloc/role_manage/role_change_bloc.dart';
 import 'package:campus_saga/presentation/pages/profile/update_profile_page.dart';
 import 'package:campus_saga/presentation/pages/profile/verification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_saga/domain/entities/user.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -17,6 +20,20 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  RoleChange _changeRoleEntity() {
+    final user = (sl<AuthBloc>().state as AuthAuthenticated).user;
+    return RoleChange(
+      role: user.userType.toString().split('.').last,
+      userName: user.name,
+      timestamp: DateTime.now(),
+      email: user.email,
+      uuid: user.id,
+      phoneNumber: user.phoneNumber ?? "Not Available",
+      profilePicture: user.profilePictureUrl,
+      status: "pending",
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -184,15 +201,21 @@ class _ProfilePageState extends State<ProfilePage> {
           style: TextStyle(fontSize: 16, color: Colors.grey[600]),
         ),
         const SizedBox(height: 8.0),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: _getUserTypeColor(user.userType),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            _getUserTypeText(user.userType),
-            style: const TextStyle(color: Colors.white),
+        InkWell(
+          onLongPress: () {
+            copyToClipboard(user.id, "User ID copied to clipboard");
+            sl<RoleChangeBloc>().add(ChangeRoleEvent(_changeRoleEntity()));
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: _getUserTypeColor(user.userType),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              _getUserTypeText(user.userType),
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ),
       ],
@@ -396,6 +419,14 @@ class _ProfilePageState extends State<ProfilePage> {
     return department.toString().split('.').last.toUpperCase();
   }
 
+  // Helper method to copy text to clipboard
+  void copyToClipboard(String text, String message) {
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   // Helper methods for UserType display
   Color _getUserTypeColor(UserType userType) {
     switch (userType) {
@@ -405,6 +436,8 @@ class _ProfilePageState extends State<ProfilePage> {
         return Colors.green;
       case UserType.admin:
         return Colors.orange;
+      case UserType.ambassador:
+        return Colors.purple;
     }
   }
 
@@ -416,6 +449,8 @@ class _ProfilePageState extends State<ProfilePage> {
         return "University";
       case UserType.admin:
         return "Admin";
+      case UserType.ambassador:
+        return "Ambassador";
     }
   }
 }

@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:campus_saga/data/models/promotion_model.dart';
+import 'package:campus_saga/data/models/role_change_model.dart';
 import 'package:campus_saga/data/models/university_model.dart';
 import 'package:campus_saga/data/models/varification_status_model.dart';
 import 'package:campus_saga/domain/entities/varification_status.dart';
@@ -41,6 +42,27 @@ class FirebaseDataSource {
   Future<void> createPost(PostModel post) async {
     //create doc baseed on the post id
     await firestore.collection('posts').doc(post.id).set(post.toJson());
+  }
+
+  Future<void> changeRoleRequest(RoleChangeModel role) async {
+    //create doc baseed on the post id
+    await firestore.collection('role').doc(role.uuid).set(role.toJson());
+  }
+
+  Future<List<RoleChangeModel>> loadAllRoleChangeRequest() async {
+    final querySnapshot = await firestore
+        .collection('role')
+        .where('status', isEqualTo: 'pending')
+        .get();
+    return querySnapshot.docs
+        .map((doc) => RoleChangeModel.fromJson(doc.data()))
+        .toList();
+  }
+
+  Future<void> updateUserRole(UserRoleParams role) async {
+    await firestore.collection('users').doc(role.uuid).update(
+      {'userType': role.role},
+    );
   }
 
   //addVarificationRequest
@@ -197,6 +219,13 @@ class FirebaseDataSource {
 
   Future<void> updateIssuePost(PostModel post) async {
     await firestore.collection('posts').doc(post.id).update(post.toJson());
+  }
+
+  Future<void> updatePromotion(PromotionModel promotion) async {
+    await firestore
+        .collection('promotion')
+        .doc(promotion.id)
+        .update(promotion.toJson());
   }
 
   //Add a vote to a specific post

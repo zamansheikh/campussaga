@@ -58,9 +58,9 @@ class _PostCardState extends State<PostCard> {
     return Card(
       elevation: 2.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      margin: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -357,14 +357,17 @@ class _VoteButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(6),
       child: Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
         child: Row(
           children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(width: 4.0),
-            Text("$label: $count"),
+            Icon(icon, color: color, size: 18),
+            const SizedBox(width: 4),
+            Text(
+              '$label: $count',
+              style: TextStyle(color: color, fontWeight: FontWeight.w500),
+            ),
           ],
         ),
       ),
