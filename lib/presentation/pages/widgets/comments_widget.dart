@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:campus_saga/domain/entities/comment.dart';
+import 'package:intl/intl.dart';
 
 class CommentsWidget extends StatefulWidget {
   final List<Comment> comments;
@@ -51,10 +52,14 @@ class _CommentsWidgetState extends State<CommentsWidget> {
                         itemBuilder: (context, index) {
                           final comment = widget.comments[index];
                           return ListTile(
-                            title: Text(comment.text),
-                            subtitle: Text(comment.userId),
+                            title: Text(comment.text,
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.black)),
+                            subtitle:
+                                Text("By: ${comment.userId.substring(0, 5)}"),
                             trailing: Text(
-                              comment.timestamp.toString(),
+                              DateFormat('yyyy-MM-dd – HH:mm')
+                                  .format(comment.timestamp),
                               style:
                                   TextStyle(fontSize: 12, color: Colors.grey),
                             ),

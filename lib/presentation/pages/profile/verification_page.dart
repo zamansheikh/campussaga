@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:campus_saga/domain/entities/user.dart';
 import 'package:campus_saga/domain/entities/varification_status.dart';
 import 'package:campus_saga/presentation/bloc/varify/varification_bloc.dart';
+import 'package:campus_saga/presentation/pages/profile/update_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -65,7 +66,7 @@ class _VerificationPageState extends State<VerificationPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Upload Live Selfie',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
@@ -75,32 +76,50 @@ class _VerificationPageState extends State<VerificationPage> {
                 child: Container(
                   height: 300,
                   width: double.infinity,
-                  color: Colors.grey[300],
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                   child: selfieImage == null
-                      ? Icon(Icons.camera_alt, size: 50)
-                      : Image.file(
-                          File(selfieImage!.path),
-                          fit: BoxFit.cover,
+                      ? Center(
+                          child: Icon(Icons.camera_alt,
+                              size: 50, color: Colors.grey[700]),
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Image.file(
+                            File(selfieImage!.path),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                 ),
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Upload University ID Card',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               GestureDetector(
                 onTap: _takeIdCardPhoto,
                 child: Container(
                   height: 200,
                   width: double.infinity,
-                  color: Colors.grey[300],
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                   child: idCardImage == null
-                      ? Icon(Icons.camera_alt, size: 50)
-                      : Image.file(
-                          File(idCardImage!.path),
-                          fit: BoxFit.cover,
+                      ? Center(
+                          child: Icon(Icons.camera_alt,
+                              size: 50, color: Colors.grey[700]),
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Image.file(
+                            File(idCardImage!.path),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                 ),
               ),
@@ -154,14 +173,6 @@ class _VerificationPageState extends State<VerificationPage> {
 
             return ElevatedButton(
               onPressed: () {
-                if (selfieFile == null || idCardFile == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Please upload both images'),
-                    ),
-                  );
-                  return;
-                }
                 // Check if required user information fields are null
                 final missingFields = <String>[];
                 if (widget.user.phoneNumber == null ||
@@ -187,6 +198,46 @@ class _VerificationPageState extends State<VerificationPage> {
                       ),
                     ),
                   );
+                  //show alert dialog - Are you want to update the profile yes or not
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Update Profile'),
+                        content: Text(
+                          'The following fields are missing: $missingFieldsText. '
+                          '\nDo you want to update them now?'
+                          'After Update, go back to profile and Refresh the page',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text('No'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => UpdateProfilePage(
+                                          user: widget.user)));
+                            },
+                            child: Text('Yes'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                if (selfieFile == null || idCardFile == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please upload both images'),
+                    ),
+                  );
                   return;
                 }
                 final verificationEntity = Verification(
@@ -207,6 +258,8 @@ class _VerificationPageState extends State<VerificationPage> {
               },
               child: Text('Submit Verification'),
               style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.blue,
                 minimumSize: Size(double.infinity, 50),
               ),
             );

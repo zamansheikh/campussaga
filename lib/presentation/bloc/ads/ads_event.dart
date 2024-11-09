@@ -15,3 +15,10 @@ final class FetchAdsEvent extends AdsEvent {
   List<Object> get props => [];
 
 }
+
+final class UpdateAdsEvent extends AdsEvent {
+  final Promotion promotion;
+  const UpdateAdsEvent(this.promotion);
+  @override
+  List<Object> get props => [promotion];
+}

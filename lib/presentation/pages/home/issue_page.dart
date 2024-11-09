@@ -3,6 +3,7 @@ import 'package:campus_saga/domain/entities/user.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
+import 'package:campus_saga/presentation/pages/admin/admin_page.dart';
 import 'package:campus_saga/presentation/pages/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -218,9 +219,14 @@ class _IssuePageState extends State<IssuePage> {
                 if (userState.userType == UserType.admin)
                   FloatingActionButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed('/admin', arguments: {
-                        'user': userState,
-                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminPage(
+                            user: userState as User,
+                          ),
+                        ),
+                      );
                     },
                     child: const Icon(Icons.admin_panel_settings),
                   ),

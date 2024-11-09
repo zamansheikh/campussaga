@@ -4,6 +4,7 @@ import 'package:campus_saga/domain/entities/promotion.dart';
 import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
+import 'package:campus_saga/presentation/pages/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -38,18 +39,30 @@ class _PromotionPageState extends State<PromotionPage> {
     }
   }
 
+  String getUserId() {
+    try {
+      return userState.user.id;
+    } catch (e) {
+      return '';
+    }
+  }
+
   void toggleTrueVote(Promotion promotion) {
+    int index = promotions.indexOf(promotion);
     setState(() {
-      int index = promotions.indexOf(promotion);
-      promotions[index] = promotion.toggleTrueVote('user1'); // Example userId
+      promotions[index] =
+          promotion.toggleTrueVote(getUserId()); // Example userId
     });
+    sl<AdsBloc>().add(UpdateAdsEvent(promotions[index]));
   }
 
   void toggleFalseVote(Promotion promotion) {
+    int index = promotions.indexOf(promotion);
     setState(() {
-      int index = promotions.indexOf(promotion);
-      promotions[index] = promotion.toggleFalseVote('user1'); // Example userId
+      promotions[index] =
+          promotion.toggleFalseVote(getUserId()); // Example userId
     });
+    sl<AdsBloc>().add(UpdateAdsEvent(promotions[index]));
   }
 
   @override
@@ -105,7 +118,7 @@ class _PromotionPageState extends State<PromotionPage> {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Icon(Icons.post_add, size: 64, color: Colors.grey),
                   SizedBox(height: 16),
                   Text(
@@ -115,6 +128,15 @@ class _PromotionPageState extends State<PromotionPage> {
                   Text(
                     "Be the first to create a post!",
                     style: TextStyle(color: Colors.grey),
+                  ),
+                  SizedBox(
+                    width: 200,
+                    child: CustomButton(
+                        color: Colors.grey,
+                        text: 'Refresh/Reload',
+                        onPressed: () async {
+                          _fetchAds();
+                        }),
                   ),
                 ],
               ),
@@ -154,8 +176,8 @@ class _PromotionPageState extends State<PromotionPage> {
                     onFalseVote: () => toggleFalseVote(promotion),
                     likes: promotion.likes,
                     dislikes: promotion.dislikes,
-                    hasUserVotedTrue: promotion.hasUserVotedTrue('user1'),
-                    hasUserVotedFalse: promotion.hasUserVotedFalse('user1'),
+                    hasUserVotedTrue: promotion.hasUserVotedTrue(getUserId()),
+                    hasUserVotedFalse: promotion.hasUserVotedFalse(getUserId()),
                     eventLink: promotion.eventLink,
                   );
                 },

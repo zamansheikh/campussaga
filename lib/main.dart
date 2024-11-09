@@ -2,11 +2,11 @@
 import 'package:campus_saga/presentation/bloc/admin/admin_bloc.dart';
 import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
 import 'package:campus_saga/presentation/bloc/promotion/promotion_bloc.dart';
+import 'package:campus_saga/presentation/bloc/role_manage/role_change_bloc.dart';
 import 'package:campus_saga/presentation/bloc/university/university_bloc.dart';
 import 'package:campus_saga/presentation/bloc/varify/varification_bloc.dart';
 import 'package:campus_saga/presentation/bloc/verify_user/verify_user_bloc.dart';
 import 'package:campus_saga/presentation/pages/admin/add_university_page.dart';
-import 'package:campus_saga/presentation/pages/admin/admin_page.dart';
 import 'package:campus_saga/presentation/pages/admin/user_verify_page.dart';
 import 'package:campus_saga/presentation/pages/auth/login_page.dart';
 import 'package:campus_saga/presentation/pages/auth/register_page.dart';
@@ -62,10 +62,15 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => sl<VerifyUserBloc>(),
         ),
-        BlocProvider(create: (_) => sl<AdsBloc>(),),
+        BlocProvider(
+          create: (_) => sl<AdsBloc>(),
+        ),
         BlocProvider(
           create: (_) => sl<UniversityBloc>(),
         ),
+        BlocProvider(
+          create: (_) => sl<RoleChangeBloc>(),
+        )
       ],
       child: MaterialApp(
         title: 'Campus Saga',
@@ -81,7 +86,6 @@ class MyApp extends StatelessWidget {
           '/home': (context) => HomePage(),
           '/issue': (context) => IssuePage(),
           '/post': (context) => CreatePostPage(),
-          '/admin': (context) => AdminPage(),
           '/ranking': (context) => RankingPage(),
           '/addUniversity': (context) => AddUniversityPage(),
           '/userVerification': (context) => UserVerifyPage(),

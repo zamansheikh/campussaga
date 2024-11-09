@@ -37,8 +37,8 @@ Promotion promotionGenerate(
     expiryDate:  expiryDate,
     imageUrls: [
     ],
-    likes: 25,
-    dislikes: 5,
+    likes: 0,
+    dislikes: 0,
     eventLink: eventLink,
   );
   return freshPromotion;

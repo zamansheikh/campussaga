@@ -38,3 +38,8 @@ class AddCommentParams {
   AddCommentParams({required this.postId, required this.comment});
 }
 
+class UserRoleParams {
+  final String uuid;
+  final String role;
+  UserRoleParams({required this.uuid, required this.role});
+}
