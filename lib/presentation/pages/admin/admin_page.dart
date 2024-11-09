@@ -1,6 +1,5 @@
 import 'package:campus_saga/domain/entities/user.dart';
 import 'package:campus_saga/presentation/pages/admin/role_mange_page.dart';
-import 'package:campus_saga/presentation/pages/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 
 class AdminPage extends StatefulWidget {
