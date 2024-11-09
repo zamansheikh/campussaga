@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:campus_saga/domain/entities/user.dart';
 import 'package:campus_saga/domain/entities/varification_status.dart';
+import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/varify/varification_bloc.dart';
 import 'package:campus_saga/presentation/pages/profile/update_profile_page.dart';
 import 'package:flutter/material.dart';
@@ -30,8 +32,8 @@ class _VerificationPageState extends State<VerificationPage> {
         preferredCameraDevice: CameraDevice.front,
         source: ImageSource.camera,
         imageQuality: 50,
-        maxWidth: 800,
-        maxHeight: 800);
+        maxWidth: 400,
+        maxHeight: 400);
     if (image != null) {
       setState(() {
         selfieImage = image;
@@ -54,93 +56,124 @@ class _VerificationPageState extends State<VerificationPage> {
     }
   }
 
+  late User user;
+
+  @override
+  void initState() {
+    super.initState();
+    user = widget.user;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Verification'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Upload Live Selfie',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              GestureDetector(
-                onTap: _takeSelfie,
-                child: Container(
-                  height: 300,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: selfieImage == null
-                      ? Center(
-                          child: Icon(Icons.camera_alt,
-                              size: 50, color: Colors.grey[700]),
-                        )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Image.file(
-                            File(selfieImage!.path),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Upload University ID Card',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              GestureDetector(
-                onTap: _takeIdCardPhoto,
-                child: Container(
-                  height: 200,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: idCardImage == null
-                      ? Center(
-                          child: Icon(Icons.camera_alt,
-                              size: 50, color: Colors.grey[700]),
-                        )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Image.file(
-                            File(idCardImage!.path),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Divider(),
-              SizedBox(height: 10),
-              Text(
-                'Personal Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Text('Phone Number: ${widget.user.phoneNumber}'),
-              Text('Date of Birth: ${widget.user.dateOfBirth}'),
-              Text('Department: ${widget.user.department}'),
-              Text('Gender: ${widget.user.gender}'),
-              Text('User UUID: ${widget.user.id}'),
-              Text('University Email: ${widget.user.email}'),
-              SizedBox(height: 20),
-            ],
+        centerTitle: true,
+        forceMaterialTransparency: true,
+        title: Text(
+          'Verification Page',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
           ),
         ),
+      ),
+      body: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state is AuthAuthenticated) {
+            user = state.user;
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Upload Live Selfie',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: _takeSelfie,
+                      child: Container(
+                        height: 155,
+                        width: MediaQuery.of(context).size.width * .45,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: selfieImage == null
+                            ? Center(
+                                child: Icon(Icons.camera_alt,
+                                    size: 50, color: Colors.grey[700]),
+                              )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Image.file(
+                                  File(selfieImage!.path),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Upload University ID Card',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: _takeIdCardPhoto,
+                      child: Container(
+                        height: 180,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: idCardImage == null
+                            ? Center(
+                                child: Icon(Icons.camera_alt,
+                                    size: 50, color: Colors.grey[700]),
+                              )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Image.file(
+                                  File(idCardImage!.path),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Divider(),
+                    SizedBox(height: 10),
+                    Text(
+                      'Personal Information',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text('Phone Number: ${user.phoneNumber}'),
+                    Text('Date of Birth: ${user.dateOfBirth}'),
+                    Text('Department: ${user.department}'),
+                    Text('Gender: ${user.gender}'),
+                    Text('User UUID: ${user.id}'),
+                    Text('University Email: ${user.email}'),
+                    SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -152,6 +185,7 @@ class _VerificationPageState extends State<VerificationPage> {
                   content: Text('Verification request submitted successfully'),
                 ),
               );
+              Navigator.pop(context);
             } else if (state is VarificationError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -175,17 +209,16 @@ class _VerificationPageState extends State<VerificationPage> {
               onPressed: () {
                 // Check if required user information fields are null
                 final missingFields = <String>[];
-                if (widget.user.phoneNumber == null ||
-                    widget.user.phoneNumber!.isEmpty) {
+                if (user.phoneNumber == null || user.phoneNumber!.isEmpty) {
                   missingFields.add("Phone Number");
                 }
-                if (widget.user.dateOfBirth == null) {
+                if (user.dateOfBirth == null) {
                   missingFields.add("Date of Birth");
                 }
-                if (widget.user.department == null) {
+                if (user.department == null) {
                   missingFields.add("Department");
                 }
-                if (widget.user.gender == null || widget.user.gender!.isEmpty) {
+                if (user.gender == null || user.gender!.isEmpty) {
                   missingFields.add("Gender");
                 }
                 if (missingFields.isNotEmpty) {
@@ -222,8 +255,8 @@ class _VerificationPageState extends State<VerificationPage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => UpdateProfilePage(
-                                          user: widget.user)));
+                                      builder: (context) =>
+                                          UpdateProfilePage(user: user)));
                             },
                             child: Text('Yes'),
                           ),
@@ -233,6 +266,7 @@ class _VerificationPageState extends State<VerificationPage> {
                   );
                 }
                 if (selfieFile == null || idCardFile == null) {
+                  if (missingFields.isNotEmpty) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Please upload both images'),
@@ -241,15 +275,15 @@ class _VerificationPageState extends State<VerificationPage> {
                   return;
                 }
                 final verificationEntity = Verification(
-                  userUuid: widget.user.id,
-                  universityEmail: widget.user.email,
+                  userUuid: user.id,
+                  universityEmail: user.email,
                   universityIdCardPhotoUrl: "",
-                  profilePhotoUrl: '',
+                  profilePhotoUrl: user.profilePictureUrl,
                   status: VerificationStatus.pending,
                   phoneNumber: '',
-                  dateOfBirth: widget.user.dateOfBirth ?? DateTime.now(),
-                  department: widget.user.department?.toString() ?? '',
-                  gender: widget.user.gender ?? '',
+                  dateOfBirth: user.dateOfBirth ?? DateTime.now(),
+                  department: user.department?.toString() ?? '',
+                  gender: user.gender ?? '',
                   timestamp: DateTime.now(),
                 );
                 context.read<VarificationBloc>().add(SubmitVerification(

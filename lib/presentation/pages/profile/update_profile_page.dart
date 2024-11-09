@@ -62,7 +62,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     }
   }
 
-  void _updateProfile(BuildContext context) {
+  void _updateProfile(BuildContext context) async {
     context.read<AuthBloc>().add(
           AuthUpdateRequested(
             widget.user.copyWith(
@@ -82,12 +82,15 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
             ),
           ),
         );
+    
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle:  true,
+        forceMaterialTransparency: true,
         title: const Text('Update Profile'),
       ),
       body: SingleChildScrollView(

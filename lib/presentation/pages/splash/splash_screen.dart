@@ -5,6 +5,7 @@ import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import '../auth/login_page.dart';
 import '../home/home_page.dart';
 
@@ -45,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
             );
           }
         },
-        child: const Center(child: CircularProgressIndicator()),
+        child: Center(child: Lottie.asset('assets/lottie/campus.json')),
       ),
     );
   }

@@ -40,13 +40,14 @@ class _IssuePageState extends State<IssuePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        forceMaterialTransparency: true,
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
             Scaffold.of(context).openDrawer();
           },
         ),
-        centerTitle: true,
         title: Text(
           "Campus Saga",
           style: TextStyle(

@@ -69,13 +69,14 @@ class _PromotionPageState extends State<PromotionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        forceMaterialTransparency: true,
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
             Scaffold.of(context).openDrawer();
           },
         ),
-        centerTitle: true,
         title: const Text(
           "Promotions",
           style: TextStyle(

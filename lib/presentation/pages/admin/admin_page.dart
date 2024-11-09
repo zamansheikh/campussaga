@@ -15,6 +15,7 @@ class _AdminPageState extends State<AdminPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        forceMaterialTransparency: true,
         centerTitle: true,
         title: const Text(
           "Campus Saga",

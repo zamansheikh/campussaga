@@ -77,13 +77,28 @@ class _AddUniversityPageState extends State<AddUniversityPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add University'),
+        centerTitle: true,
+        forceMaterialTransparency: true,
+        title: const Text('Add University',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            )),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'Add University Details Below and Click on Add University',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: uidController,
               decoration: const InputDecoration(

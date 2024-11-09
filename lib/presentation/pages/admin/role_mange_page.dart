@@ -26,6 +26,7 @@ class _RoleMangePageState extends State<RoleMangePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        forceMaterialTransparency: true,
         title: Text(
           "Role Change Requests",
           style: TextStyle(
