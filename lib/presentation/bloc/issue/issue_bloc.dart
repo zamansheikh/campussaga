@@ -2,6 +2,7 @@
 import 'package:campus_saga/domain/entities/post.dart';
 import 'package:campus_saga/domain/usecases/add_comment_usecase.dart';
 import 'package:campus_saga/domain/usecases/add_feedback_usecase.dart';
+import 'package:campus_saga/domain/usecases/delete_issue_usecase.dart';
 import 'package:campus_saga/domain/usecases/fetch_posts.dart';
 import 'package:campus_saga/domain/usecases/update_issue_post_usecase.dart';
 import 'package:equatable/equatable.dart';
@@ -15,12 +16,14 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   final AddCommentUsecase addCommentUsecase;
   final AddFeedbackUsecase addFeedbackUsecase;
   final UpdateIssuePostUsecase updateIssuePostUsecase;
+  final DeleteIssueUsecase deleteIssueUsecase;
 
   IssueBloc({
     required this.fetchPosts,
     required this.addCommentUsecase,
     required this.addFeedbackUsecase,
     required this.updateIssuePostUsecase,
+    required this.deleteIssueUsecase,
   }) : super(IssueInitial()) {
     on<FetchIssueEvent>((event, emit) async {
       emit(IssueLoading());
@@ -86,6 +89,18 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
             }
             return post;
           }).toList();
+          emit(IssueLoaded(updatedPosts));
+        },
+      );
+    });
+    on<DeletePostEvent>((event, emit) async {
+      final previousPosts = (state as IssueLoaded).posts;
+      final result = await deleteIssueUsecase(event.post);
+      result.fold(
+        (failure) => emit(IssueLoaded(previousPosts)),
+        (_) {
+          print("Comment added successfully!");
+          final updatedPosts = previousPosts.where((post) => post.id != event.post.id).toList();
           emit(IssueLoaded(updatedPosts));
         },
       );

@@ -163,6 +163,17 @@ class PostRepositoryImpl implements PostRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> deleteIssue(Post post) async{
+    try {
+      final postModel = PostModel.fromEntity(post);
+      await dataSource.deleteIssue(postModel);
+      return Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
   
   @override
   Future<Either<Failure, void>> updatePromotion(Promotion promotion)async {
@@ -173,4 +184,6 @@ class PostRepositoryImpl implements PostRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+  
+
 }
