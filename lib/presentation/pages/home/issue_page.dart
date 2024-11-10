@@ -1,4 +1,5 @@
 import 'package:campus_saga/core/injection_container.dart';
+import 'package:campus_saga/core/utils/validators.dart';
 import 'package:campus_saga/domain/entities/user.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
@@ -217,7 +218,8 @@ class _IssuePageState extends State<IssuePage> {
           ? Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (userState.userType == UserType.admin)
+                if (userState.userType == UserType.admin ||
+                    Validators.isDev(userState))
                   FloatingActionButton(
                     onPressed: () {
                       Navigator.push(

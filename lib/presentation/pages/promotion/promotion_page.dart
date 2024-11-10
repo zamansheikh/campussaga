@@ -96,7 +96,14 @@ class _PromotionPageState extends State<PromotionPage> {
       ),
       body: BlocConsumer<AdsBloc, AdsState>(
         listener: (context, state) {
-          // TODO: implement listener
+          if (state is AdsError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         },
         builder: (context, state) {
           if (state is AdsError) {

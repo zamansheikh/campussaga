@@ -116,7 +116,7 @@ class FullPostDetails extends StatelessWidget {
             LinearProgressIndicator(
               value: _calculatePercentage(post.trueVotes, post.falseVotes),
               backgroundColor: Colors.grey[400],
-              minHeight: 3,
+              minHeight: 2,
               valueColor: const AlwaysStoppedAnimation(Colors.green),
             ),
           ],

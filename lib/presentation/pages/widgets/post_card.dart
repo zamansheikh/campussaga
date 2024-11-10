@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/core/utils/utils.dart';
+import 'package:campus_saga/core/utils/validators.dart';
 import 'package:campus_saga/domain/entities/comment.dart';
 import 'package:campus_saga/domain/entities/feedback.dart';
 import 'package:campus_saga/domain/entities/post.dart';
@@ -66,35 +67,40 @@ class _PostCardState extends State<PostCard> {
                 FullPostDetails(post: post, user: widget.user),
           ),
         );
-        CustomConfirmDialog.show(
-          context,
-          title: "Fact Check",
-          message: "Is this really happening?",
-          confirmButtonText: "Yes",
-          cancelButtonText: "No",
-          dismissButtonText: "I don't know",
-          onTapDismiss: () => Navigator.pop(context),
-          onTapCancel: () {
-            Navigator.pop(context);
-            setState(() {
-              post = post.toggleFalseVote(widget.user.id);
-            });
-            sl<IssueBloc>().add(UpdatePostEvent(post));
-          },
-          onTapConfirm: () {
-            Navigator.pop(context);
-            setState(() {
-              post = post.toggleTrueVote(widget.user.id);
-            });
-            sl<IssueBloc>().add(UpdatePostEvent(post));
-          },
-          panaraDialogType: PanaraDialogType.warning,
-          barrierDismissible: false, // optional parameter (default is true)
-        );
+        if (Validators.isBelogsTo(widget.user, post) &&
+            Validators.isValidStudent(widget.user, post) &&
+            !Validators.isValidAuthority(post, widget.user)) {
+          CustomConfirmDialog.show(
+            context,
+            title: "Fact Check",
+            message: "Is this really happening?",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            dismissButtonText: "I don't know",
+            onTapDismiss: () => Navigator.pop(context),
+            onTapCancel: () {
+              Navigator.pop(context);
+              setState(() {
+                post = post.toggleFalseVote(widget.user.id);
+              });
+              sl<IssueBloc>().add(UpdatePostEvent(post));
+            },
+            onTapConfirm: () {
+              Navigator.pop(context);
+              setState(() {
+                post = post.toggleTrueVote(widget.user.id);
+              });
+              sl<IssueBloc>().add(UpdatePostEvent(post));
+            },
+            panaraDialogType: PanaraDialogType.warning,
+            barrierDismissible: false, // optional parameter (default is true)
+          );
+        }
       },
       onLongPress: () {
-        if (widget.user.userType == UserType.admin ||
-            widget.user.userType == UserType.ambassador) {
+        if (Validators.isValidAdmin(widget.user, post) ||
+            (Validators.isBelogsTo(widget.user, post) &&
+                Validators.isValidAmbassador(widget.user, post))) {
           CustomConfirmDialog.show(
             context,
             title: "Post Deletion",
@@ -102,12 +108,17 @@ class _PostCardState extends State<PostCard> {
             confirmButtonText: "Yes",
             cancelButtonText: "No",
             dismissButtonText: "Dismiss Dialog",
-            onTapDismiss: () => Navigator.pop(context),
+            onTapDismiss: () {
+              Navigator.pop(context);
+              FocusScope.of(context).unfocus();
+            },
             onTapCancel: () {
               Navigator.pop(context);
+              FocusScope.of(context).unfocus();
             },
             onTapConfirm: () {
               Navigator.pop(context);
+              FocusScope.of(context).unfocus();
               sl<IssueBloc>().add(DeletePostEvent(post));
             },
             panaraDialogType: PanaraDialogType.warning,
@@ -239,34 +250,39 @@ class _PostCardState extends State<PostCard> {
                 children: [
                   CommentsWidget(
                     onDismiss: () {
-                      if (post.feedback == null) {
-                        Future.delayed(const Duration(milliseconds: 500), () {
-                          CustomConfirmDialog.show(
-                            context,
-                            title: "Fact Check",
-                            message: "Is issue still available?",
-                            confirmButtonText: "Yes",
-                            cancelButtonText: "No",
-                            dismissButtonText: "I don't know",
-                            onTapDismiss: () => Navigator.pop(context),
-                            onTapCancel: () {
-                              Navigator.pop(context);
-                              setState(() {
-                                post = post.toggleDisagreeVote(widget.user.id);
-                              });
-                              sl<IssueBloc>().add(UpdatePostEvent(post));
-                            },
-                            onTapConfirm: () {
-                              Navigator.pop(context);
-                              setState(() {
-                                post = post.toggleAgreeVote(widget.user.id);
-                              });
-                              sl<IssueBloc>().add(UpdatePostEvent(post));
-                            },
-                            panaraDialogType: PanaraDialogType.warning,
-                            barrierDismissible: false,
-                          );
-                        });
+                      if (Validators.isBelogsTo(widget.user, post) &&
+                          Validators.isValidStudent(widget.user, post) &&
+                          !Validators.isValidAuthority(post, widget.user)) {
+                        if (post.feedback == null) {
+                          Future.delayed(const Duration(milliseconds: 500), () {
+                            CustomConfirmDialog.show(
+                              context,
+                              title: "Fact Check",
+                              message: "Is issue still available?",
+                              confirmButtonText: "Yes",
+                              cancelButtonText: "No",
+                              dismissButtonText: "I don't know",
+                              onTapDismiss: () => Navigator.pop(context),
+                              onTapCancel: () {
+                                setState(() {
+                                  post =
+                                      post.toggleDisagreeVote(widget.user.id);
+                                });
+                                sl<IssueBloc>().add(UpdatePostEvent(post));
+                                Navigator.pop(context);
+                              },
+                              onTapConfirm: () {
+                                Navigator.pop(context);
+                                setState(() {
+                                  post = post.toggleAgreeVote(widget.user.id);
+                                });
+                                sl<IssueBloc>().add(UpdatePostEvent(post));
+                              },
+                              panaraDialogType: PanaraDialogType.warning,
+                              barrierDismissible: false,
+                            );
+                          });
+                        }
                       }
                     },
                     comments: post.comments,
@@ -286,7 +302,8 @@ class _PostCardState extends State<PostCard> {
                     },
                   ),
                   const SizedBox(width: 12.0),
-                  if (widget.user.userType == UserType.university)
+                  if (Validators.isBelogsTo(widget.user, post) &&
+                      Validators.isValidAuthority(post, widget.user))
                     Visibility(
                       child: FeedbackWidget(
                         onDismiss: () {},
@@ -330,45 +347,9 @@ class _PostCardState extends State<PostCard> {
                     Visibility(
                       child: FeedbackWidget(
                         onDismiss: () {
-                          Future.delayed(const Duration(milliseconds: 700), () {
-                            CustomConfirmDialog.show(
-                              context,
-                              title: "Fact Check",
-                              message: "Is this really solved?",
-                              confirmButtonText: "Yes",
-                              cancelButtonText: "No",
-                              dismissButtonText: "I don't know",
-                              onTapDismiss: () => Navigator.pop(context),
-                              onTapCancel: () {
-                                Navigator.pop(context);
-                                setState(() {
-                                  post =
-                                      post.toggleDisagreeVote(widget.user.id);
-                                });
-                                sl<IssueBloc>().add(UpdatePostEvent(post));
-                              },
-                              onTapConfirm: () {
-                                Navigator.pop(context);
-                                setState(() {
-                                  post = post.toggleAgreeVote(widget.user.id);
-                                });
-                                sl<IssueBloc>().add(UpdatePostEvent(post));
-                              },
-                              panaraDialogType: PanaraDialogType.warning,
-                              barrierDismissible: false,
-                            );
-                          });
-                        },
-                        feedback: post.feedback,
-                        onAddFeedback: (value) {
-                          //show a toast
-                          fToast(context,
-                              message: "You are not an Authority 😒");
-                        },
-                        buttonName: "View Feedback",
-                      ),
-                      replacement: FeedbackWidget(
-                          onDismiss: () {
+                          if (Validators.isBelogsTo(widget.user, post) &&
+                              Validators.isValidStudent(widget.user, post) &&
+                              !Validators.isValidAuthority(post, widget.user)) {
                             Future.delayed(const Duration(milliseconds: 500),
                                 () {
                               CustomConfirmDialog.show(
@@ -398,7 +379,18 @@ class _PostCardState extends State<PostCard> {
                                 barrierDismissible: false,
                               );
                             });
-                          },
+                          }
+                        },
+                        feedback: post.feedback,
+                        onAddFeedback: (value) {
+                          //show a toast
+                          fToast(context,
+                              message: "You are not an Authority 😒");
+                        },
+                        buttonName: "View Feedback",
+                      ),
+                      replacement: FeedbackWidget(
+                          onDismiss: () {},
                           feedback: post.feedback,
                           onAddFeedback: (_) {
                             //show a toast

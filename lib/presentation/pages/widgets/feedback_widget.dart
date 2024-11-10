@@ -6,14 +6,14 @@ class FeedbackWidget extends StatefulWidget {
   final AuthorityFeedback? feedback;
   final Function(String) onAddFeedback;
   final String buttonName;
-  final VoidCallback onDismiss; // Callback for when the sheet is dismissed
+  final VoidCallback onDismiss;
 
   const FeedbackWidget({
     Key? key,
     this.feedback,
     required this.onAddFeedback,
     required this.buttonName,
-    required this.onDismiss, // Required callback for dismissal
+    required this.onDismiss,
   }) : super(key: key);
 
   @override
@@ -22,8 +22,11 @@ class FeedbackWidget extends StatefulWidget {
 
 class _FeedbackWidgetState extends State<FeedbackWidget> {
   final TextEditingController _feedbackController = TextEditingController();
+  bool _isDismissed = false;
 
   void _showFeedbackModal(BuildContext context) {
+    _isDismissed = false; // Reset flag when showing modal
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -32,9 +35,11 @@ class _FeedbackWidgetState extends State<FeedbackWidget> {
       ),
       builder: (context) {
         return WillPopScope(
-          // This ensures the dismissal action triggers even on swipe down
           onWillPop: () async {
-            widget.onDismiss();
+            if (!_isDismissed) {
+              _isDismissed = true;
+              widget.onDismiss();
+            }
             return true;
           },
           child: Padding(
@@ -106,8 +111,10 @@ class _FeedbackWidgetState extends State<FeedbackWidget> {
         );
       },
     ).whenComplete(() {
-      // Trigger action when the modal is dismissed or swiped down
-      widget.onDismiss();
+      if (!_isDismissed) {
+        _isDismissed = true;
+        widget.onDismiss();
+      }
     });
   }
 

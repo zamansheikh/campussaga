@@ -18,7 +18,7 @@ class PredictionWidget extends StatelessWidget {
     Color predictionColor;
 
     if (!isTwoDaysOld) {
-      predictionText = "AI is calculating...";
+      predictionText = "Predicting";
       predictionColor = Colors.grey[600]!;
     } else if (trueVoteRatio >= 0.75) {
       predictionText = "True Issue";

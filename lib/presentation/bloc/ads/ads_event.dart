@@ -22,3 +22,10 @@ final class UpdateAdsEvent extends AdsEvent {
   @override
   List<Object> get props => [promotion];
 }
+
+final class MargeAdsEvent extends AdsEvent {
+  final Promotion promotion;
+  const MargeAdsEvent(this.promotion);
+  @override
+  List<Object> get props => [promotion];
+}
