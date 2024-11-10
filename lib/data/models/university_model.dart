@@ -4,6 +4,8 @@ class UniversityModel extends University {
   const UniversityModel({
     required String id,
     required String name,
+    required String description,
+    required String logoUrl,
     required String location,
     required bool isPublic,
     required double researchScore,
@@ -20,6 +22,8 @@ class UniversityModel extends University {
   }) : super(
           id: id,
           name: name,
+          description: description,
+          logoUrl: logoUrl,
           location: location,
           isPublic: isPublic,
           researchScore: researchScore,
@@ -39,6 +43,8 @@ class UniversityModel extends University {
     return UniversityModel(
       id: json['id'] as String,
       name: json['name'] as String,
+      description: json['description'] as String,
+      logoUrl: json['logoUrl'] as String,
       location: json['location'] as String,
       isPublic: json['isPublic'] as bool,
       researchScore: (json['researchScore'] as num).toDouble(),
@@ -59,6 +65,8 @@ class UniversityModel extends University {
     return {
       'id': id,
       'name': name,
+      'description': description,
+      'logoUrl': logoUrl,
       'location': location,
       'isPublic': isPublic,
       'researchScore': researchScore,
@@ -79,6 +87,8 @@ class UniversityModel extends University {
     return UniversityModel(
       id: university.id,
       name: university.name,
+      description: university.description,
+      logoUrl: university.logoUrl,
       location: university.location,
       isPublic: university.isPublic,
       researchScore: university.researchScore,
@@ -99,6 +109,8 @@ class UniversityModel extends University {
     return University(
       id: id,
       name: name,
+      description: description,
+      logoUrl: logoUrl,
       location: location,
       isPublic: isPublic,
       researchScore: researchScore,
@@ -118,6 +130,8 @@ class UniversityModel extends University {
   UniversityModel copyWith({
     String? id,
     String? name,
+    String? description,
+    String? logoUrl,
     String? location,
     bool? isPublic,
     double? researchScore,
@@ -135,6 +149,8 @@ class UniversityModel extends University {
     return UniversityModel(
       id: id ?? this.id,
       name: name ?? this.name,
+      description: description ?? this.description,
+      logoUrl: logoUrl ?? this.logoUrl,
       location: location ?? this.location,
       isPublic: isPublic ?? this.isPublic,
       researchScore: researchScore ?? this.researchScore,

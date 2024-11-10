@@ -14,6 +14,8 @@ class AddUniversityPage extends StatefulWidget {
 class _AddUniversityPageState extends State<AddUniversityPage> {
   final TextEditingController uidController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController logoUrlController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController researchScoreController = TextEditingController();
   final TextEditingController qsRankingScoreController =
@@ -35,6 +37,8 @@ class _AddUniversityPageState extends State<AddUniversityPage> {
   University _addUniversity() {
     final String id = uidController.text;
     final String name = nameController.text;
+    final String description = descriptionController.text;
+    final String logoUrl = logoUrlController.text;
     final String location = locationController.text;
     final double researchScore =
         double.tryParse(researchScoreController.text) ?? 0.0;
@@ -56,6 +60,8 @@ class _AddUniversityPageState extends State<AddUniversityPage> {
     final university = University(
       id: id,
       name: name,
+      description: description,
+      logoUrl: logoUrl,
       location: location,
       isPublic: isPublic,
       researchScore: researchScore,
@@ -111,6 +117,22 @@ class _AddUniversityPageState extends State<AddUniversityPage> {
               controller: nameController,
               decoration: const InputDecoration(
                 labelText: 'University Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: logoUrlController,
+              decoration: const InputDecoration(
+                labelText: 'Logo URL',
                 border: OutlineInputBorder(),
               ),
             ),

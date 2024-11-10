@@ -42,6 +42,14 @@ class FirebaseDataSource {
   Future<void> createPost(PostModel post) async {
     //create doc baseed on the post id
     await firestore.collection('posts').doc(post.id).set(post.toJson());
+    //update the user post count
+    await firestore.collection('users').doc(post.userId).update({
+      'postCount': FieldValue.increment(1),
+    });
+    //update the university post count
+    await firestore.collection('universities').doc(post.universityId).update({
+      'totalPosts': FieldValue.increment(1),
+    });
   }
 
   Future<void> changeRoleRequest(RoleChangeModel role) async {
