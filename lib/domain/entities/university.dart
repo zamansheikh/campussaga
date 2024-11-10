@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 class University extends Equatable {
   final String id;
   final String name;
+  final String description;
+  final String logoUrl;
   final String location;
   final bool isPublic;
   final double researchScore;
@@ -20,6 +22,8 @@ class University extends Equatable {
   const University({
     required this.id,
     required this.name,
+    required this.description,
+    required this.logoUrl,
     required this.location,
     required this.isPublic,
     required this.researchScore,
@@ -61,6 +65,8 @@ class University extends Equatable {
   List<Object?> get props => [
     id,
     name,
+    description,
+    logoUrl,
     location,
     isPublic,
     researchScore,

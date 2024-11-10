@@ -22,8 +22,18 @@ class _PromotionPageState extends State<PromotionPage> {
   var userState = null;
   @override
   void initState() {
-    super.initState();
+    fetchUser();
     _fetchAds();
+    super.initState();
+  }
+
+  void fetchUser() {
+    final state = sl<AuthBloc>().state;
+    if (state is AuthAuthenticated) {
+      setState(() {
+        userState = state.user;
+      });
+    }
   }
 
   void _fetchAds() {

@@ -19,7 +19,7 @@ class UniversityBloc extends Bloc<UniversityEvent, UniversityState> {
         (failure) => emit(UniversityError(failure.message)),
         (universities) {
           final sortedbyRank = universities
-            ..sort((a, b) => a.rankingScore.compareTo(b.rankingScore));
+            ..sort((a, b) => b.rankingScore.compareTo(a.rankingScore));
           emit(UniversityLoaded(sortedbyRank));
         },
       );
