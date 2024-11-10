@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/data/models/promotion_model.dart';
 import 'package:campus_saga/domain/entities/promotion.dart';
 import 'package:campus_saga/domain/usecases/create_promotion.dart';
 import 'package:campus_saga/domain/usecases/upload_post_images.dart';
+import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
 import 'package:equatable/equatable.dart';
 
 part 'promotion_event.dart';
@@ -18,10 +20,6 @@ class PromotionBloc extends Bloc<PromotionEvent, PromotionState> {
     required this.createPromotion,
   }) : super(PromotionInitial()) {
     on<PromotionPostCreated>((event, emit) async {
-      // List<Post> posts = [];
-      // if (state is PostsLoaded) {
-      //   posts = (state as PostsLoaded).posts;
-      // }
       try {
         emit(PromotionPostingLoading());
         List<String> imageUrls = [];
@@ -45,11 +43,7 @@ class PromotionBloc extends Bloc<PromotionEvent, PromotionState> {
           (failure) async => emit(PromotionPostingFailure(failure.message)),
           (createdPost) async {
             emit(PromotionPostingSuccess(createdPost));
-            // posts.elementAt(0);
-            // posts = posts.toSet().toList();
-            // emit(PostsLoaded(posts));
-            // Trigger FetchIssueEvent after successful post creation
-            // issueBloc.add(FetchIssueEvent(createdPost.universityId)); //! TODO: Uncomment this line
+            sl<AdsBloc>().add(MargeAdsEvent(createdPost));
           },
         );
       } catch (e) {

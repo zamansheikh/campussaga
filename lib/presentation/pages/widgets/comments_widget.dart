@@ -20,8 +20,11 @@ class CommentsWidget extends StatefulWidget {
 
 class _CommentsWidgetState extends State<CommentsWidget> {
   final TextEditingController _commentController = TextEditingController();
+  bool _isDismissed = false;
 
   void _showCommentsModal(BuildContext context) {
+    _isDismissed = false; // Reset when showing modal
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -30,9 +33,11 @@ class _CommentsWidgetState extends State<CommentsWidget> {
       ),
       builder: (context) {
         return WillPopScope(
-          // Ensures dismiss action triggers even on swipe down
           onWillPop: () async {
-            widget.onDismiss();
+            if (!_isDismissed) {
+              _isDismissed = true;
+              widget.onDismiss();
+            }
             return true;
           },
           child: Padding(
@@ -110,8 +115,10 @@ class _CommentsWidgetState extends State<CommentsWidget> {
         );
       },
     ).whenComplete(() {
-      // Trigger action when the modal is dismissed or swiped down
-      widget.onDismiss();
+      if (!_isDismissed) {
+        _isDismissed = true; // Prevent onDismiss from firing again
+        widget.onDismiss();
+      }
     });
   }
 
@@ -124,8 +131,7 @@ class _CommentsWidgetState extends State<CommentsWidget> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        padding: const EdgeInsets.symmetric(
-            horizontal: 8.0, vertical: 4.0), // Adjust padding here
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       ),
       onPressed: () => _showCommentsModal(context),
       child: Row(
@@ -134,14 +140,14 @@ class _CommentsWidgetState extends State<CommentsWidget> {
           Icon(
             Icons.comment,
             color: Colors.blue[700],
-            size: 18, // Smaller icon size
+            size: 18,
           ),
           const SizedBox(width: 4.0),
           Text(
             "Comments",
             style: TextStyle(
               color: Colors.blue[700],
-              fontSize: 14, // Smaller text size
+              fontSize: 14,
             ),
           ),
         ],

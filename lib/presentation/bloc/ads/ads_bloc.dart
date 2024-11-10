@@ -40,5 +40,18 @@ class AdsBloc extends Bloc<AdsEvent, AdsState> {
         },
       );
     });
+
+    on<MargeAdsEvent>((event, emit) async {
+      if (state is AdsLoaded) {
+        final allAds = (state as AdsLoaded).promotions;
+        final updatedAds = allAds + [event.promotion];
+        if(updatedAds.length <1){
+              updatedAds.add(event.promotion);
+             }else{
+               updatedAds.insert(0, event.promotion);
+             }
+        emit(AdsLoaded(updatedAds));
+      }
+    });
   }
 }

@@ -22,25 +22,33 @@ class Validators {
     return phoneRegex.hasMatch(phoneNumber);
   }
 
+  static bool isBelogsTo(User user, Post post) {
+    return post.universityId == user.universityId.split('@').last.trim();
+  }
+
+  static bool isValidStudent(User user, Post post) {
+    return user.isVerified && user.userType == UserType.student;
+  }
+
+  static bool isValidAmbassador(User user, Post post) {
+    return user.isVerified && user.userType == UserType.ambassador;
+  }
+
   static bool isValidAuthority(Post post, User user) {
     return post.universityId == user.universityId.split('@').last.trim() &&
         user.isVerified &&
         user.userType == UserType.university;
   }
 
-  static bool isValidStudent(User user, Post post) {
-    return user.isVerified &&
-        user.userType == UserType.student &&
-        post.universityId == user.universityId.split('@').last.trim();
-  }
-
   static bool isValidAdmin(User user, Post post) {
-    return user.isVerified &&
-        user.userType == UserType.admin &&
-        post.universityId == user.universityId.split('@').last.trim();
+    return user.isVerified && user.userType == UserType.admin;
   }
 
   static bool isSuperAdmin(User user) {
-    return user.isVerified && user.userType == UserType.admin;
+    return user.userType == UserType.admin;
+  }
+
+  static bool isDev(User user) {
+    return user.email == 'zaman6545@gmail.com';
   }
 }
