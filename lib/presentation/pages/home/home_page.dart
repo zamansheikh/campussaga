@@ -1,6 +1,7 @@
 import 'package:campus_saga/core/constants/update_constants.dart';
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/core/services/update_checker.dart';
+import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/pages/home/issue_page.dart';
@@ -138,6 +139,7 @@ class _HomePageState extends State<HomePage> {
               title: const Text('Switch Campus'),
               onTap: () {
                 Navigator.pop(context);
+                fToast(context, message: "No other campus available!");
               },
             ),
 
