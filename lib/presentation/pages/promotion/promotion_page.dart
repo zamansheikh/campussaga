@@ -5,6 +5,7 @@ import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/pages/profile/profile_page.dart';
+import 'package:campus_saga/presentation/pages/promotion/promotion_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -182,21 +183,33 @@ class _PromotionPageState extends State<PromotionPage> {
                           .toString()
                       : null;
 
-                  return PromotionCardNew(
-                    club: promotion.clubName,
-                    title: promotion.promotionTitle,
-                    imageUrl: promotion.imageUrls.isNotEmpty
-                        ? promotion.imageUrls.first
-                        : 'https://placehold.co/600x400',
-                    date: DateFormat.yMMMd().format(promotion.timestamp),
-                    timeLeft: timeLeft,
-                    onTrueVote: () => toggleTrueVote(promotion),
-                    onFalseVote: () => toggleFalseVote(promotion),
-                    likes: promotion.likes,
-                    dislikes: promotion.dislikes,
-                    hasUserVotedTrue: promotion.hasUserVotedTrue(getUserId()),
-                    hasUserVotedFalse: promotion.hasUserVotedFalse(getUserId()),
-                    eventLink: promotion.eventLink,
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              PromotionDetailPage(promotion: promotion),
+                        ),
+                      );
+                    },
+                    child: PromotionCardNew(
+                      club: promotion.clubName,
+                      title: promotion.promotionTitle,
+                      imageUrl: promotion.imageUrls.isNotEmpty
+                          ? promotion.imageUrls.first
+                          : 'https://placehold.co/600x400',
+                      date: DateFormat.yMMMd().format(promotion.timestamp),
+                      timeLeft: timeLeft,
+                      onTrueVote: () => toggleTrueVote(promotion),
+                      onFalseVote: () => toggleFalseVote(promotion),
+                      likes: promotion.likes,
+                      dislikes: promotion.dislikes,
+                      hasUserVotedTrue: promotion.hasUserVotedTrue(getUserId()),
+                      hasUserVotedFalse:
+                          promotion.hasUserVotedFalse(getUserId()),
+                      eventLink: promotion.eventLink,
+                    ),
                   );
                 },
               ),
