@@ -1,6 +1,8 @@
 // lib/core/injection_container.dart
 import 'package:campus_saga/core/services/auth_service.dart';
-import 'package:campus_saga/data/datasources/remote/firebase_datasource.dart';
+import 'package:campus_saga/data/datasources/remote/auth_remote_datasource.dart';
+import 'package:campus_saga/data/datasources/remote/firebase_storage_remote_datasource.dart';
+import 'package:campus_saga/data/datasources/remote/firestore_remote_datasource.dart';
 import 'package:campus_saga/data/repositories/post_repository_impl.dart';
 import 'package:campus_saga/data/repositories/user_repository_impl.dart';
 import 'package:campus_saga/domain/repositories/post_repository.dart';
@@ -56,20 +58,36 @@ Future<void> init() async {
   sl.registerLazySingleton(() => FirebaseStorage.instance);
 
   // Data sources
-  sl.registerLazySingleton<FirebaseDataSource>(
-    () => FirebaseDataSource(
+  sl.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSource(
       firebaseAuth: sl(),
-      firestore: sl(),
+    ),
+  );
+  sl.registerLazySingleton<FirebaseStorageRemoteDataSource>(
+    () => FirebaseStorageRemoteDataSource(
       firebaseStorage: sl(),
+    ),
+  );
+  sl.registerLazySingleton<FirestoreRemoteDataSource>(
+    () => FirestoreRemoteDataSource(
+      firestore: sl(),
     ),
   );
 
   // Repositories
   sl.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(dataSource: sl()),
+    () => UserRepositoryImpl(
+      authRemoteDataSource: sl(),
+      firestoreRemoteDataSource: sl(),
+      firebaseStorageRemoteDataSource: sl(),
+    ),
   );
   sl.registerLazySingleton<PostRepository>(
-    () => PostRepositoryImpl(dataSource: sl()),
+    () => PostRepositoryImpl(
+      authRemoteDataSource: sl(),
+      firestoreRemoteDataSource: sl(),
+      firebaseStorageRemoteDataSource: sl(),
+    ),
   );
 
   // Use cases
