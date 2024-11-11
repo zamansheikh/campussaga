@@ -29,6 +29,19 @@ class FirebaseStorageRemoteDataSource {
     return urls;
   }
 
+  Future<List<String>> uploadPromotionImages(String postId, List<File> images) async {
+    final urls = <String>[];
+    for (final image in images) {
+      final ref = firebaseStorage
+          .ref()
+          .child('promotion_images')
+          .child('$postId-${p.basename(image.path)}.jpg');
+      await ref.putFile(image);
+      urls.add(await ref.getDownloadURL());
+    }
+    return urls;
+  }
+
   Future<List<String>> uploadVerificationImages(String postId, List<File> images) async {
     final urls = <String>[];
     for (final image in images) {

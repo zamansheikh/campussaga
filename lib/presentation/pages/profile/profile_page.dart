@@ -258,14 +258,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     _buildMetricItem(Icons.post_add, user.postCount, "Posts"),
                     const SizedBox(height: 16.0),
-                    _buildMetricItem(
-                        Icons.comment, user.commentCount, "Comments"),
+                    _buildMetricItem(Icons.check_circle,
+                        user.resolvedIssuesCount, "Resolved"),
                   ],
                 ),
                 Column(
                   children: [
-                    _buildMetricItem(Icons.check_circle,
-                        user.resolvedIssuesCount, "Resolved"),
+                    _buildMetricItem(
+                        Icons.how_to_vote, user.givenVotesCount, "Given Votes"),
                     const SizedBox(height: 16.0),
                     _buildMetricItem(Icons.thumb_up, user.receivedVotesCount,
                         "Received Votes"),
@@ -274,7 +274,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Column(
                   children: [
                     _buildMetricItem(
-                        Icons.how_to_vote, user.givenVotesCount, "Given Votes"),
+                        Icons.comment, user.commentCount, "Comments"),
                     const SizedBox(height: 16.0),
                     _buildMetricItem(Icons.star, user.streakDays, "Day Streak"),
                   ],
