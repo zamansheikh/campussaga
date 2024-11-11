@@ -125,21 +125,6 @@ class FirestoreRemoteDataSource {
     return timelinePosts;
   }
 
-  // University Operations
-  Future<void> addUniversity(UniversityModel university) async {
-    await firestore
-        .collection('universities')
-        .doc(university.id)
-        .set(university.toJson());
-  }
-
-  Future<List<UniversityModel>> getAllUniversity() async {
-    final querySnapshot = await firestore.collection('universities').get();
-    return querySnapshot.docs
-        .map((doc) => UniversityModel.fromJson(doc.data()))
-        .toList();
-  }
-
   // Comment and Feedback Operations
   Future<void> updatePostComments(PostModel post) async {
     await firestore.collection('posts').doc(post.id).update(
@@ -168,6 +153,48 @@ class FirestoreRemoteDataSource {
     });
   }
 
+  Future<void> updateAgreeOrDisagree(PostModel post) async {
+    await firestore.collection('posts').doc(post.id).update(
+      {
+        'agree': post.agree,
+        'disagree': post.disagree,
+      },
+    );
+  }
+
+  Future<void> updateTrueOrFalse(PostModel post, UserModel user, bool isTrue) async {
+    
+    await firestore.collection('posts').doc(post.id).update(
+      {
+        'trueVotes': post.trueVotes,
+        'falseVotes': post.falseVotes,
+      },
+    );
+    if (isTrue) {
+      await firestore.collection('users').doc(user.id).update({
+        'trueVotes': FieldValue.increment(1),
+      });
+    } else {
+      await firestore.collection('users').doc(user.id).update({
+        'falseVotes': FieldValue.increment(1),
+      });
+    }
+  }
+  // University Operations
+  Future<void> addUniversity(UniversityModel university) async {
+    await firestore
+        .collection('universities')
+        .doc(university.id)
+        .set(university.toJson());
+  }
+
+  Future<List<UniversityModel>> getAllUniversity() async {
+    final querySnapshot = await firestore.collection('universities').get();
+    return querySnapshot.docs
+        .map((doc) => UniversityModel.fromJson(doc.data()))
+        .toList();
+  }
+
   // Vote Operations
   Future<void> addVote(String postId, String userId, bool isTrueVote) async {
     await firestore.collection('posts').doc(postId).update({
@@ -191,17 +218,11 @@ class FirestoreRemoteDataSource {
     });
   }
 
-  Future<void> updatePromotion(PromotionModel promotion) async {
-    await firestore
-        .collection('promotion')
-        .doc(promotion.id)
-        .update(promotion.toJson());
-  }
-
   Future<void> updateIssuePost(PostModel post) async {
     await firestore.collection('posts').doc(post.id).update(post.toJson());
   }
 
+  //Create a promotion post
   Future<List<PromotionModel>> getPromotionByUniversity(
       String universityId) async {
     final querySnapshot = await firestore
@@ -215,13 +236,19 @@ class FirestoreRemoteDataSource {
         .toList();
   }
 
-  //Create a promotion post
   Future<void> createPromotion(PromotionModel promotion) async {
     //create doc baseed on the post id
     await firestore
         .collection('promotion')
         .doc(promotion.id)
         .set(promotion.toJson());
+  }
+
+  Future<void> updatePromotion(PromotionModel promotion) async {
+    await firestore
+        .collection('promotion')
+        .doc(promotion.id)
+        .update(promotion.toJson());
   }
 
   //addVarificationRequest
