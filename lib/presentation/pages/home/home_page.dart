@@ -1,4 +1,4 @@
-import 'package:campus_saga/core/constants/App_colors.dart';
+import 'package:advanced_salomon_bottom_bar/advanced_salomon_bottom_bar.dart';
 import 'package:campus_saga/core/constants/update_constants.dart';
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/core/services/update_checker.dart';
@@ -143,6 +143,33 @@ class _HomePageState extends State<HomePage> {
                 fToast(context, message: "No other campus available!");
               },
             ),
+            //about app
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('About App'),
+              onTap: () {
+                Navigator.pop(context);
+                showAboutDialog(
+                  context: context,
+                  applicationName: 'Campus Saga',
+                  applicationVersion: CURRENT_VERSION,
+                  applicationIcon: const Icon(Icons.school),
+                  applicationLegalese: '© 2024 Campus Saga',
+                  children: [
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Campus Saga is a platform for students to share their thoughts, ideas, and feedback with their campus community.',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Developed by: deCoders Family',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                );
+              },
+            ),
 
             const Spacer(),
             const Divider(),
@@ -173,25 +200,68 @@ class _HomePageState extends State<HomePage> {
         index: _currentIndex,
         children: pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppColors.bottomNavBackground,
-        selectedItemColor: AppColors.bottomNavActive,
-        type: BottomNavigationBarType.fixed,
-        unselectedItemColor: Colors.grey,
+      // bottomNavigationBar: BottomNavigationBar(
+      //   backgroundColor: AppColors.bottomNavBackground,
+      //   selectedItemColor: AppColors.bottomNavActive,
+      //   type: BottomNavigationBarType.fixed,
+      //   unselectedItemColor: Colors.grey,
+      //   currentIndex: _currentIndex,
+      //   onTap: (index) {
+      //     setState(() {
+      //       _currentIndex = index;
+      //     });
+      //   },
+      //   items: const [
+      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.campaign), label: 'Promotions'),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.add_circle_outline), label: 'Add Post'),
+      //     BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Rankings'),
+      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+      //   ],
+      // ),
+      bottomNavigationBar: AdvancedSalomonBottomBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.campaign), label: 'Promotions'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_outline), label: 'Add Post'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Rankings'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        onTap: (i) => setState(() => _currentIndex = i),
+        items: [
+          /// Home
+          AdvancedSalomonBottomBarItem(
+            icon: Icon(Icons.home),
+            title: Text("Home"),
+            selectedColor: Colors.purple,
+          ),
+
+          /// Likes
+          AdvancedSalomonBottomBarItem(
+            icon: Icon(Icons.campaign),
+            title: Text(
+              "Promotions",
+              style: TextStyle(fontSize: 12),
+            ),
+            selectedColor: Colors.pink,
+          ),
+
+          /// Search
+          AdvancedSalomonBottomBarItem(
+            icon: Icon(Icons.add_circle_outline),
+            title: Text("Add Post"),
+            selectedColor: Colors.orange,
+          ),
+
+          /// Profile
+          AdvancedSalomonBottomBarItem(
+            icon: Icon(Icons.search),
+            title: Text("Rankings"),
+            selectedColor: Colors.teal,
+          ),
+
+          /// Profile
+          AdvancedSalomonBottomBarItem(
+            icon: Icon(Icons.person),
+            title: Text("Profile"),
+            selectedColor: Colors.teal,
+          ),
         ],
       ),
     );
