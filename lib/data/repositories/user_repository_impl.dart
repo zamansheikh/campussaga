@@ -3,6 +3,9 @@
 import 'dart:io';
 
 import 'package:campus_saga/core/usecases/usecase.dart';
+import 'package:campus_saga/data/datasources/remote/auth_remote_datasource.dart';
+import 'package:campus_saga/data/datasources/remote/firebase_storage_remote_datasource.dart';
+import 'package:campus_saga/data/datasources/remote/firestore_remote_datasource.dart';
 import 'package:campus_saga/data/models/role_change_model.dart';
 import 'package:campus_saga/data/models/user_model.dart';
 import 'package:campus_saga/data/models/varification_status_model.dart';
@@ -12,17 +15,22 @@ import 'package:dartz/dartz.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../core/errors/failures.dart';
-import '../datasources/remote/firebase_datasource.dart';
 
 class UserRepositoryImpl implements UserRepository {
-  final FirebaseDataSource dataSource;
+  final AuthRemoteDataSource authRemoteDataSource;
+  final FirestoreRemoteDataSource firestoreRemoteDataSource;
+  final FirebaseStorageRemoteDataSource firebaseStorageRemoteDataSource;
 
-  UserRepositoryImpl({required this.dataSource});
+  UserRepositoryImpl({
+    required this.authRemoteDataSource,
+    required this.firestoreRemoteDataSource,
+    required this.firebaseStorageRemoteDataSource,
+  });
 
   @override
   Future<Either<Failure, User>> getUserProfile(String userId) async {
     try {
-      final user = await dataSource.getUserProfile(userId);
+      final user = await firestoreRemoteDataSource.getUserProfile(userId);
       if (user != null) {
         return Right(user);
       } else {
@@ -37,7 +45,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<Either<Failure, void>> createUserProfile(User user) async {
     try {
       UserModel userModel = UserModel.fromEntity(user);
-      await dataSource.createUser(userModel);
+      await firestoreRemoteDataSource.createUser(userModel);
       return Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -53,7 +61,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<Either<Failure, String>> uploadUserImage(
       String userId, File image) async {
     try {
-      final imageUrl = await dataSource.uploadUserImage(image, userId);
+      final imageUrl = await firebaseStorageRemoteDataSource.uploadUserImage(image, userId);
       return Right(imageUrl);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -63,7 +71,7 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Either<Failure, String>> signUpUser(UserParams user) async {
     try {
-      final right = await dataSource.signUpUser(user);
+      final right = await authRemoteDataSource.signUpUser(user);
       return Right(right);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -74,7 +82,7 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Either<Failure, String>> signInUser(UserParams user) async {
     try {
-      final right = await dataSource.signInUser(user);
+      final right = await authRemoteDataSource.signInUser(user);
       return Right(right);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -84,7 +92,7 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Either<Failure, void>> signOutUser() async {
     try {
-      return Right(dataSource.signOutUser());
+      return Right(authRemoteDataSource.signOutUser());
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -94,7 +102,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<Either<Failure, List<String>>> uploadVerificationImages(
       String userId, List<File> image) async {
     try {
-      final urls = await dataSource.uploadVerificationImages(userId, image);
+      final urls = await firebaseStorageRemoteDataSource.uploadVerificationImages(userId, image);
       return Right(urls);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -105,7 +113,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<Either<Failure, Verification>> varificationRequest(
       Verification verification) async {
     try {
-      await dataSource.addVarificationRequest(
+      await firestoreRemoteDataSource.addVarificationRequest(
           VerificationStatusModel.fromEntity(verification));
       return Right(verification);
     } catch (e) {
@@ -118,7 +126,7 @@ class UserRepositoryImpl implements UserRepository {
       String universityId) async {
     try {
       final pendingList =
-          await dataSource.getPendingVerificaionByUniversity(universityId);
+          await firestoreRemoteDataSource.getPendingVerificaionByUniversity(universityId);
       return Right(pendingList);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -129,7 +137,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<Either<Failure, void>> updateVerificationStatus(
       Verification verification) async {
     try {
-      dataSource.updateVerificationStatus(
+      firestoreRemoteDataSource.updateVerificationStatus(
           VerificationStatusModel.fromEntity(verification));
       return Right(null);
     } catch (e) {
@@ -141,7 +149,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<Either<Failure, void>> changeRoleRequest(
       RoleChange role_change) async {
     try {
-      dataSource.changeRoleRequest(RoleChangeModel.fromEntity(role_change));
+      firestoreRemoteDataSource.changeRoleRequest(RoleChangeModel.fromEntity(role_change));
       return Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -151,7 +159,7 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Either<Failure, List<RoleChange>>> loadAllRoleChangeRequest() async {
     try {
-      final roleChangeList = await dataSource.loadAllRoleChangeRequest();
+      final roleChangeList = await firestoreRemoteDataSource.loadAllRoleChangeRequest();
       final roleChangeEnityList =
           roleChangeList.map((e) => e.toEntity()).toList();
       return Right(roleChangeEnityList);
@@ -164,7 +172,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<Either<Failure, void>> updateUserRole(
       UserRoleParams userRoleParams) async {
     try {
-      dataSource.updateUserRole(userRoleParams);
+      firestoreRemoteDataSource.updateUserRole(userRoleParams);
       return Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

@@ -1,3 +1,4 @@
+import 'package:campus_saga/core/constants/App_colors.dart';
 import 'package:campus_saga/core/constants/update_constants.dart';
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/core/services/update_checker.dart';
@@ -173,7 +174,8 @@ class _HomePageState extends State<HomePage> {
         children: pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.black,
+        backgroundColor: AppColors.bottomNavBackground,
+        selectedItemColor: AppColors.bottomNavActive,
         type: BottomNavigationBarType.fixed,
         unselectedItemColor: Colors.grey,
         currentIndex: _currentIndex,
