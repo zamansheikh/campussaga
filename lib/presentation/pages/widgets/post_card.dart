@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:campus_saga/core/constants/App_colors.dart';
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/core/utils/validators.dart';
@@ -127,6 +128,7 @@ class _PostCardState extends State<PostCard> {
         }
       },
       child: Card(
+        color: AppColors.background,
         elevation: 2.0,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
@@ -187,8 +189,10 @@ class _PostCardState extends State<PostCard> {
               // Post Title
               Text(
                 post.postTitle,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: AppColors.primaryText),
               ),
               const SizedBox(height: 8.0),
 
@@ -197,7 +201,7 @@ class _PostCardState extends State<PostCard> {
                 post.description,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey[700]),
+                style: TextStyle(color: AppColors.secondaryText),
               ),
               const SizedBox(height: 8.0),
 
