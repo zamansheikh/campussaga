@@ -153,7 +153,8 @@ class FirestoreRemoteDataSource {
     });
   }
 
-  Future<void> updateAgreeOrDisagree(PostModel post) async {
+  Future<void> updateAgreeOrDisagree(
+      PostModel post, UserModel user, bool isAgree) async {
     await firestore.collection('posts').doc(post.id).update(
       {
         'agree': post.agree,
@@ -162,24 +163,25 @@ class FirestoreRemoteDataSource {
     );
   }
 
-  Future<void> updateTrueOrFalse(PostModel post, UserModel user, bool isTrue) async {
-    
+  Future<void> updateTrueOrFalse(
+      PostModel post, UserModel user, bool isTrue) async {
     await firestore.collection('posts').doc(post.id).update(
       {
         'trueVotes': post.trueVotes,
         'falseVotes': post.falseVotes,
       },
     );
-    if (isTrue) {
-      await firestore.collection('users').doc(user.id).update({
-        'trueVotes': FieldValue.increment(1),
+   
+      await firestore.collection('users').doc(post.userId).update({
+        'receivedVotesCount': FieldValue.increment(1),
       });
-    } else {
+  
       await firestore.collection('users').doc(user.id).update({
-        'falseVotes': FieldValue.increment(1),
+        'givenVotesCount': FieldValue.increment(1),
       });
-    }
+    
   }
+
   // University Operations
   Future<void> addUniversity(UniversityModel university) async {
     await firestore

@@ -1,7 +1,6 @@
-// lib/pages/auth/register_page.dart
-
 import 'dart:io';
 
+import 'package:campus_saga/core/constants/App_colors.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
@@ -77,9 +76,11 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor, // Light gray background
       appBar: AppBar(
+        backgroundColor: AppColors.primaryColor, // Green for AppBar
         centerTitle: true,
-        forceMaterialTransparency: true,
+        // forceMaterialTransparency: true,
         title: Text("Sign Up"),
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
@@ -134,6 +135,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         }
                         return null;
                       },
+                      backgroundColor: AppColors.backgroundColor,
+                      hintTextColor: AppColors.hintTextColor,
+                      fillColor: AppColors.fillColor,
                     ),
                     SizedBox(height: 20),
                     UniversitySearchField(
@@ -157,6 +161,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         }
                         return null;
                       },
+                      backgroundColor: AppColors.backgroundColor,
+                      hintTextColor: AppColors.hintTextColor,
+                      fillColor: AppColors.fillColor,
                     ),
                     SizedBox(height: 20),
                     TextEditingField(
@@ -170,12 +177,27 @@ class _RegisterPageState extends State<RegisterPage> {
                         }
                         return null;
                       },
+                      backgroundColor: AppColors.backgroundColor,
+                      hintTextColor: AppColors.hintTextColor,
+                      fillColor: AppColors.fillColor,
                     ),
                     SizedBox(height: 20),
                     if (state is AuthLoading)
                       CircularProgressIndicator()
                     else
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              AppColors.buttonColor, // Blue button color
+                          foregroundColor:
+                              AppColors.buttonTextColor, // White text color
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8), // Rounded corners
+                          ),
+                        ),
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             BlocProvider.of<AuthBloc>(context).add(
