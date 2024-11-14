@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:campus_saga/core/constants/App_colors.dart';
+import 'package:campus_saga/core/constants/app_constants.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
@@ -24,42 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController universityController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  final List<String> universities = [
-    'Daffodil International University @DIU',
-    'North South University @NSU',
-    'American International University-Bangladesh @AIUB',
-    'BRAC University @BRACU',
-    'East West University @EWU',
-    'Independent University, Bangladesh @IUB',
-    'United International University @UIU',
-    'Ahsanullah University of Science and Technology @AUST',
-    'Bangladesh University of Professionals @BUP',
-    'Bangladesh University of Engineering and Technology @BUET',
-    'University of Dhaka @DU',
-    'Jahangirnagar University @JU',
-    'Jagannath University @JnU',
-    'University of Chittagong @CU',
-    'Rajshahi University @RU',
-    'Khulna University @KU',
-    'Bangladesh Agricultural University @BAU',
-    'Shahjalal University of Science and Technology @SUST',
-    'Islamic University, Bangladesh @IU',
-    'Hajee Mohammad Danesh Science and Technology University @HSTU',
-    'Mawlana Bhashani Science and Technology University @MBSTU',
-    'Noakhali Science and Technology University @NSTU',
-    'Pabna University of Science and Technology @PUST',
-    'Patuakhali Science and Technology University @PSTU',
-    'Sher-e-Bangla Agricultural University @SAU',
-    'Sylhet Agricultural University @SAU',
-    'Chittagong Veterinary and Animal Sciences University @CVASU',
-    'Khulna University of Engineering and Technology @KUET',
-    'Rajshahi University of Engineering and Technology @RUET',
-    'Bangladesh University of Textiles @BUTEX',
-    'Dhaka University of Engineering and Technology @DUET',
-    'Jessore University of Science and Technology @JUST',
-    'Bangabandhu Sheikh Mujibur Rahman Science and Technology University @BSMRSTU',
-    'Chittagong University of Engineering and Technology @CUET',
-  ];
+  final List<String> universities = AppConstants.UNIVERSITY_LIST;
 
   File? selectedImage;
 
