@@ -1,6 +1,6 @@
 import 'package:campus_saga/domain/entities/varification_status.dart';
-import 'package:campus_saga/domain/usecases/fetch_pending_verification_usecase.dart';
-import 'package:campus_saga/domain/usecases/update_verification_status_usecase.dart';
+import 'package:campus_saga/domain/usecases/admin/fetch_pending_verification_usecase.dart';
+import 'package:campus_saga/domain/usecases/admin/update_verification_status_usecase.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

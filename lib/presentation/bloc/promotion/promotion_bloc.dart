@@ -4,8 +4,8 @@ import 'package:bloc/bloc.dart';
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/data/models/promotion_model.dart';
 import 'package:campus_saga/domain/entities/promotion.dart';
-import 'package:campus_saga/domain/usecases/create_promotion.dart';
-import 'package:campus_saga/domain/usecases/upload_post_images.dart';
+import 'package:campus_saga/domain/usecases/promotion/create_promotion.dart';
+import 'package:campus_saga/domain/usecases/issue/upload_post_images.dart';
 import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
 import 'package:equatable/equatable.dart';
 

@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:campus_saga/data/models/varification_status_model.dart';
 import 'package:campus_saga/domain/entities/varification_status.dart';
-import 'package:campus_saga/domain/usecases/create_varification_request_usecase.dart';
-import 'package:campus_saga/domain/usecases/upload_verification_images_usecase.dart';
+import 'package:campus_saga/domain/usecases/auth/create_varification_request_usecase.dart';
+import 'package:campus_saga/domain/usecases/auth/upload_verification_images_usecase.dart';
 import 'package:equatable/equatable.dart';
 
 part 'varification_event.dart';
