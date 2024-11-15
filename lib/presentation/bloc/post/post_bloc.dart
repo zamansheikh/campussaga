@@ -1,12 +1,12 @@
 // lib/presentation/bloc/post/post_bloc.dart
 import 'package:campus_saga/data/models/post_model.dart';
 import 'package:campus_saga/domain/entities/post.dart';
-import 'package:campus_saga/domain/usecases/upload_post_images.dart';
+import 'package:campus_saga/domain/usecases/issue/upload_post_images.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'post_event.dart';
 import 'post_state.dart';
-import '../../../domain/usecases/create_post.dart';
+import '../../../domain/usecases/issue/create_post.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
   final CreatePost createPost;

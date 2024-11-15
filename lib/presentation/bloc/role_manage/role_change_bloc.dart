@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:campus_saga/core/usecases/usecase.dart';
 import 'package:campus_saga/domain/entities/role_change.dart';
-import 'package:campus_saga/domain/usecases/change_role_request.dart';
-import 'package:campus_saga/domain/usecases/fetch_role_change_usecase.dart';
-import 'package:campus_saga/domain/usecases/update_user_role_usecase.dart';
+import 'package:campus_saga/domain/usecases/admin/change_role_request.dart';
+import 'package:campus_saga/domain/usecases/admin/fetch_role_change_usecase.dart';
+import 'package:campus_saga/domain/usecases/admin/update_user_role_usecase.dart';
 import 'package:equatable/equatable.dart';
 
 part 'role_change_event.dart';

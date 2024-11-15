@@ -1,9 +1,9 @@
 import 'package:campus_saga/domain/entities/post.dart';
 import 'package:dartz/dartz.dart';
 
-import '../../core/errors/failures.dart';
-import '../../core/usecases/usecase.dart';
-import '../repositories/post_repository.dart';
+import '../../../core/errors/failures.dart';
+import '../../../core/usecases/usecase.dart';
+import '../../repositories/post_repository.dart';
 
 class UpdateIssuePostUsecase  extends UseCase<void, Post> {
   final PostRepository repository;

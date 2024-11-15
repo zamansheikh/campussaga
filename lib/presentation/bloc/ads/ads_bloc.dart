@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:campus_saga/domain/entities/promotion.dart';
-import 'package:campus_saga/domain/usecases/fetch_promotion_usecase.dart';
-import 'package:campus_saga/domain/usecases/update_promotion_usecase.dart';
+import 'package:campus_saga/domain/usecases/promotion/fetch_promotion_usecase.dart';
+import 'package:campus_saga/domain/usecases/promotion/update_promotion_usecase.dart';
 import 'package:equatable/equatable.dart';
 
 part 'ads_event.dart';

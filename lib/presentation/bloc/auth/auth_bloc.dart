@@ -1,16 +1,16 @@
 // lib/presentation/bloc/auth/auth_bloc.dart
 
 import 'package:campus_saga/core/usecases/usecase.dart';
-import 'package:campus_saga/domain/usecases/create_user_profile.dart';
-import 'package:campus_saga/domain/usecases/sign_in_user.dart';
-import 'package:campus_saga/domain/usecases/sign_out_user.dart';
-import 'package:campus_saga/domain/usecases/sign_up_user.dart';
-import 'package:campus_saga/domain/usecases/upload_user_image.dart';
+import 'package:campus_saga/domain/usecases/auth/create_user_profile.dart';
+import 'package:campus_saga/domain/usecases/auth/sign_in_user.dart';
+import 'package:campus_saga/domain/usecases/auth/sign_out_user.dart';
+import 'package:campus_saga/domain/usecases/auth/sign_up_user.dart';
+import 'package:campus_saga/domain/usecases/auth/upload_user_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/user.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
-import '../../../domain/usecases/get_user_profile.dart';
+import '../../../domain/usecases/auth/get_user_profile.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GetUserProfile getUserProfile;

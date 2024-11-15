@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:campus_saga/domain/entities/university.dart';
-import 'package:campus_saga/domain/usecases/add_universtity_usecase.dart';
+import 'package:campus_saga/domain/usecases/admin/add_universtity_usecase.dart';
 import 'package:equatable/equatable.dart';
 
 part 'admin_event.dart';

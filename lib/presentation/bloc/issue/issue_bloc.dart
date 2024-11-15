@@ -1,10 +1,10 @@
 // lib/presentation/bloc/post/post_bloc.dart
 import 'package:campus_saga/domain/entities/post.dart';
-import 'package:campus_saga/domain/usecases/add_comment_usecase.dart';
-import 'package:campus_saga/domain/usecases/add_feedback_usecase.dart';
-import 'package:campus_saga/domain/usecases/delete_issue_usecase.dart';
-import 'package:campus_saga/domain/usecases/fetch_posts.dart';
-import 'package:campus_saga/domain/usecases/update_issue_post_usecase.dart';
+import 'package:campus_saga/domain/usecases/issue/add_comment_usecase.dart';
+import 'package:campus_saga/domain/usecases/issue/add_feedback_usecase.dart';
+import 'package:campus_saga/domain/usecases/issue/delete_issue_usecase.dart';
+import 'package:campus_saga/domain/usecases/issue/fetch_posts.dart';
+import 'package:campus_saga/domain/usecases/issue/update_issue_post_usecase.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

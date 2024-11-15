@@ -1,10 +1,10 @@
 // lib/domain/usecases/create_post.dart
 
 import 'package:dartz/dartz.dart';
-import '../entities/post.dart';
-import '../repositories/post_repository.dart';
-import '../../core/errors/failures.dart';
-import '../../core/usecases/usecase.dart';
+import '../../entities/post.dart';
+import '../../repositories/post_repository.dart';
+import '../../../core/errors/failures.dart';
+import '../../../core/usecases/usecase.dart';
 
 class CreatePost extends UseCase<Post, Post> {
   final PostRepository repository;
