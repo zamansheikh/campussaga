@@ -20,7 +20,6 @@ class _AdminPageState extends State<AdminPage> {
         title: const Text(
           "Campus Saga",
           style: TextStyle(
-            color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),

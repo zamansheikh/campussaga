@@ -53,7 +53,6 @@ class _RankingPageState extends State<RankingPage> {
         title: const Text(
           "Rankings",
           style: TextStyle(
-            color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -105,7 +104,6 @@ class _RankingPageState extends State<RankingPage> {
                             AppConstants.UNIVERSITY_RANKING_DESCRIPTION,
                             style: GoogleFonts.poppins(
                               fontSize: 12,
-                              color: Colors.grey[600],
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -120,14 +118,14 @@ class _RankingPageState extends State<RankingPage> {
                                   },
                                   decoration: InputDecoration(
                                     hintText: 'Search universities',
-                                    prefixIcon:
-                                        Icon(Icons.search, color: Colors.grey),
+                                    prefixIcon: Icon(
+                                      Icons.search,
+                                    ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       borderSide: BorderSide.none,
                                     ),
                                     filled: true,
-                                    fillColor: Colors.grey[200],
                                   ),
                                 ),
                               ),
@@ -154,10 +152,10 @@ class _RankingPageState extends State<RankingPage> {
                                   });
                                 },
                                 underline: Container(),
-                                icon: Icon(Icons.arrow_drop_down,
-                                    color: Colors.grey),
-                                style: GoogleFonts.poppins(
-                                    color: Colors.black, fontSize: 14),
+                                icon: Icon(
+                                  Icons.arrow_drop_down,
+                                ),
+                                style: GoogleFonts.poppins(fontSize: 14),
                               ),
                             ],
                           ),
@@ -213,7 +211,6 @@ class _UniversityCardState extends State<UniversityCard> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       margin: const EdgeInsets.symmetric(vertical: 8),
       elevation: 4,
-      shadowColor: Colors.purple.withOpacity(0.2),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -222,11 +219,9 @@ class _UniversityCardState extends State<UniversityCard> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.purpleAccent.withOpacity(0.2),
                   child: Text(
                     '#${widget.rank}',
                     style: GoogleFonts.poppins(
-                      color: Colors.purple,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -238,7 +233,6 @@ class _UniversityCardState extends State<UniversityCard> {
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.purple,
                     ),
                   ),
                 ),
@@ -264,9 +258,6 @@ class _UniversityCardState extends State<UniversityCard> {
                     });
                   },
                   isSelected: [showMetrics, !showMetrics],
-                  selectedColor: Colors.white,
-                  color: Colors.grey[600],
-                  fillColor: Colors.purpleAccent.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 const SizedBox(width: 16),
@@ -320,7 +311,6 @@ class _UniversityCardState extends State<UniversityCard> {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -328,7 +318,6 @@ class _UniversityCardState extends State<UniversityCard> {
                     widget.university.location,
                     style: GoogleFonts.poppins(
                       fontSize: 12,
-                      color: Colors.grey[600],
                     ),
                   ),
                 ],
@@ -354,9 +343,9 @@ class _UniversityCardState extends State<UniversityCard> {
           Text(
             label,
             style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87),
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -380,12 +369,14 @@ class _UniversityCardState extends State<UniversityCard> {
   Widget _buildDetailItem(IconData icon, String label) {
     return Column(
       children: [
-        Icon(icon, color: Colors.purple, size: 20),
+        Icon(icon, size: 20),
         const SizedBox(height: 4),
         Text(
           label,
           textAlign: TextAlign.center,
-          style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[700]),
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+          ),
         ),
       ],
     );

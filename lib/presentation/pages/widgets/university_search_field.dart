@@ -31,10 +31,8 @@ class UniversitySearchField extends StatelessWidget {
             prefixIcon: Icon(
               Icons.school,
               size: 20,
-              color: Colors.black,
             ),
             hintText: "Search University",
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           ),
           onSuggestionTap: (suggestion) {
             controller.text = suggestion.searchKey;
@@ -53,7 +51,7 @@ class UniversitySearchField extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 5.0),
                       child: Text(
                         errorText,
-                        style: TextStyle(color: Colors.red, fontSize: 12),
+                        style: TextStyle(fontSize: 12),
                       ),
                     )
                   : SizedBox.shrink();

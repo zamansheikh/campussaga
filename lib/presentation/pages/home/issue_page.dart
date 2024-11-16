@@ -51,6 +51,10 @@ class _IssuePageState extends State<IssuePage> {
         ),
         title: Text(
           "Campus Saga",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(

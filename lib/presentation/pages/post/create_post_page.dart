@@ -70,7 +70,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
         title: Text(
           "Create Post",
           style: TextStyle(
-            color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -96,7 +95,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
             const SizedBox(height: 16),
             Theme(
               data: Theme.of(context).copyWith(
-                canvasColor: Colors.white,
+                canvasColor: Theme.of(context).scaffoldBackgroundColor,
               ),
               child: DropdownButtonFormField<String>(
                 value: postType,
@@ -105,9 +104,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     value: type,
                     child: Container(
                       width: 200,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text(type),

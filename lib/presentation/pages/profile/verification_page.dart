@@ -73,7 +73,6 @@ class _VerificationPageState extends State<VerificationPage> {
         title: Text(
           'Verification Page',
           style: TextStyle(
-            color: Colors.black,
             fontSize: 26,
             fontWeight: FontWeight.bold,
           ),
