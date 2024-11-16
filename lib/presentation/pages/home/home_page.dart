@@ -59,26 +59,21 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
         child: Column(
           children: [
-            // Drawer Header
             DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-              ),
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.school,
-                          size: 40, color: Theme.of(context).primaryColor),
-                    ),
+                        radius: 40,
+                        child: Icon(
+                          Icons.school,
+                          size: 40,
+                        )),
                     const SizedBox(height: 10),
                     const Text(
                       'Campus Saga',
                       style: TextStyle(
-                        color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -185,8 +180,12 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout', style: TextStyle(color: Colors.red)),
+              leading: const Icon(
+                Icons.logout,
+              ),
+              title: const Text(
+                'Logout',
+              ),
               onTap: () async {
                 sl<AuthBloc>().add(SignOutEvent());
                 Navigator.pop(context);
@@ -200,27 +199,6 @@ class _HomePageState extends State<HomePage> {
         index: _currentIndex,
         children: pages,
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   backgroundColor: AppColors.bottomNavBackground,
-      //   selectedItemColor: AppColors.bottomNavActive,
-      //   type: BottomNavigationBarType.fixed,
-      //   unselectedItemColor: Colors.grey,
-      //   currentIndex: _currentIndex,
-      //   onTap: (index) {
-      //     setState(() {
-      //       _currentIndex = index;
-      //     });
-      //   },
-      //   items: const [
-      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-      //     BottomNavigationBarItem(
-      //         icon: Icon(Icons.campaign), label: 'Promotions'),
-      //     BottomNavigationBarItem(
-      //         icon: Icon(Icons.add_circle_outline), label: 'Add Post'),
-      //     BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Rankings'),
-      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-      //   ],
-      // ),
       bottomNavigationBar: AdvancedSalomonBottomBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),

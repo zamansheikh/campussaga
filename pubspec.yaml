@@ -17,12 +17,12 @@ dependencies:
   flutter_launcher_icons: "^0.13.1"
   rename: ^3.0.2
   dropdown_button2: ^2.3.9
-  firebase_core: ^3.7.0
-  firebase_auth: ^5.3.2
-  firebase_storage: ^12.3.5
-  cloud_firestore: ^5.4.5
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.3.3
+  firebase_storage: ^12.3.6
+  cloud_firestore: ^5.5.0
   image_picker: ^1.1.2
-  firebase_database: ^11.1.5
+  firebase_database: ^11.1.6
   searchfield: ^1.1.7
   get_it: ^8.0.2
   flutter_bloc: ^8.1.6
@@ -43,6 +43,7 @@ dependencies:
   panara_dialogs: ^0.1.5
   advanced_salomon_bottom_bar: ^3.3.4
   json_theme_plus: ^6.6.4
+  flex_color_scheme: ^8.0.1
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +60,7 @@ flutter:
     - assets/models/
     - assets/icon/
     - assets/lottie/
+    - assets/theme/
 
   fonts:
     - family: Urbanist

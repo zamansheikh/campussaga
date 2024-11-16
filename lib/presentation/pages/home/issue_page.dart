@@ -51,11 +51,6 @@ class _IssuePageState extends State<IssuePage> {
         ),
         title: Text(
           "Campus Saga",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
         ),
         actions: [
           IconButton(
@@ -91,8 +86,10 @@ class _IssuePageState extends State<IssuePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline,
-                          size: 64, color: Colors.red),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                      ),
                       const SizedBox(height: 16),
                       Text(issueState.message),
                       ElevatedButton(
@@ -109,15 +106,19 @@ class _IssuePageState extends State<IssuePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Icon(Icons.post_add, size: 64, color: Colors.grey),
+                      Icon(
+                        Icons.post_add,
+                        size: 64,
+                      ),
                       SizedBox(height: 16),
                       Text(
                         "No posts yet",
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
                       ),
                       Text(
                         "Be the first to create a post!",
-                        style: TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
@@ -139,7 +140,6 @@ class _IssuePageState extends State<IssuePage> {
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             Divider(
-                              color: Colors.grey[300],
                               indent: 20,
                               endIndent: 20,
                             ),
@@ -161,7 +161,6 @@ class _IssuePageState extends State<IssuePage> {
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             Divider(
-                              color: Colors.grey[300],
                               indent: 20,
                               endIndent: 20,
                             ),
@@ -183,7 +182,6 @@ class _IssuePageState extends State<IssuePage> {
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             Divider(
-                              color: Colors.grey[300],
                               indent: 20,
                               endIndent: 20,
                             ),

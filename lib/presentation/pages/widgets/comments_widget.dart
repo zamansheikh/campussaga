@@ -32,13 +32,13 @@ class _CommentsWidgetState extends State<CommentsWidget> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return WillPopScope(
-          onWillPop: () async {
+        return PopScope(
+          canPop: true,
+          onPopInvokedWithResult: (didPop, result) {
             if (!_isDismissed) {
               _isDismissed = true;
               widget.onDismiss();
             }
-            return true;
           },
           child: Padding(
             padding: EdgeInsets.only(
@@ -124,16 +124,8 @@ class _CommentsWidgetState extends State<CommentsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.blue[700],
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      ),
-      onPressed: () => _showCommentsModal(context),
+    return GestureDetector(
+      onTap: () => _showCommentsModal(context),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
