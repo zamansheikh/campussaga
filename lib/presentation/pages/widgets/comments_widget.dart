@@ -68,7 +68,8 @@ class _CommentsWidgetState extends State<CommentsWidget> {
                               title: Text(
                                 comment.text,
                                 style: const TextStyle(
-                                    fontSize: 20, color: Colors.black),
+                                  fontSize: 20,
+                                ),
                               ),
                               subtitle:
                                   Text("By: ${comment.userId.substring(0, 5)}"),
@@ -76,7 +77,8 @@ class _CommentsWidgetState extends State<CommentsWidget> {
                                 DateFormat('yyyy-MM-dd – HH:mm')
                                     .format(comment.timestamp),
                                 style: const TextStyle(
-                                    fontSize: 12, color: Colors.grey),
+                                  fontSize: 12,
+                                ),
                               ),
                             );
                           },
@@ -131,14 +133,12 @@ class _CommentsWidgetState extends State<CommentsWidget> {
         children: [
           Icon(
             Icons.comment,
-            color: Colors.blue[700],
             size: 18,
           ),
           const SizedBox(width: 4.0),
           Text(
             "Comments",
             style: TextStyle(
-              color: Colors.blue[700],
               fontSize: 14,
             ),
           ),

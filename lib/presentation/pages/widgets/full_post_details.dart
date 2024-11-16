@@ -46,8 +46,9 @@ class FullPostDetails extends StatelessWidget {
             Row(
               children: [
                 const CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, color: Colors.white),
+                  child: Icon(
+                    Icons.person,
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Column(
@@ -59,7 +60,7 @@ class FullPostDetails extends StatelessWidget {
                     ),
                     Text(
                       timeago.format(post.timestamp),
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      style: TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
@@ -69,7 +70,6 @@ class FullPostDetails extends StatelessWidget {
                     _getIssueStatus(),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  backgroundColor: Colors.grey[200],
                 ),
               ],
             ),
@@ -81,7 +81,6 @@ class FullPostDetails extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               post.description,
-              style: TextStyle(color: Colors.grey[800]),
             ),
             const SizedBox(height: 20),
             if (post.imageUrls.isNotEmpty)
@@ -103,7 +102,6 @@ class FullPostDetails extends StatelessWidget {
                             child: CircularProgressIndicator(),
                           ),
                           errorWidget: (context, url, error) => Container(
-                            color: Colors.grey[200],
                             child: const Icon(Icons.error),
                           ),
                         ),
@@ -115,9 +113,7 @@ class FullPostDetails extends StatelessWidget {
             const SizedBox(height: 20),
             LinearProgressIndicator(
               value: _calculatePercentage(post.trueVotes, post.falseVotes),
-              backgroundColor: Colors.grey[400],
               minHeight: 2,
-              valueColor: const AlwaysStoppedAnimation(Colors.green),
             ),
           ],
         ),

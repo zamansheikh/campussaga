@@ -89,7 +89,9 @@ class PromotionDetailPage extends StatelessWidget {
                 IconButton(
                   icon: Icon(
                     Icons.thumb_up,
-                    color: promotion.hasUserVotedTrue == true ? Colors.blue : Colors.grey,
+                    color: promotion.hasUserVotedTrue == true
+                        ? Colors.blue
+                        : Colors.grey,
                   ),
                   onPressed: () {
                     // Handle upvote
@@ -100,7 +102,9 @@ class PromotionDetailPage extends StatelessWidget {
                 IconButton(
                   icon: Icon(
                     Icons.thumb_down,
-                    color: promotion.hasUserVotedFalse == true ? Colors.red : Colors.grey,
+                    color: promotion.hasUserVotedFalse == true
+                        ? Colors.red
+                        : Colors.grey,
                   ),
                   onPressed: () {
                     // Handle downvote

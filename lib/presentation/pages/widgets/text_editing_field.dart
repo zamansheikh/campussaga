@@ -40,27 +40,18 @@ class _TextEditingFieldState extends State<TextEditingField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: widget.backgroundColor ??
-          Colors.transparent, // Apply background color if provided
       child: TextFormField(
         controller: widget.controller,
         decoration: InputDecoration(
           labelText: widget.labelText,
-          labelStyle: TextStyle(
-            color: widget.hintTextColor ??
-                Colors.grey, // Apply hint text color if provided
-          ),
+          labelStyle: TextStyle(),
           prefixIcon: Icon(
             widget.icon,
-            color: widget.hintTextColor ??
-                Colors.grey, // Apply icon color to match hint color
           ),
           suffixIcon: widget.isObscure
               ? IconButton(
                   icon: Icon(
                     _isObscure ? Icons.visibility : Icons.visibility_off,
-                    color: widget.hintTextColor ??
-                        Colors.grey, // Icon color for visibility toggle
                   ),
                   onPressed: () {
                     setState(() {
@@ -70,8 +61,6 @@ class _TextEditingFieldState extends State<TextEditingField> {
                 )
               : null,
           filled: true,
-          fillColor: widget.fillColor ??
-              Colors.white, // Fill inside of the field if color provided
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
             borderSide:

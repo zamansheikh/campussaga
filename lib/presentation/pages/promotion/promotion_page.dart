@@ -91,7 +91,6 @@ class _PromotionPageState extends State<PromotionPage> {
         title: const Text(
           "Promotions",
           style: TextStyle(
-            color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),

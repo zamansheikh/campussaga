@@ -65,7 +65,8 @@ class _FeedbackWidgetState extends State<FeedbackWidget> {
                           title: Text(
                             widget.feedback!.message,
                             style: const TextStyle(
-                                fontSize: 20, color: Colors.black),
+                              fontSize: 20,
+                            ),
                           ),
                           subtitle: Text(
                             "By: ${widget.feedback!.authorityId.substring(0, 5)}(Authority)",
@@ -74,7 +75,8 @@ class _FeedbackWidgetState extends State<FeedbackWidget> {
                             DateFormat('yyyy-MM-dd – HH:mm')
                                 .format(widget.feedback!.timestamp),
                             style: const TextStyle(
-                                fontSize: 12, color: Colors.grey),
+                              fontSize: 12,
+                            ),
                           ),
                         )
                       else
@@ -128,11 +130,12 @@ class _FeedbackWidgetState extends State<FeedbackWidget> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.feedback, color: Colors.blue[700]),
+              Icon(
+                Icons.feedback,
+              ),
               const SizedBox(width: 4.0),
               Text(
                 widget.buttonName,
-                style: TextStyle(color: Colors.blue[700]),
               ),
             ],
           ),

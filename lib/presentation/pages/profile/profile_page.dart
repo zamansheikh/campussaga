@@ -50,7 +50,6 @@ class _ProfilePageState extends State<ProfilePage> {
         title: Text(
           "User Profile",
           style: TextStyle(
-            color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -162,10 +161,8 @@ class _ProfilePageState extends State<ProfilePage> {
             if (user.isVerified)
               const CircleAvatar(
                 radius: 12,
-                backgroundColor: Colors.white,
                 child: Icon(
                   Icons.verified,
-                  color: Colors.blue,
                   size: 20,
                 ),
               ),
@@ -178,7 +175,9 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: 8.0),
         Text(
           user.email,
-          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          style: TextStyle(
+            fontSize: 16,
+          ),
         ),
         if (!user.isVerified)
           Column(
@@ -192,13 +191,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   );
                 },
-                icon: const Icon(Icons.shield, color: Colors.white),
+                icon: const Icon(
+                  Icons.shield,
+                ),
                 label: const Text(
                   "Please Verify Account",
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
