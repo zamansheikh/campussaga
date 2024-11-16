@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:campus_saga/core/constants/App_colors.dart';
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/core/utils/validators.dart';
@@ -128,7 +127,6 @@ class _PostCardState extends State<PostCard> {
         }
       },
       child: Card(
-        color: AppColors.background,
         elevation: 2.0,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
@@ -142,8 +140,9 @@ class _PostCardState extends State<PostCard> {
               Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: Colors.grey[300],
-                    child: const Icon(Icons.person, color: Colors.white),
+                    child: const Icon(
+                      Icons.person,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Column(
@@ -155,7 +154,7 @@ class _PostCardState extends State<PostCard> {
                       ),
                       Text(
                         timeago.format(post.timestamp),
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        style: TextStyle(fontSize: 12),
                       ),
                     ],
                   ),
@@ -163,7 +162,6 @@ class _PostCardState extends State<PostCard> {
                   Container(
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -190,9 +188,9 @@ class _PostCardState extends State<PostCard> {
               Text(
                 post.postTitle,
                 style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: AppColors.primaryText),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
               const SizedBox(height: 8.0),
 
@@ -201,7 +199,7 @@ class _PostCardState extends State<PostCard> {
                 post.description,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: AppColors.secondaryText),
+                
               ),
               const SizedBox(height: 8.0),
 

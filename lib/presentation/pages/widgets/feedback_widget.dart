@@ -34,13 +34,13 @@ class _FeedbackWidgetState extends State<FeedbackWidget> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return WillPopScope(
-          onWillPop: () async {
+        return PopScope(
+          canPop: true,
+          onPopInvokedWithResult: (didPop, result) {
             if (!_isDismissed) {
               _isDismissed = true;
               widget.onDismiss();
             }
-            return true;
           },
           child: Padding(
             padding: EdgeInsets.only(
@@ -123,16 +123,8 @@ class _FeedbackWidgetState extends State<FeedbackWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.blue[700],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-          ),
-          onPressed: () => _showFeedbackModal(context),
+        GestureDetector(
+          onTap: () => _showFeedbackModal(context),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

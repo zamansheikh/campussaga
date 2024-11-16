@@ -1,4 +1,5 @@
 // lib/main.dart
+import 'package:campus_saga/core/theme/app_theme.dart';
 import 'package:campus_saga/presentation/bloc/admin/admin_bloc.dart';
 import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
 import 'package:campus_saga/presentation/bloc/promotion/promotion_bloc.dart';
@@ -15,7 +16,6 @@ import 'package:campus_saga/presentation/pages/home/issue_page.dart';
 import 'package:campus_saga/presentation/pages/post/create_post_page.dart';
 import 'package:campus_saga/presentation/pages/ranking/ranking_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'core/injection_container.dart' as di;
 import 'package:campus_saga/presentation/pages/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -75,10 +75,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Campus Saga',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
-          primarySwatch: Colors.blue,
-        ),
+        themeMode: ThemeMode.system,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
         routes: {
           '/login': (context) => LoginPage(),
           '/splash': (context) => SplashScreen(),

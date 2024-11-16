@@ -1,6 +1,5 @@
 // lib/presentation/pages/auth/login_page.dart
 
-import 'package:campus_saga/core/constants/App_colors.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/pages/widgets/text_editing_field.dart';
 import 'package:flutter/material.dart';
@@ -23,17 +22,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor, // Light gray background
       appBar: AppBar(
-        backgroundColor: AppColors.primaryColor, // Green for AppBar
         centerTitle: true,
         title: Text(
           "Log In",
-          style:
-              TextStyle(color: AppColors.buttonTextColor), // White AppBar title
         ),
-        iconTheme:
-            IconThemeData(color: AppColors.buttonTextColor), // White icons
+        
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -63,10 +57,8 @@ class _LoginPageState extends State<LoginPage> {
                     controller: emailController,
                     labelText: "Email",
                     icon: Icons.email,
-                    backgroundColor:
-                        AppColors.inputFieldFillColor, // Soft gray background
-                    hintTextColor:
-                        AppColors.hintTextColor, // Light gray for hint text
+                    
+                    
                     validator: (value) {
                       if (!Validators.isValidEmail(value ?? '')) {
                         return 'Enter a valid email';
@@ -80,10 +72,7 @@ class _LoginPageState extends State<LoginPage> {
                     labelText: "Password",
                     icon: Icons.lock,
                     isObscure: true,
-                    fillColor:
-                        AppColors.inputFieldFillColor, // Soft gray background
-                    hintTextColor:
-                        AppColors.hintTextColor, // Light gray for hint text
+                   
                     validator: (value) {
                       if (!Validators.isValidPassword(value ?? '')) {
                         return 'Password must be at least 6 characters';
@@ -97,10 +86,8 @@ class _LoginPageState extends State<LoginPage> {
                   else
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            AppColors.buttonColor, // Blue button color
-                        foregroundColor:
-                            AppColors.buttonTextColor, // White text color
+                       
+                       
                         padding:
                             EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                         shape: RoundedRectangleBorder(
@@ -126,8 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     child: Text(
                       "Don't have an account? Sign Up",
-                      style: TextStyle(
-                          color: AppColors.primaryColor), // Green text
+                     
                     ),
                   ),
                 ],

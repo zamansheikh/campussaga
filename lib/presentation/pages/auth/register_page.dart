@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:campus_saga/core/constants/App_colors.dart';
 import 'package:campus_saga/core/constants/app_constants.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
@@ -42,9 +41,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor, // Light gray background
       appBar: AppBar(
-        backgroundColor: AppColors.primaryColor, // Green for AppBar
         centerTitle: true,
         // forceMaterialTransparency: true,
         title: Text("Sign Up"),
@@ -101,9 +98,6 @@ class _RegisterPageState extends State<RegisterPage> {
                         }
                         return null;
                       },
-                      backgroundColor: AppColors.backgroundColor,
-                      hintTextColor: AppColors.hintTextColor,
-                      fillColor: AppColors.fillColor,
                     ),
                     SizedBox(height: 20),
                     UniversitySearchField(
@@ -127,9 +121,6 @@ class _RegisterPageState extends State<RegisterPage> {
                         }
                         return null;
                       },
-                      backgroundColor: AppColors.backgroundColor,
-                      hintTextColor: AppColors.hintTextColor,
-                      fillColor: AppColors.fillColor,
                     ),
                     SizedBox(height: 20),
                     TextEditingField(
@@ -143,9 +134,6 @@ class _RegisterPageState extends State<RegisterPage> {
                         }
                         return null;
                       },
-                      backgroundColor: AppColors.backgroundColor,
-                      hintTextColor: AppColors.hintTextColor,
-                      fillColor: AppColors.fillColor,
                     ),
                     SizedBox(height: 20),
                     if (state is AuthLoading)
@@ -153,10 +141,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     else
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              AppColors.buttonColor, // Blue button color
-                          foregroundColor:
-                              AppColors.buttonTextColor, // White text color
                           padding: EdgeInsets.symmetric(
                               horizontal: 50, vertical: 15),
                           shape: RoundedRectangleBorder(
