@@ -229,10 +229,10 @@ packages:
     dependency: "direct main"
     description:
       name: equatable
-      sha256: c2b87cb7756efdf69892005af546c56c0b5037f54d2a88269b4f347a505e3ca2
+      sha256: "567c64b3cb4cf82397aac55f4f0cbd3ca20d77c6c03bedbc4ceaddc08904aef7"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.5"
+    version: "2.0.7"
   fake_async:
     dependency: transitive
     description:
@@ -652,10 +652,10 @@ packages:
     dependency: "direct main"
     description:
       name: json_theme_plus
-      sha256: "34824b7d9aa1b30a50be06a3355ff5abf87c29d7e97b872199586e61185d692a"
+      sha256: bc1ffeccc4d4a2916a3883c84f0b62295a264149e78105f20c1d57ea5079508e
       url: "https://pub.dev"
     source: hosted
-    version: "6.6.4"
+    version: "6.6.5"
   leak_tracker:
     dependency: transitive
     description:
@@ -852,10 +852,10 @@ packages:
     dependency: "direct main"
     description:
       name: percent_indicator
-      sha256: c37099ad833a883c9d71782321cb65c3a848c21b6939b6185f0ff6640d05814c
+      sha256: "0d77d5c6fa9b7f60202cedf748b568ba9ba38d3f30405d6ceae4da76f5185462"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.3"
+    version: "4.2.4"
   petitparser:
     dependency: transitive
     description:
@@ -924,10 +924,10 @@ packages:
     dependency: "direct main"
     description:
       name: searchfield
-      sha256: "837721576ca1de1ce40c9841760e40cd7452d3068ea2a22a7b25d06133a7d989"
+      sha256: "6b657ee0cf943fc53bdf3cc68459231bdaba9b25ebac52a335f35079a68f2a7c"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.7"
+    version: "1.1.8"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -1199,4 +1199,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.5.4 <4.0.0"
-  flutter: ">=3.24.4"
+  flutter: ">=3.24.5"
