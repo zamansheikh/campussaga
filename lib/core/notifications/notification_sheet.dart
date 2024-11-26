@@ -35,22 +35,30 @@ void showNotificationsSheet(BuildContext context) {
                     itemCount: 10, // Replace with actual notifications count
                     itemBuilder: (context, index) {
                       return InkWell(
-                        onTap: () {
+                        onTap: () async {
                           final notificationService =
                               NotificationService.instance;
-                          notificationService.showNotificationNow(
-                            id: 0,
-                            title: "Trying to Schedule a Notification",
-                            body: "A notification is scheduled for 5 seconds",
-                          );
-                          notificationService.showNotificationScheduled(
+                          // notificationService.showNotificationNow(
+                          //   id: 0,
+                          //   title: "Trying to Schedule a Notification",
+                          //   body: "A notification is scheduled for 5 seconds",
+                          // );
+                          // notificationService.showNotificationScheduled(
+                          //   id: 1,
+                          //   title: "Scheduled Notification",
+                          //   body:
+                          //       "This notification is scheduled for 5 seconds",
+                          //   scheduledDate: DateTime.now().add(
+                          //     Duration(seconds: 5),
+                          //   ),
+                          // );
+                          await notificationService.showNotificationWithImage(
                             id: 1,
-                            title: "Scheduled Notification",
-                            body:
-                                "This notification is scheduled for 5 seconds",
-                            scheduledDate: DateTime.now().add(
-                              Duration(seconds: 5),
-                            ),
+                            title: "Exciting News!",
+                            body: "Check out this amazing picture!",
+                            imageUrl:
+                                'https://static.vecteezy.com/system/resources/previews/008/352/318/large_2x/smartphone-notification-concept-banner-isometric-style-vector.jpg', // Ensure the image is locally available
+                            payload: 'Check out this amazing picture!',
                           );
                         },
                         child: ListTile(

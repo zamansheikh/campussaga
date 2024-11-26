@@ -1,4 +1,5 @@
 import 'package:campus_saga/core/injection_container.dart';
+import 'package:campus_saga/core/notifications/notification_sheet.dart';
 import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/domain/entities/promotion.dart';
 import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
@@ -100,6 +101,7 @@ class _PromotionPageState extends State<PromotionPage> {
             icon: const Icon(Icons.notifications),
             onPressed: () {
               // Navigate to notifications page
+              showNotificationsSheet(context);
             },
           ),
         ],

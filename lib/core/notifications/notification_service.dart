@@ -1,33 +1,10 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-
-void backgroundNotificationResponseHandler(NotificationResponse response) {
-  if (response.payload != null) {
-    // Handle the notification payload
-    print("Notification payload received: ${response.payload}");
-    handleNotificationPayload(response.payload!);
-  }
-}
-
-void notificationResponseHandler(NotificationResponse response) {
-  if (response.payload != null) {
-    print("Notification payload received: ${response.payload}");
-    handleNotificationPayload(response.payload!);
-  }
-}
-
-/// Handle actions based on notification payload
-void handleNotificationPayload(String payload) {
-  // Example: Log payload or navigate to specific screen
-  print("Notification payload received: $payload");
-
-  // Add custom logic here, such as navigation:
-  if (payload == 'navigate_to_detail_screen') {
-    // Example:
-    // Navigator.push(context, MaterialPageRoute(builder: (_) => DetailScreen()));
-  }
-}
+//donwload file -- add this to your file
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class NotificationService {
   // Singleton Pattern
@@ -154,8 +131,106 @@ class NotificationService {
     );
   }
 
+  /// Show a notification with an image URL
+  Future<void> showNotificationWithImage({
+    required int id,
+    required String title,
+    required String body,
+    required String imageUrl,
+    String? payload,
+  }) async {
+    try {
+      // Download and save the image file
+      final String filePath =
+          await downloadAndSaveFile(imageUrl, 'notification_image_$id.jpg');
+
+      // Android-specific Big Picture Style
+      final BigPictureStyleInformation bigPictureStyleInformation =
+          BigPictureStyleInformation(
+        FilePathAndroidBitmap(filePath), // Image file path for notification
+        largeIcon: FilePathAndroidBitmap(filePath), // Optional large icon
+        contentTitle: title,
+        summaryText: body,
+        htmlFormatContentTitle: true,
+        htmlFormatSummaryText: true,
+      );
+
+      // Android Notification Details with Big Picture Style
+      final AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        'image_channel',
+        'Image Notifications',
+        channelDescription: 'Channel for notifications with images',
+        styleInformation: bigPictureStyleInformation,
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+      );
+
+      // iOS Notification Details (without image support directly in notification)
+      final DarwinNotificationDetails iOSPlatformChannelSpecifics =
+          DarwinNotificationDetails();
+
+      // Combine Platform-Specific Notification Details
+      final NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics,
+      );
+
+      // Show Notification
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        body,
+        platformChannelSpecifics,
+        payload: payload, // Attach a payload
+      );
+    } catch (e) {
+      print('Error showing notification with image: $e');
+    }
+  }
+
   /// Cancel a notification by ID
   Future<void> cancelNotification(int id) async {
     await _flutterLocalNotificationsPlugin.cancel(id);
+  }
+}
+
+/// Download and save a file to the device
+Future<String> downloadAndSaveFile(String url, String fileName) async {
+  final directory = await getApplicationDocumentsDirectory();
+  final filePath = '${directory.path}/$fileName';
+  final response = await http.get(Uri.parse(url));
+  final file = File(filePath);
+  await file.writeAsBytes(response.bodyBytes);
+  return filePath;
+}
+
+/// Background notification response handler
+void backgroundNotificationResponseHandler(NotificationResponse response) {
+  if (response.payload != null) {
+    // Handle the notification payload
+    print("Notification payload received: ${response.payload}");
+    handleNotificationPayload(response.payload!);
+  }
+}
+
+/// Notification response handler
+void notificationResponseHandler(NotificationResponse response) {
+  if (response.payload != null) {
+    print("Notification payload received: ${response.payload}");
+    handleNotificationPayload(response.payload!);
+  }
+}
+
+/// Handle actions based on notification payload
+void handleNotificationPayload(String payload) {
+  // Example: Log payload or navigate to specific screen
+  print("Notification payload received: $payload");
+
+  // Add custom logic here, such as navigation:
+  if (payload == 'navigate_to_detail_screen') {
+    // Example:
+    // Navigator.push(context, MaterialPageRoute(builder: (_) => DetailScreen()));
   }
 }

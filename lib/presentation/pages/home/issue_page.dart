@@ -5,7 +5,7 @@ import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
 import 'package:campus_saga/presentation/pages/admin/admin_page.dart';
-import 'package:campus_saga/presentation/pages/home/notification_sheet.dart';
+import 'package:campus_saga/core/notifications/notification_sheet.dart';
 import 'package:campus_saga/presentation/pages/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
