@@ -1,4 +1,5 @@
 // lib/main.dart
+import 'package:campus_saga/core/notifications/notification_service.dart';
 import 'package:campus_saga/core/theme/app_theme.dart';
 import 'package:campus_saga/presentation/bloc/admin/admin_bloc.dart';
 import 'package:campus_saga/presentation/bloc/ads/ads_bloc.dart';
@@ -33,7 +34,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await di.init(); // Initialize dependency injection
-
+  await NotificationService.instance.init();
   runApp(const MyApp());
 }
 
