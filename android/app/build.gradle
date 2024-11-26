@@ -7,6 +7,10 @@ plugins {
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
 }
+//Local Notification Required
+dependencies {
+  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
+}
 
 android {
     namespace = "com.decodersfamily.campus_saga"
@@ -16,6 +20,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        // Flag to enable support for the new language APIs - Local Notification Required
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -31,6 +37,8 @@ android {
         targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        //for Local Notification
+        multiDexEnabled true
     }
 
     buildTypes {

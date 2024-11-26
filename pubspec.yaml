@@ -23,7 +23,7 @@ dependencies:
   cloud_firestore: ^5.5.0
   image_picker: ^1.1.2
   firebase_database: ^11.1.6
-  searchfield: ^1.1.8
+  searchfield: ^1.1.9
   get_it: ^8.0.2
   flutter_bloc: ^8.1.6
   dartz: ^0.10.1
@@ -44,6 +44,8 @@ dependencies:
   advanced_salomon_bottom_bar: ^3.3.4
   json_theme_plus: ^6.6.5
   flex_color_scheme: ^8.0.1
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.0
 
 dev_dependencies:
   flutter_test:
