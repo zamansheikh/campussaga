@@ -38,44 +38,12 @@ void showNotificationsSheet(BuildContext context) {
                         onTap: () async {
                           final notificationService =
                               NotificationService.instance;
-                          // notificationService.showNotificationNow(
-                          //   id: 0,
-                          //   title: "Trying to Schedule a Notification",
-                          //   body: "A notification is scheduled for 5 seconds",
-                          // );
-                          // notificationService.showNotificationScheduled(
-                          //   id: 1,
-                          //   title: "Scheduled Notification",
-                          //   body:
-                          //       "This notification is scheduled for 5 seconds",
-                          //   scheduledDate: DateTime.now().add(
-                          //     Duration(seconds: 5),
-                          //   ),
-                          // );
-                          // await notificationService
-                          //     .showNotificationWithImageURLAndSound(
-                          //   id: 1,
-                          //   title: "Exciting News!",
-                          //   body: "Check out this amazing picture!",
-                          //   imageUrl:
-                          //       'https://static.vecteezy.com/system/resources/previews/008/352/318/large_2x/smartphone-notification-concept-banner-isometric-style-vector.jpg', // Ensure the image is locally available
-                          //   payload: 'Check out this amazing picture!',
-                          //   soundAsset: 'bell_notificaion',
-                          // );
-                          await notificationService
-                              .showNotificationWithImageAssetAndSoundFromAssets(
-                            id: 1,
-                            title: "Exciting News!",
-                            body: "Check out this amazing picture!",
-                            imageAsset: "assets/temp/jenny.jpg",
-                            payload: 'Check out this amazing picture!',
-                            soundAsset: 'assets/sounds/bell_notificaion.wav',
-                          );
                           await notificationService
                               .showNotificationWithImageFromAssets(
                             id: 1,
                             title: "Exciting News!",
-                            body: "Check out this amazing picture!",
+                            body:
+                                "Check out this amazing picture! Stay tuned for more updates.",
                             imageAsset: "assets/temp/jenny.jpg",
                             payload: 'Check out this amazing picture!',
                           );
