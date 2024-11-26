@@ -52,15 +52,32 @@ void showNotificationsSheet(BuildContext context) {
                           //     Duration(seconds: 5),
                           //   ),
                           // );
+                          // await notificationService
+                          //     .showNotificationWithImageURLAndSound(
+                          //   id: 1,
+                          //   title: "Exciting News!",
+                          //   body: "Check out this amazing picture!",
+                          //   imageUrl:
+                          //       'https://static.vecteezy.com/system/resources/previews/008/352/318/large_2x/smartphone-notification-concept-banner-isometric-style-vector.jpg', // Ensure the image is locally available
+                          //   payload: 'Check out this amazing picture!',
+                          //   soundAsset: 'bell_notificaion',
+                          // );
                           await notificationService
-                              .showNotificationWithImageURLAndSound(
+                              .showNotificationWithImageAssetAndSoundFromAssets(
                             id: 1,
                             title: "Exciting News!",
                             body: "Check out this amazing picture!",
-                            imageUrl:
-                                'https://static.vecteezy.com/system/resources/previews/008/352/318/large_2x/smartphone-notification-concept-banner-isometric-style-vector.jpg', // Ensure the image is locally available
+                            imageAsset: "assets/temp/jenny.jpg",
                             payload: 'Check out this amazing picture!',
-                            soundAsset: 'bell_notificaion',
+                            soundAsset: 'assets/sounds/bell_notificaion.wav',
+                          );
+                          await notificationService
+                              .showNotificationWithImageFromAssets(
+                            id: 1,
+                            title: "Exciting News!",
+                            body: "Check out this amazing picture!",
+                            imageAsset: "assets/temp/jenny.jpg",
+                            payload: 'Check out this amazing picture!',
                           );
                         },
                         child: ListTile(

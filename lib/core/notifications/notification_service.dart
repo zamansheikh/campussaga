@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -132,7 +133,7 @@ class NotificationService {
   }
 
   /// Show a notification with an image URL
-  Future<void> showNotificationWithImage({
+  Future<void> showNotificationWithImageURL({
     required int id,
     required String title,
     required String body,
@@ -188,59 +189,6 @@ class NotificationService {
     } catch (e) {
       print('Error showing notification with image: $e');
     }
-  }
-
-  /// Show a notification with image from assets
-  Future<void> showNotificationWithImageFromAssets({
-    required int id,
-    required String title,
-    required String body,
-    required String imageAsset,
-    String? payload,
-  }) async {
-    // Android-specific Big Picture Style
-    final BigPictureStyleInformation bigPictureStyleInformation =
-        BigPictureStyleInformation(
-      DrawableResourceAndroidBitmap(
-          imageAsset), // Image file path for notification
-      largeIcon:
-          DrawableResourceAndroidBitmap(imageAsset), // Optional large icon
-      contentTitle: title,
-      summaryText: body,
-      htmlFormatContentTitle: true,
-      htmlFormatSummaryText: true,
-    );
-
-    // Android Notification Details with Big Picture Style
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'image_channel',
-      'Image Notifications',
-      channelDescription: 'Channel for notifications with images',
-      styleInformation: bigPictureStyleInformation,
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-    );
-
-    // iOS Notification Details (without image support directly in notification)
-    final DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails();
-
-    // Combine Platform-Specific Notification Details
-    final NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: iOSPlatformChannelSpecifics,
-    );
-
-    // Show Notification
-    await _flutterLocalNotificationsPlugin.show(
-      id,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: payload, // Attach a payload
-    );
   }
 
   /// Show a notification with an image URL and with Scheduled Date
@@ -307,64 +255,6 @@ class NotificationService {
     }
   }
 
-  /// Show a notification with an image Asset and with Scheduled Date
-  Future<void> showNotificationWithImageFromAssetsScheduled({
-    required int id,
-    required String title,
-    required String body,
-    required String imageAsset,
-    required DateTime scheduledDate,
-    String? payload,
-  }) async {
-    // Android-specific Big Picture Style
-    final BigPictureStyleInformation bigPictureStyleInformation =
-        BigPictureStyleInformation(
-      DrawableResourceAndroidBitmap(
-          imageAsset), // Image file path for notification
-      largeIcon:
-          DrawableResourceAndroidBitmap(imageAsset), // Optional large icon
-      contentTitle: title,
-      summaryText: body,
-      htmlFormatContentTitle: true,
-      htmlFormatSummaryText: true,
-    );
-
-    // Android Notification Details with Big Picture Style
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'image_channel',
-      'Image Notifications',
-      channelDescription: 'Channel for notifications with images',
-      styleInformation: bigPictureStyleInformation,
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-    );
-
-    // iOS Notification Details (without image support directly in notification)
-    final DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails();
-
-    // Combine Platform-Specific Notification Details
-    final NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: iOSPlatformChannelSpecifics,
-    );
-
-    // Schedule Notification
-    await _flutterLocalNotificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.from(scheduledDate, tz.local),
-      platformChannelSpecifics,
-      payload: payload, // Attach a payload
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    );
-  }
-
   /// Show a notification with an image Asset and with sound
   Future<void> showNotificationWithImageAssetAndSoundFromAssets({
     required int id,
@@ -374,50 +264,55 @@ class NotificationService {
     required String soundAsset,
     String? payload,
   }) async {
-    // Android-specific Big Picture Style
-    final BigPictureStyleInformation bigPictureStyleInformation =
-        BigPictureStyleInformation(
-      DrawableResourceAndroidBitmap(
-          imageAsset), // Image file path for notification
-      largeIcon:
-          DrawableResourceAndroidBitmap(imageAsset), // Optional large icon
-      contentTitle: title,
-      summaryText: body,
-      htmlFormatContentTitle: true,
-      htmlFormatSummaryText: true,
-    );
+    try {
+      // Load local asset image and sound files
+      final String imageFilePath = await copyAssetImageToDrawable(imageAsset);
+      final String soundFilePath = await copyAssetSoundToDrawable(soundAsset);
+      // Android-specific Big Picture Style
+      final BigPictureStyleInformation bigPictureStyleInformation =
+          BigPictureStyleInformation(
+        FilePathAndroidBitmap(imageFilePath), // Use FilePathAndroidBitmap here
+        largeIcon: FilePathAndroidBitmap(imageFilePath), // Optional large icon
+        contentTitle: title,
+        summaryText: body,
+        htmlFormatContentTitle: true,
+        htmlFormatSummaryText: true,
+      );
 
-    // Android Notification Details with Big Picture Style and Sound
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'image_channel',
-      'Image Notifications',
-      channelDescription: 'Channel for notifications with images',
-      styleInformation: bigPictureStyleInformation,
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-      sound: RawResourceAndroidNotificationSound(soundAsset),
-    );
+      // Android Notification Details with Big Picture Style and Sound
+      final AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        'image_channel',
+        'Image Notifications',
+        channelDescription: 'Channel for notifications with images',
+        styleInformation: bigPictureStyleInformation,
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+        sound: RawResourceAndroidNotificationSound(soundFilePath),
+      );
 
-    // iOS Notification Details (without image support directly in notification)
-    final DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails();
+      // iOS Notification Details
+      final DarwinNotificationDetails iOSPlatformChannelSpecifics =
+          DarwinNotificationDetails();
 
-    // Combine Platform-Specific Notification Details
-    final NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: iOSPlatformChannelSpecifics,
-    );
+      // Combine Platform-Specific Notification Details
+      final NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics,
+      );
 
-    // Show Notification
-    await _flutterLocalNotificationsPlugin.show(
-      id,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: payload, // Attach a payload
-    );
+      // Show Notification
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        body,
+        platformChannelSpecifics,
+        payload: payload, // Attach a payload
+      );
+    } catch (e) {
+      print('Error showing notification with image and sound: $e');
+    }
   }
 
   /// Show a notification with an image URL and with sound
@@ -481,10 +376,151 @@ class NotificationService {
     }
   }
 
+  /// Show a notification with image from assets
+  Future<void> showNotificationWithImageFromAssets({
+    required int id,
+    required String title,
+    required String body,
+    required String imageAsset,
+    String? payload,
+  }) async {
+    try {
+      final String imageFilePath = await copyAssetImageToDrawable(imageAsset);
+
+      // Android-specific Big Picture Style
+      final BigPictureStyleInformation bigPictureStyleInformation =
+          BigPictureStyleInformation(
+        FilePathAndroidBitmap(imageFilePath),
+        largeIcon: FilePathAndroidBitmap(imageFilePath),
+        contentTitle: title,
+        summaryText: body,
+        htmlFormatContentTitle: true,
+        htmlFormatSummaryText: true,
+      );
+
+      // Android Notification Details with Big Picture Style
+      final AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        'image_channel',
+        'Image Notifications',
+        channelDescription: 'Channel for notifications with images',
+        styleInformation: bigPictureStyleInformation,
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+      );
+
+      // iOS Notification Details
+      final DarwinNotificationDetails iOSPlatformChannelSpecifics =
+          DarwinNotificationDetails();
+
+      // Combine Platform-Specific Notification Details
+      final NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics,
+      );
+
+      // Show Notification
+      await _flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        body,
+        platformChannelSpecifics,
+        payload: payload,
+      );
+    } catch (e) {
+      print('Error showing notification with image from assets: $e');
+    }
+  }
+
+  /// Show a notification with an image Asset and with Scheduled Date
+  Future<void> showNotificationWithImageFromAssetsScheduled({
+    required int id,
+    required String title,
+    required String body,
+    required String imageAsset,
+    required DateTime scheduledDate,
+    String? payload,
+  }) async {
+    try {
+      final String imageFilePath = await copyAssetImageToDrawable(imageAsset);
+
+      // Android-specific Big Picture Style
+      final BigPictureStyleInformation bigPictureStyleInformation =
+          BigPictureStyleInformation(
+        FilePathAndroidBitmap(imageFilePath),
+        largeIcon: FilePathAndroidBitmap(imageFilePath),
+        contentTitle: title,
+        summaryText: body,
+        htmlFormatContentTitle: true,
+        htmlFormatSummaryText: true,
+      );
+
+      // Android Notification Details with Big Picture Style
+      final AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        'image_channel',
+        'Image Notifications',
+        channelDescription: 'Channel for notifications with images',
+        styleInformation: bigPictureStyleInformation,
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+      );
+
+      // iOS Notification Details
+      final DarwinNotificationDetails iOSPlatformChannelSpecifics =
+          DarwinNotificationDetails();
+
+      // Combine Platform-Specific Notification Details
+      final NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics,
+      );
+
+      // Schedule Notification
+      await _flutterLocalNotificationsPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        tz.TZDateTime.from(scheduledDate, tz.local),
+        platformChannelSpecifics,
+        payload: payload,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+    } catch (e) {
+      print('Error scheduling notification with image from assets: $e');
+    }
+  }
+
   /// Cancel a notification by ID
   Future<void> cancelNotification(int id) async {
     await _flutterLocalNotificationsPlugin.cancel(id);
   }
+}
+
+/// Copy an asset Image to the documents directory
+Future<String> copyAssetImageToDrawable(String assetFile) async {
+  // Copy the sound asset to the documents directory
+  final byteData = await rootBundle.load(assetFile);
+  final directory = await getApplicationDocumentsDirectory();
+  final filePath = '${directory.path}/${assetFile.split('/').last}';
+  final file = File(filePath);
+  await file.writeAsBytes(byteData.buffer.asUint8List());
+  return filePath;
+}
+
+/// Copy an asset Sound to the documents directory
+Future<String> copyAssetSoundToDrawable(String assetFile) async {
+  // Copy the sound asset to the documents directory
+  final byteData = await rootBundle.load(assetFile);
+  final directory = await getApplicationDocumentsDirectory();
+  final filePath = '${directory.path}/${assetFile.split('/').last}';
+  final file = File(filePath);
+  await file.writeAsBytes(byteData.buffer.asUint8List());
+  return filePath.split('/').last.split('.').first;
 }
 
 /// Download and save a file to the device
@@ -495,6 +531,12 @@ Future<String> downloadAndSaveFile(String url, String fileName) async {
   final file = File(filePath);
   await file.writeAsBytes(response.bodyBytes);
   return filePath;
+}
+
+/// Local File Path  Return
+Future<String> localFilePath(String fileName) async {
+  final directory = await getApplicationDocumentsDirectory();
+  return '${directory.path}/$fileName';
 }
 
 /// Background notification response handler
