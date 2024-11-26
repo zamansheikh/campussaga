@@ -1,4 +1,5 @@
 import 'package:campus_saga/core/constants/dummypost.dart';
+import 'package:campus_saga/core/notifications/notification_sheet.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/post/post_bloc.dart';
@@ -79,6 +80,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
             icon: const Icon(Icons.notifications),
             onPressed: () {
               // Navigate to notifications page
+              showNotificationsSheet(context);
             },
           ),
         ],

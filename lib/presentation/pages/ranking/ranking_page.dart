@@ -1,3 +1,4 @@
+import 'package:campus_saga/core/notifications/notification_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:campus_saga/core/constants/app_constants.dart';
@@ -62,6 +63,7 @@ class _RankingPageState extends State<RankingPage> {
             icon: const Icon(Icons.notifications),
             onPressed: () {
               // Navigate to notifications page
+              showNotificationsSheet(context);
             },
           ),
         ],
