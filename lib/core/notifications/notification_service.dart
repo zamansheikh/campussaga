@@ -2,6 +2,33 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+void backgroundNotificationResponseHandler(NotificationResponse response) {
+  if (response.payload != null) {
+    // Handle the notification payload
+    print("Notification payload received: ${response.payload}");
+    handleNotificationPayload(response.payload!);
+  }
+}
+
+void notificationResponseHandler(NotificationResponse response) {
+  if (response.payload != null) {
+    print("Notification payload received: ${response.payload}");
+    handleNotificationPayload(response.payload!);
+  }
+}
+
+/// Handle actions based on notification payload
+void handleNotificationPayload(String payload) {
+  // Example: Log payload or navigate to specific screen
+  print("Notification payload received: $payload");
+
+  // Add custom logic here, such as navigation:
+  if (payload == 'navigate_to_detail_screen') {
+    // Example:
+    // Navigator.push(context, MaterialPageRoute(builder: (_) => DetailScreen()));
+  }
+}
+
 class NotificationService {
   // Singleton Pattern
   NotificationService._privateConstructor();
@@ -31,17 +58,9 @@ class NotificationService {
     // Initialize the plugin and setup callback handlers
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        if (response.payload != null) {
-          _handleNotificationPayload(response.payload!);
-        }
-      },
+      onDidReceiveNotificationResponse: notificationResponseHandler,
       onDidReceiveBackgroundNotificationResponse:
-          (NotificationResponse response) {
-        if (response.payload != null) {
-          _handleNotificationPayload(response.payload!);
-        }
-      },
+          backgroundNotificationResponseHandler,
     );
 
     // Initialize timezone data for scheduled notifications
@@ -52,18 +71,6 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
-  }
-
-  /// Handle actions based on notification payload
-  void _handleNotificationPayload(String payload) {
-    // Example: Log payload or navigate to specific screen
-    print("Notification payload received: $payload");
-
-    // Add custom logic here, such as navigation:
-    if (payload == 'navigate_to_detail_screen') {
-      // Example:
-      // Navigator.push(context, MaterialPageRoute(builder: (_) => DetailScreen()));
-    }
   }
 
   /// Show an immediate notification
