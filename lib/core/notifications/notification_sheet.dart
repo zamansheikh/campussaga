@@ -1,4 +1,5 @@
 import 'package:campus_saga/core/notifications/notification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 void showNotificationsSheet(BuildContext context) {
@@ -36,6 +37,7 @@ void showNotificationsSheet(BuildContext context) {
                     itemBuilder: (context, index) {
                       return InkWell(
                         onTap: () async {
+                          await FirebaseMessaging.instance.subscribeToTopic('news');
                           final notificationService =
                               NotificationService.instance;
                           await notificationService
