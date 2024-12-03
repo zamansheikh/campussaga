@@ -44,5 +44,5 @@ app.*.map.json
 /android/app/release
 
 #Random 
-campus-saga-final-bd8817ec94f5.json
+/serverKey.json
 lib/core/notifications/get_server_key.dart
