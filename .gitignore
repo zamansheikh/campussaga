@@ -46,3 +46,4 @@ app.*.map.json
 #Random 
 /serverKey.json
 lib/core/notifications/get_server_key.dart
+serverKey.jsonx
