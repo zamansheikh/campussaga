@@ -352,10 +352,9 @@ class _UniversityCardState extends State<UniversityCard> {
           const SizedBox(width: 12),
           Expanded(
             child: LinearProgressIndicator(
-              value: score / 100,
-              color: color,
-              backgroundColor: color.withOpacity(0.2),
-            ),
+                value: score / 100,
+                color: color,
+                backgroundColor: color.withValues(alpha: .2)),
           ),
           const SizedBox(width: 12),
           Text(
