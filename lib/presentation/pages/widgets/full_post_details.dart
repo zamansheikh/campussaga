@@ -74,13 +74,20 @@ class FullPostDetails extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            Text(
-              post.postTitle,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Text(
+                post.postTitle,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
             const SizedBox(height: 10),
-            Text(
-              post.description,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Text(
+                post.description,
+              ),
             ),
             const SizedBox(height: 20),
             if (post.imageUrls.isNotEmpty)

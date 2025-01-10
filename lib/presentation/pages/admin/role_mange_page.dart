@@ -30,7 +30,7 @@ class _RoleMangePageState extends State<RoleMangePage> {
         title: Text(
           "Role Change Requests",
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
