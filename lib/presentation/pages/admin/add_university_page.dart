@@ -87,7 +87,7 @@ class _AddUniversityPageState extends State<AddUniversityPage> {
         forceMaterialTransparency: true,
         title: const Text('Add University',
             style: TextStyle(
-              color: Colors.black,
+              color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             )),

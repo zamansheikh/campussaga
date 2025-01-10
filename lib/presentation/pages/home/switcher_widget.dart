@@ -10,8 +10,12 @@ class _SwitcherWidgetState extends State<SwitcherWidget> {
   final List<String> universities = [
     'North South University @nsu',
     'Daffodil International University @diu',
-    'university3.edu',
-    // Add more universities as needed
+    'American International University-Bangladesh @aiub',
+    'East West University @ewu',
+    'Independent University, Bangladesh @iub',
+    'United International University @uiu',
+    'BRAC University @bracu',
+    'Bangladesh University of Professionals @bup',
   ];
 
   String? selectedUniversity;

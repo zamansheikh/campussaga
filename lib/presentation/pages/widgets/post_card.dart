@@ -183,25 +183,30 @@ class _PostCardState extends State<PostCard> {
                 minHeight: 1,
                 valueColor: const AlwaysStoppedAnimation(Colors.green),
               ),
-              const SizedBox(height: 4.0),
+              const SizedBox(height: 15.0),
               // Post Title
-              Text(
-                post.postTitle,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Text(
+                  post.postTitle,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ),
-              const SizedBox(height: 8.0),
+              const SizedBox(height: 15.0),
 
               // Post Description
-              Text(
-                post.description,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Text(
+                  post.description,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              const SizedBox(height: 8.0),
+              const SizedBox(height: 20.0),
 
               // Post Images
               if (post.imageUrls.isNotEmpty)
@@ -239,17 +244,20 @@ class _PostCardState extends State<PostCard> {
                     },
                   ),
                 ),
-              const SizedBox(height: 12.0),
+              const SizedBox(height: 15.0),
               LinearProgressIndicator(
                 value: _calculatePercentage(post.agree, post.disagree),
                 minHeight: 1,
                 backgroundColor: Colors.grey[200],
                 valueColor: const AlwaysStoppedAnimation(Colors.green),
               ),
-              const SizedBox(height: 4.0),
+              const SizedBox(height: 20.0),
               // Comments and Feedback
               Wrap(
                 children: [
+                  SizedBox(
+                    width: 10,
+                  ),
                   CommentsWidget(
                     onDismiss: () {
                       if (Validators.isBelogsTo(widget.user, post) &&
@@ -303,7 +311,7 @@ class _PostCardState extends State<PostCard> {
                       sl<IssueBloc>().add(AddACommentEvent(post));
                     },
                   ),
-                  const SizedBox(width: 12.0),
+                  const SizedBox(width: 20.0),
                   if (Validators.isBelogsTo(widget.user, post) &&
                       Validators.isValidAuthority(post, widget.user))
                     Visibility(
@@ -404,6 +412,7 @@ class _PostCardState extends State<PostCard> {
                     ),
                 ],
               ),
+              const SizedBox(height: 8.0),
             ],
           ),
         ),
