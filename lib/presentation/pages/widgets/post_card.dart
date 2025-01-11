@@ -90,7 +90,7 @@ class _PostCardState extends State<PostCard> {
               setState(() {
                 post = post.toggleTrueVote(widget.user.id);
               });
-              sl<IssueBloc>().add(UpdatePostEvent(post));
+              sl<IssueBloc>().add(AddAFeedbackEvent(post));
             },
             panaraDialogType: PanaraDialogType.warning,
             barrierDismissible: false, // optional parameter (default is true)
@@ -278,7 +278,7 @@ class _PostCardState extends State<PostCard> {
                                   post =
                                       post.toggleDisagreeVote(widget.user.id);
                                 });
-                                sl<IssueBloc>().add(UpdatePostEvent(post));
+                                sl<IssueBloc>().add(AddAgreeVoteEvent(post));
                                 Navigator.pop(context);
                               },
                               onTapConfirm: () {
@@ -286,7 +286,7 @@ class _PostCardState extends State<PostCard> {
                                 setState(() {
                                   post = post.toggleAgreeVote(widget.user.id);
                                 });
-                                sl<IssueBloc>().add(UpdatePostEvent(post));
+                                sl<IssueBloc>().add(AddAgreeVoteEvent(post));
                               },
                               panaraDialogType: PanaraDialogType.warning,
                               barrierDismissible: false,
@@ -376,7 +376,7 @@ class _PostCardState extends State<PostCard> {
                                     post =
                                         post.toggleDisagreeVote(widget.user.id);
                                   });
-                                  sl<IssueBloc>().add(UpdatePostEvent(post));
+                                  sl<IssueBloc>().add(AddAgreeVoteEvent(post));
                                 },
                                 onTapConfirm: () {
                                   Navigator.pop(context);

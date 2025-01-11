@@ -30,7 +30,8 @@ class PostRepositoryImpl implements PostRepository {
       String universityId) async {
     print("fetching posts for universityId: $universityId");
     try {
-      final posts = await firestoreRemoteDataSource.getTimelinePosts(universityId);
+      final posts =
+          await firestoreRemoteDataSource.getTimelinePosts(universityId);
       final postFromEntity = posts.map((post) => post.toEntity()).toList();
       return Right(postFromEntity);
     } catch (e) {
@@ -62,7 +63,8 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<Either<Failure, List<Post>>> fetchPosts(String universityId) async {
     try {
-      final posts = await firestoreRemoteDataSource.getTimelinePosts(universityId);
+      final posts =
+          await firestoreRemoteDataSource.getTimelinePosts(universityId);
       return Right(posts.map((post) => post.toEntity()).toList());
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -73,7 +75,8 @@ class PostRepositoryImpl implements PostRepository {
   Future<Either<Failure, List<String>>> uploadPostImages(
       String userId, List<File> image) async {
     try {
-      final urls = await firebaseStorageRemoteDataSource.uploadPostImages(userId, image);
+      final urls =
+          await firebaseStorageRemoteDataSource.uploadPostImages(userId, image);
       return Right(urls);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -103,10 +106,19 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<Either<Failure, void>> addVote(
-      String postId, String userId, bool isTrueVote) async {
+  Future<Either<Failure, void>> addVote(Post post) async {
     try {
-      await firestoreRemoteDataSource.addVote(postId, userId, isTrueVote);
+      await firestoreRemoteDataSource.addVote(PostModel.fromEntity(post));
+      return Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> addAgreeVote(Post post) async {
+    try {
+      await firestoreRemoteDataSource.addVote(PostModel.fromEntity(post));
       return Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -128,7 +140,8 @@ class PostRepositoryImpl implements PostRepository {
   Future<Either<Failure, Promotion>> createPromotion(
       Promotion promotion) async {
     try {
-      await firestoreRemoteDataSource.createPromotion(PromotionModel.fromEntity(promotion));
+      await firestoreRemoteDataSource
+          .createPromotion(PromotionModel.fromEntity(promotion));
       return Right(promotion);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -139,8 +152,8 @@ class PostRepositoryImpl implements PostRepository {
   Future<Either<Failure, List<Promotion>>> getPromotionByUniversity(
       String universityId) async {
     try {
-      final promotions =
-          await firestoreRemoteDataSource.getPromotionByUniversity(universityId);
+      final promotions = await firestoreRemoteDataSource
+          .getPromotionByUniversity(universityId);
       final promotionFromEntity =
           promotions.map((promotion) => promotion.toEntity()).toList();
       return Right(promotionFromEntity);
@@ -160,10 +173,10 @@ class PostRepositoryImpl implements PostRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
-  
+
   @override
-  Future<Either<Failure, void>> updateIssuePost(Post post)async {
-     try {
+  Future<Either<Failure, void>> updateIssuePost(Post post) async {
+    try {
       final postModel = PostModel.fromEntity(post);
       await firestoreRemoteDataSource.updateIssuePost(postModel);
       return Right(null);
@@ -173,7 +186,7 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteIssue(Post post) async{
+  Future<Either<Failure, void>> deleteIssue(Post post) async {
     try {
       final postModel = PostModel.fromEntity(post);
       await firestoreRemoteDataSource.deleteIssue(postModel);
@@ -182,16 +195,15 @@ class PostRepositoryImpl implements PostRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
-  
+
   @override
-  Future<Either<Failure, void>> updatePromotion(Promotion promotion)async {
+  Future<Either<Failure, void>> updatePromotion(Promotion promotion) async {
     try {
-      await firestoreRemoteDataSource.updatePromotion(PromotionModel.fromEntity(promotion));
+      await firestoreRemoteDataSource
+          .updatePromotion(PromotionModel.fromEntity(promotion));
       return Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
-  
-
 }

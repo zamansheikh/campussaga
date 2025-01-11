@@ -47,7 +47,7 @@ class FirestoreRemoteDataSource {
     });
   }
 
-  //! Post Operations
+  //! Post Operations || Create Post and Update UserProfile as The User has created a post
   Future<void> createPost(PostModel post) async {
     await firestore.collection('posts').doc(post.id).set(post.toJson());
     await firestore.collection('users').doc(post.userId).update({
@@ -171,15 +171,14 @@ class FirestoreRemoteDataSource {
         'falseVotes': post.falseVotes,
       },
     );
-   
-      await firestore.collection('users').doc(post.userId).update({
-        'receivedVotesCount': FieldValue.increment(1),
-      });
-  
-      await firestore.collection('users').doc(user.id).update({
-        'givenVotesCount': FieldValue.increment(1),
-      });
-    
+
+    await firestore.collection('users').doc(post.userId).update({
+      'receivedVotesCount': FieldValue.increment(1),
+    });
+
+    await firestore.collection('users').doc(user.id).update({
+      'givenVotesCount': FieldValue.increment(1),
+    });
   }
 
   // University Operations
@@ -197,23 +196,6 @@ class FirestoreRemoteDataSource {
         .toList();
   }
 
-  // Vote Operations
-  Future<void> addVote(String postId, String userId, bool isTrueVote) async {
-    await firestore.collection('posts').doc(postId).update({
-      'votes': FieldValue.arrayUnion([userId]),
-    });
-
-    if (isTrueVote) {
-      await firestore.collection('posts').doc(postId).update({
-        'trueVotes': FieldValue.increment(1),
-      });
-    } else {
-      await firestore.collection('posts').doc(postId).update({
-        'falseVotes': FieldValue.increment(1),
-      });
-    }
-  }
-
   Future<void> updatePostStatus(String postId, bool isResolved) async {
     await firestore.collection('posts').doc(postId).update({
       'isResolved': isResolved,
@@ -222,6 +204,28 @@ class FirestoreRemoteDataSource {
 
   Future<void> updateIssuePost(PostModel post) async {
     await firestore.collection('posts').doc(post.id).update(post.toJson());
+  }
+
+  Future<void> addAgreeVote(PostModel post) async {
+    await firestore.collection('posts').doc(post.id).set(post.toJson());
+    await firestore.collection('users').doc(post.userId).update({
+      'givenVotesCount': FieldValue.increment(1),
+    });
+    //! add New operation to Update Received Votes Count to the post owner
+    // await firestore.collection('universities').doc(post.universityId).update({
+    //   'totalPosts': FieldValue.increment(1),
+    // });
+  }
+
+  Future<void> addVote(PostModel post) async {
+    await firestore.collection('posts').doc(post.id).set(post.toJson());
+    await firestore.collection('users').doc(post.userId).update({
+      'givenVotesCount': FieldValue.increment(1),
+    });
+    //! add New operation to Update Received Votes Count to the post owner
+    // await firestore.collection('universities').doc(post.universityId).update({
+    //   'totalPosts': FieldValue.increment(1),
+    // });
   }
 
   //Create a promotion post
