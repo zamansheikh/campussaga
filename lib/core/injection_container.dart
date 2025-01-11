@@ -7,6 +7,7 @@ import 'package:campus_saga/data/repositories/post_repository_impl.dart';
 import 'package:campus_saga/data/repositories/user_repository_impl.dart';
 import 'package:campus_saga/domain/repositories/post_repository.dart';
 import 'package:campus_saga/domain/repositories/user_repository.dart';
+import 'package:campus_saga/domain/usecases/issue/add_a_agree_vote_use_case.dart';
 import 'package:campus_saga/domain/usecases/issue/add_comment_usecase.dart';
 import 'package:campus_saga/domain/usecases/issue/add_feedback_usecase.dart';
 import 'package:campus_saga/domain/usecases/admin/add_universtity_usecase.dart';
@@ -105,6 +106,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AddFeedbackUsecase(sl()));
   sl.registerLazySingleton(() => AddUniverstityUsecase(sl()));
   sl.registerLazySingleton(() => AddVoteUsecase(sl()));
+  sl.registerLazySingleton(() => AddAAgreeVoteUseCase(sl()));
   sl.registerLazySingleton(() => UploadVerificationImagesUsecase(sl()));
   sl.registerLazySingleton(() => CreateVarificationRequestUsecase(sl()));
   sl.registerLazySingleton(() => FetchPendingVerificationUsecase(sl()));
