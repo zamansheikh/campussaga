@@ -24,9 +24,25 @@ class AddACommentEvent extends IssueEvent {
   List<Object> get props => [post];
 }
 
+class AddAVoteEvent extends IssueEvent {
+  final Post post;
+  AddAVoteEvent(this.post);
+
+  @override
+  List<Object> get props => [post];
+}
+
 class AddAFeedbackEvent extends IssueEvent {
   final Post post;
   AddAFeedbackEvent(this.post);
+
+  @override
+  List<Object> get props => [post];
+}
+
+class AddAgreeVoteEvent extends IssueEvent {
+  final Post post;
+  AddAgreeVoteEvent(this.post);
 
   @override
   List<Object> get props => [post];
