@@ -1,5 +1,6 @@
 import 'package:campus_saga/core/injection_container.dart';
 import 'package:campus_saga/core/notifications/notification_sheet.dart';
+import 'package:campus_saga/core/theme/app_theme.dart';
 import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/domain/entities/role_change.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
@@ -12,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:campus_saga/domain/entities/user.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax/iconsax.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -40,28 +43,38 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
-        shadowColor: Colors.black,
         leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
+          icon: const Icon(Iconsax.menu_1),
+          onPressed: () => Scaffold.of(context).openDrawer(),
         ),
         centerTitle: true,
-        title: Text(
-          "User Profile",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: AppColors.primaryGradient,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Iconsax.user, size: 16, color: Colors.white),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Profile',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              // Navigate to notifications page
-              showNotificationsSheet(context);
-            },
+            icon: const Icon(Iconsax.notification),
+            onPressed: () => showNotificationsSheet(context),
           ),
         ],
       ),
@@ -80,66 +93,71 @@ class _ProfilePageState extends State<ProfilePage> {
                 return Future.delayed(const Duration(seconds: 1));
               },
               child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Profile Header
-                      _buildProfileHeader(user),
-                      const SizedBox(height: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Profile Header
+                    _buildProfileHeader(user),
 
-                      // Engagement Metrics
-                      _buildEngagementMetrics(user),
-
-                      // Achievements and Badges
-                      _buildAchievements(user),
-
-                      // Student Details (if applicable)
-                      if (user.userType == UserType.student)
-                        _buildStudentDetails(user),
-
-                      //edit profile button
-                      const SizedBox(height: 10.0),
-                      CustomButton(
-                        color: Colors.indigoAccent,
-                        text: "Edit Profile",
-                        onPressed: () {
-                          Navigator.push(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 16),
+                          // Engagement Metrics
+                          _buildEngagementMetrics(user),
+                          const SizedBox(height: 16),
+                          // Achievements
+                          _buildAchievements(user),
+                          const SizedBox(height: 16),
+                          // Student Details
+                          if (user.userType == UserType.student) ...[
+                            _buildStudentDetails(user),
+                            const SizedBox(height: 16),
+                          ],
+                          // Action buttons
+                          _ActionButton(
+                            icon: Iconsax.edit_2,
+                            text: 'Edit Profile',
+                            color: AppColors.primary,
+                            onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      UpdateProfilePage(user: user)));
-                        },
+                                builder: (_) => UpdateProfilePage(user: user),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          _ActionButton(
+                            icon: Iconsax.document_text,
+                            text: 'Terms and Conditions',
+                            color: const Color(0xFF4CAF50),
+                            onPressed: () => launchURL(
+                              "https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md",
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          _ActionButton(
+                            icon: Iconsax.info_circle,
+                            text: 'About Us',
+                            color: const Color(0xFF00BCD4),
+                            onPressed: () =>
+                                launchURL("https://zamansheikh.com"),
+                          ),
+                          const SizedBox(height: 10),
+                          _ActionButton(
+                            icon: Iconsax.logout,
+                            text: 'Logout',
+                            color: Colors.red,
+                            onPressed: () => BlocProvider.of<AuthBloc>(
+                              context,
+                            ).add(SignOutEvent()),
+                          ),
+                          const SizedBox(height: 32),
+                        ],
                       ),
-                      const SizedBox(height: 10.0),
-                      CustomButton(
-                        color: Colors.green,
-                        text: "Terms and Conditions",
-                        onPressed: () async {
-                          launchURL(
-                              "https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md");
-                        },
-                      ),
-                      const SizedBox(height: 10.0),
-                      CustomButton(
-                        color: Colors.blue,
-                        text: "About Us",
-                        onPressed: () async {
-                          launchURL("https://zamansheikh.com");
-                        },
-                      ),
-                      const SizedBox(height: 10.0),
-                      CustomButton(
-                        color: Colors.red,
-                        text: "Logout",
-                        onPressed: () {
-                          BlocProvider.of<AuthBloc>(context)
-                              .add(SignOutEvent());
-                        },
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -151,248 +169,381 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildProfileHeader(User user) {
-    return Column(
-      children: [
-        Stack(
-          alignment: Alignment.bottomRight,
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage(user.profilePictureUrl),
-            ),
-            if (user.isVerified)
-              const CircleAvatar(
-                radius: 12,
-                child: Icon(
-                  Icons.verified,
-                  size: 20,
-                ),
-              ),
-          ],
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: AppColors.darkGradient,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        Text(
-          user.name,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8.0),
-        Text(
-          user.email,
-          style: TextStyle(
-            fontSize: 16,
-          ),
-        ),
-        if (!user.isVerified)
-          Column(
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => VerificationPage(user: user),
+      ),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+      child: Column(
+        children: [
+          InkWell(
+            onLongPress: () {
+              copyToClipboard(user.id, "User ID copied to clipboard");
+              sl<RoleChangeBloc>().add(ChangeRoleEvent(_changeRoleEntity()));
+            },
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withAlpha(160),
+                      width: 3,
                     ),
-                  );
-                },
-                icon: const Icon(
-                  Icons.shield,
-                ),
-                label: const Text(
-                  "Please Verify Account",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                  ),
+                  child: CircleAvatar(
+                    radius: 52,
+                    backgroundImage: NetworkImage(user.profilePictureUrl),
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent, // Background color
-                  foregroundColor: Colors.white, // Text and icon color
-                  minimumSize: const Size(100, 35), // Adjusted button size
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30), // Rounded corners
-                    side:
-                        BorderSide(color: Colors.blueAccent.shade100), // Border
+                if (user.isVerified)
+                  Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Iconsax.verify5,
+                      size: 22,
+                      color: AppColors.primary,
+                    ),
                   ),
-                  elevation: 2, // Subtle shadow effect
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        const SizedBox(height: 2.0),
-        InkWell(
-          onLongPress: () {
-            copyToClipboard(user.id, "User ID copied to clipboard");
-            sl<RoleChangeBloc>().add(ChangeRoleEvent(_changeRoleEntity()));
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          const SizedBox(height: 14),
+          Text(
+            user.name,
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            user.email,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              color: Colors.white.withAlpha(190),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
             decoration: BoxDecoration(
-              color: _getUserTypeColor(user.userType),
+              color: _getUserTypeColor(user.userType).withAlpha(200),
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withAlpha(80), width: 1),
             ),
             child: Text(
               _getUserTypeText(user.userType),
-              style: const TextStyle(color: Colors.white),
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-        ),
-      ],
+          if (!user.isVerified) ...[
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => VerificationPage(user: user)),
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.orange.shade600,
+                minimumSize: const Size(0, 36),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              icon: const Icon(Iconsax.shield_tick, size: 16),
+              label: Text(
+                'Verify Account',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
   Widget _buildEngagementMetrics(User user) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Engagement",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    _buildMetricItem(Icons.post_add, user.postCount, "Posts"),
-                    const SizedBox(height: 16.0),
-                    _buildMetricItem(Icons.check_circle,
-                        user.resolvedIssuesCount, "Resolved"),
-                  ],
-                ),
-                Column(
-                  children: [
-                    _buildMetricItem(
-                        Icons.how_to_vote, user.givenVotesCount, "Given Votes"),
-                    const SizedBox(height: 16.0),
-                    _buildMetricItem(Icons.thumb_up, user.receivedVotesCount,
-                        "Received Votes"),
-                  ],
-                ),
-                Column(
-                  children: [
-                    _buildMetricItem(
-                        Icons.comment, user.commentCount, "Comments"),
-                    const SizedBox(height: 16.0),
-                    _buildMetricItem(Icons.star, user.streakDays, "Day Streak"),
-                  ],
-                ),
-              ],
-            ),
-          ],
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1D2024) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withAlpha(40),
         ),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Engagement',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMetricItem(
+                  Iconsax.document_text,
+                  user.postCount,
+                  'Posts',
+                  color: AppColors.primary,
+                ),
+              ),
+              Expanded(
+                child: _buildMetricItem(
+                  Iconsax.tick_circle,
+                  user.resolvedIssuesCount,
+                  'Resolved',
+                  color: const Color(0xFF4CAF50),
+                ),
+              ),
+              Expanded(
+                child: _buildMetricItem(
+                  Iconsax.message_text,
+                  user.commentCount,
+                  'Comments',
+                  color: const Color(0xFF00BCD4),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMetricItem(
+                  Iconsax.like_1,
+                  user.givenVotesCount,
+                  'Given',
+                  color: const Color(0xFF7C4DFF),
+                ),
+              ),
+              Expanded(
+                child: _buildMetricItem(
+                  Iconsax.heart,
+                  user.receivedVotesCount,
+                  'Received',
+                  color: Colors.pink,
+                ),
+              ),
+              Expanded(
+                child: _buildMetricItem(
+                  Iconsax.star_1,
+                  user.streakDays,
+                  'Streak',
+                  color: Colors.orange,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildAchievements(User user) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Achievements",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                _buildBadge(user.currentBadge),
-              ],
-            ),
-            // const SizedBox(height: 16.0),
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
-              children: user.achievements.map((achievement) {
-                return Chip(
-                  avatar: const Icon(Icons.emoji_events, size: 18),
-                  label: Text(_getAchievementText(achievement)),
-                  backgroundColor: Colors.amber[100],
-                );
-              }).toList(),
-            ),
-          ],
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1D2024) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withAlpha(40),
         ),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Achievements',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              _buildBadge(user.currentBadge),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8.0,
+            runSpacing: 8.0,
+            children: user.achievements.map((achievement) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withAlpha(40),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.amber.shade300, width: 1),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Iconsax.award,
+                      size: 13,
+                      color: Color(0xFFFFB300),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _getAchievementText(achievement),
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.amber.shade800,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildStudentDetails(User user) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Student Details",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16.0),
-            if (user.studentId != null)
-              _buildDetailRow("Student ID", user.studentId!),
-            if (user.department != null)
-              _buildDetailRow(
-                  "Department", _getDepartmentText(user.department!)),
-            if (user.batch != null)
-              _buildDetailRow("Batch", user.batch.toString()),
-            if (user.cgpa != null)
-              _buildDetailRow("CGPA", user.cgpa.toString()),
-            if (user.currentSemester != null)
-              _buildDetailRow("Semester", user.currentSemester!),
-            if (user.phoneNumber != null)
-              _buildDetailRow("Phone", user.phoneNumber!),
-            if (user.clubNames?.isNotEmpty ?? false)
-              _buildDetailRow("Clubs", user.clubNames!.join(", ")),
-          ],
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1D2024) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withAlpha(40),
         ),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Student Details',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (user.studentId != null)
+            _buildDetailRow(Iconsax.card, 'Student ID', user.studentId!),
+          if (user.department != null)
+            _buildDetailRow(
+              Iconsax.building,
+              'Department',
+              _getDepartmentText(user.department!),
+            ),
+          if (user.batch != null)
+            _buildDetailRow(Iconsax.calendar, 'Batch', user.batch.toString()),
+          if (user.cgpa != null)
+            _buildDetailRow(Iconsax.chart_2, 'CGPA', user.cgpa.toString()),
+          if (user.currentSemester != null)
+            _buildDetailRow(Iconsax.book_1, 'Semester', user.currentSemester!),
+          if (user.phoneNumber != null)
+            _buildDetailRow(Iconsax.call, 'Phone', user.phoneNumber!),
+          if (user.clubNames?.isNotEmpty ?? false)
+            _buildDetailRow(
+              Iconsax.people,
+              'Clubs',
+              user.clubNames!.join(', '),
+            ),
+        ],
       ),
     );
   }
 
-  Widget _buildMetricItem(IconData icon, int value, String label) {
+  Widget _buildMetricItem(
+    IconData icon,
+    int value,
+    String label, {
+    Color color = AppColors.primary,
+  }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(icon, size: 24, color: Colors.blue),
-        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withAlpha(25),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, size: 18, color: color),
+        ),
+        const SizedBox(height: 6),
         Text(
           value.toString(),
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         Text(
           label,
-          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+          style: GoogleFonts.poppins(
+            fontSize: 10,
+            color: const Color(0xFF9CA3AF),
+          ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Icon(icon, size: 15, color: AppColors.primary),
+          const SizedBox(width: 8),
           SizedBox(
-            width: 100,
+            width: 90,
             child: Text(
               label,
-              style: TextStyle(color: Colors.grey[600]),
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: const Color(0xFF9CA3AF),
+              ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -402,17 +553,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildBadge(UserBadge badge) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: _getBadgeColors(badge),
-        ),
+        gradient: LinearGradient(colors: _getBadgeColors(badge)),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         _getBadgeText(badge),
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style: GoogleFonts.poppins(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
       ),
     );
   }
@@ -453,9 +605,9 @@ class _ProfilePageState extends State<ProfilePage> {
   // Helper method to copy text to clipboard
   void copyToClipboard(String text, String message) {
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   // Helper methods for UserType display
@@ -486,6 +638,69 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
+// ── Action button helper ─────────────────────────────────────────────────────
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final Color color;
+  final VoidCallback? onPressed;
+
+  const _ActionButton({
+    required this.icon,
+    required this.text,
+    required this.color,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDestructive = color == Colors.red;
+    return SizedBox(
+      width: double.infinity,
+      height: 48,
+      child: isDestructive
+          ? OutlinedButton.icon(
+              onPressed: onPressed,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red,
+                side: BorderSide(color: Colors.red.withAlpha(120)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: Icon(icon, size: 18),
+              label: Text(
+                text,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
+          : FilledButton.icon(
+              onPressed: onPressed,
+              style: FilledButton.styleFrom(
+                backgroundColor: color,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: Icon(icon, size: 18),
+              label: Text(
+                text,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+    );
+  }
+}
+
+// ── CustomButton (kept for compatibility with other pages) ────────────────────
+
 class CustomButton extends StatelessWidget {
   final Color? color;
   final Size? size;
@@ -502,21 +717,23 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: size?.width ?? double.infinity,
-      height: size?.height ?? 45,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor:
-              color ?? Colors.red, // Use provided color or default to red
+      height: size?.height ?? 48,
+      child: FilledButton(
+        style: FilledButton.styleFrom(
+          backgroundColor: color ?? AppColors.primary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0), // Border radius
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
         onPressed: onPressed,
         child: Text(
-          text, // Use provided text or default to "Button"
-          style: const TextStyle(color: Colors.white), // Text color
+          text,
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
