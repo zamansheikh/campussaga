@@ -47,3 +47,14 @@ app.*.map.json
 /serverKey.json
 lib/core/notifications/get_server_key.dart
 serverKey.jsonx
+# Added by git-vanish — removed from history
+firebase.json
+
+# Added by git-vanish — removed from history
+android/app/google-services.json
+
+# Added by git-vanish — removed from history
+lib/firebase_options.dart
+
+# Added by git-vanish — removed from history
+lib/core/utils/cloudinary_config.dart
