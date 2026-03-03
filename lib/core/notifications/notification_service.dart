@@ -29,13 +29,13 @@ class NotificationService {
     // Combine Platform-Specific Initialization Settings
     final InitializationSettings initializationSettings =
         InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
 
     // Initialize the plugin and setup callback handlers
     await _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: notificationResponseHandler,
       onDidReceiveBackgroundNotificationResponse:
           backgroundNotificationResponseHandler,
@@ -47,7 +47,8 @@ class NotificationService {
     // Request notification permissions (Android-specific)
     await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
   }
 
@@ -61,13 +62,13 @@ class NotificationService {
     // Android Notification Details
     final AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'basic_channel',
-      'Important Notices',
-      channelDescription: 'This channel is used for important notices',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-    );
+          'basic_channel',
+          'Important Notices',
+          channelDescription: 'This channel is used for important notices',
+          importance: Importance.max,
+          priority: Priority.high,
+          ticker: 'ticker',
+        );
 
     // iOS Notification Details
     final DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -81,11 +82,11 @@ class NotificationService {
 
     // Show Notification
     await _flutterLocalNotificationsPlugin.show(
-      id,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: payload, // Attach a payload
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: platformChannelSpecifics,
+      payload: payload,
     );
   }
 
@@ -100,13 +101,13 @@ class NotificationService {
     // Android Notification Details
     final AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'basic_channel',
-      'Important Notices',
-      channelDescription: 'This channel is used for important notices',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-    );
+          'basic_channel',
+          'Important Notices',
+          channelDescription: 'This channel is used for important notices',
+          importance: Importance.max,
+          priority: Priority.high,
+          ticker: 'ticker',
+        );
 
     // iOS Notification Details
     final DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -120,14 +121,12 @@ class NotificationService {
 
     // Schedule Notification
     await _flutterLocalNotificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.from(scheduledDate, tz.local),
-      platformChannelSpecifics,
-      payload: payload, // Attach a payload
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+      notificationDetails: platformChannelSpecifics,
+      payload: payload,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
   }
@@ -142,31 +141,33 @@ class NotificationService {
   }) async {
     try {
       // Download and save the image file
-      final String filePath =
-          await downloadAndSaveFile(imageUrl, 'notification_image_$id.jpg');
+      final String filePath = await downloadAndSaveFile(
+        imageUrl,
+        'notification_image_$id.jpg',
+      );
 
       // Android-specific Big Picture Style
       final BigPictureStyleInformation bigPictureStyleInformation =
           BigPictureStyleInformation(
-        FilePathAndroidBitmap(filePath), // Image file path for notification
-        largeIcon: FilePathAndroidBitmap(filePath), // Optional large icon
-        contentTitle: title,
-        summaryText: body,
-        htmlFormatContentTitle: true,
-        htmlFormatSummaryText: true,
-      );
+            FilePathAndroidBitmap(filePath), // Image file path for notification
+            largeIcon: FilePathAndroidBitmap(filePath), // Optional large icon
+            contentTitle: title,
+            summaryText: body,
+            htmlFormatContentTitle: true,
+            htmlFormatSummaryText: true,
+          );
 
       // Android Notification Details with Big Picture Style
       final AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
-        'image_channel',
-        'Image Notifications',
-        channelDescription: 'Channel for notifications with images',
-        styleInformation: bigPictureStyleInformation,
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker',
-      );
+            'image_channel',
+            'Image Notifications',
+            channelDescription: 'Channel for notifications with images',
+            styleInformation: bigPictureStyleInformation,
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker',
+          );
 
       // iOS Notification Details (without image support directly in notification)
       final DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -180,11 +181,11 @@ class NotificationService {
 
       // Show Notification
       await _flutterLocalNotificationsPlugin.show(
-        id,
-        title,
-        body,
-        platformChannelSpecifics,
-        payload: payload, // Attach a payload
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: platformChannelSpecifics,
+        payload: payload,
       );
     } catch (e) {
       print('Error showing notification with image: $e');
@@ -202,31 +203,33 @@ class NotificationService {
   }) async {
     try {
       // Download and save the image file
-      final String filePath =
-          await downloadAndSaveFile(imageUrl, 'notification_image_$id.jpg');
+      final String filePath = await downloadAndSaveFile(
+        imageUrl,
+        'notification_image_$id.jpg',
+      );
 
       // Android-specific Big Picture Style
       final BigPictureStyleInformation bigPictureStyleInformation =
           BigPictureStyleInformation(
-        FilePathAndroidBitmap(filePath), // Image file path for notification
-        largeIcon: FilePathAndroidBitmap(filePath), // Optional large icon
-        contentTitle: title,
-        summaryText: body,
-        htmlFormatContentTitle: true,
-        htmlFormatSummaryText: true,
-      );
+            FilePathAndroidBitmap(filePath), // Image file path for notification
+            largeIcon: FilePathAndroidBitmap(filePath), // Optional large icon
+            contentTitle: title,
+            summaryText: body,
+            htmlFormatContentTitle: true,
+            htmlFormatSummaryText: true,
+          );
 
       // Android Notification Details with Big Picture Style
       final AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
-        'image_channel',
-        'Image Notifications',
-        channelDescription: 'Channel for notifications with images',
-        styleInformation: bigPictureStyleInformation,
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker',
-      );
+            'image_channel',
+            'Image Notifications',
+            channelDescription: 'Channel for notifications with images',
+            styleInformation: bigPictureStyleInformation,
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker',
+          );
 
       // iOS Notification Details (without image support directly in notification)
       final DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -240,14 +243,12 @@ class NotificationService {
 
       // Schedule Notification
       await _flutterLocalNotificationsPlugin.zonedSchedule(
-        id,
-        title,
-        body,
-        tz.TZDateTime.from(scheduledDate, tz.local),
-        platformChannelSpecifics,
-        payload: payload, // Attach a payload
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+        notificationDetails: platformChannelSpecifics,
+        payload: payload,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
     } catch (e) {
@@ -269,8 +270,8 @@ class NotificationService {
       final String imageFilePath = await copyAssetImageToDrawable(imageAsset);
       final String soundFilePath = await copyAssetSoundToDrawable(soundAsset);
       // Android-specific Big Picture Style
-      final BigPictureStyleInformation bigPictureStyleInformation =
-          BigPictureStyleInformation(
+      final BigPictureStyleInformation
+      bigPictureStyleInformation = BigPictureStyleInformation(
         FilePathAndroidBitmap(imageFilePath), // Use FilePathAndroidBitmap here
         largeIcon: FilePathAndroidBitmap(imageFilePath), // Optional large icon
         contentTitle: title,
@@ -282,15 +283,15 @@ class NotificationService {
       // Android Notification Details with Big Picture Style and Sound
       final AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
-        'image_channel',
-        'Image Notifications',
-        channelDescription: 'Channel for notifications with images',
-        styleInformation: bigPictureStyleInformation,
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker',
-        sound: RawResourceAndroidNotificationSound(soundFilePath),
-      );
+            'image_channel',
+            'Image Notifications',
+            channelDescription: 'Channel for notifications with images',
+            styleInformation: bigPictureStyleInformation,
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker',
+            sound: RawResourceAndroidNotificationSound(soundFilePath),
+          );
 
       // iOS Notification Details
       final DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -304,11 +305,11 @@ class NotificationService {
 
       // Show Notification
       await _flutterLocalNotificationsPlugin.show(
-        id,
-        title,
-        body,
-        platformChannelSpecifics,
-        payload: payload, // Attach a payload
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: platformChannelSpecifics,
+        payload: payload,
       );
     } catch (e) {
       print('Error showing notification with image and sound: $e');
@@ -326,32 +327,34 @@ class NotificationService {
   }) async {
     try {
       // Download and save the image file
-      final String filePath =
-          await downloadAndSaveFile(imageUrl, 'notification_image_$id.jpg');
+      final String filePath = await downloadAndSaveFile(
+        imageUrl,
+        'notification_image_$id.jpg',
+      );
 
       // Android-specific Big Picture Style
       final BigPictureStyleInformation bigPictureStyleInformation =
           BigPictureStyleInformation(
-        FilePathAndroidBitmap(filePath), // Image file path for notification
-        largeIcon: FilePathAndroidBitmap(filePath), // Optional large icon
-        contentTitle: title,
-        summaryText: body,
-        htmlFormatContentTitle: true,
-        htmlFormatSummaryText: true,
-      );
+            FilePathAndroidBitmap(filePath), // Image file path for notification
+            largeIcon: FilePathAndroidBitmap(filePath), // Optional large icon
+            contentTitle: title,
+            summaryText: body,
+            htmlFormatContentTitle: true,
+            htmlFormatSummaryText: true,
+          );
 
       // Android Notification Details with Big Picture Style and Sound
       final AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
-        'image_channel',
-        'Image Notifications',
-        channelDescription: 'Channel for notifications with images',
-        styleInformation: bigPictureStyleInformation,
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker',
-        sound: RawResourceAndroidNotificationSound(soundAsset),
-      );
+            'image_channel',
+            'Image Notifications',
+            channelDescription: 'Channel for notifications with images',
+            styleInformation: bigPictureStyleInformation,
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker',
+            sound: RawResourceAndroidNotificationSound(soundAsset),
+          );
 
       // iOS Notification Details (without image support directly in notification)
       final DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -365,11 +368,11 @@ class NotificationService {
 
       // Show Notification
       await _flutterLocalNotificationsPlugin.show(
-        id,
-        title,
-        body,
-        platformChannelSpecifics,
-        payload: payload, // Attach a payload
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: platformChannelSpecifics,
+        payload: payload,
       );
     } catch (e) {
       print('Error showing notification with image and sound: $e');
@@ -390,25 +393,25 @@ class NotificationService {
       // Android-specific Big Picture Style
       final BigPictureStyleInformation bigPictureStyleInformation =
           BigPictureStyleInformation(
-        FilePathAndroidBitmap(imageFilePath),
-        largeIcon: FilePathAndroidBitmap(imageFilePath),
-        contentTitle: title,
-        summaryText: body,
-        htmlFormatContentTitle: true,
-        htmlFormatSummaryText: true,
-      );
+            FilePathAndroidBitmap(imageFilePath),
+            largeIcon: FilePathAndroidBitmap(imageFilePath),
+            contentTitle: title,
+            summaryText: body,
+            htmlFormatContentTitle: true,
+            htmlFormatSummaryText: true,
+          );
 
       // Android Notification Details with Big Picture Style
       final AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
-        'image_channel',
-        'Image Notifications',
-        channelDescription: 'Channel for notifications with images',
-        styleInformation: bigPictureStyleInformation,
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker',
-      );
+            'image_channel',
+            'Image Notifications',
+            channelDescription: 'Channel for notifications with images',
+            styleInformation: bigPictureStyleInformation,
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker',
+          );
 
       // iOS Notification Details
       final DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -422,10 +425,10 @@ class NotificationService {
 
       // Show Notification
       await _flutterLocalNotificationsPlugin.show(
-        id,
-        title,
-        body,
-        platformChannelSpecifics,
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: platformChannelSpecifics,
         payload: payload,
       );
     } catch (e) {
@@ -448,25 +451,25 @@ class NotificationService {
       // Android-specific Big Picture Style
       final BigPictureStyleInformation bigPictureStyleInformation =
           BigPictureStyleInformation(
-        FilePathAndroidBitmap(imageFilePath),
-        largeIcon: FilePathAndroidBitmap(imageFilePath),
-        contentTitle: title,
-        summaryText: body,
-        htmlFormatContentTitle: true,
-        htmlFormatSummaryText: true,
-      );
+            FilePathAndroidBitmap(imageFilePath),
+            largeIcon: FilePathAndroidBitmap(imageFilePath),
+            contentTitle: title,
+            summaryText: body,
+            htmlFormatContentTitle: true,
+            htmlFormatSummaryText: true,
+          );
 
       // Android Notification Details with Big Picture Style
       final AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
-        'image_channel',
-        'Image Notifications',
-        channelDescription: 'Channel for notifications with images',
-        styleInformation: bigPictureStyleInformation,
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker',
-      );
+            'image_channel',
+            'Image Notifications',
+            channelDescription: 'Channel for notifications with images',
+            styleInformation: bigPictureStyleInformation,
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker',
+          );
 
       // iOS Notification Details
       final DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -480,14 +483,12 @@ class NotificationService {
 
       // Schedule Notification
       await _flutterLocalNotificationsPlugin.zonedSchedule(
-        id,
-        title,
-        body,
-        tz.TZDateTime.from(scheduledDate, tz.local),
-        platformChannelSpecifics,
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+        notificationDetails: platformChannelSpecifics,
         payload: payload,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
     } catch (e) {
@@ -497,7 +498,7 @@ class NotificationService {
 
   /// Cancel a notification by ID
   Future<void> cancelNotification(int id) async {
-    await _flutterLocalNotificationsPlugin.cancel(id);
+    await _flutterLocalNotificationsPlugin.cancel(id: id);
   }
 }
 

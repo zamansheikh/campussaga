@@ -3,7 +3,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
     // Request permission for notifications
@@ -22,10 +23,11 @@ class NotificationService {
     }
 
     // Initialize local notifications
-    const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings initializationSettings =
         InitializationSettings(android: androidSettings);
-    await _localNotifications.initialize(initializationSettings);
+    await _localNotifications.initialize(settings: initializationSettings);
 
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen(_handleMessage);
@@ -44,10 +46,10 @@ class NotificationService {
 
     if (notification != null && android != null) {
       _localNotifications.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        const NotificationDetails(
+        id: notification.hashCode,
+        title: notification.title,
+        body: notification.body,
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'campus_saga_channel', // Channel ID
             'Campus Saga Notifications', // Channel Name
