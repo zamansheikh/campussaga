@@ -49,8 +49,9 @@ dependencies:
   advanced_salomon_bottom_bar: ^3.3.4
 
   # Notifications
-  flutter_local_notifications: ^17.2.2
-  timezone: any
+  flutter_local_notifications: 21.0.0-dev.2
+  timezone: ^0.11.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -67,6 +68,3 @@ flutter:
     - assets/icon/
     - assets/lottie/
     - assets/sounds/
-
-dependency_overrides:
-  meta: ^1.18.1
