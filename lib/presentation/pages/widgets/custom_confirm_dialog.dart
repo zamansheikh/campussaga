@@ -20,29 +20,28 @@ class CustomConfirmDialog {
     EdgeInsets? padding,
     bool barrierDismissible = true,
     bool noImage = false,
-  }) =>
-      showDialog<T>(
-        barrierDismissible: barrierDismissible,
-        context: context,
-        builder: (context) => PanaraConfirmDialogWidget(
-          noImage: noImage,
-          title: title,
-          message: message,
-          confirmButtonText: confirmButtonText,
-          cancelButtonText: cancelButtonText,
-          dismissButtonText: dismissButtonText,
-          onTapConfirm: onTapConfirm,
-          onTapCancel: onTapCancel,
-          onTapDismiss: onTapDismiss,
-          panaraDialogType: panaraDialogType,
-          color: color,
-          textColor: textColor,
-          buttonTextColor: buttonTextColor,
-          imagePath: imagePath,
-          margin: margin,
-          padding: padding,
-        ),
-      );
+  }) => showDialog<T>(
+    barrierDismissible: barrierDismissible,
+    context: context,
+    builder: (context) => PanaraConfirmDialogWidget(
+      noImage: noImage,
+      title: title,
+      message: message,
+      confirmButtonText: confirmButtonText,
+      cancelButtonText: cancelButtonText,
+      dismissButtonText: dismissButtonText,
+      onTapConfirm: onTapConfirm,
+      onTapCancel: onTapCancel,
+      onTapDismiss: onTapDismiss,
+      panaraDialogType: panaraDialogType,
+      color: color,
+      textColor: textColor,
+      buttonTextColor: buttonTextColor,
+      imagePath: imagePath,
+      margin: margin,
+      padding: padding,
+    ),
+  );
 }
 
 enum PanaraDialogType { success, normal, warning, error, custom }
@@ -118,13 +117,14 @@ class PanaraConfirmDialogWidget extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: Container(
-          constraints: const BoxConstraints(
-            maxWidth: 340,
-          ),
+          constraints: const BoxConstraints(maxWidth: 340),
           margin: margin ?? const EdgeInsets.all(24),
           padding: padding ?? const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: backgroundColor ?? Theme.of(context).dialogTheme.backgroundColor ?? theme.colorScheme.surface,
+            color:
+                backgroundColor ??
+                Theme.of(context).dialogTheme.backgroundColor ??
+                theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Column(
@@ -141,19 +141,16 @@ class PanaraConfirmDialogWidget extends StatelessWidget {
                   color: imagePath != null
                       ? null
                       : (panaraDialogType == PanaraDialogType.normal
-                          ? PanaraColors.normal
-                          : panaraDialogType == PanaraDialogType.success
-                              ? PanaraColors.success
-                              : panaraDialogType == PanaraDialogType.warning
-                                  ? PanaraColors.warning
-                                  : panaraDialogType == PanaraDialogType.error
-                                      ? PanaraColors.error
-                                      : color),
+                            ? PanaraColors.normal
+                            : panaraDialogType == PanaraDialogType.success
+                            ? PanaraColors.success
+                            : panaraDialogType == PanaraDialogType.warning
+                            ? PanaraColors.warning
+                            : panaraDialogType == PanaraDialogType.error
+                            ? PanaraColors.error
+                            : color),
                 ),
-              if (!noImage)
-                const SizedBox(
-                  height: 24,
-                ),
+              if (!noImage) const SizedBox(height: 24),
               if (title != null)
                 Text(
                   title ?? "",
@@ -165,10 +162,7 @@ class PanaraConfirmDialogWidget extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-              if (title != null)
-                const SizedBox(
-                  height: 5,
-                ),
+              if (title != null) const SizedBox(height: 5),
               Text(
                 message,
                 style: TextStyle(
@@ -179,9 +173,7 @@ class PanaraConfirmDialogWidget extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -194,18 +186,16 @@ class PanaraConfirmDialogWidget extends StatelessWidget {
                       bgColor: panaraDialogType == PanaraDialogType.normal
                           ? PanaraColors.normal
                           : panaraDialogType == PanaraDialogType.success
-                              ? PanaraColors.success
-                              : panaraDialogType == PanaraDialogType.warning
-                                  ? PanaraColors.warning
-                                  : panaraDialogType == PanaraDialogType.error
-                                      ? PanaraColors.error
-                                      : color ?? const Color(0xFF179DFF),
+                          ? PanaraColors.success
+                          : panaraDialogType == PanaraDialogType.warning
+                          ? PanaraColors.warning
+                          : panaraDialogType == PanaraDialogType.error
+                          ? PanaraColors.error
+                          : color ?? const Color(0xFF179DFF),
                       isOutlined: true,
                     ),
                   ),
-                  const SizedBox(
-                    width: 12,
-                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     flex: 2,
                     child: PanaraButton(
@@ -215,9 +205,7 @@ class PanaraConfirmDialogWidget extends StatelessWidget {
                       isOutlined: true,
                     ),
                   ),
-                  const SizedBox(
-                    width: 12,
-                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     flex: 1,
                     child: PanaraButton(
@@ -227,17 +215,17 @@ class PanaraConfirmDialogWidget extends StatelessWidget {
                       bgColor: panaraDialogType == PanaraDialogType.normal
                           ? PanaraColors.normal
                           : panaraDialogType == PanaraDialogType.success
-                              ? PanaraColors.success
-                              : panaraDialogType == PanaraDialogType.warning
-                                  ? PanaraColors.warning
-                                  : panaraDialogType == PanaraDialogType.error
-                                      ? PanaraColors.error
-                                      : color ?? const Color(0xFF179DFF),
+                          ? PanaraColors.success
+                          : panaraDialogType == PanaraDialogType.warning
+                          ? PanaraColors.warning
+                          : panaraDialogType == PanaraDialogType.error
+                          ? PanaraColors.error
+                          : color ?? const Color(0xFF179DFF),
                       isOutlined: false,
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
