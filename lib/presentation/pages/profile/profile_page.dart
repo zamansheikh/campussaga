@@ -32,10 +32,16 @@ class _ProfilePageState extends State<ProfilePage> {
       timestamp: DateTime.now(),
       email: user.email,
       uuid: user.id,
-      phoneNumber: user.phoneNumber ?? "Not Available",
+      phoneNumber: user.phoneNumber ?? 'Not Available',
       profilePicture: user.profilePictureUrl,
-      status: "pending",
+      status: 'pending',
     );
+  }
+
+  void _copyToClipboard(String text, String message) {
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -54,21 +60,15 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: AppColors.primaryGradient,
-                ),
+                gradient: const LinearGradient(colors: AppColors.primaryGradient),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(Iconsax.user, size: 16, color: Colors.white),
             ),
             const SizedBox(width: 10),
-            Text(
-              'Profile',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text('Profile',
+                style: GoogleFonts.poppins(
+                    fontSize: 20, fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
@@ -86,74 +86,76 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         builder: (context, state) {
           if (state is AuthAuthenticated) {
-            final User user = state.user;
+            final user = state.user;
             return RefreshIndicator(
+              color: AppColors.primary,
               onRefresh: () async {
                 sl<AuthBloc>().add(AuthRefreshRequested());
-                return Future.delayed(const Duration(seconds: 1));
+                await Future.delayed(const Duration(seconds: 1));
               },
               child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Profile Header
-                    _buildProfileHeader(user),
-
+                    _buildHeader(user),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
                       child: Column(
                         children: [
-                          const SizedBox(height: 16),
-                          // Engagement Metrics
-                          _buildEngagementMetrics(user),
-                          const SizedBox(height: 16),
-                          // Achievements
-                          _buildAchievements(user),
-                          const SizedBox(height: 16),
-                          // Student Details
                           if (user.userType == UserType.student) ...[
-                            _buildStudentDetails(user),
-                            const SizedBox(height: 16),
+                            _buildSectionCard(
+                              icon: Iconsax.profile_2user,
+                              title: 'Student Details',
+                              child: _buildStudentDetails(user),
+                            ),
+                            const SizedBox(height: 14),
                           ],
-                          // Action buttons
-                          _ActionButton(
+                          _buildSectionCard(
+                            icon: Iconsax.award,
+                            title: 'Achievements',
+                            trailing: _buildBadge(user.currentBadge),
+                            child: user.achievements.isEmpty
+                                ? _emptyAchievements()
+                                : _buildAchievements(user),
+                          ),
+                          const SizedBox(height: 20),
+                          _buildSettingsTile(
                             icon: Iconsax.edit_2,
-                            text: 'Edit Profile',
-                            color: AppColors.primary,
-                            onPressed: () => Navigator.push(
+                            title: 'Edit Profile',
+                            subtitle: 'Update your name, photo & details',
+                            iconBg: AppColors.primary,
+                            onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => UpdateProfilePage(user: user),
-                              ),
+                                  builder: (_) =>
+                                      UpdateProfilePage(user: user)),
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          _ActionButton(
+                          _buildSettingsTile(
                             icon: Iconsax.document_text,
-                            text: 'Terms and Conditions',
-                            color: const Color(0xFF4CAF50),
-                            onPressed: () => launchURL(
-                              "https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md",
-                            ),
+                            title: 'Terms & Conditions',
+                            subtitle: 'Read our usage policy',
+                            iconBg: const Color(0xFF4CAF50),
+                            onTap: () => launchURL(
+                                'https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md'),
                           ),
-                          const SizedBox(height: 10),
-                          _ActionButton(
+                          _buildSettingsTile(
                             icon: Iconsax.info_circle,
-                            text: 'About Us',
-                            color: const Color(0xFF00BCD4),
-                            onPressed: () =>
-                                launchURL("https://zamansheikh.com"),
+                            title: 'About Us',
+                            subtitle: 'Learn more about Campus Saga',
+                            iconBg: const Color(0xFF00BCD4),
+                            onTap: () => launchURL('https://zamansheikh.com'),
                           ),
-                          const SizedBox(height: 10),
-                          _ActionButton(
+                          const SizedBox(height: 6),
+                          _buildSettingsTile(
                             icon: Iconsax.logout,
-                            text: 'Logout',
-                            color: Colors.red,
-                            onPressed: () => BlocProvider.of<AuthBloc>(
-                              context,
-                            ).add(SignOutEvent()),
+                            title: 'Logout',
+                            subtitle: 'Sign out of your account',
+                            iconBg: Colors.red,
+                            isDestructive: true,
+                            onTap: () => BlocProvider.of<AuthBloc>(context)
+                                .add(SignOutEvent()),
                           ),
-                          const SizedBox(height: 32),
                         ],
                       ),
                     ),
@@ -162,13 +164,17 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             );
           }
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary));
         },
       ),
     );
   }
 
-  Widget _buildProfileHeader(User user) {
+  // ── Header ──────────────────────────────────────────────────────────────────
+
+  Widget _buildHeader(User user) {
+    final typeColor = _getUserTypeColor(user.userType);
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -178,12 +184,12 @@ class _ProfilePageState extends State<ProfilePage> {
           end: Alignment.bottomRight,
         ),
       ),
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
       child: Column(
         children: [
-          InkWell(
+          const SizedBox(height: 16),
+          GestureDetector(
             onLongPress: () {
-              copyToClipboard(user.id, "User ID copied to clipboard");
+              _copyToClipboard(user.id, 'User ID copied to clipboard');
               sl<RoleChangeBloc>().add(ChangeRoleEvent(_changeRoleEntity()));
             },
             child: Stack(
@@ -193,32 +199,35 @@ class _ProfilePageState extends State<ProfilePage> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withAlpha(160),
-                      width: 3,
-                    ),
+                        color: Colors.white.withAlpha(170), width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(60),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
                   child: CircleAvatar(
-                    radius: 52,
+                    radius: 50,
                     backgroundImage: NetworkImage(user.profilePictureUrl),
                   ),
                 ),
                 if (user.isVerified)
                   Container(
-                    padding: const EdgeInsets.all(3),
+                    width: 28,
+                    height: 28,
                     decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Iconsax.verify5,
-                      size: 22,
-                      color: AppColors.primary,
-                    ),
+                    child: const Icon(Iconsax.verify5,
+                        size: 18, color: AppColors.primary),
                   ),
               ],
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           Text(
             user.name,
             style: GoogleFonts.poppins(
@@ -226,13 +235,12 @@ class _ProfilePageState extends State<ProfilePage> {
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
-            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
           Text(
             user.email,
             style: GoogleFonts.poppins(
-              fontSize: 13,
+              fontSize: 12,
               color: Colors.white.withAlpha(190),
             ),
           ),
@@ -240,7 +248,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
             decoration: BoxDecoration(
-              color: _getUserTypeColor(user.userType).withAlpha(200),
+              color: typeColor.withAlpha(200),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: Colors.white.withAlpha(80), width: 1),
             ),
@@ -254,296 +262,198 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           if (!user.isVerified) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             FilledButton.icon(
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => VerificationPage(user: user)),
+                MaterialPageRoute(
+                    builder: (_) => VerificationPage(user: user)),
               ),
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.orange.shade600,
                 minimumSize: const Size(0, 36),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
+                    borderRadius: BorderRadius.circular(20)),
               ),
-              icon: const Icon(Iconsax.shield_tick, size: 16),
+              icon: const Icon(Iconsax.shield_tick, size: 15),
               label: Text(
                 'Verify Account',
                 style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                    fontSize: 12, fontWeight: FontWeight.w600),
               ),
             ),
           ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEngagementMetrics(User user) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1D2024) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withAlpha(40),
-        ),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Engagement',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+          const SizedBox(height: 20),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(15),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withAlpha(40), width: 1),
+            ),
+            child: Row(
+              children: [
+                _statItem(user.postCount, 'Posts'),
+                _divider(),
+                _statItem(user.resolvedIssuesCount, 'Resolved'),
+                _divider(),
+                _statItem(user.streakDays, 'Day Streak'),
+                _divider(),
+                _statItem(user.receivedVotesCount, 'Votes'),
+              ],
             ),
           ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _buildMetricItem(
-                  Iconsax.document_text,
-                  user.postCount,
-                  'Posts',
-                  color: AppColors.primary,
-                ),
-              ),
-              Expanded(
-                child: _buildMetricItem(
-                  Iconsax.tick_circle,
-                  user.resolvedIssuesCount,
-                  'Resolved',
-                  color: const Color(0xFF4CAF50),
-                ),
-              ),
-              Expanded(
-                child: _buildMetricItem(
-                  Iconsax.message_text,
-                  user.commentCount,
-                  'Comments',
-                  color: const Color(0xFF00BCD4),
-                ),
-              ),
-            ],
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _statItem(int value, String label) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            value.toString(),
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildMetricItem(
-                  Iconsax.like_1,
-                  user.givenVotesCount,
-                  'Given',
-                  color: const Color(0xFF7C4DFF),
-                ),
-              ),
-              Expanded(
-                child: _buildMetricItem(
-                  Iconsax.heart,
-                  user.receivedVotesCount,
-                  'Received',
-                  color: Colors.pink,
-                ),
-              ),
-              Expanded(
-                child: _buildMetricItem(
-                  Iconsax.star_1,
-                  user.streakDays,
-                  'Streak',
-                  color: Colors.orange,
-                ),
-              ),
-            ],
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 10,
+              color: Colors.white.withAlpha(180),
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAchievements(User user) {
+  Widget _divider() {
+    return Container(
+      width: 1,
+      height: 32,
+      color: Colors.white.withAlpha(50),
+    );
+  }
+
+  // ── Section card ─────────────────────────────────────────────────────────────
+
+  Widget _buildSectionCard({
+    required IconData icon,
+    required String title,
+    required Widget child,
+    Widget? trailing,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1D2024) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withAlpha(40),
-        ),
+            color: Theme.of(context).colorScheme.outline.withAlpha(40)),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withAlpha(20),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 14, color: AppColors.primary),
+              ),
+              const SizedBox(width: 8),
               Text(
-                'Achievements',
+                title,
                 style: GoogleFonts.poppins(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              _buildBadge(user.currentBadge),
+              if (trailing != null) ...[
+                const Spacer(),
+                trailing,
+              ],
             ],
           ),
           const SizedBox(height: 12),
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 8.0,
-            children: user.achievements.map((achievement) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withAlpha(40),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.amber.shade300, width: 1),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Iconsax.award,
-                      size: 13,
-                      color: Color(0xFFFFB300),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _getAchievementText(achievement),
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.amber.shade800,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
+          child,
         ],
       ),
     );
   }
+
+  // ── Student details ───────────────────────────────────────────────────────────
 
   Widget _buildStudentDetails(User user) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1D2024) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withAlpha(40),
-        ),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Student Details',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (user.studentId != null)
-            _buildDetailRow(Iconsax.card, 'Student ID', user.studentId!),
-          if (user.department != null)
-            _buildDetailRow(
-              Iconsax.building,
-              'Department',
-              _getDepartmentText(user.department!),
-            ),
-          if (user.batch != null)
-            _buildDetailRow(Iconsax.calendar, 'Batch', user.batch.toString()),
-          if (user.cgpa != null)
-            _buildDetailRow(Iconsax.chart_2, 'CGPA', user.cgpa.toString()),
-          if (user.currentSemester != null)
-            _buildDetailRow(Iconsax.book_1, 'Semester', user.currentSemester!),
-          if (user.phoneNumber != null)
-            _buildDetailRow(Iconsax.call, 'Phone', user.phoneNumber!),
-          if (user.clubNames?.isNotEmpty ?? false)
-            _buildDetailRow(
-              Iconsax.people,
-              'Clubs',
-              user.clubNames!.join(', '),
-            ),
-        ],
-      ),
-    );
+    final rows = <Widget>[];
+    if (user.studentId != null)
+      rows.add(_detailRow(Iconsax.card, 'Student ID', user.studentId!));
+    if (user.department != null)
+      rows.add(_detailRow(Iconsax.building, 'Department',
+          _getDepartmentText(user.department!)));
+    if (user.batch != null)
+      rows.add(_detailRow(Iconsax.calendar, 'Batch', user.batch.toString()));
+    if (user.cgpa != null)
+      rows.add(_detailRow(Iconsax.chart_2, 'CGPA', user.cgpa.toString()));
+    if (user.currentSemester != null)
+      rows.add(
+          _detailRow(Iconsax.book_1, 'Semester', user.currentSemester!));
+    if (user.phoneNumber != null)
+      rows.add(_detailRow(Iconsax.call, 'Phone', user.phoneNumber!));
+    if (user.clubNames?.isNotEmpty ?? false)
+      rows.add(
+          _detailRow(Iconsax.people, 'Clubs', user.clubNames!.join(', ')));
+
+    if (rows.isEmpty) {
+      return Text(
+        'No student details added yet. Tap Edit Profile to fill in.',
+        style: GoogleFonts.poppins(
+            fontSize: 12, color: const Color(0xFF9CA3AF)),
+      );
+    }
+    return Column(children: rows);
   }
 
-  Widget _buildMetricItem(
-    IconData icon,
-    int value,
-    String label, {
-    Color color = AppColors.primary,
-  }) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withAlpha(25),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, size: 18, color: color),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          value.toString(),
-          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 10,
-            color: const Color(0xFF9CA3AF),
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDetailRow(IconData icon, String label, String value) {
+  Widget _detailRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 15, color: AppColors.primary),
-          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withAlpha(15),
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: Icon(icon, size: 13, color: AppColors.primary),
+          ),
+          const SizedBox(width: 10),
           SizedBox(
-            width: 90,
+            width: 88,
             child: Text(
               label,
               style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: const Color(0xFF9CA3AF),
-              ),
+                  fontSize: 12, color: const Color(0xFF9CA3AF)),
             ),
           ),
           Expanded(
             child: Text(
               value,
               style: GoogleFonts.poppins(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+                  fontSize: 12, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -551,9 +461,57 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // ── Achievements ────────────────────────────────────────────────────────────
+
+  Widget _buildAchievements(User user) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: user.achievements.map((achievement) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: Colors.amber.withAlpha(40),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.amber.shade300, width: 1),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Iconsax.award, size: 13, color: Color(0xFFFFB300)),
+              const SizedBox(width: 4),
+              Text(
+                _getAchievementText(achievement),
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.amber.shade800,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _emptyAchievements() {
+    return Row(
+      children: [
+        const Icon(Iconsax.medal_star, size: 18, color: Color(0xFF9CA3AF)),
+        const SizedBox(width: 8),
+        Text(
+          'No achievements yet. Keep engaging!',
+          style: GoogleFonts.poppins(
+              fontSize: 12, color: const Color(0xFF9CA3AF)),
+        ),
+      ],
+    );
+  }
+
   Widget _buildBadge(UserBadge badge) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: _getBadgeColors(badge)),
         borderRadius: BorderRadius.circular(20),
@@ -563,143 +521,142 @@ class _ProfilePageState extends State<ProfilePage> {
         style: GoogleFonts.poppins(
           color: Colors.white,
           fontWeight: FontWeight.bold,
-          fontSize: 12,
+          fontSize: 11,
         ),
       ),
     );
   }
 
-  // Helper methods...
-  String _getBadgeText(UserBadge badge) {
-    return badge.toString().split('.').last.toUpperCase();
+  // ── Settings tile ────────────────────────────────────────────────────────────
+
+  Widget _buildSettingsTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color iconBg,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1D2024) : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isDestructive
+                ? Colors.red.withAlpha(60)
+                : Theme.of(context).colorScheme.outline.withAlpha(40),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: iconBg.withAlpha(isDestructive ? 30 : 25),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 18, color: iconBg),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDestructive ? Colors.red : null,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: const Color(0xFF9CA3AF),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Iconsax.arrow_right_3,
+              size: 16,
+              color: isDestructive
+                  ? Colors.red.withAlpha(150)
+                  : const Color(0xFF9CA3AF),
+            ),
+          ],
+        ),
+      ),
+    );
   }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────────
+
+  String _getBadgeText(UserBadge badge) =>
+      badge.toString().split('.').last.toUpperCase();
 
   List<Color> _getBadgeColors(UserBadge badge) {
     switch (badge) {
       case UserBadge.newbie:
-        return [Colors.grey, Colors.grey.shade600];
+        return [const Color(0xFF9E9E9E), const Color(0xFF616161)];
       case UserBadge.active:
-        return [Colors.green, Colors.green.shade700];
+        return [const Color(0xFF43A047), const Color(0xFF1B5E20)];
       case UserBadge.expert:
-        return [Colors.blue, Colors.blue.shade700];
+        return AppColors.primaryGradient;
       case UserBadge.hero:
-        return [Colors.purple, Colors.purple.shade700];
+        return [const Color(0xFF7C4DFF), const Color(0xFF3D5AFE)];
       case UserBadge.legend:
-        return [Colors.orange, Colors.red];
+        return [const Color(0xFFFF6F00), const Color(0xFFE53935)];
     }
   }
 
-  String _getAchievementText(AchievementType achievement) {
-    return achievement
-        .toString()
-        .split('.')
-        .last
-        .split(RegExp(r'(?=[A-Z])'))
-        .join(' ');
-  }
+  String _getAchievementText(AchievementType achievement) => achievement
+      .toString()
+      .split('.')
+      .last
+      .split(RegExp(r'(?=[A-Z])'))
+      .join(' ');
 
-  String _getDepartmentText(Department department) {
-    return department.toString().split('.').last.toUpperCase();
-  }
+  String _getDepartmentText(Department department) =>
+      department.toString().split('.').last.toUpperCase();
 
-  // Helper method to copy text to clipboard
-  void copyToClipboard(String text, String message) {
-    Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  // Helper methods for UserType display
   Color _getUserTypeColor(UserType userType) {
     switch (userType) {
       case UserType.student:
-        return Colors.blue;
+        return AppColors.primary;
       case UserType.university:
-        return Colors.green;
+        return const Color(0xFF4CAF50);
       case UserType.admin:
         return Colors.orange;
       case UserType.ambassador:
-        return Colors.purple;
+        return const Color(0xFF7C4DFF);
     }
   }
 
   String _getUserTypeText(UserType userType) {
     switch (userType) {
       case UserType.student:
-        return "Student";
+        return 'Student';
       case UserType.university:
-        return "University";
+        return 'University';
       case UserType.admin:
-        return "Admin";
+        return 'Admin';
       case UserType.ambassador:
-        return "Ambassador";
+        return 'Ambassador';
     }
   }
 }
 
-// ── Action button helper ─────────────────────────────────────────────────────
-
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final Color color;
-  final VoidCallback? onPressed;
-
-  const _ActionButton({
-    required this.icon,
-    required this.text,
-    required this.color,
-    this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDestructive = color == Colors.red;
-    return SizedBox(
-      width: double.infinity,
-      height: 48,
-      child: isDestructive
-          ? OutlinedButton.icon(
-              onPressed: onPressed,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.red,
-                side: BorderSide(color: Colors.red.withAlpha(120)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              icon: Icon(icon, size: 18),
-              label: Text(
-                text,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            )
-          : FilledButton.icon(
-              onPressed: onPressed,
-              style: FilledButton.styleFrom(
-                backgroundColor: color,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              icon: Icon(icon, size: 18),
-              label: Text(
-                text,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-    );
-  }
-}
-
-// ── CustomButton (kept for compatibility with other pages) ────────────────────
+// ── CustomButton (kept for compatibility with other pages) ─────────────────────
 
 class CustomButton extends StatelessWidget {
   final Color? color;

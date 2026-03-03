@@ -124,7 +124,7 @@ class PanaraConfirmDialogWidget extends StatelessWidget {
           margin: margin ?? const EdgeInsets.all(24),
           padding: padding ?? const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: backgroundColor ?? theme.dialogBackgroundColor,
+            color: backgroundColor ?? Theme.of(context).dialogTheme.backgroundColor ?? theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Column(

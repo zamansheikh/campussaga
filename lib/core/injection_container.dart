@@ -44,7 +44,6 @@ import 'package:campus_saga/presentation/bloc/university/university_bloc.dart';
 import 'package:campus_saga/presentation/bloc/varify/varification_bloc.dart';
 import 'package:campus_saga/presentation/bloc/verify_user/verify_user_bloc.dart';
 import 'package:campus_saga/core/services/cloudinary_service.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -58,14 +57,16 @@ Future<void> init() async {
   // Firebase services
   sl.registerLazySingleton(() => FirebaseAuth.instance);
   sl.registerLazySingleton(() => FirebaseFirestore.instance);
-  sl.registerLazySingleton(() => FirebaseStorage.instance);
+
+  // Cloudinary image upload service
+  sl.registerLazySingleton(() => CloudinaryService());
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSource(firebaseAuth: sl()),
   );
   sl.registerLazySingleton<FirebaseStorageRemoteDataSource>(
-    () => FirebaseStorageRemoteDataSource(firebaseStorage: sl()),
+    () => FirebaseStorageRemoteDataSource(cloudinaryService: sl()),
   );
   sl.registerLazySingleton<FirestoreRemoteDataSource>(
     () => FirestoreRemoteDataSource(firestore: sl()),

@@ -196,12 +196,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     });
     on<AuthRefreshRequested>((event, emit) async {
-      final authState = (state as AuthAuthenticated);
-      final result = await getUserProfile(authState.user.id);
-      result.fold(
-        (failure) => emit(AuthAuthenticated(authState.user)),
-        (user) => emit(AuthAuthenticated(user)),
-      );
+      final current = state;
+      if (current is! AuthAuthenticated) return;
+      try {
+        final result = await getUserProfile(current.user.id);
+        result.fold(
+          (failure) => emit(AuthAuthenticated(current.user)),
+          (user) => emit(AuthAuthenticated(user)),
+        );
+      } catch (_) {
+        emit(AuthAuthenticated(current.user));
+      }
     });
   }
 }

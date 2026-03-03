@@ -1,56 +1,63 @@
-import 'dart:io';
-import 'package:path/path.dart' as p;
-import 'package:firebase_storage/firebase_storage.dart';
-
-
 // lib/data/datasources/remote/firebase_storage_remote_datasource.dart
+// NOTE: Despite the class name (kept for compatibility), this now uploads
+//       to Cloudinary instead of Firebase Storage.
+
+import 'dart:io';
+import 'package:campus_saga/core/services/cloudinary_service.dart';
 
 class FirebaseStorageRemoteDataSource {
-  final FirebaseStorage firebaseStorage;
+  final CloudinaryService cloudinaryService;
 
-  FirebaseStorageRemoteDataSource({required this.firebaseStorage});
+  FirebaseStorageRemoteDataSource({required this.cloudinaryService});
 
+  /// Upload a user profile photo and return the Cloudinary secure URL.
   Future<String> uploadUserImage(File image, String userId) async {
-    final ref = firebaseStorage.ref().child('user_images').child('$userId.jpg');
-    await ref.putFile(image);
-    return await ref.getDownloadURL();
+    return cloudinaryService.uploadImage(
+      file: image,
+      folder: 'campus_saga/user_images',
+      publicId: 'user_$userId',
+    );
   }
 
+  /// Upload images for an issue/problem post.
   Future<List<String>> uploadPostImages(String postId, List<File> images) async {
     final urls = <String>[];
-    for (final image in images) {
-      final ref = firebaseStorage
-          .ref()
-          .child('post_images')
-          .child('$postId-${p.basename(image.path)}.jpg');
-      await ref.putFile(image);
-      urls.add(await ref.getDownloadURL());
+    for (int i = 0; i < images.length; i++) {
+      final url = await cloudinaryService.uploadImage(
+        file: images[i],
+        folder: 'campus_saga/post_images',
+        publicId: 'post_${postId}_$i',
+      );
+      urls.add(url);
     }
     return urls;
   }
 
+  /// Upload images for a promotion post.
   Future<List<String>> uploadPromotionImages(String postId, List<File> images) async {
     final urls = <String>[];
-    for (final image in images) {
-      final ref = firebaseStorage
-          .ref()
-          .child('promotion_images')
-          .child('$postId-${p.basename(image.path)}.jpg');
-      await ref.putFile(image);
-      urls.add(await ref.getDownloadURL());
+    for (int i = 0; i < images.length; i++) {
+      final url = await cloudinaryService.uploadImage(
+        file: images[i],
+        folder: 'campus_saga/promotion_images',
+        publicId: 'promo_${postId}_$i',
+      );
+      urls.add(url);
     }
     return urls;
   }
 
-  Future<List<String>> uploadVerificationImages(String postId, List<File> images) async {
+  /// Upload selfie + ID card photos for verification.
+  Future<List<String>> uploadVerificationImages(String userId, List<File> images) async {
     final urls = <String>[];
-    for (final image in images) {
-      final ref = firebaseStorage
-          .ref()
-          .child('verification_images')
-          .child('$postId-${p.basename(image.path)}.jpg');
-      await ref.putFile(image);
-      urls.add(await ref.getDownloadURL());
+    final labels = ['selfie', 'id_card'];
+    for (int i = 0; i < images.length; i++) {
+      final url = await cloudinaryService.uploadImage(
+        file: images[i],
+        folder: 'campus_saga/verification',
+        publicId: 'verify_${userId}_${labels.length > i ? labels[i] : i}',
+      );
+      urls.add(url);
     }
     return urls;
   }
