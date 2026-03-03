@@ -1,4 +1,5 @@
 import 'package:campus_saga/core/injection_container.dart';
+import 'package:campus_saga/core/theme/app_theme.dart';
 import 'package:campus_saga/core/utils/validators.dart';
 import 'package:campus_saga/domain/entities/user.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
@@ -9,6 +10,8 @@ import 'package:campus_saga/core/notifications/notification_sheet.dart';
 import 'package:campus_saga/presentation/pages/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax/iconsax.dart';
 
 class IssuePage extends StatefulWidget {
   const IssuePage({super.key});
@@ -31,8 +34,10 @@ class _IssuePageState extends State<IssuePage> {
       setState(() {
         userState = state.user;
       });
-      final String universityId =
-          state.user.universityId.split('@').last.trim();
+      final String universityId = state.user.universityId
+          .split('@')
+          .last
+          .trim();
       print("Fetching posts for university: $universityId");
       sl<IssueBloc>().add(FetchIssueEvent(universityId));
     }
@@ -44,27 +49,40 @@ class _IssuePageState extends State<IssuePage> {
       appBar: AppBar(
         centerTitle: true,
         forceMaterialTransparency: true,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
+          icon: const Icon(Iconsax.menu_1, size: 22),
+          onPressed: () => Scaffold.of(context).openDrawer(),
         ),
-        title: Text(
-          "Campus Saga",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: AppColors.primaryGradient,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Iconsax.book_1, size: 18, color: Colors.white),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Campus Saga',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              //show a popUpwindows
-              showNotificationsSheet(context);
-            },
+            icon: const Icon(Iconsax.notification, size: 22),
+            onPressed: () => showNotificationsSheet(context),
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
@@ -92,15 +110,28 @@ class _IssuePageState extends State<IssuePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 64,
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withAlpha(20),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Iconsax.warning_2,
+                          size: 48,
+                          color: Colors.red,
+                        ),
                       ),
                       const SizedBox(height: 16),
-                      Text(issueState.message),
-                      ElevatedButton(
+                      Text(
+                        issueState.message,
+                        style: GoogleFonts.poppins(fontSize: 14),
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton.icon(
                         onPressed: _fetchPosts,
-                        child: const Text('Retry'),
+                        icon: const Icon(Iconsax.refresh, size: 16),
+                        label: const Text('Retry'),
                       ),
                     ],
                   ),
@@ -111,20 +142,33 @@ class _IssuePageState extends State<IssuePage> {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(
-                        Icons.post_add,
-                        size: 64,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        "No posts yet",
-                        style: TextStyle(
-                          fontSize: 18,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withAlpha(20),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Iconsax.document_text,
+                          size: 48,
+                          color: AppColors.primary,
                         ),
                       ),
+                      const SizedBox(height: 16),
                       Text(
-                        "Be the first to create a post!",
+                        'No posts yet',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Be the first to create a post!',
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF6B7280),
+                        ),
                       ),
                     ],
                   ),
@@ -141,14 +185,11 @@ class _IssuePageState extends State<IssuePage> {
                       if (index == 0) {
                         return Column(
                           children: [
-                            Text(
-                              "Latest Issues",
-                              style: Theme.of(context).textTheme.bodySmall,
+                            _SectionHeader(
+                              label: 'Latest Issues',
+                              icon: Iconsax.flash_1,
                             ),
-                            Divider(
-                              indent: 20,
-                              endIndent: 20,
-                            ),
+                            const SizedBox(height: 4),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: PostCard(
@@ -162,14 +203,11 @@ class _IssuePageState extends State<IssuePage> {
                       if (index == 2) {
                         return Column(
                           children: [
-                            Text(
-                              "Trending Issues",
-                              style: Theme.of(context).textTheme.bodySmall,
+                            _SectionHeader(
+                              label: 'Trending Issues',
+                              icon: Iconsax.trend_up,
                             ),
-                            Divider(
-                              indent: 20,
-                              endIndent: 20,
-                            ),
+                            const SizedBox(height: 4),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: PostCard(
@@ -183,14 +221,11 @@ class _IssuePageState extends State<IssuePage> {
                       if (index == 7) {
                         return Column(
                           children: [
-                            Text(
-                              "Other Issues",
-                              style: Theme.of(context).textTheme.bodySmall,
+                            _SectionHeader(
+                              label: 'Other Issues',
+                              icon: Iconsax.document_text_1,
                             ),
-                            Divider(
-                              indent: 20,
-                              endIndent: 20,
-                            ),
+                            const SizedBox(height: 4),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: PostCard(
@@ -229,17 +264,55 @@ class _IssuePageState extends State<IssuePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AdminPage(
-                            user: userState as User,
-                          ),
+                          builder: (context) =>
+                              AdminPage(user: userState as User),
                         ),
                       );
                     },
-                    child: const Icon(Icons.admin_panel_settings),
+                    tooltip: 'Admin Panel',
+                    backgroundColor: AppColors.primary,
+                    child: const Icon(Iconsax.shield_tick, color: Colors.white),
                   ),
               ],
             )
           : null,
+    );
+  }
+}
+// ── Section header widget ─────────────────────────────────────────────────────
+
+class _SectionHeader extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  const _SectionHeader({required this.label, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withAlpha(20),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: AppColors.primary),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Expanded(child: Divider()),
+        ],
+      ),
     );
   }
 }
