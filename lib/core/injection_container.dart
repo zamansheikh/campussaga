@@ -180,5 +180,4 @@ Future<void> init() async {
   );
   //Auth Service
   sl.registerLazySingleton(() => AuthService());
-  sl.registerLazySingleton(() => CloudinaryService());
 }
