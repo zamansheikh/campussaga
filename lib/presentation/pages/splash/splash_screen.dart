@@ -4,6 +4,7 @@ import 'package:campus_saga/core/theme/app_theme.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
+import 'package:campus_saga/presentation/pages/auth/complete_profile_page.dart';
 import 'package:campus_saga/presentation/pages/auth/onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -95,6 +96,12 @@ class _SplashScreenState extends State<SplashScreen>
           if (state is AuthAuthenticated) {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          } else if (state is AuthProfileIncomplete) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => CompleteProfilePage(user: state.user),
+              ),
             );
           } else if (state is AuthUnauthenticated || state is AuthFailure) {
             Navigator.of(context).pushReplacement(

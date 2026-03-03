@@ -36,7 +36,6 @@ class AuthFailure extends AuthState {
   List<Object?> get props => [message];
 }
 
-
 class AuthUpdateFailure extends AuthState {
   final String message;
 
@@ -44,4 +43,15 @@ class AuthUpdateFailure extends AuthState {
 
   @override
   List<Object?> get props => [message];
+}
+
+/// Emitted after Google sign-in when the user profile lacks essential info
+/// (university, department, gender). The partial user is carried along.
+class AuthProfileIncomplete extends AuthState {
+  final User user;
+
+  const AuthProfileIncomplete(this.user);
+
+  @override
+  List<Object?> get props => [user];
 }

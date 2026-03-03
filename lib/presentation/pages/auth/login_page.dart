@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campus_saga/presentation/pages/auth/complete_profile_page.dart';
 
 import '../../bloc/auth/auth_state.dart';
 
@@ -19,6 +20,12 @@ class LoginPage extends StatelessWidget {
         listener: (context, state) {
           if (state is AuthAuthenticated) {
             Navigator.of(context).pushReplacementNamed('/home');
+          } else if (state is AuthProfileIncomplete) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => CompleteProfilePage(user: state.user),
+              ),
+            );
           } else if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

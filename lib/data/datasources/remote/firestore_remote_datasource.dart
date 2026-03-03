@@ -31,13 +31,14 @@ class FirestoreRemoteDataSource {
   }
 
   Future<void> updateUserRole(UserRoleParams role) async {
-    await firestore.collection('users').doc(role.uuid).update(
-      {'userType': role.role},
-    );
+    await firestore.collection('users').doc(role.uuid).update({
+      'userType': role.role,
+    });
   }
 
   Future<void> updateUserVerificationStatus(
-      VerificationStatusModel verification) async {
+    VerificationStatusModel verification,
+  ) async {
     await firestore
         .collection('verification')
         .doc(verification.userUuid)
@@ -50,12 +51,14 @@ class FirestoreRemoteDataSource {
   //! Post Operations || Create Post and Update UserProfile as The User has created a post
   Future<void> createPost(PostModel post) async {
     await firestore.collection('posts').doc(post.id).set(post.toJson());
-    await firestore.collection('users').doc(post.userId).update({
+    await firestore.collection('users').doc(post.userId).set({
       'postCount': FieldValue.increment(1),
-    });
-    await firestore.collection('universities').doc(post.universityId).update({
-      'totalPosts': FieldValue.increment(1),
-    });
+    }, SetOptions(merge: true));
+    if (post.universityId.isNotEmpty) {
+      await firestore.collection('universities').doc(post.universityId).set({
+        'totalPosts': FieldValue.increment(1),
+      }, SetOptions(merge: true));
+    }
   }
 
   Future<void> deleteIssue(PostModel post) async {
@@ -104,8 +107,9 @@ class FirestoreRemoteDataSource {
         .get();
     if (randomPostSnapshot.size > 0) {
       final randomIndex = Random().nextInt(randomPostSnapshot.size);
-      final randomPost =
-          PostModel.fromJson(randomPostSnapshot.docs[randomIndex].data());
+      final randomPost = PostModel.fromJson(
+        randomPostSnapshot.docs[randomIndex].data(),
+      );
       timelinePosts.add(randomPost);
     }
 
@@ -113,9 +117,11 @@ class FirestoreRemoteDataSource {
         .collection('posts')
         .where('universityId', isEqualTo: universityId)
         .orderBy('timestamp', descending: true)
-        .startAfterDocument(latestPostsSnapshot.docs.isNotEmpty
-            ? latestPostsSnapshot.docs.last
-            : topVotedPostsSnapshot.docs.last)
+        .startAfterDocument(
+          latestPostsSnapshot.docs.isNotEmpty
+              ? latestPostsSnapshot.docs.last
+              : topVotedPostsSnapshot.docs.last,
+        )
         .get();
     final remainingPosts = remainingPostsSnapshot.docs
         .map((doc) => PostModel.fromJson(doc.data()))
@@ -127,9 +133,9 @@ class FirestoreRemoteDataSource {
 
   // Comment and Feedback Operations
   Future<void> updatePostComments(PostModel post) async {
-    await firestore.collection('posts').doc(post.id).update(
-      {'comments': post.comments.map((c) => c.toJson()).toList()},
-    );
+    await firestore.collection('posts').doc(post.id).update({
+      'comments': post.comments.map((c) => c.toJson()).toList(),
+    });
   }
 
   Future<void> addComment(String postId, CommentModel comment) async {
@@ -140,37 +146,41 @@ class FirestoreRemoteDataSource {
 
   Future<void> updatePostFeedback(PostModel post) async {
     if (post.feedback != null) {
-      await firestore.collection('posts').doc(post.id).update(
-        {'feedback': post.feedback!.toJson()},
-      );
+      await firestore.collection('posts').doc(post.id).update({
+        'feedback': post.feedback!.toJson(),
+      });
     }
   }
 
   Future<void> addFeedback(
-      String postId, AuthorityFeedbackModel feedback) async {
+    String postId,
+    AuthorityFeedbackModel feedback,
+  ) async {
     await firestore.collection('posts').doc(postId).update({
       'feedback': feedback.toJson(),
     });
   }
 
   Future<void> updateAgreeOrDisagree(
-      PostModel post, UserModel user, bool isAgree) async {
-    await firestore.collection('posts').doc(post.id).update(
-      {
-        'agree': post.agree,
-        'disagree': post.disagree,
-      },
-    );
+    PostModel post,
+    UserModel user,
+    bool isAgree,
+  ) async {
+    await firestore.collection('posts').doc(post.id).update({
+      'agree': post.agree,
+      'disagree': post.disagree,
+    });
   }
 
   Future<void> updateTrueOrFalse(
-      PostModel post, UserModel user, bool isTrue) async {
-    await firestore.collection('posts').doc(post.id).update(
-      {
-        'trueVotes': post.trueVotes,
-        'falseVotes': post.falseVotes,
-      },
-    );
+    PostModel post,
+    UserModel user,
+    bool isTrue,
+  ) async {
+    await firestore.collection('posts').doc(post.id).update({
+      'trueVotes': post.trueVotes,
+      'falseVotes': post.falseVotes,
+    });
 
     await firestore.collection('users').doc(post.userId).update({
       'receivedVotesCount': FieldValue.increment(1),
@@ -230,7 +240,8 @@ class FirestoreRemoteDataSource {
 
   //Create a promotion post
   Future<List<PromotionModel>> getPromotionByUniversity(
-      String universityId) async {
+    String universityId,
+  ) async {
     final querySnapshot = await firestore
         .collection('promotion')
         // .where('universityId', isEqualTo: universityId)
@@ -259,7 +270,8 @@ class FirestoreRemoteDataSource {
 
   //addVarificationRequest
   Future<void> addVarificationRequest(
-      VerificationStatusModel verification) async {
+    VerificationStatusModel verification,
+  ) async {
     await firestore
         .collection('verification')
         .doc(verification.userUuid)
@@ -268,7 +280,8 @@ class FirestoreRemoteDataSource {
 
   //get getPendingVerificaionByUniversity
   Future<List<VerificationStatusModel>> getPendingVerificaionByUniversity(
-      String universityId) async {
+    String universityId,
+  ) async {
     try {
       final querySnapshot = await firestore
           .collection("verification")

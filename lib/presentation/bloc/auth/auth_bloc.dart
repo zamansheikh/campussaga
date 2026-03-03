@@ -165,8 +165,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(AuthFailure(failure.message));
         },
         (user) async {
-          emit(AuthSuccess());
-          emit(AuthAuthenticated(user));
+          // Profile is incomplete when universityId is empty / placeholder
+          final needsProfile =
+              user.universityId.isEmpty || user.universityId == 'Not Selected';
+          if (needsProfile) {
+            emit(AuthProfileIncomplete(user));
+          } else {
+            emit(AuthSuccess());
+            emit(AuthAuthenticated(user));
+          }
         },
       );
     });
