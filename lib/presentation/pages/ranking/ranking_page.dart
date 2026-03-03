@@ -19,16 +19,17 @@ class RankingPage extends StatefulWidget {
 class _RankingPageState extends State<RankingPage> {
   List<University> universities = [];
   String searchQuery = '';
-  String filter = 'All Universities';
+  String filter = 'All';
+  bool _descExpanded = false;
 
   List<University> get filteredUniversities {
     List<University> filtered = universities.where((university) {
       return university.name.toLowerCase().contains(searchQuery.toLowerCase());
     }).toList();
 
-    if (filter == 'Public Universities') {
+    if (filter == 'Public') {
       filtered = filtered.where((university) => university.isPublic).toList();
-    } else if (filter == 'Private Universities') {
+    } else if (filter == 'Private') {
       filtered = filtered.where((university) => !university.isPublic).toList();
     }
 
@@ -62,8 +63,11 @@ class _RankingPageState extends State<RankingPage> {
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Iconsax.ranking_1, size: 16,
-                  color: Colors.white),
+              child: const Icon(
+                Iconsax.ranking_1,
+                size: 16,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(width: 10),
             Text(
@@ -85,9 +89,9 @@ class _RankingPageState extends State<RankingPage> {
       body: BlocConsumer<UniversityBloc, UniversityState>(
         listener: (context, state) {
           if (state is UniversityError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         builder: (context, state) {
@@ -106,11 +110,11 @@ class _RankingPageState extends State<RankingPage> {
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 8),
+                          // Title
                           Text(
                             'University Rankings 2025',
                             style: GoogleFonts.poppins(
@@ -119,94 +123,104 @@ class _RankingPageState extends State<RankingPage> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            AppConstants.UNIVERSITY_RANKING_DESCRIPTION,
-                            style: GoogleFonts.poppins(
+                          // Collapsible description
+                          AnimatedCrossFade(
+                            duration: const Duration(milliseconds: 250),
+                            crossFadeState: _descExpanded
+                                ? CrossFadeState.showSecond
+                                : CrossFadeState.showFirst,
+                            firstChild: Text(
+                              AppConstants.UNIVERSITY_RANKING_DESCRIPTION,
+                              style: GoogleFonts.poppins(
                                 fontSize: 12,
-                                color: const Color(0xFF9CA3AF)),
+                                color: const Color(0xFF9CA3AF),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            secondChild: Text(
+                              AppConstants.UNIVERSITY_RANKING_DESCRIPTION,
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: const Color(0xFF9CA3AF),
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 16),
-                          // Search + filter row
+                          GestureDetector(
+                            onTap: () =>
+                                setState(() => _descExpanded = !_descExpanded),
+                            child: Text(
+                              _descExpanded ? 'Show less' : 'Show more',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Search bar
+                          TextField(
+                            onChanged: (value) =>
+                                setState(() => searchQuery = value),
+                            style: GoogleFonts.poppins(fontSize: 13),
+                            decoration: InputDecoration(
+                              hintText: 'Search universities…',
+                              hintStyle: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: const Color(0xFF9CA3AF),
+                              ),
+                              prefixIcon: const Icon(
+                                Iconsax.search_normal,
+                                size: 18,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 14,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          // Pill filter row
                           Row(
                             children: [
-                              Expanded(
-                                child: TextField(
-                                  onChanged: (value) =>
-                                      setState(() => searchQuery = value),
-                                  style: GoogleFonts.poppins(fontSize: 13),
-                                  decoration: InputDecoration(
-                                    hintText: 'Search universities…',
-                                    hintStyle: GoogleFonts.poppins(
-                                        fontSize: 13,
-                                        color: const Color(0xFF9CA3AF)),
-                                    prefixIcon: const Icon(Iconsax.search_normal,
-                                        size: 18),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    filled: true,
-                                    contentPadding:
-                                        const EdgeInsets.symmetric(
-                                            vertical: 12, horizontal: 14),
-                                  ),
-                                ),
+                              _FilterPill(
+                                label: 'All',
+                                selected: filter == 'All',
+                                onTap: () => setState(() => filter = 'All'),
                               ),
                               const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surfaceContainerHighest,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    value: filter,
-                                    items: const [
-                                      DropdownMenuItem(
-                                          value: 'All Universities',
-                                          child: Text('All')),
-                                      DropdownMenuItem(
-                                          value: 'Public Universities',
-                                          child: Text('Public')),
-                                      DropdownMenuItem(
-                                          value: 'Private Universities',
-                                          child: Text('Private')),
-                                    ],
-                                    onChanged: (value) =>
-                                        setState(() => filter = value!),
-                                    icon: const Icon(Iconsax.arrow_down,
-                                        size: 16),
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 13,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface),
-                                    isDense: true,
-                                  ),
-                                ),
+                              _FilterPill(
+                                label: 'Public',
+                                selected: filter == 'Public',
+                                onTap: () => setState(() => filter = 'Public'),
+                              ),
+                              const SizedBox(width: 8),
+                              _FilterPill(
+                                label: 'Private',
+                                selected: filter == 'Private',
+                                onTap: () => setState(() => filter = 'Private'),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                         ],
                       ),
                     ),
                   ),
                   SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final university = filteredUniversities[index];
-                        return UniversityCard(
-                          university: university,
-                          rank: index + 1,
-                        );
-                      },
-                      childCount: filteredUniversities.length,
-                    ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final university = filteredUniversities[index];
+                      return UniversityCard(
+                        university: university,
+                        rank: index + 1,
+                      );
+                    }, childCount: filteredUniversities.length),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 24)),
                 ],
@@ -223,12 +237,14 @@ class _RankingPageState extends State<RankingPage> {
                       color: Colors.red.withAlpha(20),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Iconsax.warning_2, size: 48,
-                        color: Colors.red),
+                    child: const Icon(
+                      Iconsax.warning_2,
+                      size: 48,
+                      color: Colors.red,
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  Text(state.message,
-                      style: GoogleFonts.poppins(fontSize: 14)),
+                  Text(state.message, style: GoogleFonts.poppins(fontSize: 14)),
                 ],
               ),
             );
@@ -244,11 +260,8 @@ class _RankingPageState extends State<RankingPage> {
 class UniversityCard extends StatefulWidget {
   final University university;
   final int rank;
-  const UniversityCard({
-    Key? key,
-    required this.university,
-    required this.rank,
-  }) : super(key: key);
+  const UniversityCard({Key? key, required this.university, required this.rank})
+    : super(key: key);
 
   @override
   State<UniversityCard> createState() => _UniversityCardState();
@@ -260,8 +273,7 @@ class _UniversityCardState extends State<UniversityCard> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final borderColor =
-        Theme.of(context).colorScheme.outline.withAlpha(50);
+    final borderColor = Theme.of(context).colorScheme.outline.withAlpha(50);
 
     Color rankBg;
     Color rankFg;
@@ -333,15 +345,19 @@ class _UniversityCardState extends State<UniversityCard> {
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          const Icon(Iconsax.location, size: 11,
-                              color: Color(0xFF9CA3AF)),
+                          const Icon(
+                            Iconsax.location,
+                            size: 11,
+                            color: Color(0xFF9CA3AF),
+                          ),
                           const SizedBox(width: 3),
                           Expanded(
                             child: Text(
                               widget.university.location,
                               style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  color: const Color(0xFF9CA3AF)),
+                                fontSize: 11,
+                                color: const Color(0xFF9CA3AF),
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -352,7 +368,9 @@ class _UniversityCardState extends State<UniversityCard> {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 5),
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withAlpha(20),
                     borderRadius: BorderRadius.circular(20),
@@ -389,38 +407,54 @@ class _UniversityCardState extends State<UniversityCard> {
             const SizedBox(height: 12),
             if (showMetrics) ...[
               _buildMetricRow(
-                  label: 'QS Score',
-                  score: widget.university.qsRankingScore,
-                  color: AppColors.primary,
-                  icon: Iconsax.bookmark),
+                label: 'QS Score',
+                score: widget.university.qsRankingScore,
+                color: AppColors.primary,
+                icon: Iconsax.bookmark,
+              ),
               _buildMetricRow(
-                  label: 'Academic',
-                  score: widget.university.academicScore,
-                  color: const Color(0xFF4CAF50),
-                  icon: Iconsax.teacher),
+                label: 'Academic',
+                score: widget.university.academicScore,
+                color: const Color(0xFF4CAF50),
+                icon: Iconsax.teacher,
+              ),
               _buildMetricRow(
-                  label: 'Research',
-                  score: widget.university.researchScore,
-                  color: Color(0xFFFF9800),
-                  icon: Iconsax.microscope),
+                label: 'Research',
+                score: widget.university.researchScore,
+                color: Color(0xFFFF9800),
+                icon: Iconsax.microscope,
+              ),
               _buildMetricRow(
-                  label: 'Satisfaction',
-                  score: widget.university.satisfactionPercentage,
-                  color: const Color(0xFF00BCD4),
-                  icon: Iconsax.emoji_happy),
+                label: 'Satisfaction',
+                score: widget.university.satisfactionPercentage,
+                color: const Color(0xFF00BCD4),
+                icon: Iconsax.emoji_happy,
+              ),
             ] else ...[
               const SizedBox(height: 4),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildDetailItem(Iconsax.people,
-                      '${widget.university.studentCount}', 'Students'),
-                  _buildDetailItem(Iconsax.teacher,
-                      '${widget.university.facultyCount}', 'Faculty'),
-                  _buildDetailItem(Iconsax.book_1,
-                      '${widget.university.programsOffered}', 'Programs'),
-                  _buildDetailItem(Iconsax.calendar,
-                      '${widget.university.establishmentYear}', 'Est.'),
+                  _buildDetailItem(
+                    Iconsax.people,
+                    '${widget.university.studentCount}',
+                    'Students',
+                  ),
+                  _buildDetailItem(
+                    Iconsax.teacher,
+                    '${widget.university.facultyCount}',
+                    'Faculty',
+                  ),
+                  _buildDetailItem(
+                    Iconsax.book_1,
+                    '${widget.university.programsOffered}',
+                    'Programs',
+                  ),
+                  _buildDetailItem(
+                    Iconsax.calendar,
+                    '${widget.university.establishmentYear}',
+                    'Est.',
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -441,11 +475,12 @@ class _UniversityCardState extends State<UniversityCard> {
     );
   }
 
-  Widget _buildMetricRow(
-      {required String label,
-      required double score,
-      required Color color,
-      required IconData icon}) {
+  Widget _buildMetricRow({
+    required String label,
+    required double score,
+    required Color color,
+    required IconData icon,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
@@ -464,7 +499,9 @@ class _UniversityCardState extends State<UniversityCard> {
             child: Text(
               label,
               style: GoogleFonts.poppins(
-                  fontSize: 12, fontWeight: FontWeight.w600),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           Expanded(
@@ -484,7 +521,9 @@ class _UniversityCardState extends State<UniversityCard> {
             child: Text(
               '${score.toStringAsFixed(0)}%',
               style: GoogleFonts.poppins(
-                  fontSize: 12, fontWeight: FontWeight.bold),
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.end,
             ),
           ),
@@ -507,13 +546,14 @@ class _UniversityCardState extends State<UniversityCard> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: GoogleFonts.poppins(
-              fontSize: 13, fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.bold),
         ),
         Text(
           label,
           style: GoogleFonts.poppins(
-              fontSize: 10, color: const Color(0xFF9CA3AF)),
+            fontSize: 10,
+            color: const Color(0xFF9CA3AF),
+          ),
         ),
       ],
     );
@@ -554,10 +594,11 @@ class _ToggleChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon,
-                size: 14,
-                color:
-                    selected ? Colors.white : const Color(0xFF9CA3AF)),
+            Icon(
+              icon,
+              size: 14,
+              color: selected ? Colors.white : const Color(0xFF9CA3AF),
+            ),
             const SizedBox(width: 5),
             Text(
               label,
@@ -573,7 +614,49 @@ class _ToggleChip extends StatelessWidget {
         ),
       ),
     );
-   }
+  }
 }
 
+// ── Filter pill helper ────────────────────────────────────────────────────────
 
+class _FilterPill extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _FilterPill({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected
+                ? AppColors.primary
+                : Theme.of(context).colorScheme.outline.withAlpha(80),
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: selected
+                ? Colors.white
+                : Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
+  }
+}

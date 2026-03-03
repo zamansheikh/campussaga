@@ -123,7 +123,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<Department>(
-              value: selectedDepartment,
+              initialValue: selectedDepartment,
               onChanged: (newValue) {
                 setState(() {
                   selectedDepartment = newValue;
@@ -176,7 +176,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: selectedBloodGroup,
+              initialValue: selectedBloodGroup,
               onChanged: (newValue) {
                 setState(() {
                   selectedBloodGroup = newValue;
@@ -206,7 +206,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: selectedGender,
+              initialValue: selectedGender,
               onChanged: (newValue) {
                 setState(() {
                   selectedGender = newValue;
