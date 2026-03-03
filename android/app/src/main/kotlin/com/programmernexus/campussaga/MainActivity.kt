@@ -1,4 +1,4 @@
-package com.decodersfamily.campus_saga
+package com.programmernexus.campussaga
 
 import io.flutter.embedding.android.FlutterActivity
 

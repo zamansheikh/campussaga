@@ -22,22 +22,17 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          "Log In",
-        ),
-        
-      ),
+      appBar: AppBar(centerTitle: true, title: Text("Log In")),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Logged In Successfully")),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text("Logged In Successfully")));
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.message)));
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           } else if (state is AuthAuthenticated) {
             Navigator.of(context).pushReplacementNamed('/home');
           } else if (state is AuthUnauthenticated) {
@@ -57,8 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                     controller: emailController,
                     labelText: "Email",
                     icon: Icons.email,
-                    
-                    
+
                     validator: (value) {
                       if (!Validators.isValidEmail(value ?? '')) {
                         return 'Enter a valid email';
@@ -72,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
                     labelText: "Password",
                     icon: Icons.lock,
                     isObscure: true,
-                   
+
                     validator: (value) {
                       if (!Validators.isValidPassword(value ?? '')) {
                         return 'Password must be at least 6 characters';
@@ -86,13 +80,14 @@ class _LoginPageState extends State<LoginPage> {
                   else
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                       
-                       
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 50,
+                          vertical: 15,
+                        ),
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(8), // Rounded corners
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ), // Rounded corners
                         ),
                       ),
                       onPressed: () {
@@ -111,9 +106,25 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {
                       Navigator.of(context).pushNamed('/signup');
                     },
-                    child: Text(
-                      "Don't have an account? Sign Up",
-                     
+                    child: Text("Don't have an account? Sign Up"),
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      BlocProvider.of<AuthBloc>(
+                        context,
+                      ).add(SignInWithGoogleEvent());
+                    },
+                    icon: Icon(Icons.g_mobiledata, size: 30),
+                    label: Text("Sign In with Google"),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ],

@@ -1,58 +1,58 @@
 name: campus_saga
-description: A new Flutter project.
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+description: "A new Flutter project."
+publish_to: 'none'
 
-version: 1.2.4+1
+version: 1.0.0+1
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
-
+  sdk: ^3.9.2
 dependencies:
   flutter:
     sdk: flutter
-  percent_indicator: ^4.2.4
+
+  percent_indicator: ^4.2.5
   cupertino_icons: ^1.0.8
-  flutter_launcher_icons: "^0.13.1"
-  rename: ^3.0.2
-  dropdown_button2: ^2.3.9
-  firebase_core: ^3.8.1
-  firebase_auth: ^5.3.4
-  firebase_storage: ^12.3.7
-  cloud_firestore: ^5.5.1
-  image_picker: ^1.1.2
-  firebase_database: ^11.2.0
-  searchfield: ^1.2.2
-  get_it: ^8.0.2
-  flutter_bloc: ^8.1.6
+  flutter_launcher_icons: 0.14.4
+  rename: ^3.1.0
+  dropdown_button2: ^3.0.0
+  firebase_core: ^4.5.0
+  firebase_auth: ^6.2.0
+  firebase_storage: ^13.1.0
+  cloud_firestore: ^6.1.3
+  image_picker: ^1.2.1
+  firebase_database: ^12.1.4
+  google_sign_in: ^7.2.0
+  cloudinary_flutter: ^1.3.0
+  http: ^1.2.1
+  searchfield: ^2.0.0
+  get_it: ^9.2.1
+  flutter_bloc: ^9.1.1
   dartz: ^0.10.1
-  equatable: ^2.0.7
-  icons_launcher: ^3.0.0
-  package_rename: ^1.7.1
-  uuid: ^4.5.1
+  equatable: ^2.0.8
+  icons_launcher: ^3.0.3
+  package_rename: ^1.10.1
+  uuid: ^4.5.3
   flutter_staggered_grid_view: ^0.7.0
   flutter_lorem: ^2.0.0
   cached_network_image: ^3.4.1
-  timeago: ^3.7.0
-  connectivity_plus: ^6.1.0
+  timeago: ^3.7.1
+  connectivity_plus: ^7.0.0
   easy_url_launcher: ^0.0.7
-  toastification: ^2.3.0
-  google_fonts: ^6.2.1
-  lottie: ^3.1.3
+  toastification: ^3.0.3
+  google_fonts: ^8.0.2
+  lottie: ^3.3.2
   panara_dialogs: ^0.1.5
   advanced_salomon_bottom_bar: ^3.3.4
-  json_theme_plus: ^6.6.5
-  flex_color_scheme: ^8.0.2
-  flutter_local_notifications: ^18.0.1
-  timezone: ^0.10.0
-  firebase_messaging: ^15.1.6
-  googleapis_auth: ^1.6.0
-
+  json_theme_plus: ^6.8.1
+  flex_color_scheme: ^8.4.0
+  flutter_local_notifications: ^17.2.2
+  timezone: any
+  firebase_messaging: ^16.1.2
+  googleapis_auth: ^2.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
@@ -64,70 +64,7 @@ flutter:
     - assets/models/
     - assets/icon/
     - assets/lottie/
-    - assets/theme/
     - assets/sounds/
 
-  fonts:
-    - family: Urbanist
-      fonts:
-        - asset: assets/fonts/Urbanist-Black.ttf
-          weight: 900
-        - asset: assets/fonts/Urbanist-Bold.ttf
-          weight: 700
-        - asset: assets/fonts/Urbanist-ExtraBold.ttf
-          weight: 800
-        - asset: assets/fonts/Urbanist-ExtraLight.ttf
-          weight: 200
-        - asset: assets/fonts/Urbanist-Light.ttf
-          weight: 300
-        - asset: assets/fonts/Urbanist-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Urbanist-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/Urbanist-SemiBold.ttf
-          weight: 600
-
-    - family: Boogaloo
-      fonts:
-        - asset: assets/fonts/Boogaloo-Regular.ttf
-          weight: 400
-
-  # An image path is required for android and ios
-icons_launcher:
-  image_path: "assets/icon/Campus_Saga_Icon.png"
-  platforms:
-    android:
-      enable: true
-    ios:
-      enable: true
-
-package_rename_config:
-  android:
-    app_name: Campus Saga
-    package_name: com.decodersfamily.campus_saga
-    override_old_package: com.example.campus_saga
-    lang: kotlin
-
-  ios:
-    app_name: Campus Saga
-    bundle_name: campus_saga
-    package_name: com.decodersfamily.campus_saga
-
-  web:
-    app_name: Campus Saga
-    description: Raise Your Voice
-  linux:
-    app_name: Campus Saga
-    package_name: com.decodersfamily.campus_saga
-    exe_name: campus_saga-linux
-
-  windows:
-    app_name: Campus Saga
-    organization: deCoders Family
-    copyright_notice: Copyright ©️ 2024 DecodersFamily. All rights reserved.
-    exe_name: campus_saga-windows
-
-  macos:
-    app_name: Campus Saga
-    package_name: com.decodersfamily.campus_saga
-    copyright_notice: Copyright ©️ 2022 DecodersFamily . All rights reserved.
+dependency_overrides:
+  meta: ^1.18.1

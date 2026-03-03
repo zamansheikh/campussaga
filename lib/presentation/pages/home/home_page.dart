@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Developed by: deCoders Family',
+                      'Developed by: Programmers Nexus',
                       style: TextStyle(fontSize: 16),
                     ),
                   ],

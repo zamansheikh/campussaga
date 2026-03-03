@@ -8,7 +8,7 @@
 PRODUCT_NAME = Campus Saga
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.decodersfamily.campus_saga
+PRODUCT_BUNDLE_IDENTIFIER = com.programmernexus.campussaga
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright ©️ 2022 DecodersFamily . All rights reserved.
+PRODUCT_COPYRIGHT = Copyright ©️ 2022 Programmers Nexus. All rights reserved.

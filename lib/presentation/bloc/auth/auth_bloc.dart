@@ -3,6 +3,7 @@
 import 'package:campus_saga/core/usecases/usecase.dart';
 import 'package:campus_saga/domain/usecases/auth/create_user_profile.dart';
 import 'package:campus_saga/domain/usecases/auth/sign_in_user.dart';
+import 'package:campus_saga/domain/usecases/auth/sign_in_with_google.dart';
 import 'package:campus_saga/domain/usecases/auth/sign_out_user.dart';
 import 'package:campus_saga/domain/usecases/auth/sign_up_user.dart';
 import 'package:campus_saga/domain/usecases/auth/upload_user_image.dart';
@@ -19,6 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final CreateUserProfile createUserProfile;
   final SignOutUser signOutUser;
   final SignInUser signInUser;
+  final SignInWithGoogle signInWithGoogle;
 
   AuthBloc({
     required this.getUserProfile,
@@ -27,6 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.createUserProfile,
     required this.signOutUser,
     required this.signInUser,
+    required this.signInWithGoogle,
   }) : super(AuthInitial()) {
     on<AuthRequested>((event, emit) async {
       emit(AuthLoading());
@@ -49,10 +52,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       try {
         final isSignedUp = await signUpUser(
-          UserParams(
-            email: event.email,
-            password: event.password,
-          ),
+          UserParams(email: event.email, password: event.password),
         );
 
         await isSignedUp.fold(
@@ -61,14 +61,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           },
           (userId) async {
             if (event.image == null) {
-              final isDatabaseUpdated = await createUserProfile(User(
-                id: userId,
-                name: event.username,
-                email: event.email,
-                universityId: event.university,
-                userType: UserType.student,
-                profilePictureUrl: "https://loremflickr.com/200/200?random=2",
-              ));
+              final isDatabaseUpdated = await createUserProfile(
+                User(
+                  id: userId,
+                  name: event.username,
+                  email: event.email,
+                  universityId: event.university,
+                  userType: UserType.student,
+                  profilePictureUrl: "https://loremflickr.com/200/200?random=2",
+                ),
+              );
               await isDatabaseUpdated.fold(
                 (failure) async {
                   emit(AuthFailure(failure.message));
@@ -93,14 +95,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                   emit(AuthFailure(failure.message));
                 },
                 (imageUrl) async {
-                  final isDatabaseUpdated = await createUserProfile(User(
-                    id: userId,
-                    name: event.username,
-                    email: event.email,
-                    universityId: event.university,
-                    userType: UserType.student,
-                    profilePictureUrl: imageUrl,
-                  ));
+                  final isDatabaseUpdated = await createUserProfile(
+                    User(
+                      id: userId,
+                      name: event.username,
+                      email: event.email,
+                      universityId: event.university,
+                      userType: UserType.student,
+                      profilePictureUrl: imageUrl,
+                    ),
+                  );
                   await isDatabaseUpdated.fold(
                     (failure) async {
                       emit(AuthFailure(failure.message));
@@ -130,35 +134,55 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInEvent>((event, emit) async {
       emit(AuthLoading());
 
-      final result = await signInUser(UserParams(
-        email: event.email,
-        password: event.password,
-      ));
-      await result.fold((failure) async {
-        emit(AuthFailure(failure.message));
-      }, (userId) async {
-        emit(AuthSuccess());
-        final user = await getUserProfile(userId);
-        await user.fold(
-          (failure) async {
-            emit(AuthFailure(failure.message));
-          },
-          (user) async {
-            emit(AuthAuthenticated(user));
-          },
-        );
-      });
+      final result = await signInUser(
+        UserParams(email: event.email, password: event.password),
+      );
+      await result.fold(
+        (failure) async {
+          emit(AuthFailure(failure.message));
+        },
+        (userId) async {
+          emit(AuthSuccess());
+          final user = await getUserProfile(userId);
+          await user.fold(
+            (failure) async {
+              emit(AuthFailure(failure.message));
+            },
+            (user) async {
+              emit(AuthAuthenticated(user));
+            },
+          );
+        },
+      );
+    });
+
+    on<SignInWithGoogleEvent>((event, emit) async {
+      emit(AuthLoading());
+
+      final result = await signInWithGoogle(NoParams());
+      await result.fold(
+        (failure) async {
+          emit(AuthFailure(failure.message));
+        },
+        (user) async {
+          emit(AuthSuccess());
+          emit(AuthAuthenticated(user));
+        },
+      );
     });
 
     on<SignOutEvent>((event, emit) async {
       emit(AuthLoading());
 
       final result = await signOutUser(NoParams());
-      result.fold((failure) {
-        emit(AuthFailure(failure.message));
-      }, (_) {
-        emit(AuthUnauthenticated());
-      });
+      result.fold(
+        (failure) {
+          emit(AuthFailure(failure.message));
+        },
+        (_) {
+          emit(AuthUnauthenticated());
+        },
+      );
       await Future.delayed(Duration(seconds: 2));
       emit(AuthUnauthenticated());
     });

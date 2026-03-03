@@ -23,6 +23,7 @@ import 'package:campus_saga/domain/usecases/promotion/fetch_promotion_usecase.da
 import 'package:campus_saga/domain/usecases/admin/fetch_role_change_usecase.dart';
 import 'package:campus_saga/domain/usecases/university/fetch_university_usecase.dart';
 import 'package:campus_saga/domain/usecases/auth/sign_in_user.dart';
+import 'package:campus_saga/domain/usecases/auth/sign_in_with_google.dart';
 import 'package:campus_saga/domain/usecases/auth/sign_out_user.dart';
 import 'package:campus_saga/domain/usecases/auth/sign_up_user.dart';
 import 'package:campus_saga/domain/usecases/issue/update_issue_post_usecase.dart';
@@ -42,6 +43,7 @@ import 'package:campus_saga/presentation/bloc/role_manage/role_change_bloc.dart'
 import 'package:campus_saga/presentation/bloc/university/university_bloc.dart';
 import 'package:campus_saga/presentation/bloc/varify/varification_bloc.dart';
 import 'package:campus_saga/presentation/bloc/verify_user/verify_user_bloc.dart';
+import 'package:campus_saga/core/services/cloudinary_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -60,19 +62,13 @@ Future<void> init() async {
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSource(
-      firebaseAuth: sl(),
-    ),
+    () => AuthRemoteDataSource(firebaseAuth: sl()),
   );
   sl.registerLazySingleton<FirebaseStorageRemoteDataSource>(
-    () => FirebaseStorageRemoteDataSource(
-      firebaseStorage: sl(),
-    ),
+    () => FirebaseStorageRemoteDataSource(firebaseStorage: sl()),
   );
   sl.registerLazySingleton<FirestoreRemoteDataSource>(
-    () => FirestoreRemoteDataSource(
-      firestore: sl(),
-    ),
+    () => FirestoreRemoteDataSource(firestore: sl()),
   );
 
   // Repositories
@@ -99,6 +95,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => CreateUserProfile(sl()));
   sl.registerLazySingleton(() => SignOutUser(sl()));
   sl.registerLazySingleton(() => SignInUser(sl()));
+  sl.registerLazySingleton(() => SignInWithGoogle(sl()));
   sl.registerLazySingleton(() => FetchPostsUsecase(sl()));
   sl.registerLazySingleton(() => UploadPostImages(sl()));
   sl.registerLazySingleton(() => CreatePostUsecase(sl()));
@@ -121,60 +118,66 @@ Future<void> init() async {
   sl.registerLazySingleton(() => DeleteIssueUsecase(sl()));
 
   // BLoCs
-  sl.registerLazySingleton(() => AuthBloc(
-        getUserProfile: sl(),
-        uploadUserImage: sl(),
-        signUpUser: sl(),
-        createUserProfile: sl(),
-        signOutUser: sl(),
-        signInUser: sl(),
-      ));
-  sl.registerLazySingleton(() => PostBloc(
-        createPost: sl(),
-        uploadPostImages: sl(),
-        issueBloc: sl(),
-      ));
+  sl.registerLazySingleton(
+    () => AuthBloc(
+      getUserProfile: sl(),
+      uploadUserImage: sl(),
+      signUpUser: sl(),
+      createUserProfile: sl(),
+      signOutUser: sl(),
+      signInUser: sl(),
+      signInWithGoogle: sl(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => PostBloc(createPost: sl(), uploadPostImages: sl(), issueBloc: sl()),
+  );
 
-  sl.registerLazySingleton(() => PromotionBloc(
-        uploadPostImages: sl(),
-        createPromotion: sl(),
-      ));
+  sl.registerLazySingleton(
+    () => PromotionBloc(uploadPostImages: sl(), createPromotion: sl()),
+  );
 
-  sl.registerLazySingleton(() => IssueBloc(
-        addCommentUsecase: sl(),
-        fetchPosts: sl(),
-        addFeedbackUsecase: sl(),
-        updateIssuePostUsecase: sl(),
-        deleteIssueUsecase: sl(),
-        addVoteUseCase: sl(),
-        addAAgreeVoteUseCase: sl(),
-      ));
+  sl.registerLazySingleton(
+    () => IssueBloc(
+      addCommentUsecase: sl(),
+      fetchPosts: sl(),
+      addFeedbackUsecase: sl(),
+      updateIssuePostUsecase: sl(),
+      deleteIssueUsecase: sl(),
+      addVoteUseCase: sl(),
+      addAAgreeVoteUseCase: sl(),
+    ),
+  );
 
   sl.registerLazySingleton(() => AdminBloc(sl()));
-  sl.registerLazySingleton(() => VarificationBloc(
-        uploadVerificationImages: sl(),
-        createVarificationRequest: sl(),
-      ));
+  sl.registerLazySingleton(
+    () => VarificationBloc(
+      uploadVerificationImages: sl(),
+      createVarificationRequest: sl(),
+    ),
+  );
 
-  sl.registerLazySingleton(() => VerifyUserBloc(
-        fetchPendingVerificationUsecase: sl(),
-        updateVerificationStatusUsecase: sl(),
-      ));
+  sl.registerLazySingleton(
+    () => VerifyUserBloc(
+      fetchPendingVerificationUsecase: sl(),
+      updateVerificationStatusUsecase: sl(),
+    ),
+  );
 
-  sl.registerLazySingleton(() => AdsBloc(
-        fetchPromotionUsecase: sl(),
-        updatePromotionUsecase: sl(),
-      ));
+  sl.registerLazySingleton(
+    () => AdsBloc(fetchPromotionUsecase: sl(), updatePromotionUsecase: sl()),
+  );
 
-  sl.registerLazySingleton(() => UniversityBloc(
-        fetchUniversityUsecase: sl(),
-      ));
+  sl.registerLazySingleton(() => UniversityBloc(fetchUniversityUsecase: sl()));
 
-  sl.registerLazySingleton(() => RoleChangeBloc(
-        fetchRoleChangeUsecase: sl(),
-        changeRoleRequest: sl(),
-        updateUserRoleUsecase: sl(),
-      ));
+  sl.registerLazySingleton(
+    () => RoleChangeBloc(
+      fetchRoleChangeUsecase: sl(),
+      changeRoleRequest: sl(),
+      updateUserRoleUsecase: sl(),
+    ),
+  );
   //Auth Service
   sl.registerLazySingleton(() => AuthService());
+  sl.registerLazySingleton(() => CloudinaryService());
 }

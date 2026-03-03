@@ -112,7 +112,7 @@ The app will interact with external APIs for location services (optional), authe
 
 ## 11. Review and Approval
 
-The SRS document will undergo review and approval by org:deCodersFamily.
+The SRS document will undergo review and approval by org:Programmers Nexus.
 
 ## 12. Change History
 

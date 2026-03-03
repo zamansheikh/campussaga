@@ -58,3 +58,8 @@ class SignInEvent extends AuthEvent {
 class AuthRefreshRequested extends AuthEvent {}
 
 class SignOutEvent extends AuthEvent {}
+
+class SignInWithGoogleEvent extends AuthEvent {
+  @override
+  List<Object?> get props => [];
+}
