@@ -1,5 +1,4 @@
 import 'package:campus_saga/core/constants/dummypost.dart';
-import 'package:campus_saga/core/notifications/notification_sheet.dart';
 import 'package:campus_saga/core/theme/app_theme.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
@@ -79,7 +78,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                    colors: AppColors.primaryGradient),
+                  colors: AppColors.primaryGradient,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(Iconsax.edit_2, size: 16, color: Colors.white),
@@ -88,14 +88,16 @@ class _CreatePostPageState extends State<CreatePostPage> {
             Text(
               'Create Post',
               style: GoogleFonts.poppins(
-                  fontSize: 20, fontWeight: FontWeight.bold),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
         actions: [
           IconButton(
             icon: const Icon(Iconsax.notification),
-            onPressed: () => showNotificationsSheet(context),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
           ),
         ],
       ),
@@ -138,9 +140,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
               decoration: InputDecoration(
                 hintText: 'Enter a clear, concise title…',
                 hintStyle: GoogleFonts.poppins(
-                    fontSize: 13, color: const Color(0xFF9CA3AF)),
-                prefixIcon:
-                    const Icon(Iconsax.text, size: 18),
+                  fontSize: 13,
+                  color: const Color(0xFF9CA3AF),
+                ),
+                prefixIcon: const Icon(Iconsax.text, size: 18),
               ),
             ),
 
@@ -156,7 +159,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
               decoration: InputDecoration(
                 hintText: 'Describe the issue or event in detail…',
                 hintStyle: GoogleFonts.poppins(
-                    fontSize: 13, color: const Color(0xFF9CA3AF)),
+                  fontSize: 13,
+                  color: const Color(0xFF9CA3AF),
+                ),
                 alignLabelWithHint: true,
               ),
             ),
@@ -172,9 +177,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 decoration: InputDecoration(
                   hintText: 'e.g. Robotics Club',
                   hintStyle: GoogleFonts.poppins(
-                      fontSize: 13, color: const Color(0xFF9CA3AF)),
-                  prefixIcon:
-                      const Icon(Iconsax.people, size: 18),
+                    fontSize: 13,
+                    color: const Color(0xFF9CA3AF),
+                  ),
+                  prefixIcon: const Icon(Iconsax.people, size: 18),
                 ),
               ),
               const SizedBox(height: 16),
@@ -186,9 +192,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 decoration: InputDecoration(
                   hintText: 'https://…',
                   hintStyle: GoogleFonts.poppins(
-                      fontSize: 13, color: const Color(0xFF9CA3AF)),
-                  prefixIcon:
-                      const Icon(Iconsax.link_21, size: 18),
+                    fontSize: 13,
+                    color: const Color(0xFF9CA3AF),
+                  ),
+                  prefixIcon: const Icon(Iconsax.link_21, size: 18),
                 ),
               ),
             ],
@@ -198,19 +205,20 @@ class _CreatePostPageState extends State<CreatePostPage> {
             // ── Attachments ──────────────────────────────────────────
             Row(
               children: [
-                _SectionLabel(
-                    icon: Iconsax.gallery, text: 'Attachments'),
+                _SectionLabel(icon: Iconsax.gallery, text: 'Attachments'),
                 const Spacer(),
                 OutlinedButton.icon(
                   onPressed: pickImages,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primary,
-                    side: BorderSide(
-                        color: AppColors.primary.withAlpha(120)),
+                    side: BorderSide(color: AppColors.primary.withAlpha(120)),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
@@ -218,7 +226,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   label: Text(
                     'Add',
                     style: GoogleFonts.poppins(
-                        fontSize: 12, fontWeight: FontWeight.w600),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -245,10 +255,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               fit: BoxFit.cover,
                             ),
                             border: Border.all(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .outline
-                                  .withAlpha(60),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outline.withAlpha(60),
                             ),
                           ),
                         ),
@@ -270,8 +279,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   ),
                                 ],
                               ),
-                              child: const Icon(Icons.close,
-                                  size: 13, color: Colors.white),
+                              child: const Icon(
+                                Icons.close,
+                                size: 13,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -289,10 +301,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       : const Color(0xFFF5F6FF),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .outline
-                        .withAlpha(40),
+                    color: Theme.of(context).colorScheme.outline.withAlpha(40),
                     style: BorderStyle.solid,
                   ),
                 ),
@@ -300,9 +309,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Iconsax.gallery_add,
-                          size: 18,
-                          color: AppColors.primary.withAlpha(160)),
+                      Icon(
+                        Iconsax.gallery_add,
+                        size: 18,
+                        color: AppColors.primary.withAlpha(160),
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'Tap "Add" to attach images',
@@ -330,15 +341,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           if (postState is PostingSuccess) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content:
-                                      Text('Post created successfully')),
+                                content: Text('Post created successfully'),
+                              ),
                             );
                             handlePostCreation(0);
                           } else if (postState is PostingFailure) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                  content: Text(
-                                      'Failed: ${postState.message}')),
+                                content: Text('Failed: ${postState.message}'),
+                              ),
                             );
                           }
                         },
@@ -348,16 +359,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           if (promoState is PromotionPostingSuccess) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content: Text(
-                                      'Promotion created successfully')),
+                                content: Text('Promotion created successfully'),
+                              ),
                             );
                             handlePostCreation(1);
-                          } else if (promoState
-                              is PromotionPostingFailure) {
+                          } else if (promoState is PromotionPostingFailure) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                  content: Text(
-                                      'Failed: ${promoState.message}')),
+                                content: Text('Failed: ${promoState.message}'),
+                              ),
                             );
                           }
                         },
@@ -369,8 +379,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           builder: (_, postState) {
                             if (postState is PostingLoading) {
                               return Padding(
-                                padding:
-                                    const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.only(bottom: 12),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -378,15 +387,18 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                       width: 18,
                                       height: 18,
                                       child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: AppColors.primary),
+                                        strokeWidth: 2,
+                                        color: AppColors.primary,
+                                      ),
                                     ),
                                     const SizedBox(width: 10),
-                                    Text('Publishing post…',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 13,
-                                            color:
-                                                const Color(0xFF9CA3AF))),
+                                    Text(
+                                      'Publishing post…',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 13,
+                                        color: const Color(0xFF9CA3AF),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               );
@@ -398,8 +410,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           builder: (_, promoState) {
                             if (promoState is PromotionPostingLoading) {
                               return Padding(
-                                padding:
-                                    const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.only(bottom: 12),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -407,16 +418,18 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                       width: 18,
                                       height: 18,
                                       child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color:
-                                              Color(0xFF7C4DFF)),
+                                        strokeWidth: 2,
+                                        color: Color(0xFF7C4DFF),
+                                      ),
                                     ),
                                     const SizedBox(width: 10),
-                                    Text('Publishing promotion…',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 13,
-                                            color:
-                                                const Color(0xFF9CA3AF))),
+                                    Text(
+                                      'Publishing promotion…',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 13,
+                                        color: const Color(0xFF9CA3AF),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               );
@@ -435,9 +448,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   titleController.text,
                                   descriptionController.text,
                                 );
-                                BlocProvider.of<PostBloc>(context)
-                                    .add(PostCreated(
-                                        post, selectedImages));
+                                BlocProvider.of<PostBloc>(
+                                  context,
+                                ).add(PostCreated(post, selectedImages));
                               } else if (postType == 'Promotional') {
                                 final promotion = promotionGenerate(
                                   user,
@@ -445,27 +458,31 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   descriptionController.text,
                                   clubNameController.text,
                                   eventLinkController.text,
-                                  DateTime.now()
-                                      .add(const Duration(days: 7)),
+                                  DateTime.now().add(const Duration(days: 7)),
                                 );
                                 if (selectedImages.isEmpty) {
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(
+                                  ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content: Text(
-                                            'Please select at least one image')),
+                                      content: Text(
+                                        'Please select at least one image',
+                                      ),
+                                    ),
                                   );
                                   return;
                                 }
-                                BlocProvider.of<PromotionBloc>(context)
-                                    .add(PromotionPostCreated(
-                                        promotion, selectedImages));
+                                BlocProvider.of<PromotionBloc>(context).add(
+                                  PromotionPostCreated(
+                                    promotion,
+                                    selectedImages,
+                                  ),
+                                );
                               } else {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(
+                                ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text(
-                                          'Please select a post type first')),
+                                    content: Text(
+                                      'Please select a post type first',
+                                    ),
+                                  ),
                                 );
                               }
                             },
@@ -479,12 +496,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             ),
                             icon: const Icon(Iconsax.send_2, size: 18),
                             label: Text(
-                              isPromo
-                                  ? 'Publish Promotion'
-                                  : 'Create Post',
+                              isPromo ? 'Publish Promotion' : 'Create Post',
                               style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600),
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
@@ -556,29 +572,27 @@ class _TypeChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: selected ? color : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: selected
                 ? color
-                : Theme.of(context)
-                    .colorScheme
-                    .outline
-                    .withAlpha(80),
+                : Theme.of(context).colorScheme.outline.withAlpha(80),
             width: 1.5,
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon,
-                size: 16,
-                color: selected
-                    ? Colors.white
-                    : Theme.of(context).colorScheme.onSurface),
+            Icon(
+              icon,
+              size: 16,
+              color: selected
+                  ? Colors.white
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
             const SizedBox(width: 7),
             Text(
               label,

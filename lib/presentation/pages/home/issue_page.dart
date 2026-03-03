@@ -1,4 +1,5 @@
 import 'package:campus_saga/core/injection_container.dart';
+import 'package:campus_saga/core/notifications/notification_panel.dart';
 import 'package:campus_saga/core/theme/app_theme.dart';
 import 'package:campus_saga/core/utils/validators.dart';
 import 'package:campus_saga/domain/entities/user.dart';
@@ -6,7 +7,6 @@ import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
 import 'package:campus_saga/presentation/pages/admin/admin_page.dart';
-import 'package:campus_saga/core/notifications/notification_sheet.dart';
 import 'package:campus_saga/presentation/pages/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,11 +80,12 @@ class _IssuePageState extends State<IssuePage> {
         actions: [
           IconButton(
             icon: const Icon(Iconsax.notification, size: 22),
-            onPressed: () => showNotificationsSheet(context),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
           ),
           const SizedBox(width: 4),
         ],
       ),
+      endDrawer: const NotificationPanel(),
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: sl<AuthBloc>(),
         listener: (context, state) {

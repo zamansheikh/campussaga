@@ -1,6 +1,7 @@
 import 'package:advanced_salomon_bottom_bar/advanced_salomon_bottom_bar.dart';
 import 'package:campus_saga/core/constants/update_constants.dart';
 import 'package:campus_saga/core/injection_container.dart';
+import 'package:campus_saga/core/notifications/notification_panel.dart';
 import 'package:campus_saga/core/services/update_checker.dart';
 import 'package:campus_saga/core/theme/app_theme.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:campus_saga/presentation/pages/home/issue_page.dart';
 import 'package:campus_saga/presentation/pages/home/switcher_widget.dart';
 import 'package:campus_saga/presentation/pages/post/create_post_page.dart';
 import 'package:campus_saga/presentation/pages/profile/profile_page.dart';
+import 'package:campus_saga/presentation/pages/profile/settings_page.dart';
 import 'package:campus_saga/presentation/pages/promotion/promotion_page.dart';
 import 'package:campus_saga/presentation/pages/ranking/ranking_page.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   String _currentVersion = CURRENT_VERSION;
   int _currentIndex = 0;
   List<Widget> pages = [];
@@ -52,9 +55,11 @@ class _HomePageState extends State<HomePage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      key: _scaffoldKey,
       onDrawerChanged: (isOpen) {
         if (isOpen) FocusScope.of(context).unfocus();
       },
+      endDrawer: const NotificationPanel(),
 
       // ── Polished Drawer ───────────────────────────────────────────
       drawer: Drawer(
@@ -183,29 +188,37 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const Divider(height: 24),
                   _DrawerItem(
+                    icon: Iconsax.notification,
+                    label: 'Notifications',
+                    selected: false,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Future.microtask(
+                        () => _scaffoldKey.currentState?.openEndDrawer(),
+                      );
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Iconsax.setting_2,
+                    label: 'Settings',
+                    selected: false,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const SettingsPage()),
+                      );
+                    },
+                  ),
+                  _DrawerItem(
                     icon: Iconsax.info_circle,
                     label: 'About App',
                     selected: false,
                     onTap: () {
                       Navigator.pop(context);
-                      showAboutDialog(
-                        context: context,
-                        applicationName: 'Campus Saga',
-                        applicationVersion: CURRENT_VERSION,
-                        applicationIcon: const Icon(Iconsax.book_1),
-                        applicationLegalese: '© 2024 Campus Saga',
-                        children: [
-                          const SizedBox(height: 20),
-                          Text(
-                            'Campus Saga is a platform for students to share their thoughts, ideas, and feedback with their campus community.',
-                            style: GoogleFonts.poppins(fontSize: 14),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Developed by: Programmers Nexus',
-                            style: GoogleFonts.poppins(fontSize: 14),
-                          ),
-                        ],
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const SettingsPage()),
                       );
                     },
                   ),

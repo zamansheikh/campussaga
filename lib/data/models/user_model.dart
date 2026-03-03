@@ -36,38 +36,38 @@ class UserModel extends User {
     List<String>? skills,
     List<String>? interests,
   }) : super(
-          id: id,
-          name: name,
-          email: email,
-          universityId: universityId,
-          isVerified: isVerified,
-          gender: gender,
-          userType: userType,
-          profilePictureUrl: profilePictureUrl,
-          postCount: postCount,
-          commentCount: commentCount,
-          resolvedIssuesCount: resolvedIssuesCount,
-          receivedVotesCount: receivedVotesCount,
-          givenVotesCount: givenVotesCount,
-          reputationScore: reputationScore,
-          currentBadge: currentBadge,
-          achievements: achievements,
-          streakDays: streakDays,
-          activityLog: activityLog,
-          studentId: studentId,
-          dateOfBirth: dateOfBirth,
-          phoneNumber: phoneNumber,
-          clubNames: clubNames,
-          department: department,
-          batch: batch,
-          cgpa: cgpa,
-          currentSemester: currentSemester,
-          bloodGroup: bloodGroup,
-          address: address,
-          guardianPhone: guardianPhone,
-          skills: skills,
-          interests: interests,
-        );
+         id: id,
+         name: name,
+         email: email,
+         universityId: universityId,
+         isVerified: isVerified,
+         gender: gender,
+         userType: userType,
+         profilePictureUrl: profilePictureUrl,
+         postCount: postCount,
+         commentCount: commentCount,
+         resolvedIssuesCount: resolvedIssuesCount,
+         receivedVotesCount: receivedVotesCount,
+         givenVotesCount: givenVotesCount,
+         reputationScore: reputationScore,
+         currentBadge: currentBadge,
+         achievements: achievements,
+         streakDays: streakDays,
+         activityLog: activityLog,
+         studentId: studentId,
+         dateOfBirth: dateOfBirth,
+         phoneNumber: phoneNumber,
+         clubNames: clubNames,
+         department: department,
+         batch: batch,
+         cgpa: cgpa,
+         currentSemester: currentSemester,
+         bloodGroup: bloodGroup,
+         address: address,
+         guardianPhone: guardianPhone,
+         skills: skills,
+         interests: interests,
+       );
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
@@ -75,10 +75,11 @@ class UserModel extends User {
       name: json['name'] as String,
       email: json['email'] as String,
       universityId: json['universityId'] as String,
-      gender:  json['gender'] as String? ?? '',
+      gender: json['gender'] as String? ?? '',
       isVerified: json['isVerified'] as bool? ?? false,
       userType: UserType.values.firstWhere(
         (e) => e.toString() == 'UserType.${json['userType']}',
+        orElse: () => UserType.student,
       ),
       profilePictureUrl: json['profilePictureUrl'] as String,
       postCount: json['postCount'] as int? ?? 0,
@@ -91,14 +92,19 @@ class UserModel extends User {
         (e) => e.toString() == 'UserBadge.${json['currentBadge']}',
         orElse: () => UserBadge.newbie,
       ),
-      achievements: (json['achievements'] as List<dynamic>?)
-              ?.map((e) => AchievementType.values.firstWhere(
-                    (type) => type.toString() == 'AchievementType.$e',
-                  ))
+      achievements:
+          (json['achievements'] as List<dynamic>?)
+              ?.map(
+                (e) => AchievementType.values.firstWhere(
+                  (type) => type.toString() == 'AchievementType.$e',
+                  orElse: () => AchievementType.postCreator,
+                ),
+              )
               .toList() ??
           [],
       streakDays: json['streakDays'] as int? ?? 0,
-      activityLog: (json['activityLog'] as Map<String, dynamic>?)?.map(
+      activityLog:
+          (json['activityLog'] as Map<String, dynamic>?)?.map(
             (k, v) => MapEntry(k, v as int),
           ) ??
           {},
@@ -111,6 +117,7 @@ class UserModel extends User {
       department: json['department'] != null
           ? Department.values.firstWhere(
               (e) => e.toString() == 'Department.${json['department']}',
+              orElse: () => Department.cse,
             )
           : null,
       batch: json['batch'] as int?,
@@ -130,7 +137,7 @@ class UserModel extends User {
       'name': name,
       'email': email,
       'universityId': universityId,
-      'gender' : gender,
+      'gender': gender,
       'isVerified': isVerified,
       'userType': userType.toString().split('.').last,
       'profilePictureUrl': profilePictureUrl,
@@ -141,8 +148,9 @@ class UserModel extends User {
       'givenVotesCount': givenVotesCount,
       'reputationScore': reputationScore,
       'currentBadge': currentBadge.toString().split('.').last,
-      'achievements':
-          achievements.map((e) => e.toString().split('.').last).toList(),
+      'achievements': achievements
+          .map((e) => e.toString().split('.').last)
+          .toList(),
       'streakDays': streakDays,
       'activityLog': activityLog,
       'studentId': studentId,
@@ -202,7 +210,7 @@ class UserModel extends User {
     String? name,
     String? email,
     String? universityId,
-    String? gender, 
+    String? gender,
     bool? isVerified,
     UserType? userType,
     String? profilePictureUrl,
@@ -235,7 +243,7 @@ class UserModel extends User {
       name: name ?? this.name,
       email: email ?? this.email,
       universityId: universityId ?? this.universityId,
-      gender: gender?? this.gender,
+      gender: gender ?? this.gender,
       isVerified: isVerified ?? this.isVerified,
       userType: userType ?? this.userType,
       profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,

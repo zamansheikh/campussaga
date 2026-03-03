@@ -113,20 +113,29 @@ class FirestoreRemoteDataSource {
       timelinePosts.add(randomPost);
     }
 
-    final remainingPostsSnapshot = await firestore
-        .collection('posts')
-        .where('universityId', isEqualTo: universityId)
-        .orderBy('timestamp', descending: true)
-        .startAfterDocument(
-          latestPostsSnapshot.docs.isNotEmpty
-              ? latestPostsSnapshot.docs.last
-              : topVotedPostsSnapshot.docs.last,
-        )
-        .get();
-    final remainingPosts = remainingPostsSnapshot.docs
-        .map((doc) => PostModel.fromJson(doc.data()))
-        .toList();
-    timelinePosts.addAll(remainingPosts);
+    // Only fetch remaining posts when there is a valid cursor document
+    final cursorDoc = latestPostsSnapshot.docs.isNotEmpty
+        ? latestPostsSnapshot.docs.last
+        : topVotedPostsSnapshot.docs.isNotEmpty
+        ? topVotedPostsSnapshot.docs.last
+        : null;
+
+    if (cursorDoc != null) {
+      final remainingPostsSnapshot = await firestore
+          .collection('posts')
+          .where('universityId', isEqualTo: universityId)
+          .orderBy('timestamp', descending: true)
+          .startAfterDocument(cursorDoc)
+          .get();
+      final remainingPosts = remainingPostsSnapshot.docs
+          .map((doc) => PostModel.fromJson(doc.data()))
+          .toList();
+      timelinePosts.addAll(remainingPosts);
+    }
+
+    // Deduplicate by id
+    final seen = <String>{};
+    timelinePosts.retainWhere((p) => seen.add(p.id));
 
     return timelinePosts;
   }

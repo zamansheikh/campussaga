@@ -1,5 +1,5 @@
 import 'package:campus_saga/core/injection_container.dart';
-import 'package:campus_saga/core/notifications/notification_sheet.dart';
+import 'package:campus_saga/core/notifications/notification_panel.dart';
 import 'package:campus_saga/core/theme/app_theme.dart';
 import 'package:campus_saga/core/utils/utils.dart';
 import 'package:campus_saga/domain/entities/role_change.dart';
@@ -7,6 +7,7 @@ import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
 import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
 import 'package:campus_saga/presentation/bloc/role_manage/role_change_bloc.dart';
+import 'package:campus_saga/presentation/pages/profile/settings_page.dart';
 import 'package:campus_saga/presentation/pages/profile/update_profile_page.dart';
 import 'package:campus_saga/presentation/pages/profile/verification_page.dart';
 import 'package:flutter/material.dart';
@@ -74,10 +75,11 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           IconButton(
             icon: const Icon(Iconsax.notification),
-            onPressed: () => showNotificationsSheet(context),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
           ),
         ],
       ),
+      endDrawer: const NotificationPanel(),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthUnauthenticated) {
@@ -129,6 +131,17 @@ class _ProfilePageState extends State<ProfilePage> {
                               MaterialPageRoute(
                                   builder: (_) =>
                                       UpdateProfilePage(user: user)),
+                            ),
+                          ),
+                          _buildSettingsTile(
+                            icon: Iconsax.setting_2,
+                            title: 'Settings',
+                            subtitle: 'Notifications, privacy, language & more',
+                            iconBg: const Color(0xFF607D8B),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const SettingsPage()),
                             ),
                           ),
                           _buildSettingsTile(
