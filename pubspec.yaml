@@ -1,6 +1,6 @@
 name: campus_saga
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -23,7 +23,7 @@ dependencies:
   firebase_database: ^12.1.4
   google_sign_in: ^7.2.0
   cloudinary_flutter: ^1.3.0
-  http: ^1.2.1
+  http: ^1.6.0
   searchfield: ^2.0.0
   get_it: ^9.2.1
   flutter_bloc: ^9.1.1
@@ -49,6 +49,8 @@ dependencies:
   timezone: any
   firebase_messaging: ^16.1.2
   googleapis_auth: ^2.1.0
+  iconsax: ^0.0.8
+  shared_preferences: ^2.5.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

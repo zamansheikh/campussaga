@@ -10,6 +10,7 @@ import 'package:campus_saga/presentation/bloc/varify/varification_bloc.dart';
 import 'package:campus_saga/presentation/bloc/verify_user/verify_user_bloc.dart';
 import 'package:campus_saga/presentation/pages/admin/add_university_page.dart';
 import 'package:campus_saga/presentation/pages/admin/user_verify_page.dart';
+import 'package:campus_saga/presentation/pages/auth/onboarding_page.dart';
 import 'package:campus_saga/presentation/pages/auth/login_page.dart';
 import 'package:campus_saga/presentation/pages/auth/register_page.dart';
 import 'package:campus_saga/presentation/pages/home/home_page.dart';
@@ -45,33 +46,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<AuthBloc>(
-          create: (_) => sl<AuthBloc>(),
-        ),
-        BlocProvider<PostBloc>(
-          create: (_) => sl<PostBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => sl<PromotionBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => sl<AdminBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => sl<VarificationBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => sl<VerifyUserBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => sl<AdsBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => sl<UniversityBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => sl<RoleChangeBloc>(),
-        )
+        BlocProvider<AuthBloc>(create: (_) => sl<AuthBloc>()),
+        BlocProvider<PostBloc>(create: (_) => sl<PostBloc>()),
+        BlocProvider(create: (_) => sl<PromotionBloc>()),
+        BlocProvider(create: (_) => sl<AdminBloc>()),
+        BlocProvider(create: (_) => sl<VarificationBloc>()),
+        BlocProvider(create: (_) => sl<VerifyUserBloc>()),
+        BlocProvider(create: (_) => sl<AdsBloc>()),
+        BlocProvider(create: (_) => sl<UniversityBloc>()),
+        BlocProvider(create: (_) => sl<RoleChangeBloc>()),
       ],
       child: MaterialApp(
         title: 'Campus Saga',
@@ -80,7 +63,8 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         routes: {
-          '/login': (context) => LoginPage(),
+          '/login': (context) => const LoginPage(),
+          '/onboarding': (context) => const OnboardingPage(),
           '/splash': (context) => SplashScreen(),
           '/signup': (context) => RegisterPage(),
           '/home': (context) => HomePage(),
