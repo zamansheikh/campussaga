@@ -15,8 +15,10 @@ import 'package:image_picker/image_picker.dart';
 
 class CreatePostPage extends StatefulWidget {
   final void Function(int index)? onPostCreated;
+  final String? initialPostType;
 
-  const CreatePostPage({Key? key, this.onPostCreated}) : super(key: key);
+  const CreatePostPage({Key? key, this.onPostCreated, this.initialPostType})
+    : super(key: key);
 
   @override
   State<CreatePostPage> createState() => _CreatePostPageState();
@@ -29,6 +31,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
   final TextEditingController clubNameController = TextEditingController();
   final List<File> selectedImages = [];
   String? postType;
+
+  @override
+  void initState() {
+    super.initState();
+    postType = widget.initialPostType;
+  }
 
   Future<void> pickImages() async {
     final picker = ImagePicker();

@@ -89,7 +89,7 @@ class SettingsPage extends StatelessWidget {
                 title: 'Privacy Policy',
                 subtitle: 'How we handle your data',
                 onTap: () => launchURL(
-                  'https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md',
+                  'https://zamansheikh.github.io/campus_saga/privacy_policy.html',
                 ),
               ),
               _SettingsTile(
@@ -97,9 +97,8 @@ class SettingsPage extends StatelessWidget {
                 iconColor: const Color(0xFFFF9800),
                 title: 'Terms & Conditions',
                 subtitle: 'Rules and usage policy',
-                onTap: () => launchURL(
-                  'https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md',
-                ),
+                onTap: () =>
+                    launchURL('https://zamansheikh.github.io/campus_saga/'),
               ),
               _SettingsTile(
                 icon: Iconsax.info_circle,

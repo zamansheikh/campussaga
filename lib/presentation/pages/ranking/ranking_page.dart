@@ -1,4 +1,3 @@
-import 'package:campussaga/core/notifications/notification_sheet.dart';
 import 'package:campussaga/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -82,7 +81,7 @@ class _RankingPageState extends State<RankingPage> {
         actions: [
           IconButton(
             icon: const Icon(Iconsax.notification),
-            onPressed: () => showNotificationsSheet(context),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
           ),
         ],
       ),

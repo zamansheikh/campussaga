@@ -6,6 +6,7 @@ import 'package:campussaga/core/services/update_checker.dart';
 import 'package:campussaga/core/theme/app_theme.dart';
 import 'package:campussaga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campussaga/presentation/bloc/auth/auth_event.dart';
+import 'package:campussaga/presentation/pages/home/info_page.dart';
 import 'package:campussaga/presentation/pages/home/issue_page.dart';
 import 'package:campussaga/presentation/pages/home/switcher_widget.dart';
 import 'package:campussaga/presentation/pages/post/create_post_page.dart';
@@ -26,28 +27,33 @@ class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   String _currentVersion = CURRENT_VERSION;
   int _currentIndex = 0;
+  bool _fabExpanded = false;
   List<Widget> pages = [];
 
   @override
   void initState() {
     pages = [
-      IssuePage(),
-      PromotionPage(),
-      CreatePostPage(
-        onPostCreated: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
-      RankingPage(),
-      ProfilePage(),
+      const IssuePage(),
+      const PromotionPage(),
+      const InfoPage(),
+      const RankingPage(),
+      const ProfilePage(),
     ];
     Future.delayed(const Duration(seconds: 5), () async {
       _currentVersion = await checkUpdateFromGithub(context);
       setState(() {});
     });
     super.initState();
+  }
+
+  void _openCreatePost({bool isPromotion = false}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            CreatePostPage(initialPostType: isPromotion ? 'Promotional' : null),
+      ),
+    ).then((_) => setState(() => _fabExpanded = false));
   }
 
   @override
@@ -151,8 +157,8 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                   _DrawerItem(
-                    icon: Iconsax.add_square,
-                    label: 'Create Post',
+                    icon: Iconsax.info_circle,
+                    label: 'Campus Info',
                     selected: _currentIndex == 2,
                     onTap: () {
                       setState(() => _currentIndex = 2);
@@ -263,7 +269,139 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
 
-      body: IndexedStack(index: _currentIndex, children: pages),
+      body: GestureDetector(
+        onTap: () {
+          if (_fabExpanded) setState(() => _fabExpanded = false);
+        },
+        child: IndexedStack(index: _currentIndex, children: pages),
+      ),
+
+      // ── Expandable FABs ───────────────────────────────────────────
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // Sub-actions (shown when expanded)
+          AnimatedSize(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeInOut,
+            child: _fabExpanded
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      // Create Promotion
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Material(
+                            elevation: 0,
+                            color: Colors.transparent,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0xFF2D2F3A)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withAlpha(20),
+                                    blurRadius: 6,
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                'Create Promotion',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          FloatingActionButton.small(
+                            heroTag: 'fab_promo',
+                            onPressed: () => _openCreatePost(isPromotion: true),
+                            backgroundColor: const Color(0xFF7C4DFF),
+                            child: const Icon(
+                              Iconsax.award,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // Create Post
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Material(
+                            elevation: 0,
+                            color: Colors.transparent,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0xFF2D2F3A)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withAlpha(20),
+                                    blurRadius: 6,
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                'Create Post',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          FloatingActionButton.small(
+                            heroTag: 'fab_post',
+                            onPressed: () => _openCreatePost(),
+                            backgroundColor: AppColors.primary,
+                            child: const Icon(
+                              Iconsax.edit_2,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
+          // Main FAB toggle
+          FloatingActionButton(
+            heroTag: 'fab_main',
+            onPressed: () => setState(() => _fabExpanded = !_fabExpanded),
+            backgroundColor: AppColors.primary,
+            child: AnimatedRotation(
+              turns: _fabExpanded ? 0.125 : 0,
+              duration: const Duration(milliseconds: 220),
+              child: Icon(
+                _fabExpanded ? Icons.close : Iconsax.add,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
       // ── Polished Bottom Nav ───────────────────────────────────────
       bottomNavigationBar: Container(
@@ -282,7 +420,12 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             child: AdvancedSalomonBottomBar(
               currentIndex: _currentIndex,
-              onTap: (i) => setState(() => _currentIndex = i),
+              onTap: (i) {
+                setState(() {
+                  _currentIndex = i;
+                  if (_fabExpanded) _fabExpanded = false;
+                });
+              },
               items: [
                 AdvancedSalomonBottomBarItem(
                   icon: const Icon(Iconsax.home_2),
@@ -307,9 +450,9 @@ class _HomePageState extends State<HomePage> {
                   selectedColor: const Color(0xFF7C4DFF),
                 ),
                 AdvancedSalomonBottomBarItem(
-                  icon: const Icon(Iconsax.add_square),
+                  icon: const Icon(Iconsax.info_circle),
                   title: Text(
-                    'Post',
+                    'Info',
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

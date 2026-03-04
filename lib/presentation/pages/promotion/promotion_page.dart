@@ -1,5 +1,4 @@
 import 'package:campussaga/core/injection_container.dart';
-import 'package:campussaga/core/notifications/notification_sheet.dart';
 import 'package:campussaga/core/theme/app_theme.dart';
 import 'package:campussaga/core/utils/utils.dart';
 import 'package:campussaga/domain/entities/promotion.dart';
@@ -120,7 +119,7 @@ class _PromotionPageState extends State<PromotionPage> {
         actions: [
           IconButton(
             icon: const Icon(Iconsax.notification, size: 22),
-            onPressed: () => showNotificationsSheet(context),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
           ),
           const SizedBox(width: 4),
         ],
