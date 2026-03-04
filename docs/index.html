@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Saga – Your Campus Voice</title>
+  <meta name="description" content="Campus Saga empowers university students to raise issues, engage with their institution, and stay informed about campus life." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #6C63FF;
+      --primary2: #48C6EF;
+      --dark: #0f1117;
+      --card-bg: #1a1d27;
+      --text: #e8eaf0;
+      --muted: #9ca3af;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── Hero ───────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 24px 80px;
+      background: radial-gradient(ellipse at 60% 0%, rgba(108,99,255,.35) 0%, transparent 65%),
+                  radial-gradient(ellipse at 20% 100%, rgba(72,198,239,.25) 0%, transparent 50%),
+                  var(--dark);
+      position: relative;
+    }
+
+    .hero .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(108,99,255,.18);
+      border: 1px solid rgba(108,99,255,.4);
+      border-radius: 40px;
+      padding: 6px 18px;
+      font-size: 13px;
+      color: #a89dff;
+      margin-bottom: 28px;
+      letter-spacing: .5px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.6rem, 6vw, 5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #fff 30%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+
+    .hero p.subtitle {
+      max-width: 580px;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .cta-group { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+    .btn {
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #9c55ff);
+      color: #fff;
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid rgba(255,255,255,.2);
+    }
+
+    /* ── Phone mockup ────────────────────────────────── */
+    .mockup-wrap {
+      margin-top: 64px;
+      position: relative;
+      display: inline-block;
+    }
+    .mockup-wrap img {
+      width: min(320px, 85vw);
+      border-radius: 36px;
+      box-shadow: 0 40px 100px rgba(108,99,255,.35), 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .glow {
+      position: absolute;
+      width: 60%;
+      height: 60%;
+      background: radial-gradient(circle, rgba(108,99,255,.5) 0%, transparent 70%);
+      pointer-events: none;
+      left: 50%;
+      bottom: -10%;
+      transform: translateX(-50%);
+      filter: blur(40px);
+    }
+
+    /* ── Features ────────────────────────────────────── */
+    section { padding: 80px 24px; }
+    section .inner { max-width: 1100px; margin: 0 auto; }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 52px;
+      line-height: 1.7;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 20px;
+      padding: 28px;
+      transition: transform .25s, border-color .25s;
+    }
+    .feature-card:hover { transform: translateY(-4px); border-color: rgba(108,99,255,.5); }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+    .feature-card p  { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* ── Roles ───────────────────────────────────────── */
+    .roles-section { background: rgba(255,255,255,.02); }
+
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .role-card {
+      background: var(--dark);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .role-card .emoji { font-size: 36px; margin-bottom: 12px; }
+    .role-card h3     { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .role-card p      { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ── Download ────────────────────────────────────── */
+    .download-section {
+      text-align: center;
+      background: linear-gradient(135deg, rgba(108,99,255,.15), rgba(72,198,239,.1));
+      border-radius: 28px;
+      padding: 64px 24px;
+      border: 1px solid rgba(108,99,255,.2);
+      margin: 0 24px 80px;
+    }
+    .download-section h2 { font-size: clamp(1.6rem, 3vw, 2rem); font-weight: 700; margin-bottom: 12px; }
+    .download-section p  { color: var(--muted); margin-bottom: 28px; }
+
+    /* ── Footer ──────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer a { color: #a89dff; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── Scroll reveal (simple fade-up) ─────────────── */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section class="hero">
+  <div class="badge">🎓 &nbsp; Student Voice Platform</div>
+  <h1>Campus Saga</h1>
+  <p class="subtitle">
+    Empowering university students to raise concerns, engage with institutions,
+    and stay informed — anonymously and effectively.
+  </p>
+  <div class="cta-group">
+    <a href="https://github.com/zamansheikh/campus_saga/releases" class="btn btn-primary">⬇️ &nbsp;Download Now</a>
+    <a href="https://github.com/zamansheikh/campus_saga" class="btn btn-outline">⭐&nbsp; GitHub</a>
+  </div>
+
+  <div class="mockup-wrap reveal">
+    <!-- App icon / screenshot placeholder -->
+    <img src="../assets/icon/icon.png" alt="Campus Saga App" onerror="this.style.display='none'" />
+    <div class="glow"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FEATURES ═══════════════════════ -->
+<section>
+  <div class="inner">
+    <p class="section-title reveal">Everything your campus needs</p>
+    <p class="section-sub reveal">One platform for issues, promotions, rankings, and more.</p>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon" style="background:rgba(108,99,255,.18);">📢</div>
+        <h3>Anonymous Issue Reporting</h3>
+        <p>Report campus problems without revealing your identity. Categorize, describe, and let the community vote.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon" style="background:rgba(72,198,239,.18);">🏆</div>
+        <h3>University Rankings</h3>
+        <p>Dynamic rankings based on resolution rate, engagement, and student satisfaction — updated in real-time.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon" style="background:rgba(76,175,80,.18);">📣</div>
+        <h3>Promotions & Events</h3>
+        <p>Stay up to date with club events, fests, and official notices from every university.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon" style="background:rgba(255,152,0,.18);">✅</div>
+        <h3>Issue Resolution Tracking</h3>
+        <p>University admins can mark issues resolved. Students vote on whether the resolution is satisfactory.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon" style="background:rgba(233,30,99,.18);">🔔</div>
+        <h3>Real-time Notifications</h3>
+        <p>Instant push notifications for new issues, votes, resolutions, and announcements.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon" style="background:rgba(0,188,212,.18);">🔒</div>
+        <h3>Verified Profiles</h3>
+        <p>Campus ambassadors verify student identities — only verified students can post, ensuring authenticity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ ROLES ══════════════════════════ -->
+<section class="roles-section">
+  <div class="inner">
+    <p class="section-title reveal">Four account types</p>
+    <p class="section-sub reveal">Each role has distinct responsibilities that keep the platform structured and fair.</p>
+    <div class="roles-grid">
+      <div class="role-card reveal">
+        <div class="emoji">🎓</div>
+        <h3>Student</h3>
+        <p>Post issues anonymously, vote on posts, and interact with university promotions.</p>
+      </div>
+      <div class="role-card reveal">
+        <div class="emoji">🏛️</div>
+        <h3>University Admin</h3>
+        <p>Review, resolve, or escalate student-submitted issues within their own university.</p>
+      </div>
+      <div class="role-card reveal">
+        <div class="emoji">🤝</div>
+        <h3>Campus Ambassador</h3>
+        <p>Verify student profiles, moderate content, and bridge communication gaps.</p>
+      </div>
+      <div class="role-card reveal">
+        <div class="emoji">⚙️</div>
+        <h3>App Administrator</h3>
+        <p>Oversee the entire platform, manage users, and assign campus ambassadors.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ DOWNLOAD ═══════════════════════ -->
+<div style="max-width:1100px;margin:0 auto;padding:0 24px;">
+  <div class="download-section reveal">
+    <h2>Ready to join your campus conversation?</h2>
+    <p>Download Campus Saga for free and make your voice heard.</p>
+    <div class="cta-group" style="justify-content:center;">
+      <a href="https://github.com/zamansheikh/campus_saga/releases" class="btn btn-primary">⬇️ &nbsp;Get the APK</a>
+      <a href="privacy_policy.html" class="btn btn-outline">🔒 &nbsp;Privacy Policy</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ FOOTER ═════════════════════════ -->
+<footer>
+  <p>
+    &copy; 2024–2026 Campus Saga. Built with ❤️ by
+    <a href="https://zamansheikh.com" target="_blank">zamansheikh</a>.
+  </p>
+  <p style="margin-top:8px;">
+    <a href="privacy_policy.html">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="https://github.com/zamansheikh/campus_saga" target="_blank">Source Code</a> &nbsp;·&nbsp;
+    <a href="mailto:zaman.sheikh.dev@gmail.com">Contact</a>
+  </p>
+</footer>
+
+<script>
+  // Simple scroll-reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
