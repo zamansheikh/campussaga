@@ -1,6 +1,7 @@
 // lib/main.dart
 import 'package:campussaga/core/notifications/notification_service.dart';
 import 'package:campussaga/core/theme/app_theme.dart';
+import 'package:campussaga/core/theme/theme_cubit.dart';
 import 'package:campussaga/presentation/bloc/admin/admin_bloc.dart';
 import 'package:campussaga/presentation/bloc/ads/ads_bloc.dart';
 import 'package:campussaga/presentation/bloc/promotion/promotion_bloc.dart';
@@ -55,26 +56,31 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => sl<AdsBloc>()),
         BlocProvider(create: (_) => sl<UniversityBloc>()),
         BlocProvider(create: (_) => sl<RoleChangeBloc>()),
+        BlocProvider(create: (_) => ThemeCubit()),
       ],
-      child: MaterialApp(
-        title: 'Campus Saga',
-        debugShowCheckedModeBanner: false,
-        themeMode: ThemeMode.system,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        routes: {
-          '/login': (context) => const LoginPage(),
-          '/onboarding': (context) => const OnboardingPage(),
-          '/splash': (context) => SplashScreen(),
-          '/signup': (context) => RegisterPage(),
-          '/home': (context) => HomePage(),
-          '/issue': (context) => IssuePage(),
-          '/post': (context) => CreatePostPage(),
-          '/ranking': (context) => RankingPage(),
-          '/addUniversity': (context) => AddUniversityPage(),
-          '/userVerification': (context) => UserVerifyPage(),
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
+          return MaterialApp(
+            title: 'Campus Saga',
+            debugShowCheckedModeBanner: false,
+            themeMode: themeMode,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            routes: {
+              '/login': (context) => const LoginPage(),
+              '/onboarding': (context) => const OnboardingPage(),
+              '/splash': (context) => SplashScreen(),
+              '/signup': (context) => RegisterPage(),
+              '/home': (context) => HomePage(),
+              '/issue': (context) => IssuePage(),
+              '/post': (context) => CreatePostPage(),
+              '/ranking': (context) => RankingPage(),
+              '/addUniversity': (context) => AddUniversityPage(),
+              '/userVerification': (context) => UserVerifyPage(),
+            },
+            home: SplashScreen(),
+          );
         },
-        home: SplashScreen(),
       ),
     );
   }

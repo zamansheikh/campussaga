@@ -61,7 +61,7 @@ class SettingsPage extends StatelessWidget {
                 iconColor: const Color(0xFF7C4DFF),
                 title: 'Notifications',
                 subtitle: 'Manage push notification preferences',
-                onTap: () => _showComingSoon(context, 'Notification Settings'),
+                onTap: () => _showNotificationSettings(context),
               ),
               _SettingsTile(
                 icon: Iconsax.language_square,
@@ -69,15 +69,21 @@ class SettingsPage extends StatelessWidget {
                 title: 'Language',
                 subtitle: 'English (default)',
                 trailing: _ComingSoonBadge(),
-                onTap: () => _showComingSoon(context, 'Language Settings'),
+                onTap: () => _showLanguageDialog(context),
               ),
               _SettingsTile(
                 icon: Iconsax.moon,
                 iconColor: const Color(0xFF9E9E9E),
                 title: 'Appearance',
-                subtitle: isDark ? 'Dark mode • system' : 'Light mode • system',
-                trailing: _ComingSoonBadge(),
-                onTap: () => _showComingSoon(context, 'Appearance Settings'),
+                subtitle: isDark ? 'Dark mode' : 'Light mode',
+                trailing: BlocBuilder<ThemeCubit, ThemeMode>(
+                  builder: (ctx, themeMode) => Switch.adaptive(
+                    value: themeMode == ThemeMode.dark,
+                    activeColor: AppColors.primary,
+                    onChanged: (val) => ctx.read<ThemeCubit>().toggleTheme(val),
+                  ),
+                ),
+                onTap: () => context.read<ThemeCubit>().toggleTheme(!isDark),
               ),
 
               const SizedBox(height: 8),
@@ -158,9 +164,11 @@ class SettingsPage extends StatelessWidget {
   }
 
   void _showLanguageDialog(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1D2024) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
@@ -172,7 +180,10 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(width: 10),
             Text(
               'Language',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black,
+              ),
             ),
           ],
         ),
@@ -211,26 +222,7 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Iconsax.clock, color: Colors.white, size: 16),
-            const SizedBox(width: 8),
-            Text(
-              '$feature coming soon!',
-              style: GoogleFonts.poppins(fontSize: 13),
-            ),
-          ],
-        ),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
+  void _showComingSoon(BuildContext context, String feature) {}
 
   void _showAboutDialog(BuildContext context) {
     showDialog(
@@ -552,7 +544,9 @@ class _NotificationSettingsDialogState
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return AlertDialog(
+      backgroundColor: isDark ? const Color(0xFF1D2024) : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: Row(
         children: [
@@ -564,7 +558,10 @@ class _NotificationSettingsDialogState
           const SizedBox(width: 10),
           Text(
             'Notifications',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black,
+            ),
           ),
         ],
       ),
@@ -613,7 +610,10 @@ class _NotificationSettingsDialogState
           onPressed: () => Navigator.pop(context),
           child: Text(
             'Cancel',
-            style: GoogleFonts.poppins(color: const Color(0xFF9CA3AF)),
+            style: GoogleFonts.poppins(
+              color: isDark ? const Color(0xFFC5C7CF) : const Color(0xFF4A4A4A),
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         FilledButton(
@@ -648,12 +648,13 @@ class _NotifRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Icon(icon, size: 18, color: AppColors.primary),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -663,13 +664,16 @@ class _NotifRow extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
                 Text(
                   subtitle,
                   style: GoogleFonts.poppins(
                     fontSize: 11,
-                    color: const Color(0xFF9CA3AF),
+                    color: isDark
+                        ? const Color(0xFFBDBDBD)
+                        : const Color(0xFF757575),
                   ),
                 ),
               ],
@@ -677,7 +681,7 @@ class _NotifRow extends StatelessWidget {
           ),
           Switch.adaptive(
             value: value,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primaryDark,
             onChanged: onChanged,
           ),
         ],
@@ -703,17 +707,18 @@ class _LanguageOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: active
-            ? AppColors.primary.withAlpha(18)
-            : Theme.of(context).colorScheme.surface,
+            ? AppColors.primary.withAlpha(22)
+            : (isDark ? const Color(0xFF2A2D32) : const Color(0xFFF5F5F5)),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: active
-              ? AppColors.primary.withAlpha(100)
-              : Theme.of(context).colorScheme.outline.withAlpha(40),
+              ? AppColors.primary.withAlpha(120)
+              : (isDark ? const Color(0xFF3F4347) : const Color(0xFFE0E0E0)),
         ),
       ),
       child: Row(
@@ -726,15 +731,18 @@ class _LanguageOption extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : Colors.black87,
               ),
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: active
-                  ? AppColors.primary.withAlpha(22)
-                  : const Color(0xFF9CA3AF).withAlpha(30),
+                  ? AppColors.primary.withAlpha(24)
+                  : (isDark
+                        ? const Color(0xFF3F4347)
+                        : const Color(0xFFE8E8E8)),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -742,7 +750,11 @@ class _LanguageOption extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: active ? AppColors.primary : const Color(0xFF9CA3AF),
+                color: active
+                    ? AppColors.primary
+                    : (isDark
+                          ? const Color(0xFFC5C7CF)
+                          : const Color(0xFF757575)),
               ),
             ),
           ),
