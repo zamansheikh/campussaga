@@ -158,7 +158,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             subtitle: 'Read our usage policy',
                             iconBg: const Color(0xFF4CAF50),
                             onTap: () => launchURL(
-                              'https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md',
+                              'https://zamansheikh.github.io/campussaga/',
                             ),
                           ),
                           _buildSettingsTile(
@@ -166,7 +166,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             title: 'About Us',
                             subtitle: 'Learn more about Campus Saga',
                             iconBg: const Color(0xFF00BCD4),
-                            onTap: () => launchURL('https://zamansheikh.com'),
+                            onTap: () => launchURL(
+                              'https://zamansheikh.github.io/campussaga/',
+                            ),
                           ),
                           const SizedBox(height: 6),
                           _buildSettingsTile(

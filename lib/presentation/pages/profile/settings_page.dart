@@ -89,7 +89,7 @@ class SettingsPage extends StatelessWidget {
                 title: 'Privacy Policy',
                 subtitle: 'How we handle your data',
                 onTap: () => launchURL(
-                  'https://zamansheikh.github.io/campus_saga/privacy_policy.html',
+                  'https://zamansheikh.github.io/campussaga/privacy_policy.html',
                 ),
               ),
               _SettingsTile(
@@ -98,7 +98,7 @@ class SettingsPage extends StatelessWidget {
                 title: 'Terms & Conditions',
                 subtitle: 'Rules and usage policy',
                 onTap: () =>
-                    launchURL('https://zamansheikh.github.io/campus_saga/'),
+                    launchURL('https://zamansheikh.github.io/campussaga/'),
               ),
               _SettingsTile(
                 icon: Iconsax.info_circle,
@@ -112,14 +112,15 @@ class SettingsPage extends StatelessWidget {
                 iconColor: const Color(0xFFFFB300),
                 title: 'Rate Us',
                 subtitle: 'Love the app? Leave a review!',
-                onTap: () => launchURL('https://zamansheikh.com'),
+                onTap: () =>
+                    launchURL('https://github.com/zamansheikh/campussaga'),
               ),
               _SettingsTile(
                 icon: Iconsax.message_question,
                 iconColor: const Color(0xFF009688),
                 title: 'Support & Feedback',
                 subtitle: 'Report a bug or suggest a feature',
-                onTap: () => launchURL('https://zamansheikh.com'),
+                onTap: () => launchURL('mailto:zaman6545@gmail.com'),
               ),
 
               const SizedBox(height: 8),
@@ -204,7 +205,8 @@ class SettingsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _AboutRow('Version', '1.0.0'),
-            _AboutRow('Developer', 'Programmers Nexus'),
+            _AboutRow('Developer', 'Md. Shamsuzzaman'),
+            _AboutRow('Company', 'Programmer Nexus Pvt. Ltd.'),
             _AboutRow('Platform', 'Flutter · Firebase'),
             _AboutRow('Target', 'Bangladeshi Students'),
             const SizedBox(height: 10),
@@ -237,7 +239,7 @@ class SettingsPage extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.pop(context);
-              launchURL('https://zamansheikh.com');
+              launchURL('https://zamansheikh.github.io/campussaga/');
             },
             child: Text(
               'Visit Website',

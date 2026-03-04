@@ -158,7 +158,7 @@ class _InfoPageState extends State<InfoPage> {
                       isDark: isDark,
                       universityName: myUniversity?.name,
                       onVisitWeb: () => _launchUrl(
-                        'https://zamansheikh.github.io/campus_saga/',
+                        'https://zamansheikh.github.io/campussaga/',
                       ),
                     ),
 
@@ -175,10 +175,10 @@ class _InfoPageState extends State<InfoPage> {
                     _AppInfoCard(
                       isDark: isDark,
                       onPrivacyTap: () => _launchUrl(
-                        'https://zamansheikh.github.io/campus_saga/privacy_policy.html',
+                        'https://zamansheikh.github.io/campussaga/privacy_policy.html',
                       ),
                       onWebsiteTap: () => _launchUrl(
-                        'https://zamansheikh.github.io/campus_saga/',
+                        'https://zamansheikh.github.io/campussaga/',
                       ),
                     ),
                   ],

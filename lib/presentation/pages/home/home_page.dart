@@ -276,131 +276,134 @@ class _HomePageState extends State<HomePage> {
         child: IndexedStack(index: _currentIndex, children: pages),
       ),
 
-      // ── Expandable FABs ───────────────────────────────────────────
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // Sub-actions (shown when expanded)
-          AnimatedSize(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeInOut,
-            child: _fabExpanded
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      // Create Promotion
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Material(
-                            elevation: 0,
-                            color: Colors.transparent,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFF2D2F3A)
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withAlpha(20),
-                                    blurRadius: 6,
+      // ── Expandable FABs (Home + Promotions tabs only) ─────────────
+      floatingActionButton: (_currentIndex == 0 || _currentIndex == 1)
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Sub-actions (shown when expanded)
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeInOut,
+                  child: _fabExpanded
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            // Create Promotion
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Material(
+                                  elevation: 0,
+                                  color: Colors.transparent,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isDark
+                                          ? const Color(0xFF2D2F3A)
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withAlpha(20),
+                                          blurRadius: 6,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Text(
+                                      'Create Promotion',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
-                                ],
-                              ),
-                              child: Text(
-                                'Create Promotion',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
                                 ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          FloatingActionButton.small(
-                            heroTag: 'fab_promo',
-                            onPressed: () => _openCreatePost(isPromotion: true),
-                            backgroundColor: const Color(0xFF7C4DFF),
-                            child: const Icon(
-                              Iconsax.award,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      // Create Post
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Material(
-                            elevation: 0,
-                            color: Colors.transparent,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFF2D2F3A)
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withAlpha(20),
-                                    blurRadius: 6,
+                                const SizedBox(width: 10),
+                                FloatingActionButton.small(
+                                  heroTag: 'fab_promo',
+                                  onPressed: () =>
+                                      _openCreatePost(isPromotion: true),
+                                  backgroundColor: const Color(0xFF7C4DFF),
+                                  child: const Icon(
+                                    Iconsax.award,
+                                    color: Colors.white,
                                   ),
-                                ],
-                              ),
-                              child: Text(
-                                'Create Post',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
                                 ),
-                              ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          FloatingActionButton.small(
-                            heroTag: 'fab_post',
-                            onPressed: () => _openCreatePost(),
-                            backgroundColor: AppColors.primary,
-                            child: const Icon(
-                              Iconsax.edit_2,
-                              color: Colors.white,
+                            const SizedBox(height: 12),
+                            // Create Post
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Material(
+                                  elevation: 0,
+                                  color: Colors.transparent,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isDark
+                                          ? const Color(0xFF2D2F3A)
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withAlpha(20),
+                                          blurRadius: 6,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Text(
+                                      'Create Post',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                FloatingActionButton.small(
+                                  heroTag: 'fab_post',
+                                  onPressed: () => _openCreatePost(),
+                                  backgroundColor: AppColors.primary,
+                                  child: const Icon(
+                                    Iconsax.edit_2,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  )
-                : const SizedBox.shrink(),
-          ),
-          // Main FAB toggle
-          FloatingActionButton(
-            heroTag: 'fab_main',
-            onPressed: () => setState(() => _fabExpanded = !_fabExpanded),
-            backgroundColor: AppColors.primary,
-            child: AnimatedRotation(
-              turns: _fabExpanded ? 0.125 : 0,
-              duration: const Duration(milliseconds: 220),
-              child: Icon(
-                _fabExpanded ? Icons.close : Iconsax.add,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
+                            const SizedBox(height: 12),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
+                ),
+                // Main FAB toggle
+                FloatingActionButton(
+                  heroTag: 'fab_main',
+                  onPressed: () => setState(() => _fabExpanded = !_fabExpanded),
+                  backgroundColor: AppColors.primary,
+                  child: AnimatedRotation(
+                    turns: _fabExpanded ? 0.125 : 0,
+                    duration: const Duration(milliseconds: 220),
+                    child: Icon(
+                      _fabExpanded ? Icons.close : Iconsax.add,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
       // ── Polished Bottom Nav ───────────────────────────────────────
