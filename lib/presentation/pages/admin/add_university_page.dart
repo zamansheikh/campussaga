@@ -1,6 +1,6 @@
-import 'package:campus_saga/core/injection_container.dart';
-import 'package:campus_saga/domain/entities/university.dart';
-import 'package:campus_saga/presentation/bloc/admin/admin_bloc.dart';
+import 'package:campussaga/core/injection_container.dart';
+import 'package:campussaga/domain/entities/university.dart';
+import 'package:campussaga/presentation/bloc/admin/admin_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -85,12 +85,14 @@ class _AddUniversityPageState extends State<AddUniversityPage> {
       appBar: AppBar(
         centerTitle: true,
         forceMaterialTransparency: true,
-        title: const Text('Add University',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            )),
+        title: const Text(
+          'Add University',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -99,10 +101,7 @@ class _AddUniversityPageState extends State<AddUniversityPage> {
           children: [
             Text(
               'Add University Details Below and Click on Add University',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -258,24 +257,18 @@ class _AddUniversityPageState extends State<AddUniversityPage> {
               bloc: sl<AdminBloc>(),
               listener: (context, state) {
                 if (state is AdminError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.errorMessage),
-                    ),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
                 } else if (state is AdminSuccess) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.successMessage),
-                    ),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(state.successMessage)));
                 }
               },
               builder: (context, state) {
                 if (state is AdminLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return Center(child: CircularProgressIndicator());
                 }
                 return Center(
                   child: ElevatedButton(

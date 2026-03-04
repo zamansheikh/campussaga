@@ -1,5 +1,5 @@
 // feedback_model.dart
-import 'package:campus_saga/domain/entities/feedback.dart';
+import 'package:campussaga/domain/entities/feedback.dart';
 
 class AuthorityFeedbackModel {
   final String id;
@@ -22,7 +22,8 @@ class AuthorityFeedbackModel {
     required this.timestamp,
   });
 
-  factory AuthorityFeedbackModel.fromJson(Map<String, dynamic> json) => AuthorityFeedbackModel(
+  factory AuthorityFeedbackModel.fromJson(Map<String, dynamic> json) =>
+      AuthorityFeedbackModel(
         id: json['id'] as String,
         authorityId: json['authorityId'] as String,
         postId: json['postId'] as String,
@@ -34,17 +35,18 @@ class AuthorityFeedbackModel {
       );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'authorityId': authorityId,
-        'postId': postId,
-        'message': message,
-        'resolved': resolved,
-        'agreeCount': agreeCount,
-        'disagreeCount': disagreeCount,
-        'timestamp': timestamp.toIso8601String(),
-      };
+    'id': id,
+    'authorityId': authorityId,
+    'postId': postId,
+    'message': message,
+    'resolved': resolved,
+    'agreeCount': agreeCount,
+    'disagreeCount': disagreeCount,
+    'timestamp': timestamp.toIso8601String(),
+  };
 
-  factory AuthorityFeedbackModel.fromEntity(AuthorityFeedback entity) => AuthorityFeedbackModel(
+  factory AuthorityFeedbackModel.fromEntity(AuthorityFeedback entity) =>
+      AuthorityFeedbackModel(
         id: entity.id,
         authorityId: entity.authorityId,
         postId: entity.postId,
@@ -56,15 +58,15 @@ class AuthorityFeedbackModel {
       );
 
   AuthorityFeedback toEntity() => AuthorityFeedback(
-        id: id,
-        authorityId: authorityId,
-        postId: postId,
-        message: message,
-        resolved: resolved,
-        agreeCount: agreeCount,
-        disagreeCount: disagreeCount,
-        timestamp: timestamp,
-      );
+    id: id,
+    authorityId: authorityId,
+    postId: postId,
+    message: message,
+    resolved: resolved,
+    agreeCount: agreeCount,
+    disagreeCount: disagreeCount,
+    timestamp: timestamp,
+  );
 
   AuthorityFeedbackModel copyWith({
     String? id,
@@ -75,15 +77,14 @@ class AuthorityFeedbackModel {
     int? agreeCount,
     int? disagreeCount,
     DateTime? timestamp,
-  }) =>
-      AuthorityFeedbackModel(
-        id: id ?? this.id,
-        authorityId: authorityId ?? this.authorityId,
-        postId: postId ?? this.postId,
-        message: message ?? this.message,
-        resolved: resolved ?? this.resolved,
-        agreeCount: agreeCount ?? this.agreeCount,
-        disagreeCount: disagreeCount ?? this.disagreeCount,
-        timestamp: timestamp ?? this.timestamp,
-      );
+  }) => AuthorityFeedbackModel(
+    id: id ?? this.id,
+    authorityId: authorityId ?? this.authorityId,
+    postId: postId ?? this.postId,
+    message: message ?? this.message,
+    resolved: resolved ?? this.resolved,
+    agreeCount: agreeCount ?? this.agreeCount,
+    disagreeCount: disagreeCount ?? this.disagreeCount,
+    timestamp: timestamp ?? this.timestamp,
+  );
 }

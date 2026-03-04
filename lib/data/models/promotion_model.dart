@@ -1,6 +1,6 @@
 // lib/data/models/promotion_model.dart
 
-import 'package:campus_saga/domain/entities/promotion.dart';
+import 'package:campussaga/domain/entities/promotion.dart';
 
 class PromotionModel extends Promotion {
   const PromotionModel({
@@ -19,21 +19,21 @@ class PromotionModel extends Promotion {
     Set<String> likeVoterIds = const {},
     Set<String> dislikeVoterIds = const {},
   }) : super(
-          id: id,
-          userId: userId,
-          universityId: universityId,
-          promotionTitle: promotionTitle,
-          description: description,
-          clubName: clubName,
-          timestamp: timestamp,
-          expiryDate: expiryDate,
-          imageUrls: imageUrls,
-          eventLink: eventLink,
-          likes: likes,
-          dislikes: dislikes,
-          likeVoterIds: likeVoterIds,
-          dislikeVoterIds: dislikeVoterIds,
-        );
+         id: id,
+         userId: userId,
+         universityId: universityId,
+         promotionTitle: promotionTitle,
+         description: description,
+         clubName: clubName,
+         timestamp: timestamp,
+         expiryDate: expiryDate,
+         imageUrls: imageUrls,
+         eventLink: eventLink,
+         likes: likes,
+         dislikes: dislikes,
+         likeVoterIds: likeVoterIds,
+         dislikeVoterIds: dislikeVoterIds,
+       );
 
   factory PromotionModel.fromJson(Map<String, dynamic> json) {
     return PromotionModel(
@@ -44,13 +44,27 @@ class PromotionModel extends Promotion {
       description: json['description'] as String,
       clubName: json['clubName'] as String,
       timestamp: DateTime.parse(json['timestamp'] as String),
-      expiryDate: json['expiryDate'] != null ? DateTime.parse(json['expiryDate'] as String) : null,
-      imageUrls: (json['imageUrls'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      expiryDate: json['expiryDate'] != null
+          ? DateTime.parse(json['expiryDate'] as String)
+          : null,
+      imageUrls:
+          (json['imageUrls'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
       eventLink: json['eventLink'] as String?,
       likes: json['likes'] as int? ?? 0,
       dislikes: json['dislikes'] as int? ?? 0,
-      likeVoterIds: (json['likeVoterIds'] as List<dynamic>?)?.map((e) => e as String).toSet() ?? {},
-      dislikeVoterIds: (json['dislikeVoterIds'] as List<dynamic>?)?.map((e) => e as String).toSet() ?? {},
+      likeVoterIds:
+          (json['likeVoterIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toSet() ??
+          {},
+      dislikeVoterIds:
+          (json['dislikeVoterIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toSet() ??
+          {},
     );
   }
 

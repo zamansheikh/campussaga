@@ -1,15 +1,15 @@
 import 'dart:io';
 
-import 'package:campus_saga/core/constants/app_constants.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
-import 'package:campus_saga/presentation/pages/widgets/text_editing_field.dart';
-import 'package:campus_saga/presentation/pages/widgets/university_search_field.dart';
+import 'package:campussaga/core/constants/app_constants.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_event.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_state.dart';
+import 'package:campussaga/presentation/pages/widgets/text_editing_field.dart';
+import 'package:campussaga/presentation/pages/widgets/university_search_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:campus_saga/core/utils/validators.dart';
+import 'package:campussaga/core/utils/validators.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -29,8 +29,10 @@ class _RegisterPageState extends State<RegisterPage> {
   File? selectedImage;
 
   Future<void> pickImage() async {
-    final pickedFile = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 50);
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+    );
     if (pickedFile != null) {
       setState(() {
         selectedImage = File(pickedFile.path);
@@ -49,11 +51,13 @@ class _RegisterPageState extends State<RegisterPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text("Sign Up Successful!")));
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text("Sign Up Successful!")));
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.message)));
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           } else if (state is AuthAuthenticated) {
             Navigator.of(context).pushReplacementNamed('/home');
           } else if (state is AuthUnauthenticated) {
@@ -76,8 +80,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         backgroundImage: selectedImage != null
                             ? FileImage(selectedImage!)
                             : NetworkImage(
-                                    "https://loremflickr.com/200/200?random=2")
-                                as ImageProvider,
+                                    "https://loremflickr.com/200/200?random=2",
+                                  )
+                                  as ImageProvider,
                         child: selectedImage == null
                             ? Icon(
                                 Icons.camera_alt,
@@ -142,10 +147,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 15),
+                            horizontal: 50,
+                            vertical: 15,
+                          ),
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(8), // Rounded corners
+                            borderRadius: BorderRadius.circular(
+                              8,
+                            ), // Rounded corners
                           ),
                         ),
                         onPressed: () {

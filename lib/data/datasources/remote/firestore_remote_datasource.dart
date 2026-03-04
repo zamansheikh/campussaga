@@ -1,11 +1,11 @@
 // lib/data/datasources/remote/firestore_remote_datasource.dart
 import 'dart:math';
-import 'package:campus_saga/core/usecases/usecase.dart';
-import 'package:campus_saga/data/models/post_model.dart';
-import 'package:campus_saga/data/models/promotion_model.dart';
-import 'package:campus_saga/data/models/role_change_model.dart';
-import 'package:campus_saga/data/models/varification_status_model.dart';
-import 'package:campus_saga/domain/entities/varification_status.dart';
+import 'package:campussaga/core/usecases/usecase.dart';
+import 'package:campussaga/data/models/post_model.dart';
+import 'package:campussaga/data/models/promotion_model.dart';
+import 'package:campussaga/data/models/role_change_model.dart';
+import 'package:campussaga/data/models/varification_status_model.dart';
+import 'package:campussaga/domain/entities/varification_status.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/comment_model.dart';
 import '../../models/feedback_model.dart';

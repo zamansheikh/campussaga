@@ -1,7 +1,7 @@
-import 'package:campus_saga/core/errors/failures.dart';
-import 'package:campus_saga/core/usecases/usecase.dart';
-import 'package:campus_saga/domain/entities/promotion.dart';
-import 'package:campus_saga/domain/repositories/post_repository.dart';
+import 'package:campussaga/core/errors/failures.dart';
+import 'package:campussaga/core/usecases/usecase.dart';
+import 'package:campussaga/domain/entities/promotion.dart';
+import 'package:campussaga/domain/repositories/post_repository.dart';
 import 'package:dartz/dartz.dart';
 
 class FetchPromotionUsecase extends UseCase<List<Promotion>, String> {

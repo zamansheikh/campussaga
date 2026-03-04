@@ -1,11 +1,11 @@
-import 'package:campus_saga/domain/entities/promotion.dart';
+import 'package:campussaga/domain/entities/promotion.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../../core/errors/failures.dart';
 import '../../../core/usecases/usecase.dart';
 import '../../repositories/post_repository.dart';
 
-class UpdatePromotionUsecase  extends UseCase<void, Promotion> {
+class UpdatePromotionUsecase extends UseCase<void, Promotion> {
   final PostRepository repository;
 
   UpdatePromotionUsecase(this.repository);

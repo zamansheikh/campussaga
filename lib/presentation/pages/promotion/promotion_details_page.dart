@@ -1,6 +1,6 @@
-import 'package:campus_saga/core/theme/app_theme.dart';
-import 'package:campus_saga/core/utils/utils.dart';
-import 'package:campus_saga/domain/entities/promotion.dart';
+import 'package:campussaga/core/theme/app_theme.dart';
+import 'package:campussaga/core/utils/utils.dart';
+import 'package:campussaga/domain/entities/promotion.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';

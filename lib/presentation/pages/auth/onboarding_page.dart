@@ -1,6 +1,6 @@
 // lib/presentation/pages/auth/onboarding_page.dart
 
-import 'package:campus_saga/presentation/pages/auth/login_page.dart';
+import 'package:campussaga/presentation/pages/auth/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';

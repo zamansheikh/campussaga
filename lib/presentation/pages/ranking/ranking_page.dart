@@ -1,11 +1,11 @@
-import 'package:campus_saga/core/notifications/notification_sheet.dart';
-import 'package:campus_saga/core/theme/app_theme.dart';
+import 'package:campussaga/core/notifications/notification_sheet.dart';
+import 'package:campussaga/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:campus_saga/core/constants/app_constants.dart';
-import 'package:campus_saga/core/injection_container.dart';
-import 'package:campus_saga/domain/entities/university.dart';
-import 'package:campus_saga/presentation/bloc/university/university_bloc.dart';
+import 'package:campussaga/core/constants/app_constants.dart';
+import 'package:campussaga/core/injection_container.dart';
+import 'package:campussaga/domain/entities/university.dart';
+import 'package:campussaga/presentation/bloc/university/university_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 

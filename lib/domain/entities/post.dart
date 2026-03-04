@@ -1,5 +1,5 @@
-import 'package:campus_saga/domain/entities/comment.dart';
-import 'package:campus_saga/domain/entities/feedback.dart';
+import 'package:campussaga/domain/entities/comment.dart';
+import 'package:campussaga/domain/entities/feedback.dart';
 import 'package:equatable/equatable.dart';
 
 class Post extends Equatable {
@@ -156,23 +156,23 @@ class Post extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        universityId,
-        postTitle,
-        description,
-        isResolved,
-        timestamp,
-        imageUrls,
-        trueVotes,
-        falseVotes,
-        agree,
-        disagree,
-        comments,
-        feedback,
-        trueVoterIds,
-        falseVoterIds,
-        agreeVoterIds,
-        disagreeVoterIds,
-      ];
+    id,
+    userId,
+    universityId,
+    postTitle,
+    description,
+    isResolved,
+    timestamp,
+    imageUrls,
+    trueVotes,
+    falseVotes,
+    agree,
+    disagree,
+    comments,
+    feedback,
+    trueVoterIds,
+    falseVoterIds,
+    agreeVoterIds,
+    disagreeVoterIds,
+  ];
 }

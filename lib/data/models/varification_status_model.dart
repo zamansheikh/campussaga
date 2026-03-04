@@ -1,4 +1,4 @@
-import 'package:campus_saga/domain/entities/varification_status.dart';
+import 'package:campussaga/domain/entities/varification_status.dart';
 
 class VerificationStatusModel extends Verification {
   const VerificationStatusModel({
@@ -13,17 +13,17 @@ class VerificationStatusModel extends Verification {
     required String gender,
     required DateTime timestamp,
   }) : super(
-          userUuid: userUuid,
-          universityEmail: universityEmail,
-          universityIdCardPhotoUrl: universityIdCardPhotoUrl,
-          profilePhotoUrl: profilePhotoUrl,
-          status: status,
-          phoneNumber: phoneNumber,
-          dateOfBirth: dateOfBirth,
-          department: department,
-          gender: gender,
-          timestamp: timestamp,
-        );
+         userUuid: userUuid,
+         universityEmail: universityEmail,
+         universityIdCardPhotoUrl: universityIdCardPhotoUrl,
+         profilePhotoUrl: profilePhotoUrl,
+         status: status,
+         phoneNumber: phoneNumber,
+         dateOfBirth: dateOfBirth,
+         department: department,
+         gender: gender,
+         timestamp: timestamp,
+       );
 
   factory VerificationStatusModel.fromJson(Map<String, dynamic> json) {
     return VerificationStatusModel(

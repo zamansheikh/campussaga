@@ -1,13 +1,13 @@
 // lib/data/repositories/post_repository_impl.dart
 
 import 'dart:io';
-import 'package:campus_saga/data/datasources/remote/auth_remote_datasource.dart';
-import 'package:campus_saga/data/datasources/remote/firebase_storage_remote_datasource.dart';
-import 'package:campus_saga/data/datasources/remote/firestore_remote_datasource.dart';
-import 'package:campus_saga/data/models/promotion_model.dart';
-import 'package:campus_saga/data/models/university_model.dart';
-import 'package:campus_saga/domain/entities/promotion.dart';
-import 'package:campus_saga/domain/entities/university.dart';
+import 'package:campussaga/data/datasources/remote/auth_remote_datasource.dart';
+import 'package:campussaga/data/datasources/remote/firebase_storage_remote_datasource.dart';
+import 'package:campussaga/data/datasources/remote/firestore_remote_datasource.dart';
+import 'package:campussaga/data/models/promotion_model.dart';
+import 'package:campussaga/data/models/university_model.dart';
+import 'package:campussaga/domain/entities/promotion.dart';
+import 'package:campussaga/domain/entities/university.dart';
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/post.dart';
 import '../../domain/repositories/post_repository.dart';
@@ -27,11 +27,13 @@ class PostRepositoryImpl implements PostRepository {
 
   @override
   Future<Either<Failure, List<Post>>> getPostsByUniversity(
-      String universityId) async {
+    String universityId,
+  ) async {
     print("fetching posts for universityId: $universityId");
     try {
-      final posts =
-          await firestoreRemoteDataSource.getTimelinePosts(universityId);
+      final posts = await firestoreRemoteDataSource.getTimelinePosts(
+        universityId,
+      );
       final postFromEntity = posts.map((post) => post.toEntity()).toList();
       return Right(postFromEntity);
     } catch (e) {
@@ -51,7 +53,9 @@ class PostRepositoryImpl implements PostRepository {
 
   @override
   Future<Either<Failure, void>> updatePostStatus(
-      String postId, bool isResolved) async {
+    String postId,
+    bool isResolved,
+  ) async {
     try {
       await firestoreRemoteDataSource.updatePostStatus(postId, isResolved);
       return Right(null);
@@ -63,8 +67,9 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<Either<Failure, List<Post>>> fetchPosts(String universityId) async {
     try {
-      final posts =
-          await firestoreRemoteDataSource.getTimelinePosts(universityId);
+      final posts = await firestoreRemoteDataSource.getTimelinePosts(
+        universityId,
+      );
       return Right(posts.map((post) => post.toEntity()).toList());
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -73,10 +78,14 @@ class PostRepositoryImpl implements PostRepository {
 
   @override
   Future<Either<Failure, List<String>>> uploadPostImages(
-      String userId, List<File> image) async {
+    String userId,
+    List<File> image,
+  ) async {
     try {
-      final urls =
-          await firebaseStorageRemoteDataSource.uploadPostImages(userId, image);
+      final urls = await firebaseStorageRemoteDataSource.uploadPostImages(
+        userId,
+        image,
+      );
       return Right(urls);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -128,8 +137,9 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<Either<Failure, void>> addUniversity(University university) async {
     try {
-      final result = await firestoreRemoteDataSource
-          .addUniversity(UniversityModel.fromEntity(university));
+      final result = await firestoreRemoteDataSource.addUniversity(
+        UniversityModel.fromEntity(university),
+      );
       return Right(result);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -138,10 +148,12 @@ class PostRepositoryImpl implements PostRepository {
 
   @override
   Future<Either<Failure, Promotion>> createPromotion(
-      Promotion promotion) async {
+    Promotion promotion,
+  ) async {
     try {
-      await firestoreRemoteDataSource
-          .createPromotion(PromotionModel.fromEntity(promotion));
+      await firestoreRemoteDataSource.createPromotion(
+        PromotionModel.fromEntity(promotion),
+      );
       return Right(promotion);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -150,12 +162,14 @@ class PostRepositoryImpl implements PostRepository {
 
   @override
   Future<Either<Failure, List<Promotion>>> getPromotionByUniversity(
-      String universityId) async {
+    String universityId,
+  ) async {
     try {
       final promotions = await firestoreRemoteDataSource
           .getPromotionByUniversity(universityId);
-      final promotionFromEntity =
-          promotions.map((promotion) => promotion.toEntity()).toList();
+      final promotionFromEntity = promotions
+          .map((promotion) => promotion.toEntity())
+          .toList();
       return Right(promotionFromEntity);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -166,8 +180,9 @@ class PostRepositoryImpl implements PostRepository {
   Future<Either<Failure, List<University>>> fetchAllUniversity() async {
     try {
       final universities = await firestoreRemoteDataSource.getAllUniversity();
-      final universityFromEntity =
-          universities.map((university) => university.toEntity()).toList();
+      final universityFromEntity = universities
+          .map((university) => university.toEntity())
+          .toList();
       return Right(universityFromEntity);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -199,8 +214,9 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<Either<Failure, void>> updatePromotion(Promotion promotion) async {
     try {
-      await firestoreRemoteDataSource
-          .updatePromotion(PromotionModel.fromEntity(promotion));
+      await firestoreRemoteDataSource.updatePromotion(
+        PromotionModel.fromEntity(promotion),
+      );
       return Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

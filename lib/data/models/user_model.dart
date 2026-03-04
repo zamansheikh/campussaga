@@ -1,6 +1,6 @@
 // lib/data/models/user_model.dart
 
-import 'package:campus_saga/domain/entities/user.dart';
+import 'package:campussaga/domain/entities/user.dart';
 
 class UserModel extends User {
   const UserModel({

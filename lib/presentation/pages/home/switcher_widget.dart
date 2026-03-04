@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:campus_saga/presentation/pages/home/switch_campus_page.dart';
+import 'package:campussaga/presentation/pages/home/switch_campus_page.dart';
 
 class SwitcherWidget extends StatefulWidget {
   @override
@@ -42,8 +42,9 @@ class _SwitcherWidgetState extends State<SwitcherWidget> {
                     universityId = newValue?.split('@').last;
                   });
                 },
-                items:
-                    universities.map<DropdownMenuItem<String>>((String value) {
+                items: universities.map<DropdownMenuItem<String>>((
+                  String value,
+                ) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -63,7 +64,8 @@ class _SwitcherWidgetState extends State<SwitcherWidget> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => SwitchCampusPage(
-                          universityId: universityId!.toUpperCase()),
+                        universityId: universityId!.toUpperCase(),
+                      ),
                     ),
                   );
                 },

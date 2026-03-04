@@ -1,4 +1,4 @@
-import 'package:campus_saga/domain/entities/university.dart';
+import 'package:campussaga/domain/entities/university.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../../core/errors/failures.dart';

@@ -1,12 +1,12 @@
 // lib/presentation/pages/auth/login_page.dart
 
-import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
-import 'package:campus_saga/presentation/pages/auth/complete_profile_page.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campussaga/presentation/pages/auth/complete_profile_page.dart';
 
 import '../../bloc/auth/auth_state.dart';
 

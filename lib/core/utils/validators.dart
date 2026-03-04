@@ -1,7 +1,7 @@
 // lib/core/utils/validators.dart
 
-import 'package:campus_saga/domain/entities/post.dart';
-import 'package:campus_saga/domain/entities/user.dart';
+import 'package:campussaga/domain/entities/post.dart';
+import 'package:campussaga/domain/entities/user.dart';
 
 class Validators {
   static bool isValidEmail(String email) {

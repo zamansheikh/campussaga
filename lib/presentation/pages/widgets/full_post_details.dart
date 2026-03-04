@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:campus_saga/domain/entities/post.dart';
-import 'package:campus_saga/domain/entities/user.dart';
+import 'package:campussaga/domain/entities/post.dart';
+import 'package:campussaga/domain/entities/user.dart';
 
 class FullPostDetails extends StatelessWidget {
   final Post post;
   final User user;
 
-  const FullPostDetails({
-    Key? key,
-    required this.post,
-    required this.user,
-  }) : super(key: key);
+  const FullPostDetails({Key? key, required this.post, required this.user})
+    : super(key: key);
 
   double _calculatePercentage(int trueVotes, int falseVotes) {
     final totalVotes = trueVotes + falseVotes;
@@ -45,11 +42,7 @@ class FullPostDetails extends StatelessWidget {
           children: [
             Row(
               children: [
-                const CircleAvatar(
-                  child: Icon(
-                    Icons.person,
-                  ),
-                ),
+                const CircleAvatar(child: Icon(Icons.person)),
                 const SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,16 +71,16 @@ class FullPostDetails extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 5),
               child: Text(
                 post.postTitle,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Text(
-                post.description,
-              ),
+              child: Text(post.description),
             ),
             const SizedBox(height: 20),
             if (post.imageUrls.isNotEmpty)
@@ -105,12 +98,10 @@ class FullPostDetails extends StatelessWidget {
                           imageUrl: post.imageUrls[index],
                           width: 300,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            child: const Icon(Icons.error),
-                          ),
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) =>
+                              Container(child: const Icon(Icons.error)),
                         ),
                       ),
                     );

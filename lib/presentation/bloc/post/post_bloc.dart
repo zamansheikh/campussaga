@@ -1,8 +1,8 @@
 // lib/presentation/bloc/post/post_bloc.dart
-import 'package:campus_saga/data/models/post_model.dart';
-import 'package:campus_saga/domain/entities/post.dart';
-import 'package:campus_saga/domain/usecases/issue/upload_post_images.dart';
-import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
+import 'package:campussaga/data/models/post_model.dart';
+import 'package:campussaga/domain/entities/post.dart';
+import 'package:campussaga/domain/usecases/issue/upload_post_images.dart';
+import 'package:campussaga/presentation/bloc/issue/issue_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'post_event.dart';
 import 'post_state.dart';
@@ -26,8 +26,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         emit(PostingLoading());
         List<String> imageUrls = [];
         if (event.images != null) {
-          final imageResult =
-              await uploadPostImages("${event.post.id}", event.images!);
+          final imageResult = await uploadPostImages(
+            "${event.post.id}",
+            event.images!,
+          );
           await imageResult.fold(
             (failure) async => emit(PostingFailure(failure.message)),
             (images) async {
@@ -36,9 +38,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           );
         }
 
-        Post post = PostModel.fromEntity(event.post)
-            .copyWith(imageUrls: imageUrls)
-            .toEntity();
+        Post post = PostModel.fromEntity(
+          event.post,
+        ).copyWith(imageUrls: imageUrls).toEntity();
 
         final result = await createPost(post);
         await result.fold(

@@ -2,7 +2,7 @@
 
 import 'dart:io';
 
-import 'package:campus_saga/domain/entities/user.dart';
+import 'package:campussaga/domain/entities/user.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class AuthEvent extends Equatable {

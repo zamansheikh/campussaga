@@ -1,8 +1,8 @@
 // lib/domain/repositories/post_repository.dart
 
 import 'dart:io';
-import 'package:campus_saga/domain/entities/promotion.dart';
-import 'package:campus_saga/domain/entities/university.dart';
+import 'package:campussaga/domain/entities/promotion.dart';
+import 'package:campussaga/domain/entities/university.dart';
 import 'package:dartz/dartz.dart';
 import '../entities/post.dart';
 import '../../core/errors/failures.dart';
@@ -10,13 +10,18 @@ import '../../core/errors/failures.dart';
 abstract class PostRepository {
   Future<Either<Failure, List<Post>>> getPostsByUniversity(String universityId);
   Future<Either<Failure, List<Promotion>>> getPromotionByUniversity(
-      String universityId);
+    String universityId,
+  );
   Future<Either<Failure, Post>> createPost(Post post);
   Future<Either<Failure, void>> updatePostStatus(
-      String postId, bool isResolved);
+    String postId,
+    bool isResolved,
+  );
   Future<Either<Failure, List<Post>>> fetchPosts(String universityId);
   Future<Either<Failure, List<String>>> uploadPostImages(
-      String userId, List<File> image);
+    String userId,
+    List<File> image,
+  );
   //Add a comment to a specific post
   Future<Either<Failure, void>> addComment(Post post);
   Future<Either<Failure, void>> updateIssuePost(Post post);

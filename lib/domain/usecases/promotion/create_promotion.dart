@@ -1,4 +1,4 @@
-import 'package:campus_saga/domain/entities/promotion.dart';
+import 'package:campussaga/domain/entities/promotion.dart';
 import 'package:dartz/dartz.dart';
 import '../../repositories/post_repository.dart';
 import '../../../core/errors/failures.dart';

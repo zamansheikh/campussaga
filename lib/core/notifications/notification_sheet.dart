@@ -1,4 +1,4 @@
-import 'package:campus_saga/core/notifications/notification_service.dart';
+import 'package:campussaga/core/notifications/notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
@@ -23,10 +23,7 @@ void showNotificationsSheet(BuildContext context) {
                 children: [
                   Text(
                     'Notifications',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   // Replace with your actual notifications list
@@ -37,18 +34,20 @@ void showNotificationsSheet(BuildContext context) {
                     itemBuilder: (context, index) {
                       return InkWell(
                         onTap: () async {
-                          await FirebaseMessaging.instance.subscribeToTopic('news');
+                          await FirebaseMessaging.instance.subscribeToTopic(
+                            'news',
+                          );
                           final notificationService =
                               NotificationService.instance;
                           await notificationService
                               .showNotificationWithImageFromAssets(
-                            id: 1,
-                            title: "Exciting News!",
-                            body:
-                                "Check out this amazing picture! Stay tuned for more updates.",
-                            imageAsset: "assets/temp/jenny.jpg",
-                            payload: 'Check out this amazing picture!',
-                          );
+                                id: 1,
+                                title: "Exciting News!",
+                                body:
+                                    "Check out this amazing picture! Stay tuned for more updates.",
+                                imageAsset: "assets/temp/jenny.jpg",
+                                payload: 'Check out this amazing picture!',
+                              );
                         },
                         child: ListTile(
                           leading: Icon(Icons.notification_important),

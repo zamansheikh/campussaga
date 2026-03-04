@@ -1,7 +1,7 @@
 // lib/core/usecases/usecase.dart
 
-import 'package:campus_saga/domain/entities/comment.dart';
-import 'package:campus_saga/domain/entities/feedback.dart';
+import 'package:campussaga/domain/entities/comment.dart';
+import 'package:campussaga/domain/entities/feedback.dart';
 import 'package:dartz/dartz.dart';
 import '../errors/failures.dart';
 
@@ -14,15 +14,18 @@ class NoParams {} // For use cases that don't require parameters
 class UserParams {
   final String email;
   final String password;
-  UserParams ({required this.email, required this.password});
+  UserParams({required this.email, required this.password});
 }
-
 
 class AddVoteParams {
   final String postId;
   final String userId;
   final bool isTrueVote;
-  AddVoteParams({required this.postId, required this.userId, required this.isTrueVote});
+  AddVoteParams({
+    required this.postId,
+    required this.userId,
+    required this.isTrueVote,
+  });
 }
 
 class AddFeedbackParams {
@@ -30,7 +33,6 @@ class AddFeedbackParams {
   final AuthorityFeedback feedback;
   AddFeedbackParams({required this.postId, required this.feedback});
 }
-
 
 class AddCommentParams {
   final String postId;

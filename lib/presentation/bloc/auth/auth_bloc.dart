@@ -1,12 +1,12 @@
 // lib/presentation/bloc/auth/auth_bloc.dart
 
-import 'package:campus_saga/core/usecases/usecase.dart';
-import 'package:campus_saga/domain/usecases/auth/create_user_profile.dart';
-import 'package:campus_saga/domain/usecases/auth/sign_in_user.dart';
-import 'package:campus_saga/domain/usecases/auth/sign_in_with_google.dart';
-import 'package:campus_saga/domain/usecases/auth/sign_out_user.dart';
-import 'package:campus_saga/domain/usecases/auth/sign_up_user.dart';
-import 'package:campus_saga/domain/usecases/auth/upload_user_image.dart';
+import 'package:campussaga/core/usecases/usecase.dart';
+import 'package:campussaga/domain/usecases/auth/create_user_profile.dart';
+import 'package:campussaga/domain/usecases/auth/sign_in_user.dart';
+import 'package:campussaga/domain/usecases/auth/sign_in_with_google.dart';
+import 'package:campussaga/domain/usecases/auth/sign_out_user.dart';
+import 'package:campussaga/domain/usecases/auth/sign_up_user.dart';
+import 'package:campussaga/domain/usecases/auth/upload_user_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/user.dart';
 import 'auth_event.dart';

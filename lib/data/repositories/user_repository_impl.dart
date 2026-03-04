@@ -2,15 +2,15 @@
 
 import 'dart:io';
 
-import 'package:campus_saga/core/usecases/usecase.dart';
-import 'package:campus_saga/data/datasources/remote/auth_remote_datasource.dart';
-import 'package:campus_saga/data/datasources/remote/firebase_storage_remote_datasource.dart';
-import 'package:campus_saga/data/datasources/remote/firestore_remote_datasource.dart';
-import 'package:campus_saga/data/models/role_change_model.dart';
-import 'package:campus_saga/data/models/user_model.dart';
-import 'package:campus_saga/data/models/varification_status_model.dart';
-import 'package:campus_saga/domain/entities/role_change.dart';
-import 'package:campus_saga/domain/entities/varification_status.dart';
+import 'package:campussaga/core/usecases/usecase.dart';
+import 'package:campussaga/data/datasources/remote/auth_remote_datasource.dart';
+import 'package:campussaga/data/datasources/remote/firebase_storage_remote_datasource.dart';
+import 'package:campussaga/data/datasources/remote/firestore_remote_datasource.dart';
+import 'package:campussaga/data/models/role_change_model.dart';
+import 'package:campussaga/data/models/user_model.dart';
+import 'package:campussaga/data/models/varification_status_model.dart';
+import 'package:campussaga/domain/entities/role_change.dart';
+import 'package:campussaga/domain/entities/varification_status.dart';
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/user_repository.dart';

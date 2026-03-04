@@ -2,9 +2,9 @@
 
 import 'dart:io';
 
-import 'package:campus_saga/core/usecases/usecase.dart';
-import 'package:campus_saga/domain/entities/role_change.dart';
-import 'package:campus_saga/domain/entities/varification_status.dart';
+import 'package:campussaga/core/usecases/usecase.dart';
+import 'package:campussaga/domain/entities/role_change.dart';
+import 'package:campussaga/domain/entities/varification_status.dart';
 import 'package:dartz/dartz.dart';
 import '../entities/user.dart';
 import '../../core/errors/failures.dart';

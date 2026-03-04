@@ -1,9 +1,9 @@
-import 'package:campus_saga/core/theme/app_theme.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
+import 'package:campussaga/core/theme/app_theme.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_event.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_state.dart';
 import 'package:flutter/material.dart';
-import 'package:campus_saga/domain/entities/user.dart';
+import 'package:campussaga/domain/entities/user.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';

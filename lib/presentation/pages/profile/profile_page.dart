@@ -1,17 +1,17 @@
-import 'package:campus_saga/core/injection_container.dart';
-import 'package:campus_saga/core/notifications/notification_panel.dart';
-import 'package:campus_saga/core/theme/app_theme.dart';
-import 'package:campus_saga/core/utils/utils.dart';
-import 'package:campus_saga/domain/entities/role_change.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_event.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
-import 'package:campus_saga/presentation/bloc/role_manage/role_change_bloc.dart';
-import 'package:campus_saga/presentation/pages/profile/settings_page.dart';
-import 'package:campus_saga/presentation/pages/profile/update_profile_page.dart';
-import 'package:campus_saga/presentation/pages/profile/verification_page.dart';
+import 'package:campussaga/core/injection_container.dart';
+import 'package:campussaga/core/notifications/notification_panel.dart';
+import 'package:campussaga/core/theme/app_theme.dart';
+import 'package:campussaga/core/utils/utils.dart';
+import 'package:campussaga/domain/entities/role_change.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_event.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_state.dart';
+import 'package:campussaga/presentation/bloc/role_manage/role_change_bloc.dart';
+import 'package:campussaga/presentation/pages/profile/settings_page.dart';
+import 'package:campussaga/presentation/pages/profile/update_profile_page.dart';
+import 'package:campussaga/presentation/pages/profile/verification_page.dart';
 import 'package:flutter/material.dart';
-import 'package:campus_saga/domain/entities/user.dart';
+import 'package:campussaga/domain/entities/user.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,8 +41,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _copyToClipboard(String text, String message) {
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -61,15 +62,21 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: AppColors.primaryGradient),
+                gradient: const LinearGradient(
+                  colors: AppColors.primaryGradient,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(Iconsax.user, size: 16, color: Colors.white),
             ),
             const SizedBox(width: 10),
-            Text('Profile',
-                style: GoogleFonts.poppins(
-                    fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              'Profile',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
         actions: [
@@ -129,8 +136,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) =>
-                                      UpdateProfilePage(user: user)),
+                                builder: (_) => UpdateProfilePage(user: user),
+                              ),
                             ),
                           ),
                           _buildSettingsTile(
@@ -141,7 +148,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => const SettingsPage()),
+                                builder: (_) => const SettingsPage(),
+                              ),
                             ),
                           ),
                           _buildSettingsTile(
@@ -150,7 +158,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             subtitle: 'Read our usage policy',
                             iconBg: const Color(0xFF4CAF50),
                             onTap: () => launchURL(
-                                'https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md'),
+                              'https://github.com/zamansheikh/campus_saga/blob/main/docs/SRS.md',
+                            ),
                           ),
                           _buildSettingsTile(
                             icon: Iconsax.info_circle,
@@ -166,8 +175,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             subtitle: 'Sign out of your account',
                             iconBg: Colors.red,
                             isDestructive: true,
-                            onTap: () => BlocProvider.of<AuthBloc>(context)
-                                .add(SignOutEvent()),
+                            onTap: () => BlocProvider.of<AuthBloc>(
+                              context,
+                            ).add(SignOutEvent()),
                           ),
                         ],
                       ),
@@ -178,7 +188,8 @@ class _ProfilePageState extends State<ProfilePage> {
             );
           }
           return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary));
+            child: CircularProgressIndicator(color: AppColors.primary),
+          );
         },
       ),
     );
@@ -212,7 +223,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                        color: Colors.white.withAlpha(170), width: 3),
+                      color: Colors.white.withAlpha(170),
+                      width: 3,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withAlpha(60),
@@ -234,8 +247,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Iconsax.verify5,
-                        size: 18, color: AppColors.primary),
+                    child: const Icon(
+                      Iconsax.verify5,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
                   ),
               ],
             ),
@@ -279,20 +295,22 @@ class _ProfilePageState extends State<ProfilePage> {
             FilledButton.icon(
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (_) => VerificationPage(user: user)),
+                MaterialPageRoute(builder: (_) => VerificationPage(user: user)),
               ),
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.orange.shade600,
                 minimumSize: const Size(0, 36),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
               icon: const Icon(Iconsax.shield_tick, size: 15),
               label: Text(
                 'Verify Account',
                 style: GoogleFonts.poppins(
-                    fontSize: 12, fontWeight: FontWeight.w600),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
@@ -349,11 +367,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _divider() {
-    return Container(
-      width: 1,
-      height: 32,
-      color: Colors.white.withAlpha(50),
-    );
+    return Container(width: 1, height: 32, color: Colors.white.withAlpha(50));
   }
 
   // ── Section card ─────────────────────────────────────────────────────────────
@@ -371,7 +385,8 @@ class _ProfilePageState extends State<ProfilePage> {
         color: isDark ? const Color(0xFF1D2024) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withAlpha(40)),
+          color: Theme.of(context).colorScheme.outline.withAlpha(40),
+        ),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -395,10 +410,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              if (trailing != null) ...[
-                const Spacer(),
-                trailing,
-              ],
+              if (trailing != null) ...[const Spacer(), trailing],
             ],
           ),
           const SizedBox(height: 12),
@@ -415,26 +427,31 @@ class _ProfilePageState extends State<ProfilePage> {
     if (user.studentId != null)
       rows.add(_detailRow(Iconsax.card, 'Student ID', user.studentId!));
     if (user.department != null)
-      rows.add(_detailRow(Iconsax.building, 'Department',
-          _getDepartmentText(user.department!)));
+      rows.add(
+        _detailRow(
+          Iconsax.building,
+          'Department',
+          _getDepartmentText(user.department!),
+        ),
+      );
     if (user.batch != null)
       rows.add(_detailRow(Iconsax.calendar, 'Batch', user.batch.toString()));
     if (user.cgpa != null)
       rows.add(_detailRow(Iconsax.chart_2, 'CGPA', user.cgpa.toString()));
     if (user.currentSemester != null)
-      rows.add(
-          _detailRow(Iconsax.book_1, 'Semester', user.currentSemester!));
+      rows.add(_detailRow(Iconsax.book_1, 'Semester', user.currentSemester!));
     if (user.phoneNumber != null)
       rows.add(_detailRow(Iconsax.call, 'Phone', user.phoneNumber!));
     if (user.clubNames?.isNotEmpty ?? false)
-      rows.add(
-          _detailRow(Iconsax.people, 'Clubs', user.clubNames!.join(', ')));
+      rows.add(_detailRow(Iconsax.people, 'Clubs', user.clubNames!.join(', ')));
 
     if (rows.isEmpty) {
       return Text(
         'No student details added yet. Tap Edit Profile to fill in.',
         style: GoogleFonts.poppins(
-            fontSize: 12, color: const Color(0xFF9CA3AF)),
+          fontSize: 12,
+          color: const Color(0xFF9CA3AF),
+        ),
       );
     }
     return Column(children: rows);
@@ -459,14 +476,18 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Text(
               label,
               style: GoogleFonts.poppins(
-                  fontSize: 12, color: const Color(0xFF9CA3AF)),
+                fontSize: 12,
+                color: const Color(0xFF9CA3AF),
+              ),
             ),
           ),
           Expanded(
             child: Text(
               value,
               style: GoogleFonts.poppins(
-                  fontSize: 12, fontWeight: FontWeight.w600),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -516,7 +537,9 @@ class _ProfilePageState extends State<ProfilePage> {
         Text(
           'No achievements yet. Keep engaging!',
           style: GoogleFonts.poppins(
-              fontSize: 12, color: const Color(0xFF9CA3AF)),
+            fontSize: 12,
+            color: const Color(0xFF9CA3AF),
+          ),
         ),
       ],
     );

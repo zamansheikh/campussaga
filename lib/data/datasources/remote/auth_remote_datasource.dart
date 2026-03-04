@@ -1,5 +1,5 @@
 // lib/data/datasources/remote/auth_remote_datasource.dart
-import 'package:campus_saga/core/usecases/usecase.dart';
+import 'package:campussaga/core/usecases/usecase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 

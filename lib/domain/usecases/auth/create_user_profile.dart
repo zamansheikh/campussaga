@@ -1,7 +1,7 @@
 // lib/domain/usecases/create_post.dart
 
-import 'package:campus_saga/domain/entities/user.dart';
-import 'package:campus_saga/domain/repositories/user_repository.dart';
+import 'package:campussaga/domain/entities/user.dart';
+import 'package:campussaga/domain/repositories/user_repository.dart';
 import 'package:dartz/dartz.dart';
 import '../../../core/errors/failures.dart';
 import '../../../core/usecases/usecase.dart';

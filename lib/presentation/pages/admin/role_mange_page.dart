@@ -1,7 +1,7 @@
-import 'package:campus_saga/core/injection_container.dart';
-import 'package:campus_saga/domain/entities/role_change.dart';
-import 'package:campus_saga/domain/entities/user.dart';
-import 'package:campus_saga/presentation/bloc/role_manage/role_change_bloc.dart';
+import 'package:campussaga/core/injection_container.dart';
+import 'package:campussaga/domain/entities/role_change.dart';
+import 'package:campussaga/domain/entities/user.dart';
+import 'package:campussaga/presentation/bloc/role_manage/role_change_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -39,9 +39,7 @@ class _RoleMangePageState extends State<RoleMangePage> {
       body: BlocBuilder<RoleChangeBloc, RoleChangeState>(
         builder: (context, state) {
           if (state is RoleChangeLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           } else if (state is RoleChangeSuccess) {
             roleChanges = state.roleChangeList;
             return ListView.builder(
@@ -49,8 +47,10 @@ class _RoleMangePageState extends State<RoleMangePage> {
               itemBuilder: (context, index) {
                 final roleChange = roleChanges[index];
                 return Card(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 16,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -60,8 +60,9 @@ class _RoleMangePageState extends State<RoleMangePage> {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(roleChange.profilePicture),
+                          backgroundImage: NetworkImage(
+                            roleChange.profilePicture,
+                          ),
                           radius: 24,
                         ),
                         const SizedBox(width: 12),
@@ -100,30 +101,38 @@ class _RoleMangePageState extends State<RoleMangePage> {
                           children: [
                             IconButton(
                               iconSize: 20,
-                              icon: const Icon(Icons.admin_panel_settings_sharp,
-                                  color: Colors.green),
+                              icon: const Icon(
+                                Icons.admin_panel_settings_sharp,
+                                color: Colors.green,
+                              ),
                               onPressed: () {
                                 print("approved");
-                                context
-                                    .read<RoleChangeBloc>()
-                                    .add(RoleChangeAccepted(roleChange.copyWith(
+                                context.read<RoleChangeBloc>().add(
+                                  RoleChangeAccepted(
+                                    roleChange.copyWith(
                                       status: "approved",
                                       role: "admin",
-                                    )));
+                                    ),
+                                  ),
+                                );
                               },
                             ),
                             IconButton(
                               iconSize: 20,
-                              icon:
-                                  const Icon(Icons.school, color: Colors.green),
+                              icon: const Icon(
+                                Icons.school,
+                                color: Colors.green,
+                              ),
                               onPressed: () {
                                 print("approved");
-                                context
-                                    .read<RoleChangeBloc>()
-                                    .add(RoleChangeAccepted(roleChange.copyWith(
+                                context.read<RoleChangeBloc>().add(
+                                  RoleChangeAccepted(
+                                    roleChange.copyWith(
                                       status: "approved",
                                       role: "university",
-                                    )));
+                                    ),
+                                  ),
+                                );
                               },
                             ),
                           ],
@@ -135,25 +144,29 @@ class _RoleMangePageState extends State<RoleMangePage> {
                               icon: const Icon(Icons.close, color: Colors.red),
                               onPressed: () {
                                 print("rejected");
-                                context
-                                    .read<RoleChangeBloc>()
-                                    .add(RoleChangeAccepted(roleChange.copyWith(
-                                      status: "rejected",
-                                    )));
+                                context.read<RoleChangeBloc>().add(
+                                  RoleChangeAccepted(
+                                    roleChange.copyWith(status: "rejected"),
+                                  ),
+                                );
                               },
                             ),
                             IconButton(
                               iconSize: 20,
-                              icon: const Icon(Icons.fact_check_outlined,
-                                  color: Colors.red),
+                              icon: const Icon(
+                                Icons.fact_check_outlined,
+                                color: Colors.red,
+                              ),
                               onPressed: () {
                                 print("Ambassador");
-                                context
-                                    .read<RoleChangeBloc>()
-                                    .add(RoleChangeAccepted(roleChange.copyWith(
+                                context.read<RoleChangeBloc>().add(
+                                  RoleChangeAccepted(
+                                    roleChange.copyWith(
                                       role: "ambassador",
                                       status: "Ambassador",
-                                    )));
+                                    ),
+                                  ),
+                                );
                               },
                             ),
                           ],
@@ -165,9 +178,7 @@ class _RoleMangePageState extends State<RoleMangePage> {
               },
             );
           } else if (state is RoleChangeFailure) {
-            return Center(
-              child: Text(state.message),
-            );
+            return Center(child: Text(state.message));
           }
           return Container();
         },

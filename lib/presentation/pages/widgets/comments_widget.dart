@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:campus_saga/domain/entities/comment.dart';
+import 'package:campussaga/domain/entities/comment.dart';
 import 'package:intl/intl.dart';
 
 class CommentsWidget extends StatefulWidget {
@@ -55,7 +55,9 @@ class _CommentsWidgetState extends State<CommentsWidget> {
                       const Text(
                         "Comments",
                         style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       if (widget.comments.isNotEmpty)
@@ -67,18 +69,16 @@ class _CommentsWidgetState extends State<CommentsWidget> {
                             return ListTile(
                               title: Text(
                                 comment.text,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                ),
+                                style: const TextStyle(fontSize: 20),
                               ),
-                              subtitle:
-                                  Text("By: ${comment.userId.substring(0, 5)}"),
+                              subtitle: Text(
+                                "By: ${comment.userId.substring(0, 5)}",
+                              ),
                               trailing: Text(
-                                DateFormat('yyyy-MM-dd – HH:mm')
-                                    .format(comment.timestamp),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
+                                DateFormat(
+                                  'yyyy-MM-dd – HH:mm',
+                                ).format(comment.timestamp),
+                                style: const TextStyle(fontSize: 12),
                               ),
                             );
                           },
@@ -131,17 +131,9 @@ class _CommentsWidgetState extends State<CommentsWidget> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.comment,
-            size: 18,
-          ),
+          Icon(Icons.comment, size: 18),
           const SizedBox(width: 4.0),
-          Text(
-            "Comments",
-            style: TextStyle(
-              fontSize: 14,
-            ),
-          ),
+          Text("Comments", style: TextStyle(fontSize: 14)),
         ],
       ),
     );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:campus_saga/domain/entities/feedback.dart';
+import 'package:campussaga/domain/entities/feedback.dart';
 import 'package:intl/intl.dart';
 
 class FeedbackWidget extends StatefulWidget {
@@ -57,26 +57,25 @@ class _FeedbackWidgetState extends State<FeedbackWidget> {
                       const Text(
                         "Feedback",
                         style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       if (widget.feedback != null)
                         ListTile(
                           title: Text(
                             widget.feedback!.message,
-                            style: const TextStyle(
-                              fontSize: 20,
-                            ),
+                            style: const TextStyle(fontSize: 20),
                           ),
                           subtitle: Text(
                             "By: ${widget.feedback!.authorityId.substring(0, 5)}(Authority)",
                           ),
                           trailing: Text(
-                            DateFormat('yyyy-MM-dd – HH:mm')
-                                .format(widget.feedback!.timestamp),
-                            style: const TextStyle(
-                              fontSize: 12,
-                            ),
+                            DateFormat(
+                              'yyyy-MM-dd – HH:mm',
+                            ).format(widget.feedback!.timestamp),
+                            style: const TextStyle(fontSize: 12),
                           ),
                         )
                       else
@@ -130,13 +129,9 @@ class _FeedbackWidgetState extends State<FeedbackWidget> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.feedback,
-              ),
+              Icon(Icons.feedback),
               const SizedBox(width: 4.0),
-              Text(
-                widget.buttonName,
-              ),
+              Text(widget.buttonName),
             ],
           ),
         ),

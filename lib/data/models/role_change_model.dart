@@ -1,4 +1,4 @@
-import 'package:campus_saga/domain/entities/role_change.dart';
+import 'package:campussaga/domain/entities/role_change.dart';
 
 class RoleChangeModel extends RoleChange {
   RoleChangeModel({
@@ -11,15 +11,15 @@ class RoleChangeModel extends RoleChange {
     required String status,
     required DateTime timestamp,
   }) : super(
-          role: role,
-          email: email,
-          uuid: uuid,
-          userName: userName,
-          phoneNumber: phoneNumber,
-          profilePicture: profilePicture,
-          status: status,
-          timestamp: timestamp,
-        );
+         role: role,
+         email: email,
+         uuid: uuid,
+         userName: userName,
+         phoneNumber: phoneNumber,
+         profilePicture: profilePicture,
+         status: status,
+         timestamp: timestamp,
+       );
 
   factory RoleChangeModel.fromJson(Map<String, dynamic> json) {
     return RoleChangeModel(

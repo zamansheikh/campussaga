@@ -1,8 +1,8 @@
-import 'package:campus_saga/core/injection_container.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_bloc.dart';
-import 'package:campus_saga/presentation/bloc/auth/auth_state.dart';
-import 'package:campus_saga/presentation/bloc/issue/issue_bloc.dart';
-import 'package:campus_saga/presentation/pages/widgets/post_card.dart';
+import 'package:campussaga/core/injection_container.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_bloc.dart';
+import 'package:campussaga/presentation/bloc/auth/auth_state.dart';
+import 'package:campussaga/presentation/bloc/issue/issue_bloc.dart';
+import 'package:campussaga/presentation/pages/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -41,10 +41,7 @@ class _SwitchCampusPageState extends State<SwitchCampusPage> {
         forceMaterialTransparency: true,
         title: Text(
           "You are visiting @${widget.universityId} Campus",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -80,10 +77,7 @@ class _SwitchCampusPageState extends State<SwitchCampusPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 64,
-                      ),
+                      const Icon(Icons.error_outline, size: 64),
                       const SizedBox(height: 16),
                       Text(issueState.message),
                       ElevatedButton(
@@ -100,20 +94,10 @@ class _SwitchCampusPageState extends State<SwitchCampusPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Icon(
-                        Icons.post_add,
-                        size: 64,
-                      ),
+                      Icon(Icons.post_add, size: 64),
                       SizedBox(height: 16),
-                      Text(
-                        "No posts yet",
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      Text(
-                        "Be the first to create a post!",
-                      ),
+                      Text("No posts yet", style: TextStyle(fontSize: 18)),
+                      Text("Be the first to create a post!"),
                     ],
                   ),
                 );
@@ -133,10 +117,7 @@ class _SwitchCampusPageState extends State<SwitchCampusPage> {
                               "Latest Issues",
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
-                            Divider(
-                              indent: 20,
-                              endIndent: 20,
-                            ),
+                            Divider(indent: 20, endIndent: 20),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: PostCard(
@@ -154,10 +135,7 @@ class _SwitchCampusPageState extends State<SwitchCampusPage> {
                               "Trending Issues",
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
-                            Divider(
-                              indent: 20,
-                              endIndent: 20,
-                            ),
+                            Divider(indent: 20, endIndent: 20),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: PostCard(
@@ -175,10 +153,7 @@ class _SwitchCampusPageState extends State<SwitchCampusPage> {
                               "Other Issues",
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
-                            Divider(
-                              indent: 20,
-                              endIndent: 20,
-                            ),
+                            Divider(indent: 20, endIndent: 20),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: PostCard(

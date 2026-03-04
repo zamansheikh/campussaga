@@ -1,4 +1,4 @@
-import 'package:campus_saga/domain/entities/post.dart';
+import 'package:campussaga/domain/entities/post.dart';
 import 'package:flutter/material.dart';
 
 class PredictionWidget extends StatelessWidget {

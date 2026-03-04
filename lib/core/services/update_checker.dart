@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:campus_saga/core/constants/update_constants.dart';
-import 'package:campus_saga/core/utils/utils.dart';
+import 'package:campussaga/core/constants/update_constants.dart';
+import 'package:campussaga/core/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -40,9 +40,10 @@ Future<String> checkUpdateFromGithub(BuildContext context) async {
               return AlertDialog(
                 title: const Text('Update Available'),
                 content: Text(
-                    'A new version of the app is available. Please update to the latest version.\n\n'
-                    'Please uninstall the old version before installing the new version\n\n'
-                    'Release Note:\n$releaseNote'),
+                  'A new version of the app is available. Please update to the latest version.\n\n'
+                  'Please uninstall the old version before installing the new version\n\n'
+                  'Release Note:\n$releaseNote',
+                ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -78,18 +79,17 @@ Future<String> checkUpdateFromGithub(BuildContext context) async {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              'Network error: Could not connect to the server : ${e.toString()}'),
+            'Network error: Could not connect to the server : ${e.toString()}',
+          ),
         ),
       );
     }
     return "Network error!";
   } catch (error) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: $error'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('An error occurred: $error')));
     }
     return "Update check failed: $error";
   }

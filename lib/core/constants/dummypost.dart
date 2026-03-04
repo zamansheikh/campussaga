@@ -1,11 +1,9 @@
-
-import 'package:campus_saga/domain/entities/post.dart';
-import 'package:campus_saga/domain/entities/promotion.dart';
+import 'package:campussaga/domain/entities/post.dart';
+import 'package:campussaga/domain/entities/promotion.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/user.dart';
 
-Post postGenerate(
-    User user, String postTitle, String description) {
+Post postGenerate(User user, String postTitle, String description) {
   var uuid = Uuid();
   final postId = uuid.v1();
   final freshPost = Post(
@@ -23,7 +21,13 @@ Post postGenerate(
 }
 
 Promotion promotionGenerate(
-    User user, String promotionTitle, String description, String clubName, String eventLink, DateTime expiryDate) {
+  User user,
+  String promotionTitle,
+  String description,
+  String clubName,
+  String eventLink,
+  DateTime expiryDate,
+) {
   var uuid = Uuid();
   final promotionId = uuid.v1();
   final freshPromotion = Promotion(
@@ -34,9 +38,8 @@ Promotion promotionGenerate(
     description: description,
     clubName: clubName,
     timestamp: DateTime.now(),
-    expiryDate:  expiryDate,
-    imageUrls: [
-    ],
+    expiryDate: expiryDate,
+    imageUrls: [],
     likes: 0,
     dislikes: 0,
     eventLink: eventLink,

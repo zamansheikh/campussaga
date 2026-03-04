@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
-import 'package:campus_saga/core/usecases/usecase.dart';
-import 'package:campus_saga/domain/entities/role_change.dart';
-import 'package:campus_saga/domain/usecases/admin/change_role_request.dart';
-import 'package:campus_saga/domain/usecases/admin/fetch_role_change_usecase.dart';
-import 'package:campus_saga/domain/usecases/admin/update_user_role_usecase.dart';
+import 'package:campussaga/core/usecases/usecase.dart';
+import 'package:campussaga/domain/entities/role_change.dart';
+import 'package:campussaga/domain/usecases/admin/change_role_request.dart';
+import 'package:campussaga/domain/usecases/admin/fetch_role_change_usecase.dart';
+import 'package:campussaga/domain/usecases/admin/update_user_role_usecase.dart';
 import 'package:equatable/equatable.dart';
 
 part 'role_change_event.dart';
@@ -29,17 +29,20 @@ class RoleChangeBloc extends Bloc<RoleChangeEvent, RoleChangeState> {
     on<ChangeRoleEvent>((event, emit) async {
       emit(RoleChangeLoading());
       final result = await changeRoleRequest.call(event.roleChange);
-      result.fold(
-        (failure) => emit(RoleChangeFailure(failure.toString())),
-        (_) {
-          print("Role Changed applied to admin");
-        },
-      );
+      result.fold((failure) => emit(RoleChangeFailure(failure.toString())), (
+        _,
+      ) {
+        print("Role Changed applied to admin");
+      });
     });
 
     on<RoleChangeAccepted>((event, emit) async {
-      final RoleChangedOrNot = await updateUserRoleUsecase.call(UserRoleParams(
-          uuid: event.roleChange.uuid, role: event.roleChange.role));
+      final RoleChangedOrNot = await updateUserRoleUsecase.call(
+        UserRoleParams(
+          uuid: event.roleChange.uuid,
+          role: event.roleChange.role,
+        ),
+      );
       RoleChangedOrNot.fold(
         (failure) => emit(RoleChangeFailure(failure.toString())),
         (_) async {

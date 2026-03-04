@@ -1,6 +1,6 @@
-import 'package:campus_saga/core/injection_container.dart';
-import 'package:campus_saga/domain/entities/varification_status.dart';
-import 'package:campus_saga/presentation/bloc/verify_user/verify_user_bloc.dart';
+import 'package:campussaga/core/injection_container.dart';
+import 'package:campussaga/domain/entities/varification_status.dart';
+import 'package:campussaga/presentation/bloc/verify_user/verify_user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,8 +19,9 @@ class _UserVerifyPageState extends State<UserVerifyPage> {
   }
 
   Future<void> _loadVerifications() async {
-    sl<VerifyUserBloc>()
-        .add(PendingVerificationLoadedEvent(universtiyId: "DIU"));
+    sl<VerifyUserBloc>().add(
+      PendingVerificationLoadedEvent(universtiyId: "DIU"),
+    );
   }
 
   @override
@@ -40,8 +41,10 @@ class _UserVerifyPageState extends State<UserVerifyPage> {
               itemBuilder: (context, index) {
                 final verification = state.verifications[index];
                 return Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   elevation: 2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -55,7 +58,9 @@ class _UserVerifyPageState extends State<UserVerifyPage> {
                         Text(
                           'User Information',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text('UUID: ${verification.userUuid}'),
@@ -70,7 +75,9 @@ class _UserVerifyPageState extends State<UserVerifyPage> {
                         Text(
                           'Photos',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Row(
@@ -96,7 +103,9 @@ class _UserVerifyPageState extends State<UserVerifyPage> {
                         Text(
                           'Verification Status',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                         Text(
                           verification.status.toString().split('.').last,
@@ -113,7 +122,8 @@ class _UserVerifyPageState extends State<UserVerifyPage> {
                               color: Colors.green,
                               onPressed: () {
                                 final veri = verification.copyWith(
-                                    status: VerificationStatus.verified);
+                                  status: VerificationStatus.verified,
+                                );
                                 sl<VerifyUserBloc>().add(
                                   VerifyUserAcceptedEvent(verification: veri),
                                 );
@@ -124,7 +134,8 @@ class _UserVerifyPageState extends State<UserVerifyPage> {
                               color: Colors.red,
                               onPressed: () {
                                 final veri = verification.copyWith(
-                                    status: VerificationStatus.rejected);
+                                  status: VerificationStatus.rejected,
+                                );
                                 sl<VerifyUserBloc>().add(
                                   VerifyUserRejectedEvent(verification: veri),
                                 );
@@ -150,7 +161,7 @@ class ImageCard extends StatelessWidget {
   final String imageUrl;
   final String label;
   const ImageCard({required this.imageUrl, required this.label, Key? key})
-      : super(key: key);
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -196,10 +207,7 @@ class ImageCard extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.contain,
-              ),
+              child: Image.network(imageUrl, fit: BoxFit.contain),
             ),
           ),
         ),

@@ -1,4 +1,4 @@
-import 'package:campus_saga/domain/entities/university.dart';
+import 'package:campussaga/domain/entities/university.dart';
 
 class UniversityModel extends University {
   const UniversityModel({
@@ -20,24 +20,24 @@ class UniversityModel extends University {
     int establishmentYear = 0,
     double academicScore = 0.0,
   }) : super(
-          id: id,
-          name: name,
-          description: description,
-          logoUrl: logoUrl,
-          location: location,
-          isPublic: isPublic,
-          researchScore: researchScore,
-          qsRankingScore: qsRankingScore,
-          totalPosts: totalPosts,
-          totalSolvedPosts: totalSolvedPosts,
-          agrees: agrees,
-          disagrees: disagrees,
-          studentCount: studentCount,
-          facultyCount: facultyCount,
-          programsOffered: programsOffered,
-          establishmentYear: establishmentYear,
-          academicScore: academicScore,
-        );
+         id: id,
+         name: name,
+         description: description,
+         logoUrl: logoUrl,
+         location: location,
+         isPublic: isPublic,
+         researchScore: researchScore,
+         qsRankingScore: qsRankingScore,
+         totalPosts: totalPosts,
+         totalSolvedPosts: totalSolvedPosts,
+         agrees: agrees,
+         disagrees: disagrees,
+         studentCount: studentCount,
+         facultyCount: facultyCount,
+         programsOffered: programsOffered,
+         establishmentYear: establishmentYear,
+         academicScore: academicScore,
+       );
 
   factory UniversityModel.fromJson(Map<String, dynamic> json) {
     return UniversityModel(

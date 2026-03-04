@@ -3,7 +3,7 @@
 //       to Cloudinary instead of Firebase Storage.
 
 import 'dart:io';
-import 'package:campus_saga/core/services/cloudinary_service.dart';
+import 'package:campussaga/core/services/cloudinary_service.dart';
 
 class FirebaseStorageRemoteDataSource {
   final CloudinaryService cloudinaryService;
@@ -20,7 +20,10 @@ class FirebaseStorageRemoteDataSource {
   }
 
   /// Upload images for an issue/problem post.
-  Future<List<String>> uploadPostImages(String postId, List<File> images) async {
+  Future<List<String>> uploadPostImages(
+    String postId,
+    List<File> images,
+  ) async {
     final urls = <String>[];
     for (int i = 0; i < images.length; i++) {
       final url = await cloudinaryService.uploadImage(
@@ -34,7 +37,10 @@ class FirebaseStorageRemoteDataSource {
   }
 
   /// Upload images for a promotion post.
-  Future<List<String>> uploadPromotionImages(String postId, List<File> images) async {
+  Future<List<String>> uploadPromotionImages(
+    String postId,
+    List<File> images,
+  ) async {
     final urls = <String>[];
     for (int i = 0; i < images.length; i++) {
       final url = await cloudinaryService.uploadImage(
@@ -48,7 +54,10 @@ class FirebaseStorageRemoteDataSource {
   }
 
   /// Upload selfie + ID card photos for verification.
-  Future<List<String>> uploadVerificationImages(String userId, List<File> images) async {
+  Future<List<String>> uploadVerificationImages(
+    String userId,
+    List<File> images,
+  ) async {
     final urls = <String>[];
     final labels = ['selfie', 'id_card'];
     for (int i = 0; i < images.length; i++) {

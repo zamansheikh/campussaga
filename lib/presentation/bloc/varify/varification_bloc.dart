@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
-import 'package:campus_saga/data/models/varification_status_model.dart';
-import 'package:campus_saga/domain/entities/varification_status.dart';
-import 'package:campus_saga/domain/usecases/auth/create_varification_request_usecase.dart';
-import 'package:campus_saga/domain/usecases/auth/upload_verification_images_usecase.dart';
+import 'package:campussaga/data/models/varification_status_model.dart';
+import 'package:campussaga/domain/entities/varification_status.dart';
+import 'package:campussaga/domain/usecases/auth/create_varification_request_usecase.dart';
+import 'package:campussaga/domain/usecases/auth/upload_verification_images_usecase.dart';
 import 'package:equatable/equatable.dart';
 
 part 'varification_event.dart';
@@ -22,7 +22,9 @@ class VarificationBloc extends Bloc<VarificationEvent, VarificationState> {
         emit(VarificationInProgress());
         List<String> imageUrls = [];
         final imageResult = await uploadVerificationImages(
-            "${event.verification.userUuid}", event.files);
+          "${event.verification.userUuid}",
+          event.files,
+        );
         await imageResult.fold(
           (failure) async => emit(VarificationError(failure.message)),
           (images) async {
@@ -37,15 +39,18 @@ class VarificationBloc extends Bloc<VarificationEvent, VarificationState> {
             final result = await createVarificationRequest(verificationStatus);
             result.fold(
               (failure) => emit(VarificationError(failure.message)),
-              (verification) => emit(VarificationSuccess(
-                  "Verification request submitted successfully")),
+              (verification) => emit(
+                VarificationSuccess(
+                  "Verification request submitted successfully",
+                ),
+              ),
             );
-
           },
         );
 
         emit(
-            VarificationSuccess("Verification request submitted successfully"));
+          VarificationSuccess("Verification request submitted successfully"),
+        );
       } catch (e) {
         emit(VarificationError(e.toString()));
       }
