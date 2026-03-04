@@ -1,5 +1,6 @@
 import 'package:campussaga/core/injection_container.dart';
 import 'package:campussaga/core/theme/app_theme.dart';
+import 'package:campussaga/core/theme/theme_cubit.dart';
 import 'package:campussaga/core/utils/utils.dart';
 import 'package:campussaga/presentation/bloc/auth/auth_bloc.dart';
 import 'package:campussaga/presentation/bloc/auth/auth_event.dart';
@@ -151,6 +152,64 @@ class SettingsPage extends StatelessWidget {
   }
 
   // ── Dialogs ────────────────────────────────────────────────────────────────
+
+  void _showNotificationSettings(BuildContext context) {
+    showDialog(context: context, builder: (_) => _NotificationSettingsDialog());
+  }
+
+  void _showLanguageDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(
+              Iconsax.language_square,
+              color: Color(0xFF00BCD4),
+              size: 22,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Language',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _LanguageOption(
+              flag: '🇬🇧',
+              name: 'English',
+              tag: 'Current',
+              active: true,
+            ),
+            const SizedBox(height: 8),
+            _LanguageOption(
+              flag: '🇧🇩',
+              name: 'Bangla (বাংলা)',
+              tag: 'Coming soon',
+              active: false,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'OK',
+              style: GoogleFonts.poppins(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showComingSoon(BuildContext context, String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -472,6 +531,228 @@ class _ComingSoonBadge extends StatelessWidget {
     );
   }
 }
+
+// ── Notification Settings Dialog ───────────────────────────────────────────
+
+class _NotificationSettingsDialog extends StatefulWidget {
+  const _NotificationSettingsDialog();
+
+  @override
+  State<_NotificationSettingsDialog> createState() =>
+      _NotificationSettingsDialogState();
+}
+
+class _NotificationSettingsDialogState
+    extends State<_NotificationSettingsDialog> {
+  bool newPosts = true;
+  bool commentReplies = true;
+  bool issueUpdates = true;
+  bool promotions = false;
+  bool systemAlerts = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Row(
+        children: [
+          const Icon(
+            Iconsax.notification_bing,
+            color: Color(0xFF7C4DFF),
+            size: 22,
+          ),
+          const SizedBox(width: 10),
+          Text(
+            'Notifications',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _NotifRow(
+            icon: Iconsax.document_text,
+            label: 'New Posts',
+            subtitle: 'Posts from your university',
+            value: newPosts,
+            onChanged: (v) => setState(() => newPosts = v),
+          ),
+          _NotifRow(
+            icon: Iconsax.message_text,
+            label: 'Comment Replies',
+            subtitle: 'Replies to your comments',
+            value: commentReplies,
+            onChanged: (v) => setState(() => commentReplies = v),
+          ),
+          _NotifRow(
+            icon: Iconsax.refresh_circle,
+            label: 'Issue Updates',
+            subtitle: 'Status changes on issues',
+            value: issueUpdates,
+            onChanged: (v) => setState(() => issueUpdates = v),
+          ),
+          _NotifRow(
+            icon: Iconsax.award,
+            label: 'Promotions',
+            subtitle: 'Club events & promotions',
+            value: promotions,
+            onChanged: (v) => setState(() => promotions = v),
+          ),
+          _NotifRow(
+            icon: Iconsax.info_circle,
+            label: 'System Alerts',
+            subtitle: 'App updates & maintenance',
+            value: systemAlerts,
+            onChanged: (v) => setState(() => systemAlerts = v),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            'Cancel',
+            style: GoogleFonts.poppins(color: const Color(0xFF9CA3AF)),
+          ),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          onPressed: () => Navigator.pop(context),
+          child: Text('Save', style: GoogleFonts.poppins(fontSize: 13)),
+        ),
+      ],
+    );
+  }
+}
+
+class _NotifRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _NotifRow({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: AppColors.primary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: const Color(0xFF9CA3AF),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch.adaptive(
+            value: value,
+            activeColor: AppColors.primary,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Language Option Widget ─────────────────────────────────────────────────
+
+class _LanguageOption extends StatelessWidget {
+  final String flag;
+  final String name;
+  final String tag;
+  final bool active;
+
+  const _LanguageOption({
+    required this.flag,
+    required this.name,
+    required this.tag,
+    required this.active,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: active
+            ? AppColors.primary.withAlpha(18)
+            : Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: active
+              ? AppColors.primary.withAlpha(100)
+              : Theme.of(context).colorScheme.outline.withAlpha(40),
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(flag, style: const TextStyle(fontSize: 22)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              name,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: active
+                  ? AppColors.primary.withAlpha(22)
+                  : const Color(0xFF9CA3AF).withAlpha(30),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              tag,
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: active ? AppColors.primary : const Color(0xFF9CA3AF),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── About Row ─────────────────────────────────────────────────────────────────
 
 class _AboutRow extends StatelessWidget {
   final String label;

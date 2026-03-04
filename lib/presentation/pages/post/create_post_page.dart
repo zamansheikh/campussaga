@@ -55,7 +55,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   void handlePostCreation(int index) {
-    widget.onPostCreated?.call(index);
+    if (widget.onPostCreated != null) {
+      widget.onPostCreated!.call(index);
+    } else {
+      // Standalone page — go back
+      if (mounted) Navigator.pop(context);
+      return;
+    }
     titleController.clear();
     descriptionController.clear();
     eventLinkController.clear();
@@ -76,8 +82,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
         centerTitle: true,
         forceMaterialTransparency: true,
         leading: IconButton(
-          icon: const Icon(Iconsax.menu_1),
-          onPressed: () => Scaffold.of(context).openDrawer(),
+          icon: const Icon(Iconsax.arrow_left),
+          onPressed: () => Navigator.pop(context),
         ),
         title: Row(
           mainAxisSize: MainAxisSize.min,
@@ -102,12 +108,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Iconsax.notification),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
