@@ -115,4 +115,69 @@ void main() {
     ],
     errors: () => [isA<ArgumentError>()],
   );
+
+  blocTest<AuthBloc, AuthState>(
+    'an incomplete profile needs setup until saved or skipped',
+    seed: () => const AuthState(status: AuthStatus.signedIn, user: newUser),
+    build: build,
+    act: (b) => b.add(const AuthProfileSetupSkipped()),
+    verify: (b) {
+      expect(
+        const AuthState(
+          status: AuthStatus.signedIn,
+          user: newUser,
+        ).needsProfileSetup,
+        isTrue,
+      );
+      expect(b.state.needsProfileSetup, isFalse);
+      expect(b.state.profileSetupSkipped, isTrue);
+    },
+  );
+
+  blocTest<AuthBloc, AuthState>(
+    'profile updates replace the signed-in user',
+    seed: () => const AuthState(status: AuthStatus.signedIn, user: newUser),
+    build: build,
+    act: (b) => b.add(const AuthProfileUpdated(testUser)),
+    verify: (b) {
+      expect(b.state.user?.department, 'CSE');
+      expect(b.state.needsProfileSetup, isFalse);
+    },
+  );
+
+  blocTest<AuthBloc, AuthState>(
+    'deleting the account signs out',
+    seed: () => const AuthState(status: AuthStatus.signedIn, user: testUser),
+    build: build,
+    act: (b) => b.add(const AuthAccountDeleteRequested()),
+    expect: () => [
+      const AuthState(
+        status: AuthStatus.signedIn,
+        user: testUser,
+        deleting: true,
+      ),
+      const AuthState(status: AuthStatus.signedOut),
+    ],
+    verify: (_) => expect(repo.deletes, 1),
+  );
+
+  blocTest<AuthBloc, AuthState>(
+    'if deleting fails the student stays signed in and sees why',
+    setUp: () => repo.deleteFailure = const NetworkFailure(),
+    seed: () => const AuthState(status: AuthStatus.signedIn, user: testUser),
+    build: build,
+    act: (b) => b.add(const AuthAccountDeleteRequested()),
+    expect: () => [
+      const AuthState(
+        status: AuthStatus.signedIn,
+        user: testUser,
+        deleting: true,
+      ),
+      const AuthState(
+        status: AuthStatus.signedIn,
+        user: testUser,
+        failure: NetworkFailure(),
+      ),
+    ],
+  );
 }

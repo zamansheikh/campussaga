@@ -103,6 +103,7 @@ rewriting the app.
 | `POST /auth/logout-all` | student | Ends every session (all devices) |
 | `GET /me` | student | Own profile + university |
 | `PATCH /me` | student | `displayName`, `department`, `batch` only (empty string clears); unknown fields such as `role` are rejected with 400 |
+| `GET /me/department-suggestions?q=` | student | Departments other students at the same university entered (most used first, case-insensitive); names only |
 | `DELETE /me` | student | Deletes the account and everything it owns |
 
 ### Authentication

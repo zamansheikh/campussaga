@@ -15,11 +15,33 @@ const testUser = UserProfile(
   ),
   role: 'student',
   displayName: 'Rafi',
+  department: 'CSE',
+  batch: '61',
+);
+
+/// Signed in for the first time: department and batch still missing.
+const newUser = UserProfile(
+  id: 'u2',
+  email: 'mim@diu.edu.bd',
+  university: University(
+    id: 'uni1',
+    slug: 'demo-university',
+    name: 'Demo University',
+  ),
+  role: 'student',
+  displayName: 'Mim',
 );
 
 class FakeAuthRepository implements AuthRepository {
   UserProfile? savedUser;
   Failure? googleFailure;
+
+  /// Who Google sign-in returns (default: a complete profile).
+  UserProfile googleUser = testUser;
+
+  /// deleteAccount fails with this (account kept).
+  Failure? deleteFailure;
+  int deletes = 0;
 
   /// A non-Failure error (a bug) thrown by Google sign-in.
   Object? googleCrash;
@@ -38,8 +60,8 @@ class FakeAuthRepository implements AuthRepository {
     lastGoogleToken = firebaseIdToken;
     if (googleCrash != null) throw googleCrash!;
     if (googleFailure != null) throw googleFailure!;
-    savedUser = testUser;
-    return const SignInResult(user: testUser, isNewUser: true);
+    savedUser = googleUser;
+    return SignInResult(user: googleUser, isNewUser: true);
   }
 
   @override
@@ -54,6 +76,13 @@ class FakeAuthRepository implements AuthRepository {
   final verifyFailures = <Failure>[];
   final requested = <String>[];
   final verified = <(String, String)>[];
+
+  @override
+  Future<void> deleteAccount() async {
+    deletes++;
+    if (deleteFailure != null) throw deleteFailure!;
+    savedUser = null;
+  }
 
   @override
   Future<CodeSent> requestCode(String email) async {
@@ -98,13 +127,50 @@ class FakeGoogleAuth implements GoogleAuth {
   Future<void> signOut() async => signOuts++;
 }
 
+class FakeProfileRepository implements ProfileRepository {
+  Failure? failure;
+  final updates = <(String, String, String)>[];
+  final suggestionQueries = <String>[];
+  List<String> suggestions = const ['CSE', 'Computer Science'];
+
+  @override
+  Future<UserProfile> updateProfile({
+    required String displayName,
+    required String department,
+    required String batch,
+  }) async {
+    updates.add((displayName, department, batch));
+    if (failure != null) throw failure!;
+    return UserProfile(
+      id: newUser.id,
+      email: newUser.email,
+      university: newUser.university,
+      role: newUser.role,
+      displayName: displayName,
+      department: department,
+      batch: batch,
+    );
+  }
+
+  @override
+  Future<List<String>> departmentSuggestions(String query) async {
+    suggestionQueries.add(query);
+    return suggestions
+        .where((s) => s.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+  }
+}
+
 /// Registers fakes in get_it for widget tests.
-Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes() async {
+Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
+  FakeProfileRepository? profile,
+}) async {
   await getIt.reset();
   final repo = FakeAuthRepository();
   final google = FakeGoogleAuth();
   getIt
     ..registerSingleton<AuthRepository>(repo)
-    ..registerSingleton<GoogleAuth>(google);
+    ..registerSingleton<GoogleAuth>(google)
+    ..registerSingleton<ProfileRepository>(profile ?? FakeProfileRepository());
   return (repo, google);
 }

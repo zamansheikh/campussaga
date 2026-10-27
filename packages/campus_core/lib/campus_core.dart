@@ -7,3 +7,4 @@ library;
 export 'src/auth/auth_models.dart';
 export 'src/auth/auth_repository.dart';
 export 'src/failure.dart';
+export 'src/profile/profile_repository.dart';

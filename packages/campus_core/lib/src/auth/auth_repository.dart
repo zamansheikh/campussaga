@@ -19,6 +19,11 @@ abstract interface class AuthRepository {
   /// Ends this device's session (best effort on the server) and forgets it.
   Future<void> signOut();
 
+  /// Permanently deletes the account on the server, then forgets the
+  /// session. Throws a `Failure` (and keeps the session) if the server
+  /// could not delete it.
+  Future<void> deleteAccount();
+
   /// Fires when the server ends the session on its own (signed out
   /// elsewhere, account deleted, stolen token detected).
   Stream<void> get sessionEnded;

@@ -8,6 +8,8 @@ import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/email_sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
+import '../features/profile/presentation/pages/edit_profile_page.dart';
+import '../features/profile/presentation/pages/profile_setup_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 import '../features/routine/presentation/routine_page.dart';
 import '../features/today/presentation/today_page.dart';
@@ -16,9 +18,11 @@ abstract final class Routes {
   static const splash = '/splash';
   static const signIn = '/sign-in';
   static const signInEmail = '/sign-in/email';
+  static const setupProfile = '/setup-profile';
   static const today = '/today';
   static const routine = '/routine';
   static const profile = '/profile';
+  static const editProfile = '/profile/edit';
 }
 
 /// App routes. Signed-out students only ever see the sign-in screen;
@@ -37,7 +41,13 @@ GoRouter buildRouter(AuthBloc auth) {
       if (status != AuthStatus.signedIn) {
         return atSignIn ? null : Routes.signIn;
       }
-      if (atSignIn || at == Routes.splash) return Routes.today;
+      // Signed in: finish the profile first (unless "Later" was chosen).
+      if (auth.state.needsProfileSetup) {
+        return at == Routes.setupProfile ? null : Routes.setupProfile;
+      }
+      if (atSignIn || at == Routes.splash || at == Routes.setupProfile) {
+        return Routes.today;
+      }
       return null;
     },
     routes: [
@@ -54,6 +64,10 @@ GoRouter buildRouter(AuthBloc auth) {
             builder: (context, state) => const EmailSignInPage(),
           ),
         ],
+      ),
+      GoRoute(
+        path: Routes.setupProfile,
+        builder: (context, state) => const ProfileSetupPage(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => _HomeShell(shell: shell),
@@ -79,6 +93,12 @@ GoRouter buildRouter(AuthBloc auth) {
               GoRoute(
                 path: Routes.profile,
                 builder: (context, state) => const ProfilePage(),
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    builder: (context, state) => const EditProfilePage(),
+                  ),
+                ],
               ),
             ],
           ),

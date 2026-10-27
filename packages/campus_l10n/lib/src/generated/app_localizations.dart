@@ -391,6 +391,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Too many attempts. Please wait a moment and try again.'**
   String get errorTooManyRequests;
+
+  /// No description provided for @setupProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up your profile'**
+  String get setupProfileTitle;
+
+  /// No description provided for @setupProfileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your department and batch help us find your class. Your name is shown to classmates in class groups; campus issues can still be posted anonymously.'**
+  String get setupProfileSubtitle;
+
+  /// No description provided for @displayNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get displayNameLabel;
+
+  /// No description provided for @departmentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Department'**
+  String get departmentLabel;
+
+  /// No description provided for @departmentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. CSE'**
+  String get departmentHint;
+
+  /// No description provided for @batchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch'**
+  String get batchLabel;
+
+  /// No description provided for @batchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 61 or Spring 2024'**
+  String get batchHint;
+
+  /// No description provided for @saveProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveProfile;
+
+  /// No description provided for @setupLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get setupLater;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get editProfile;
+
+  /// No description provided for @profileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile saved'**
+  String get profileSaved;
+
+  /// No description provided for @errorFieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This is required.'**
+  String get errorFieldRequired;
+
+  /// No description provided for @errorFieldTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'This is too long.'**
+  String get errorFieldTooLong;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes your profile and signs you out on every device. It can\'t be undone.'**
+  String get deleteAccountBody;
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my account'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
 }
 
 class _AppLocalizationsDelegate

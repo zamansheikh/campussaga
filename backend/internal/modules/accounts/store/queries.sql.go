@@ -44,6 +44,45 @@ func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) (int64, error) {
 	return result.RowsAffected(), nil
 }
 
+const departmentSuggestions = `-- name: DepartmentSuggestions :many
+SELECT mode() WITHIN GROUP (ORDER BY department)::text AS department
+FROM users
+WHERE university_id = $1
+  AND department IS NOT NULL
+  AND strpos(lower(department), lower($2::text)) > 0
+GROUP BY lower(department)
+ORDER BY count(*) DESC, lower(department)
+LIMIT $3
+`
+
+type DepartmentSuggestionsParams struct {
+	UniversityID uuid.UUID
+	Q            string
+	MaxResults   int32
+}
+
+// Departments other students at the same university entered, most used
+// first, each shown in its most common spelling. Matching ignores case.
+func (q *Queries) DepartmentSuggestions(ctx context.Context, arg DepartmentSuggestionsParams) ([]string, error) {
+	rows, err := q.db.Query(ctx, departmentSuggestions, arg.UniversityID, arg.Q, arg.MaxResults)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []string{}
+	for rows.Next() {
+		var department string
+		if err := rows.Scan(&department); err != nil {
+			return nil, err
+		}
+		items = append(items, department)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const findSessionByPrevious = `-- name: FindSessionByPrevious :one
 SELECT id, user_id, refresh_hash, previous_hash, user_agent, created_at, last_used_at, expires_at, revoked_at FROM sessions WHERE previous_hash = $1 ORDER BY last_used_at DESC LIMIT 1
 `

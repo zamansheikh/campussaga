@@ -31,6 +31,9 @@ func newValidator() *validator.Validate {
 		if name := strings.Split(f.Tag.Get("json"), ",")[0]; name != "" && name != "-" {
 			return name
 		}
+		if name := f.Tag.Get("query"); name != "" {
+			return name
+		}
 		return f.Name
 	})
 	return v
@@ -39,8 +42,10 @@ func newValidator() *validator.Validate {
 // Validator exposes the shared validator (for module-specific tags).
 func Validator() *validator.Validate { return validate }
 
-// Bind decodes the JSON body (if any) into dst and validates it.
+// Bind fills dst from the query string (string fields tagged `query:"name"`)
+// and the JSON body (if any), then validates it.
 func Bind(r *http.Request, dst any) error {
+	bindQuery(r, dst)
 	if r.Body != nil && r.ContentLength != 0 && r.Method != http.MethodGet {
 		dec := json.NewDecoder(r.Body)
 		dec.DisallowUnknownFields()
@@ -57,6 +62,26 @@ func Bind(r *http.Request, dst any) error {
 		}
 	}
 	return Validate(dst)
+}
+
+// bindQuery copies ?name=value into string fields tagged `query:"name"`.
+// The body is decoded afterwards with DisallowUnknownFields, and query
+// fields carry `json:"-"`, so a body can never set them.
+func bindQuery(r *http.Request, dst any) {
+	v := reflect.ValueOf(dst)
+	if v.Kind() != reflect.Pointer || v.Elem().Kind() != reflect.Struct {
+		return
+	}
+	v = v.Elem()
+	t := v.Type()
+	q := r.URL.Query()
+	for i := 0; i < t.NumField(); i++ {
+		name := t.Field(i).Tag.Get("query")
+		if name == "" || t.Field(i).Type.Kind() != reflect.String || !q.Has(name) {
+			continue
+		}
+		v.Field(i).SetString(q.Get(name))
+	}
 }
 
 // Validate runs the struct's validate tags.

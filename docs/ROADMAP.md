@@ -48,7 +48,7 @@ it saves months later.
 - CI: format, analyze, Flutter tests, Go tests (`go test -race`, incl. security e2e tests), APK build
 - Auth: sign in with **university Google account** (Firebase, done) or **university email + OTP code**; session handling; log out everywhere
 - Universities list + email domains (seed the launch universities)
-- Profile basics: name, department, batch (private by default)
+- Profile basics: name, department (with suggestions from classmates), batch; first-time setup after sign-in, edit, delete account (done)
 - App shell: navigation, settings, language switch, theme switch, force-update check, crash reporting
 - Privacy policy + terms (Bangla + English); **delete my account** works
 

@@ -98,6 +98,21 @@ func apply(current, patch *string) *string {
 	return &v
 }
 
+// DepartmentSuggestions returns departments other students at the caller's
+// university have entered that contain q (any case), most used first.
+// Only department names are returned, never who entered them.
+func (s *Service) DepartmentSuggestions(ctx context.Context, q string) ([]string, error) {
+	c := auth.MustUser(ctx)
+	q = strings.Join(strings.Fields(q), " ")
+	out, err := store.New(s.d.Q(ctx)).DepartmentSuggestions(ctx, store.DepartmentSuggestionsParams{
+		UniversityID: c.UniversityID, Q: q, MaxResults: 10,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DeleteMe deletes the caller's account and everything that belongs to it
 // (sessions cascade). Required by the Play Store and our privacy promise.
 func (s *Service) DeleteMe(ctx context.Context) error {

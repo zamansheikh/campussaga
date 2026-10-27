@@ -55,6 +55,12 @@ class UserProfile {
   final String? displayName;
   final String? department;
   final String? batch;
+
+  /// Name, department and batch are all filled in.
+  bool get isComplete =>
+      (displayName?.trim().isNotEmpty ?? false) &&
+      (department?.trim().isNotEmpty ?? false) &&
+      (batch?.trim().isNotEmpty ?? false);
 }
 
 /// Access + refresh token pair.

@@ -172,4 +172,60 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get errorTooManyRequests =>
       'অনেকবার চেষ্টা করা হয়েছে। একটু অপেক্ষা করে আবার চেষ্টা করো।';
+
+  @override
+  String get setupProfileTitle => 'তোমার প্রোফাইল সাজাও';
+
+  @override
+  String get setupProfileSubtitle =>
+      'বিভাগ আর ব্যাচ দিলে তোমার ক্লাস খুঁজে পেতে সুবিধা হবে। ক্লাস গ্রুপে সহপাঠীরা তোমার নাম দেখবে; ক্যাম্পাসের সমস্যা তবুও নাম ছাড়া পোস্ট করা যাবে।';
+
+  @override
+  String get displayNameLabel => 'তোমার নাম';
+
+  @override
+  String get departmentLabel => 'বিভাগ';
+
+  @override
+  String get departmentHint => 'যেমন: CSE';
+
+  @override
+  String get batchLabel => 'ব্যাচ';
+
+  @override
+  String get batchHint => 'যেমন: 61 বা Spring 2024';
+
+  @override
+  String get saveProfile => 'সংরক্ষণ করো';
+
+  @override
+  String get setupLater => 'পরে';
+
+  @override
+  String get editProfile => 'প্রোফাইল সম্পাদনা';
+
+  @override
+  String get profileSaved => 'প্রোফাইল সংরক্ষিত হয়েছে';
+
+  @override
+  String get errorFieldRequired => 'এটি পূরণ করা জরুরি।';
+
+  @override
+  String get errorFieldTooLong => 'লেখাটি অনেক বড়।';
+
+  @override
+  String get deleteAccount => 'অ্যাকাউন্ট মুছে ফেলো';
+
+  @override
+  String get deleteAccountTitle => 'অ্যাকাউন্ট মুছে ফেলবে?';
+
+  @override
+  String get deleteAccountBody =>
+      'এতে তোমার প্রোফাইল স্থায়ীভাবে মুছে যাবে এবং সব ডিভাইস থেকে সাইন আউট হয়ে যাবে। এটি আর ফেরানো যাবে না।';
+
+  @override
+  String get deleteAccountConfirm => 'আমার অ্যাকাউন্ট মুছে ফেলো';
+
+  @override
+  String get cancel => 'বাতিল';
 }

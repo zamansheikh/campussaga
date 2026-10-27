@@ -25,6 +25,7 @@ func (s *Service) Routes(r *httpx.Router) {
 
 	r.Student().Get("/me", httpx.Handle(s.handleGetMe))
 	r.Student().Patch("/me", httpx.Handle(s.handleUpdateMe))
+	r.Student().Get("/me/department-suggestions", httpx.Handle(s.handleDepartmentSuggestions))
 	r.Student().Delete("/me", httpx.Handle(s.handleDeleteMe, httpx.NoContent()))
 }
 
@@ -75,6 +76,22 @@ func (s *Service) handleGetMe(ctx context.Context, _ *httpx.Empty) (*Me, error) 
 
 func (s *Service) handleUpdateMe(ctx context.Context, in *ProfilePatch) (*Me, error) {
 	return s.UpdateMe(ctx, in)
+}
+
+type suggestionsReq struct {
+	Q string `json:"-" query:"q" validate:"max=60"`
+}
+
+type suggestionsRes struct {
+	Departments []string `json:"departments"`
+}
+
+func (s *Service) handleDepartmentSuggestions(ctx context.Context, in *suggestionsReq) (*suggestionsRes, error) {
+	d, err := s.DepartmentSuggestions(ctx, in.Q)
+	if err != nil {
+		return nil, err
+	}
+	return &suggestionsRes{Departments: d}, nil
 }
 
 func (s *Service) handleDeleteMe(ctx context.Context, _ *httpx.Empty) (*httpx.Empty, error) {

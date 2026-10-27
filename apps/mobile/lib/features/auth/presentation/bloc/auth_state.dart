@@ -16,21 +16,57 @@ final class AuthState extends Equatable {
     this.user,
     this.isNewUser = false,
     this.failure,
+    this.profileSetupSkipped = false,
+    this.deleting = false,
   });
 
   final AuthStatus status;
   final UserProfile? user;
   final bool isNewUser;
 
-  /// Why the last attempt failed; shown on the sign-in screen.
+  /// Why the last attempt failed; shown on the sign-in screen (or, while
+  /// signed in, why deleting the account failed).
   final Failure? failure;
+
+  /// The student chose "Later" on profile setup during this app run.
+  final bool profileSetupSkipped;
+
+  /// Account deletion in progress.
+  final bool deleting;
+
+  /// Signed in, profile incomplete, and not skipped: show profile setup.
+  bool get needsProfileSetup =>
+      status == AuthStatus.signedIn &&
+      user != null &&
+      !user!.isComplete &&
+      !profileSetupSkipped;
+
+  AuthState copyWith({
+    UserProfile? user,
+    Failure? Function()? failure,
+    bool? profileSetupSkipped,
+    bool? deleting,
+  }) {
+    return AuthState(
+      status: status,
+      user: user ?? this.user,
+      isNewUser: isNewUser,
+      failure: failure != null ? failure() : this.failure,
+      profileSetupSkipped: profileSetupSkipped ?? this.profileSetupSkipped,
+      deleting: deleting ?? this.deleting,
+    );
+  }
 
   @override
   List<Object?> get props => [
     status,
     user?.id,
     user?.displayName,
+    user?.department,
+    user?.batch,
     isNewUser,
+    profileSetupSkipped,
+    deleting,
     failure?.runtimeType,
     failure?.code,
   ];

@@ -121,5 +121,11 @@ class ApiAuthRepository implements AuthRepository {
     }
   }
 
+  @override
+  Future<void> deleteAccount() async {
+    await _api.delete('/me'); // throws (and keeps the session) on failure
+    await _forget();
+  }
+
   Future<void> dispose() => _ended.close();
 }

@@ -51,6 +51,18 @@ UPDATE users SET
 WHERE id = @id
 RETURNING *;
 
+-- Departments other students at the same university entered, most used
+-- first, each shown in its most common spelling. Matching ignores case.
+-- name: DepartmentSuggestions :many
+SELECT mode() WITHIN GROUP (ORDER BY department)::text AS department
+FROM users
+WHERE university_id = @university_id
+  AND department IS NOT NULL
+  AND strpos(lower(department), lower(@q::text)) > 0
+GROUP BY lower(department)
+ORDER BY count(*) DESC, lower(department)
+LIMIT @max_results;
+
 -- name: DeleteUser :execrows
 DELETE FROM users WHERE id = @id;
 

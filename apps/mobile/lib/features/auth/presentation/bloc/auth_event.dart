@@ -27,6 +27,31 @@ final class AuthSignedIn extends AuthEvent {
   List<Object?> get props => [result.user.id];
 }
 
+/// The profile was edited (setup or edit screen); keep the copy in sync.
+final class AuthProfileUpdated extends AuthEvent {
+  const AuthProfileUpdated(this.user);
+
+  final UserProfile user;
+
+  @override
+  List<Object?> get props => [
+    user.id,
+    user.displayName,
+    user.department,
+    user.batch,
+  ];
+}
+
+/// "Later" on the profile setup screen: don't ask again until next start.
+final class AuthProfileSetupSkipped extends AuthEvent {
+  const AuthProfileSetupSkipped();
+}
+
+/// "Delete my account" confirmed.
+final class AuthAccountDeleteRequested extends AuthEvent {
+  const AuthAccountDeleteRequested();
+}
+
 /// "Sign out" tapped.
 final class AuthSignOutRequested extends AuthEvent {
   const AuthSignOutRequested();

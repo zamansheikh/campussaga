@@ -179,4 +179,60 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorTooManyRequests =>
       'Too many attempts. Please wait a moment and try again.';
+
+  @override
+  String get setupProfileTitle => 'Set up your profile';
+
+  @override
+  String get setupProfileSubtitle =>
+      'Your department and batch help us find your class. Your name is shown to classmates in class groups; campus issues can still be posted anonymously.';
+
+  @override
+  String get displayNameLabel => 'Your name';
+
+  @override
+  String get departmentLabel => 'Department';
+
+  @override
+  String get departmentHint => 'e.g. CSE';
+
+  @override
+  String get batchLabel => 'Batch';
+
+  @override
+  String get batchHint => 'e.g. 61 or Spring 2024';
+
+  @override
+  String get saveProfile => 'Save';
+
+  @override
+  String get setupLater => 'Later';
+
+  @override
+  String get editProfile => 'Edit profile';
+
+  @override
+  String get profileSaved => 'Profile saved';
+
+  @override
+  String get errorFieldRequired => 'This is required.';
+
+  @override
+  String get errorFieldTooLong => 'This is too long.';
+
+  @override
+  String get deleteAccount => 'Delete account';
+
+  @override
+  String get deleteAccountTitle => 'Delete your account?';
+
+  @override
+  String get deleteAccountBody =>
+      'This permanently deletes your profile and signs you out on every device. It can\'t be undone.';
+
+  @override
+  String get deleteAccountConfirm => 'Delete my account';
+
+  @override
+  String get cancel => 'Cancel';
 }

@@ -23,5 +23,8 @@ void configureDependencies() {
     ..registerLazySingleton<AuthRepository>(
       () => ApiAuthRepository(getIt<ApiClient>(), getIt<TokenStore>()),
     )
+    ..registerLazySingleton<ProfileRepository>(
+      () => ApiProfileRepository(getIt<ApiClient>()),
+    )
     ..registerLazySingleton<GoogleAuth>(FirebaseGoogleAuth.new);
 }

@@ -7,3 +7,4 @@ library;
 export 'src/api_client.dart';
 export 'src/auth/api_auth_repository.dart';
 export 'src/auth/token_store.dart';
+export 'src/profile/api_profile_repository.dart';

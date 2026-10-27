@@ -20,6 +20,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthGoogleRequested>(_onGoogle);
     on<AuthSignedIn>(_onSignedIn);
     on<AuthSignOutRequested>(_onSignOut);
+    on<AuthProfileUpdated>(
+      (e, emit) => emit(state.copyWith(user: e.user, failure: () => null)),
+    );
+    on<AuthProfileSetupSkipped>(
+      (e, emit) => emit(state.copyWith(profileSetupSkipped: true)),
+    );
+    on<AuthAccountDeleteRequested>(_onDelete);
     on<_AuthSessionEnded>(_onSessionEnded);
     _ended = _repo.sessionEnded.listen((_) => add(const _AuthSessionEnded()));
   }
@@ -93,6 +100,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     await _repo.signOut();
     emit(const AuthState(status: AuthStatus.signedOut));
+  }
+
+  Future<void> _onDelete(
+    AuthAccountDeleteRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    if (state.deleting || state.status != AuthStatus.signedIn) return;
+    emit(state.copyWith(deleting: true, failure: () => null));
+    try {
+      await _repo.deleteAccount();
+      unawaited(_googleAuth.signOut());
+      emit(const AuthState(status: AuthStatus.signedOut));
+    } on Failure catch (f) {
+      // Still signed in: the account was not deleted.
+      emit(state.copyWith(deleting: false, failure: () => f));
+    } catch (e, s) {
+      addError(e, s);
+      emit(state.copyWith(deleting: false, failure: () => _unexpected(e)));
+    }
   }
 
   void _onSessionEnded(_AuthSessionEnded event, Emitter<AuthState> emit) {

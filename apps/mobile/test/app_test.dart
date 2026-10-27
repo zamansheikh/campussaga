@@ -60,7 +60,8 @@ void main() {
     expect(find.text('প্রোফাইল'), findsWidgets);
     expect(find.textContaining('ডেমো বিশ্ববিদ্যালয়'), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.text('সাইন আউট'), 100);
+    await tester.ensureVisible(find.text('সাইন আউট'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('সাইন আউট'));
     await tester.pumpAndSettle();
     expect(repo.signOuts, 1);
@@ -129,5 +130,104 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Enter your university email'), findsOneWidget);
+  });
+
+  testWidgets(
+    'first sign-in asks for department and batch, then opens the app',
+    (tester) async {
+      final profile = FakeProfileRepository();
+      final (repo, _) = await registerFakes(profile: profile);
+      repo.googleUser = newUser; // Google gave a name, nothing else
+      await tester.pumpWidget(const CampusApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Continue with Google'));
+      await tester.pumpAndSettle();
+      expect(find.text('Set up your profile'), findsOneWidget);
+      expect(find.text('Mim'), findsOneWidget, reason: 'name prefilled');
+
+      // Saving with a missing field is refused on the spot.
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      expect(find.text('This is required.'), findsNWidgets(2));
+
+      // Department suggestions come from classmates.
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Department'),
+        'com',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Computer Science'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.widgetWithText(TextField, 'Batch'), '61');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(profile.updates.last, ('Mim', 'Computer Science', '61'));
+      expect(find.text('No classes yet'), findsOneWidget);
+    },
+  );
+
+  testWidgets('"Later" skips setup for now', (tester) async {
+    final (repo, _) = await registerFakes();
+    repo.savedUser = newUser;
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Set up your profile'), findsOneWidget);
+    await tester.tap(find.text('Later'));
+    await tester.pumpAndSettle();
+    expect(find.text('No classes yet'), findsOneWidget);
+  });
+
+  testWidgets('edit profile from the Profile tab', (tester) async {
+    final profile = FakeProfileRepository();
+    final (repo, _) = await registerFakes(profile: profile);
+    repo.savedUser = testUser;
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('CSE · 61'), findsOneWidget);
+    await tester.tap(find.text('Edit profile'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.widgetWithText(TextField, 'Batch'), '62');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(profile.updates.last, ('Rafi', 'CSE', '62'));
+    expect(find.text('Profile saved'), findsOneWidget);
+    expect(find.textContaining('CSE · 62'), findsOneWidget);
+  });
+
+  testWidgets('delete account asks first, then signs out', (tester) async {
+    final (repo, _) = await registerFakes();
+    repo.savedUser = testUser;
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+
+    // The list builds rows lazily: scroll down to the button first.
+    await tester.scrollUntilVisible(find.text('Delete account'), 200);
+    await tester.ensureVisible(find.text('Delete account'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete account'));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete your account?'), findsOneWidget);
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(repo.deletes, 0, reason: 'Cancel deletes nothing');
+
+    await tester.tap(find.text('Delete account'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete my account'));
+    await tester.pumpAndSettle();
+
+    expect(repo.deletes, 1);
+    expect(find.text('Continue with Google'), findsOneWidget);
   });
 }
