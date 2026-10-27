@@ -58,4 +58,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get comingSoon => 'Coming soon';
+
+  @override
+  String get welcomeTitle => 'Sign in with your university account';
+
+  @override
+  String get welcomeSubtitle =>
+      'Only verified students can join. Your university email shows you\'re a student.';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get useUniversityEmail => 'Use university email instead';
+
+  @override
+  String get errorUniversityEmailRequired =>
+      'This isn\'t a university account. Choose your university Google account, or sign in with your university email.';
+
+  @override
+  String get errorNetwork => 'No internet connection. Please try again.';
+
+  @override
+  String get errorGoogleFailed =>
+      'Google sign-in didn\'t work. Please try again.';
+
+  @override
+  String get errorSessionEnded => 'You were signed out. Please sign in again.';
+
+  @override
+  String get errorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get signOut => 'Sign out';
 }

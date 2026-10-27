@@ -1,7 +1,9 @@
 {
   "@@locale": "en",
   "appName": "Campus Saga",
-  "@appName": { "description": "Product name. Change here when rebranding." },
+  "@appName": {
+    "description": "Product name. Change here when rebranding."
+  },
   "navToday": "Today",
   "navRoutine": "Routine",
   "navProfile": "Profile",
@@ -16,5 +18,16 @@
   "themeLight": "Light",
   "themeDark": "Dark",
   "language": "Language",
-  "comingSoon": "Coming soon"
+  "comingSoon": "Coming soon",
+  "welcomeTitle": "Sign in with your university account",
+  "welcomeSubtitle": "Only verified students can join. Your university email shows you're a student.",
+  "continueWithGoogle": "Continue with Google",
+  "useUniversityEmail": "Use university email instead",
+  "errorUniversityEmailRequired": "This isn't a university account. Choose your university Google account, or sign in with your university email.",
+  "errorNetwork": "No internet connection. Please try again.",
+  "errorGoogleFailed": "Google sign-in didn't work. Please try again.",
+  "errorSessionEnded": "You were signed out. Please sign in again.",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "account": "Account",
+  "signOut": "Sign out"
 }

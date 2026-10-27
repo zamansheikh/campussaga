@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../app/settings/bloc/settings_cubit.dart';
+import '../../auth/presentation/bloc/auth_bloc.dart';
 
-/// Profile and settings. R0 adds sign-in, profile details and delete account.
+/// Account, settings and sign out. Profile editing and account deletion
+/// come next in R0.
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -20,6 +22,8 @@ class ProfilePage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: CsSpace.sm),
         children: [
+          _SectionLabel(l10n.account),
+          const _AccountCard(),
           _SectionLabel(l10n.settings),
           _Group(
             title: l10n.theme,
@@ -58,7 +62,44 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: CsSpace.lg),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: CsSpace.screen),
+            child: OutlinedButton.icon(
+              onPressed: () =>
+                  context.read<AuthBloc>().add(const AuthSignOutRequested()),
+              icon: const Icon(Icons.logout),
+              label: Text(l10n.signOut),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _AccountCard extends StatelessWidget {
+  const _AccountCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final user = context.select((AuthBloc b) => b.state.user);
+    if (user == null) return const SizedBox.shrink();
+    final lang = Localizations.localeOf(context).languageCode;
+    final name = user.displayName ?? user.email.split('@').first;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: CsSpace.screen),
+      child: Card(
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundColor: context.cs.primaryContainer,
+            foregroundColor: context.cs.onPrimaryContainer,
+            child: Text(name.characters.first.toUpperCase()),
+          ),
+          title: Text(name),
+          subtitle: Text('${user.email}\n${user.university.localName(lang)}'),
+          isThreeLine: true,
+        ),
       ),
     );
   }

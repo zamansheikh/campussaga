@@ -18,6 +18,7 @@ import (
 	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/config"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
+	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/mail"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/ratelimit"
@@ -38,8 +39,9 @@ type App struct {
 
 // Options tune the assembly (tests).
 type Options struct {
-	Now    func() time.Time // clock; nil = time.Now
-	Mailer mail.Sender      // nil = SMTP from config
+	Now    func() time.Time        // clock; nil = time.Now
+	Mailer mail.Sender             // nil = SMTP from config
+	Google accounts.GoogleVerifier // nil = Firebase verifier from config (if configured)
 }
 
 // New assembles the app on an open, migrated database.
@@ -55,6 +57,11 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 	mailer := o.Mailer
 	if mailer == nil {
 		mailer = &mail.SMTP{Host: cfg.SMTPHost, Port: cfg.SMTPPort, Username: cfg.SMTPUsername, Password: cfg.SMTPPassword, From: cfg.MailFrom}
+	}
+
+	google := o.Google
+	if google == nil && cfg.FirebaseProjectID != "" {
+		google = firebase.NewVerifier(cfg.FirebaseProjectID, firebase.NewGoogleKeys(nil), now)
 	}
 
 	tokens := auth.NewTokens(cfg.JWTSecret, cfg.AccessTTL, now)
@@ -74,7 +81,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 			u, err := uniSvc.Get(ctx, id)
 			return toAccounts(u), err
 		},
-	}, accounts.Config{
+	}, google, accounts.Config{
 		CodeSecret: cfg.CodeSecret, CodeTTL: cfg.CodeTTL, ResendAfter: cfg.CodeResendAfter,
 		MaxPerHour: cfg.CodeMaxPerHour, MaxAttempts: cfg.CodeMaxAttempts, RefreshTTL: cfg.RefreshTTL,
 		LogCodes: !cfg.IsProduction(),

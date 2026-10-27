@@ -96,6 +96,7 @@ rewriting the app.
 | `GET /universities` | public | Active universities with their email domains (the app checks an email before sending a code) |
 | `GET /config` | public | `minSupportedBuild`, `features` (feature flags) |
 | `POST /auth/code` `{email}` | public | 202 and sends a 6-digit code. 403 `UNIVERSITY_EMAIL_REQUIRED` for non-university email; 429 when resent within 60 s or more than 5 per hour |
+| `POST /auth/google` `{idToken}` | public | Google sign-in: a Firebase ID token from the app. Only **university** Google accounts (Google Workspace) are accepted; personal Gmail gets 403 `UNIVERSITY_EMAIL_REQUIRED` |
 | `POST /auth/verify` `{email, code}` | public | Access + refresh tokens and the profile. Codes expire in 10 minutes, max 5 wrong attempts |
 | `POST /auth/refresh` | public (refresh token) | New token pair; the old refresh token stops working |
 | `POST /auth/logout` | student | Ends this session |
@@ -107,7 +108,8 @@ rewriting the app.
 ### Authentication
 
 - **Sign-in = university email + 6-digit code.** Codes are stored only as an HMAC hash (`CODE_HMAC_SECRET`), never in plain text.
-- **Accounts are created only after a correct code**, so every account is a verified student of a known university.
+- **Accounts are created only after a correct code or a verified university Google account**, so every account is a verified student of a known university. One email = one account, whichever way the student signs in.
+- **Google sign-in:** the app signs in with Google through Firebase Auth (`google_sign_in` → `firebase_auth`) and sends the Firebase ID token to `POST /auth/google`. The Go API verifies it itself (RS256, Google's published keys, audience = `FIREBASE_PROJECT_ID`, issuer, expiry, provider `google.com`, verified email); no Firebase admin key is needed. The app then signs out of Firebase/Google: our own session is the only one that counts.
 - **University matching:** by email domain, including subdomains (`cse.du.ac.bd` → `du.ac.bd`); the longest matching domain wins. Domains live in a `university_domains` table (each domain unique).
 - **Access token:** JWT (HS256, `JWT_SECRET`), valid 15 minutes. Claims: `sub` (user id), `sid` (session id), `uni` (university id), `role`.
 - **Refresh token:** 32 random bytes, stored hashed in the `sessions` table, valid 60 days, **rotated on every use**. Reusing an old refresh token is treated as theft and revokes the whole session.
@@ -129,6 +131,8 @@ rewriting the app.
 | 400 | `CODE_EXPIRED` | Code expired, used, or never sent | Offer a new code |
 | 429 | `CODE_TOO_MANY_ATTEMPTS` | 5 wrong codes | Offer a new code |
 | 401 | `UNAUTHORIZED` / `TOKEN_INVALID` | No or bad access token | Sign in |
+| 401 | `GOOGLE_TOKEN_INVALID` | Firebase token rejected | "Google sign-in didn't work" |
+| 503 | `GOOGLE_SIGN_IN_UNAVAILABLE` | Server has no `FIREBASE_PROJECT_ID` | Offer email code |
 | 401 | `TOKEN_EXPIRED` | Access token expired | Refresh, then retry |
 | 401 | `REFRESH_INVALID` / `SESSION_ENDED` | Signed out, deleted, or session revoked | Sign in |
 | 429 | `TOO_MANY_REQUESTS` | Per-IP limit on sign-in endpoints | Show countdown |

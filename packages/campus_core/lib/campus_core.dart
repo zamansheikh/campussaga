@@ -4,4 +4,6 @@
 /// shared by every app and tested quickly.
 library;
 
+export 'src/auth/auth_models.dart';
+export 'src/auth/auth_repository.dart';
 export 'src/failure.dart';

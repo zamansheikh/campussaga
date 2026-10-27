@@ -20,5 +20,5 @@ coverage/
 *.jks
 *.keystore
 key.properties
-google-services.json
-GoogleService-Info.plist
+# Firebase app config (google-services.json, GoogleService-Info.plist,
+# firebase_options.dart) IS committed: it identifies the app, it is not a secret.

@@ -35,6 +35,7 @@ import (
 	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
+	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
 	mailer "github.com/zamansheikh/campussaga/backend/internal/platform/mail"
 )
@@ -51,6 +52,11 @@ type University struct {
 type Universities struct {
 	ForEmail func(ctx context.Context, email string) (*University, error)
 	Get      func(ctx context.Context, id uuid.UUID) (*University, error)
+}
+
+// GoogleVerifier checks Firebase ID tokens from Google sign-in.
+type GoogleVerifier interface {
+	Verify(ctx context.Context, idToken string) (*firebase.Identity, error)
 }
 
 // Config tunes sign-in.
@@ -71,16 +77,17 @@ type Service struct {
 	tokens *auth.Tokens
 	mail   mailer.Sender
 	unis   Universities
+	google GoogleVerifier // nil = Google sign-in off
 	cfg    Config
 	now    func() time.Time
 	log    *slog.Logger
 }
 
-func NewService(d *db.DB, tokens *auth.Tokens, m mailer.Sender, unis Universities, cfg Config, now func() time.Time, log *slog.Logger) *Service {
+func NewService(d *db.DB, tokens *auth.Tokens, m mailer.Sender, unis Universities, google GoogleVerifier, cfg Config, now func() time.Time, log *slog.Logger) *Service {
 	if now == nil {
 		now = time.Now
 	}
-	return &Service{d: d, tokens: tokens, mail: m, unis: unis, cfg: cfg, now: now, log: log}
+	return &Service{d: d, tokens: tokens, mail: m, unis: unis, google: google, cfg: cfg, now: now, log: log}
 }
 
 // ---- sign-in codes --------------------------------------------------------
@@ -254,6 +261,75 @@ func (s *Service) VerifyCode(ctx context.Context, rawEmail, code string) (*Signe
 		return nil, failure
 	}
 	return out, nil
+}
+
+// ---- Google -----------------------------------------------------------------
+
+// SignInWithGoogle signs a student in with a Firebase ID token from Google
+// sign-in. Only verified university Google accounts are accepted (most
+// universities give students a Google Workspace address); a personal Gmail
+// gets UNIVERSITY_EMAIL_REQUIRED and the app offers the email code instead.
+// The same email always maps to the same account, whichever way they sign in.
+func (s *Service) SignInWithGoogle(ctx context.Context, idToken string) (*SignedIn, error) {
+	if s.google == nil {
+		return nil, ErrGoogleUnavailable
+	}
+	id, err := s.google.Verify(ctx, idToken)
+	if err != nil {
+		httpx.Logger(ctx).Info("google sign-in: token rejected", "err", err)
+		return nil, ErrGoogleTokenInvalid
+	}
+	if id.Provider != "google.com" || !id.EmailVerified || id.Email == "" {
+		return nil, ErrGoogleTokenInvalid
+	}
+	email, err := normalizeEmail(id.Email)
+	if err != nil {
+		return nil, ErrGoogleTokenInvalid
+	}
+	uni, err := s.unis.ForEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+	if uni == nil {
+		return nil, ErrUniversityEmailRequired
+	}
+	now := s.now()
+	var out *SignedIn
+	err = s.d.InTx(ctx, func(ctx context.Context) error {
+		q := store.New(s.d.Q(ctx))
+		if err := q.LockEmail(ctx, email); err != nil {
+			return err
+		}
+		user, err := q.GetUserByEmail(ctx, email)
+		isNew := false
+		if db.IsNoRows(err) {
+			isNew = true
+			user, err = q.InsertUser(ctx, store.InsertUserParams{Email: email, UniversityID: uni.ID, VerifiedAt: now})
+		}
+		if err != nil {
+			return err
+		}
+		if isNew && id.Name != "" {
+			name := id.Name
+			for utf8.RuneCountInString(name) > 60 {
+				name = string([]rune(name)[:60])
+			}
+			if user, err = q.UpdateProfile(ctx, store.UpdateProfileParams{ID: user.ID, DisplayName: apply(nil, &name)}); err != nil {
+				return err
+			}
+		}
+		tokens, err := s.startSession(ctx, q, user, now)
+		if err != nil {
+			return err
+		}
+		me, err := s.meView(ctx, user)
+		if err != nil {
+			return err
+		}
+		out = &SignedIn{Tokens: *tokens, User: me, IsNewUser: isNew}
+		return nil
+	})
+	return out, err
 }
 
 // ---- sessions -------------------------------------------------------------

@@ -24,6 +24,11 @@ var (
 	ErrCodeTooManyAttempts = apperr.New(http.StatusTooManyRequests, "CODE_TOO_MANY_ATTEMPTS",
 		"Too many wrong codes. Please ask for a new one")
 
+	ErrGoogleUnavailable = apperr.New(http.StatusServiceUnavailable, "GOOGLE_SIGN_IN_UNAVAILABLE",
+		"Google sign-in is not available right now. Please use your university email")
+	ErrGoogleTokenInvalid = apperr.New(http.StatusUnauthorized, "GOOGLE_TOKEN_INVALID",
+		"Google sign-in failed. Please try again")
+
 	// ErrRefreshInvalid tells the app to sign the student out.
 	ErrRefreshInvalid = apperr.New(http.StatusUnauthorized, "REFRESH_INVALID",
 		"Please sign in again")

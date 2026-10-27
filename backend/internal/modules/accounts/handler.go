@@ -15,6 +15,8 @@ func (s *Service) Routes(r *httpx.Router) {
 		Post("/auth/code", httpx.Handle(s.handleRequestCode, httpx.Status(http.StatusAccepted)))
 	r.Public().With(r.Limit("auth-verify", 30, 10*time.Minute)).
 		Post("/auth/verify", httpx.Handle(s.handleVerify))
+	r.Public().With(r.Limit("auth-google", 30, 10*time.Minute)).
+		Post("/auth/google", httpx.Handle(s.handleGoogle))
 	r.Public().With(r.Limit("auth-refresh", 60, 10*time.Minute)).
 		Post("/auth/refresh", httpx.Handle(s.handleRefresh))
 
@@ -41,6 +43,14 @@ type verifyReq struct {
 
 func (s *Service) handleVerify(ctx context.Context, in *verifyReq) (*SignedIn, error) {
 	return s.VerifyCode(ctx, in.Email, in.Code)
+}
+
+type googleReq struct {
+	IDToken string `json:"idToken" validate:"required,max=8192"`
+}
+
+func (s *Service) handleGoogle(ctx context.Context, in *googleReq) (*SignedIn, error) {
+	return s.SignInWithGoogle(ctx, in.IDToken)
 }
 
 type refreshReq struct {

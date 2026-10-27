@@ -22,40 +22,84 @@ class ApiConfig {
 /// Supplies the current access token, or null when signed out.
 typedef AccessTokenProvider = FutureOr<String?> Function();
 
+/// Gets a new access token; true when one is ready.
+typedef SessionRefresher = Future<bool> Function();
+
 /// Thin JSON client for the Campus Saga API.
 ///
 /// Every response uses the envelope
 /// `{success, data, error: {code, message, details}, meta}`. Success returns
 /// `data`; every failure is thrown as a typed [Failure] carrying the
-/// backend's error code. Nothing else in the app talks HTTP.
+/// backend's error code. When a signed-in call answers `TOKEN_EXPIRED`, the
+/// client refreshes the session once and retries. Nothing else in the app
+/// talks HTTP.
 class ApiClient {
   ApiClient(this.config, {http.Client? httpClient, this.accessToken})
     : _http = httpClient ?? http.Client();
 
   final ApiConfig config;
-  final AccessTokenProvider? accessToken;
   final http.Client _http;
+  AccessTokenProvider? accessToken;
+  SessionRefresher? _refresh;
+
+  /// Connects the session owner (the auth repository).
+  void attachSession({
+    required AccessTokenProvider accessToken,
+    required SessionRefresher refresh,
+  }) {
+    this.accessToken = accessToken;
+    _refresh = refresh;
+  }
 
   Future<Object?> get(String path) => send('GET', path);
 
-  Future<Object?> post(String path, [Object? body]) =>
-      send('POST', path, body: body);
+  Future<Object?> post(
+    String path, [
+    Object? body,
+    bool authenticated = true,
+  ]) => send('POST', path, body: body, authenticated: authenticated);
 
   Future<Object?> patch(String path, Object? body) =>
       send('PATCH', path, body: body);
 
   Future<Object?> delete(String path) => send('DELETE', path);
 
-  Future<Object?> send(String method, String path, {Object? body}) async {
+  /// [authenticated] false sends no token (sign-in endpoints).
+  Future<Object?> send(
+    String method,
+    String path, {
+    Object? body,
+    bool authenticated = true,
+  }) async {
+    try {
+      return await _send(method, path, body, authenticated);
+    } on UnauthenticatedFailure catch (f) {
+      final refresh = _refresh;
+      if (!authenticated || f.code != 'TOKEN_EXPIRED' || refresh == null) {
+        rethrow;
+      }
+      if (!await refresh()) rethrow;
+      return _send(method, path, body, authenticated);
+    }
+  }
+
+  Future<Object?> _send(
+    String method,
+    String path,
+    Object? body,
+    bool authenticated,
+  ) async {
     final request = http.Request(method, Uri.parse('${config.baseUrl}$path'))
       ..headers['Accept'] = 'application/json';
     if (body != null) {
       request.headers['Content-Type'] = 'application/json';
       request.body = jsonEncode(body);
     }
-    final token = await accessToken?.call();
-    if (token != null && token.isNotEmpty) {
-      request.headers['Authorization'] = 'Bearer $token';
+    if (authenticated) {
+      final token = await accessToken?.call();
+      if (token != null && token.isNotEmpty) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
     }
 
     final http.Response response;
@@ -120,10 +164,10 @@ Failure _failureFrom(int status, Object? error) {
   if (status == 403 && code == 'FORBIDDEN') {
     return ForbiddenFailure(code: code, message: message);
   }
-  if (status >= 500 && status != 502) {
+  if (status >= 500 && status != 502 && status != 503) {
     return UnexpectedFailure(code: code, message: message);
   }
   // Business rules: CODE_INVALID, CODE_EXPIRED, UNIVERSITY_EMAIL_REQUIRED,
-  // EMAIL_SEND_FAILED, ...
+  // EMAIL_SEND_FAILED, GOOGLE_SIGN_IN_UNAVAILABLE, ...
   return RejectedFailure(code: code, message: message, details: details);
 }

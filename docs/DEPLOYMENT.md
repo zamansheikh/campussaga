@@ -88,6 +88,7 @@ Template: [backend/deploy/env.example](../backend/deploy/env.example).
 | `DATABASE_URL` | `postgres://campus:<POSTGRES_PASSWORD>@postgres:5432/campus?sslmode=disable` |
 | `JWT_SECRET` | 64 random bytes (`openssl rand -base64 64`); signs access tokens |
 | `CODE_HMAC_SECRET` | 64 random bytes; hashes sign-in codes |
+| `FIREBASE_PROJECT_ID` | `bitlaabuzz` (enables Google sign-in; not a secret) |
 | `SMTP_HOST` / `SMTP_PORT` | `smtp.resend.com` / `587` |
 | `SMTP_USERNAME` | `resend` |
 | `SMTP_PASSWORD` | the Resend API key |

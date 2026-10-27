@@ -58,4 +58,40 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get comingSoon => 'শীঘ্রই আসছে';
+
+  @override
+  String get welcomeTitle =>
+      'তোমার বিশ্ববিদ্যালয়ের অ্যাকাউন্ট দিয়ে সাইন ইন করো';
+
+  @override
+  String get welcomeSubtitle =>
+      'শুধু যাচাই করা শিক্ষার্থীরাই যোগ দিতে পারে। বিশ্ববিদ্যালয়ের ইমেইলই দেখায় তুমি শিক্ষার্থী।';
+
+  @override
+  String get continueWithGoogle => 'Google দিয়ে চালিয়ে যাও';
+
+  @override
+  String get useUniversityEmail => 'বিশ্ববিদ্যালয়ের ইমেইল ব্যবহার করো';
+
+  @override
+  String get errorUniversityEmailRequired =>
+      'এটি বিশ্ববিদ্যালয়ের অ্যাকাউন্ট নয়। তোমার বিশ্ববিদ্যালয়ের Google অ্যাকাউন্ট বেছে নাও, অথবা বিশ্ববিদ্যালয়ের ইমেইল দিয়ে সাইন ইন করো।';
+
+  @override
+  String get errorNetwork => 'ইন্টারনেট সংযোগ নেই। আবার চেষ্টা করো।';
+
+  @override
+  String get errorGoogleFailed => 'Google সাইন-ইন কাজ করেনি। আবার চেষ্টা করো।';
+
+  @override
+  String get errorSessionEnded => 'তুমি সাইন আউট হয়ে গেছ। আবার সাইন ইন করো।';
+
+  @override
+  String get errorGeneric => 'কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করো।';
+
+  @override
+  String get account => 'অ্যাকাউন্ট';
+
+  @override
+  String get signOut => 'সাইন আউট';
 }

@@ -46,7 +46,7 @@ it saves months later.
 - Design system v1: tokens, light/dark theme, Bangla + English fonts, core components, Widgetbook
 - Go API + PostgreSQL on the VPS (Docker, behind nginx), HTTPS, backups tested ([DEPLOYMENT.md](DEPLOYMENT.md))
 - CI: format, analyze, Flutter tests, Go tests (`go test -race`, incl. security e2e tests), APK build
-- Auth: sign in with **university email + OTP code**; session handling; log out everywhere
+- Auth: sign in with **university Google account** (Firebase, done) or **university email + OTP code**; session handling; log out everywhere
 - Universities list + email domains (seed the launch universities)
 - Profile basics: name, department, batch (private by default)
 - App shell: navigation, settings, language switch, theme switch, force-update check, crash reporting

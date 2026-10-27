@@ -193,6 +193,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Coming soon'**
   String get comingSoon;
+
+  /// No description provided for @welcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your university account'**
+  String get welcomeTitle;
+
+  /// No description provided for @welcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Only verified students can join. Your university email shows you\'re a student.'**
+  String get welcomeSubtitle;
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// No description provided for @useUniversityEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Use university email instead'**
+  String get useUniversityEmail;
+
+  /// No description provided for @errorUniversityEmailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This isn\'t a university account. Choose your university Google account, or sign in with your university email.'**
+  String get errorUniversityEmailRequired;
+
+  /// No description provided for @errorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Please try again.'**
+  String get errorNetwork;
+
+  /// No description provided for @errorGoogleFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in didn\'t work. Please try again.'**
+  String get errorGoogleFailed;
+
+  /// No description provided for @errorSessionEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'You were signed out. Please sign in again.'**
+  String get errorSessionEnded;
+
+  /// No description provided for @errorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get errorGeneric;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @signOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get signOut;
 }
 
 class _AppLocalizationsDelegate
