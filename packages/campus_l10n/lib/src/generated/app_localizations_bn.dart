@@ -241,4 +241,7 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get updateFromStore => 'অ্যাপ স্টোর থেকে অ্যাপটি আপডেট করো।';
+
+  @override
+  String get privacyPolicy => 'গোপনীয়তা নীতি';
 }

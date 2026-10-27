@@ -94,5 +94,6 @@
   "updateRequiredTitle": "Update required",
   "updateRequiredBody": "This version of the app is no longer supported. Please update to keep using it.",
   "updateNow": "Update now",
-  "updateFromStore": "Please update the app from your app store."
+  "updateFromStore": "Please update the app from your app store.",
+  "privacyPolicy": "Privacy policy"
 }

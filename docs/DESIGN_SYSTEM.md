@@ -232,6 +232,7 @@ places so a rename takes an hour, not a refactor:
 | iOS app name | `apps/mobile/ios/Runner/Info.plist` → `CFBundleDisplayName` |
 | Launcher icon | replace files in `apps/mobile/assets/launcher/`, run `dart run flutter_launcher_icons` in `apps/mobile` |
 | README / docs | `README.md`, `assets/icon/` |
+| Website + policy links | `site/` pages (name, contact), and `siteUrl` in `apps/mobile/lib/app/env.dart` once the domain changes |
 
 **Do not change** the app ID `com.silifton.campussaga` after the first store
 release: stores treat a new ID as a different app. The package names

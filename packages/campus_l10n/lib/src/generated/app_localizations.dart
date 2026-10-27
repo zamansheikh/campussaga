@@ -523,6 +523,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please update the app from your app store.'**
   String get updateFromStore;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get privacyPolicy;
 }
 
 class _AppLocalizationsDelegate

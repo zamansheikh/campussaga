@@ -92,7 +92,7 @@ Template: [backend/deploy/env.example](../backend/deploy/env.example).
 | `SMTP_HOST` / `SMTP_PORT` | `smtp.resend.com` / `587` |
 | `SMTP_USERNAME` | `resend` |
 | `SMTP_PASSWORD` | the Resend API key |
-| `MAIL_FROM` | e.g. `Campus Saga <no-reply@<domain>>` (domain verified in Resend) |
+| `MAIL_FROM` | `Campus Saga <no-reply@silifton.com>`. `silifton.com` is already verified in Resend (DKIM on the root domain; its DMARC is strict, so mail must be DKIM-signed for `silifton.com`, which Resend does). Switch to the product domain once it is chosen and verified |
 
 Changing `JWT_SECRET` signs everyone out. Changing `CODE_HMAC_SECRET` only
 invalidates codes that are waiting to be used.
@@ -196,6 +196,20 @@ curl -fsS http://127.0.0.1:7030/api/v1/health
 - Never change the production schema by hand. Every change is a migration in git.
 
 ---
+
+## Log retention (promised in the privacy policy)
+
+The privacy policy says server logs are deleted within 30 days and backups
+within 6 months. `compose.yaml` caps the API's logs at 3 × 10 MB; add this
+weekly cron on the VPS so they are also wiped by age:
+
+```cron
+# /etc/cron.d/campussaga-logs: empty the API container's log every Sunday 03:30
+30 3 * * 0 root truncate -s 0 "$(docker inspect --format '{{.LogPath}}' campussaga-api-1)"
+```
+
+Keep the backup rotation in section 4 at 6 months or less. If any of
+these change, update `site/privacy.html` first.
 
 ## 4. Backups (the most important section)
 

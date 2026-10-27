@@ -24,5 +24,10 @@ abstract final class Env {
       ? _apiBaseUrl
       : (kReleaseMode ? '' : localApiBaseUrl);
 
+  /// Public web pages (site/ on GitHub Pages). Move to the product domain
+  /// once it is chosen; the rebranding checklist lists this line.
+  static const String siteUrl = 'https://zamansheikh.github.io/campussaga';
+  static const String privacyPolicyUrl = '$siteUrl/privacy.html';
+
   static bool get isProduction => appEnv == 'production';
 }

@@ -3,7 +3,9 @@ import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../app/env.dart';
 import '../../../app/router.dart';
 import '../../../app/settings/bloc/settings_cubit.dart';
 import '../../auth/presentation/auth_error_text.dart';
@@ -92,6 +94,15 @@ class ProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: CsSpace.sm),
             const _DeleteAccountButton(),
+            ListTile(
+              leading: const Icon(Icons.privacy_tip_outlined),
+              title: Text(l10n.privacyPolicy),
+              trailing: const Icon(Icons.open_in_new, size: 18),
+              onTap: () => launchUrl(
+                Uri.parse(Env.privacyPolicyUrl),
+                mode: LaunchMode.externalApplication,
+              ),
+            ),
             const SizedBox(height: CsSpace.lg),
           ],
         ),

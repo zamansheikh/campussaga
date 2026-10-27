@@ -3,7 +3,9 @@ import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../app/env.dart';
 import '../../../../app/router.dart';
 
 import '../auth_error_text.dart';
@@ -80,6 +82,14 @@ class SignInPage extends StatelessWidget {
                             ? null
                             : () => context.push(Routes.signInEmail),
                         child: Text(l10n.useUniversityEmail),
+                      ),
+                      const SizedBox(height: CsSpace.md),
+                      TextButton(
+                        onPressed: () => launchUrl(
+                          Uri.parse(Env.privacyPolicyUrl),
+                          mode: LaunchMode.externalApplication,
+                        ),
+                        child: Text(l10n.privacyPolicy),
                       ),
                     ],
                   );

@@ -1,0 +1,41 @@
+/* Campus Saga site. Colors mirror packages/campus_ui (teal brand). */
+:root {
+  --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --muted: #475569;
+  --border: #e2e8f0; --primary: #0f766e; --primary-soft: #ccfbf1; --on-primary: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1220; --surface: #111a2b; --text: #f1f5f9; --muted: #94a3b8;
+    --border: #273449; --primary: #5eead4; --primary-soft: #134e4a; --on-primary: #042f2e;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Bengali", sans-serif;
+}
+a { color: var(--primary); }
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+header.top { border-bottom: 1px solid var(--border); background: var(--surface); }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.brand { font-weight: 700; font-size: 18px; color: var(--text); text-decoration: none; }
+nav a { margin-left: 16px; font-size: 15px; text-decoration: none; }
+main { padding: 32px 0 48px; }
+h1 { font-size: 30px; line-height: 1.25; margin: 0 0 8px; }
+h2 { font-size: 21px; margin: 32px 0 8px; }
+h3 { font-size: 17px; margin: 20px 0 4px; }
+.muted { color: var(--muted); }
+.hero { padding: 48px 0 24px; }
+.hero p.lead { font-size: 19px; color: var(--muted); margin: 8px 0 24px; }
+.badge { display: inline-block; background: var(--primary-soft); color: var(--text); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 24px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+.card h3 { margin-top: 0; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 8px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; }
+.lang-switch { margin: 0 0 24px; font-size: 15px; }
+section[lang="bn"] { margin-top: 56px; padding-top: 24px; border-top: 2px solid var(--border); }
+footer { border-top: 1px solid var(--border); padding: 24px 0; font-size: 14px; color: var(--muted); }
+@media (max-width: 520px) { h1 { font-size: 25px; } nav a { margin-left: 12px; } }

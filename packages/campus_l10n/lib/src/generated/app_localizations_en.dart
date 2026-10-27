@@ -248,4 +248,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateFromStore => 'Please update the app from your app store.';
+
+  @override
+  String get privacyPolicy => 'Privacy policy';
 }
