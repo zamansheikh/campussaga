@@ -28,3 +28,12 @@ key.properties
 # Firebase Android config: kept out of git (download it from the Firebase
 # console or run `flutterfire configure`; CI writes it from a secret).
 google-services.json
+
+# Added by git-vanish — removed from history
+android/app/google-services.json
+
+# Added by git-vanish — removed from history
+ios/Runner/GoogleService-Info.plist
+
+# Added by git-vanish — removed from history
+campus-saga-final-bd8817ec94f5.json
