@@ -12,16 +12,16 @@ critical bugs**, Android first. iPhones follow once the Apple push key is set.
 | Upload key | `~/campussaga-secrets/upload-keystore.jks` (+ `key.properties.backup`). **Back both up to the password manager now.** Losing the upload key is recoverable with Play App Signing, but slow |
 | Upload key in Firebase | SHA-1 and SHA-256 registered (Google sign-in works in release builds) |
 | Privacy policy / account deletion page | Updated for groups, personal classes, announcements and pushes (`site/`; publishes on push to `main`) |
-| Backend on a public server | **Not yet: needs the server address decision below** |
+| Backend on a public server | **Live (2026-10-28): https://api-campus.silifton.com** on the Tecsior VPS, `/opt/campussaga`, compose project `campussaga` (127.0.0.1:7030), nginx `fx-api-campus.silifton.com.conf`, Let's Encrypt (auto-renew), direct DNS. Redeploy: `backend/deploy/deploy.sh`. Nightly DB dump + weekly log wipe: `/etc/cron.d/campussaga` (from `backend/deploy/campussaga.cron`). Off-site backups still to set up |
 | Push delivery | Needs the Firebase service-account key on the server (pushes are only logged until then) |
 | iPhone | Builds; pushes need the APNs key; sign-in uses the browser sheet |
 
-## 1. Decide the server address
+## 1. Server address (decided: `api-campus.silifton.com`)
 
 Students' phones need a public HTTPS address for the API. Either:
 
 - the final product domain (`api.<domain>`) if it is ready, or
-- a temporary beta address on silifton.com, e.g. `api-campus.silifton.com`.
+- a temporary beta address on silifton.com: **`api-campus.silifton.com`** (chosen).
 
 The app reads it at build time, so switching later only means a new app
 build (the old one keeps pointing at the old address until updated; keep the
@@ -43,7 +43,7 @@ curl https://<api-host>/api/v1/health      # {"status":"ok","db":"ok"}
 `apps/mobile/env/beta.json` (git-ignored):
 
 ```json
-{ "APP_ENV": "production", "API_BASE_URL": "https://<api-host>/api/v1" }
+{ "APP_ENV": "production", "API_BASE_URL": "https://api-campus.silifton.com/api/v1" }
 ```
 
 ```sh
