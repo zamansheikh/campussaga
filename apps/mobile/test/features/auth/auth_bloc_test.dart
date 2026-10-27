@@ -100,4 +100,19 @@ void main() {
       ),
     ],
   );
+
+  blocTest<AuthBloc, AuthState>(
+    'an unexpected error never leaves sign-in spinning',
+    setUp: () => repo.googleCrash = ArgumentError('No host specified in URI'),
+    build: build,
+    act: (b) => b.add(const AuthGoogleRequested()),
+    expect: () => [
+      const AuthState(status: AuthStatus.signingIn),
+      const AuthState(
+        status: AuthStatus.signedOut,
+        failure: UnexpectedFailure(),
+      ),
+    ],
+    errors: () => [isA<ArgumentError>()],
+  );
 }

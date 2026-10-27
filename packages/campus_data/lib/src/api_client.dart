@@ -16,7 +16,13 @@ class ApiConfig {
   final String baseUrl;
   final Duration timeout;
 
-  bool get isConfigured => baseUrl.isNotEmpty;
+  /// True when [baseUrl] is an absolute http(s) URL with a host.
+  bool get isConfigured {
+    final uri = Uri.tryParse(baseUrl);
+    return uri != null &&
+        (uri.scheme == 'http' || uri.scheme == 'https') &&
+        uri.host.isNotEmpty;
+  }
 }
 
 /// Supplies the current access token, or null when signed out.
@@ -89,6 +95,12 @@ class ApiClient {
     Object? body,
     bool authenticated,
   ) async {
+    if (!config.isConfigured) {
+      throw UnexpectedFailure(
+        code: 'API_NOT_CONFIGURED',
+        message: 'API base URL is not set or invalid: "${config.baseUrl}"',
+      );
+    }
     final request = http.Request(method, Uri.parse('${config.baseUrl}$path'))
       ..headers['Accept'] = 'application/json';
     if (body != null) {
@@ -110,6 +122,9 @@ class ApiClient {
       throw const NetworkFailure(message: 'Request timed out');
     } on http.ClientException catch (e) {
       throw NetworkFailure(message: e.message);
+    } on Exception catch (e) {
+      // Socket, TLS and other transport errors not wrapped by package:http.
+      throw NetworkFailure(message: e.toString());
     }
 
     if (response.statusCode == 204) return null;

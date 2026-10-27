@@ -90,6 +90,14 @@ class EmailSignInBloc extends Bloc<EmailSignInEvent, EmailSignInState> {
       );
     } on Failure catch (f) {
       emit(state.copyWith(status: EmailSignInStatus.idle, failure: () => f));
+    } catch (e, s) {
+      addError(e, s); // a bug: report it, but never leave the button spinning
+      emit(
+        state.copyWith(
+          status: EmailSignInStatus.idle,
+          failure: () => UnexpectedFailure(message: e.toString()),
+        ),
+      );
     }
   }
 
@@ -109,6 +117,14 @@ class EmailSignInBloc extends Bloc<EmailSignInEvent, EmailSignInState> {
       emit(state.copyWith(status: EmailSignInStatus.success, result: result));
     } on Failure catch (f) {
       emit(state.copyWith(status: EmailSignInStatus.idle, failure: () => f));
+    } catch (e, s) {
+      addError(e, s); // a bug: report it, but never leave the button spinning
+      emit(
+        state.copyWith(
+          status: EmailSignInStatus.idle,
+          failure: () => UnexpectedFailure(message: e.toString()),
+        ),
+      );
     }
   }
 
@@ -142,6 +158,14 @@ class EmailSignInBloc extends Bloc<EmailSignInEvent, EmailSignInState> {
       );
     } on Failure catch (f) {
       emit(state.copyWith(status: EmailSignInStatus.idle, failure: () => f));
+    } catch (e, s) {
+      addError(e, s); // a bug: report it, but never leave the button spinning
+      emit(
+        state.copyWith(
+          status: EmailSignInStatus.idle,
+          failure: () => UnexpectedFailure(message: e.toString()),
+        ),
+      );
     }
   }
 

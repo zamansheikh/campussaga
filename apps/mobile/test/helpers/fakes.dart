@@ -20,6 +20,9 @@ const testUser = UserProfile(
 class FakeAuthRepository implements AuthRepository {
   UserProfile? savedUser;
   Failure? googleFailure;
+
+  /// A non-Failure error (a bug) thrown by Google sign-in.
+  Object? googleCrash;
   String? lastGoogleToken;
   int signOuts = 0;
   final ended = StreamController<void>.broadcast();
@@ -33,6 +36,7 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Future<SignInResult> signInWithGoogle(String firebaseIdToken) async {
     lastGoogleToken = firebaseIdToken;
+    if (googleCrash != null) throw googleCrash!;
     if (googleFailure != null) throw googleFailure!;
     savedUser = testUser;
     return const SignInResult(user: testUser, isNewUser: true);

@@ -16,7 +16,7 @@ void configureDependencies() {
   if (getIt.isRegistered<ApiClient>()) return;
   getIt
     ..registerLazySingleton<ApiClient>(
-      () => ApiClient(const ApiConfig(baseUrl: Env.apiBaseUrl)),
+      () => ApiClient(ApiConfig(baseUrl: Env.apiBaseUrl)),
       dispose: (client) => client.close(),
     )
     ..registerLazySingleton<TokenStore>(SecureTokenStore.new)

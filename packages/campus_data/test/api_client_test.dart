@@ -121,4 +121,31 @@ void main() {
     final api = clientFor((_) async => http.Response('<html>502</html>', 502));
     expect(api.get('/me'), throwsA(isA<UnexpectedFailure>()));
   });
+
+  test(
+    'a missing or invalid API address is a clear failure, not a crash',
+    () async {
+      for (final base in ['', '/api/v1', 'localhost:8090', 'ftp://x/api']) {
+        expect(ApiConfig(baseUrl: base).isConfigured, isFalse, reason: base);
+        final api = ApiClient(
+          ApiConfig(baseUrl: base),
+          httpClient: MockClient((_) async => fail('must not send')),
+        );
+        await expectLater(
+          api.post('/auth/google', {'idToken': 'x'}),
+          throwsA(
+            isA<UnexpectedFailure>().having(
+              (f) => f.code,
+              'code',
+              'API_NOT_CONFIGURED',
+            ),
+          ),
+        );
+      }
+      expect(
+        const ApiConfig(baseUrl: 'http://localhost:8090/api/v1').isConfigured,
+        isTrue,
+      );
+    },
+  );
 }

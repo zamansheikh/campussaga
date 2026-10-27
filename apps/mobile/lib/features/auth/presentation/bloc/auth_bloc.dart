@@ -39,6 +39,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } on Failure catch (f) {
       // TODO(R1): keep the student signed in offline with a cached profile.
       emit(AuthState(status: AuthStatus.signedOut, failure: f));
+    } catch (e, s) {
+      addError(e, s); // a bug: report it, but never hang on the splash
+      emit(AuthState(status: AuthStatus.signedOut, failure: _unexpected(e)));
     }
   }
 
@@ -64,6 +67,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     } on Failure catch (f) {
       emit(AuthState(status: AuthStatus.signedOut, failure: f));
+    } catch (e, s) {
+      addError(e, s); // a bug: report it, but never leave the button spinning
+      emit(AuthState(status: AuthStatus.signedOut, failure: _unexpected(e)));
     } finally {
       // Our backend session is what counts; forget the Google account so
       // the picker shows again (e.g. if a personal account was chosen).
@@ -98,6 +104,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ),
     );
   }
+
+  static Failure _unexpected(Object e) =>
+      UnexpectedFailure(message: e.toString());
 
   @override
   Future<void> close() async {
