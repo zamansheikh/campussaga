@@ -55,6 +55,15 @@ jobs:
           flutter-version: 3.47.8
           cache: true
       - run: flutter pub get
+      - name: Firebase Android config (from the GOOGLE_SERVICES_JSON secret)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "::error::Add the repository secret GOOGLE_SERVICES_JSON (contents of google-services.json)"
+            exit 1
+          fi
+          printf '%s' "$GOOGLE_SERVICES_JSON" > apps/mobile/android/app/google-services.json
       - name: Build debug APK
         working-directory: apps/mobile
         run: flutter build apk --debug

@@ -40,6 +40,11 @@ everything.
 
 ## Getting started
 
+`apps/mobile/android/app/google-services.json` is not in git. Download it
+from the Firebase console (project `bitlaabuzz` → Android app
+`com.silifton.campussaga`) or run `flutterfire configure` in `apps/mobile`.
+CI writes it from the `GOOGLE_SERVICES_JSON` repository secret.
+
 Requires Flutter 3.47+ (Dart 3.13+).
 
 ```bash

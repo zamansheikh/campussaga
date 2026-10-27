@@ -25,5 +25,6 @@ coverage/
 *.jks
 *.keystore
 key.properties
-# Firebase app config (google-services.json, GoogleService-Info.plist,
-# firebase_options.dart) IS committed: it identifies the app, it is not a secret.
+# Firebase Android config: kept out of git (download it from the Firebase
+# console or run `flutterfire configure`; CI writes it from a secret).
+google-services.json
