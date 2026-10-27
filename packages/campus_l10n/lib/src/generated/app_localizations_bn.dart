@@ -725,4 +725,74 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get errorPickDay => 'অন্তত একটি দিন বেছে নাও।';
+
+  @override
+  String get changeCancelled => 'বাতিল';
+
+  @override
+  String get changeMoved => 'পরিবর্তিত';
+
+  @override
+  String get changeExtra => 'অতিরিক্ত ক্লাস';
+
+  @override
+  String get cancelThisClass => 'এই ক্লাস বাতিল করো';
+
+  @override
+  String get changeTimeOrRoom => 'সময় বা রুম বদলাও';
+
+  @override
+  String get undoChange => 'পরিবর্তন ফিরিয়ে নাও';
+
+  @override
+  String get removeExtraClass => 'অতিরিক্ত ক্লাস সরাও';
+
+  @override
+  String get editWeeklyClass => 'সাপ্তাহিক ক্লাস সম্পাদনা';
+
+  @override
+  String get addExtraClass => 'অতিরিক্ত ক্লাস যোগ করো';
+
+  @override
+  String cancelClassTitle(String course, String date) {
+    return '$date তারিখের $course বাতিল করবে?';
+  }
+
+  @override
+  String get cancelClassBody =>
+      'সহপাঠীরা এটি বাতিল হিসেবে দেখবে, আর এর রিমাইন্ডার মুছে যাবে। সাপ্তাহিক রুটিন একই থাকবে।';
+
+  @override
+  String get noteLabel => 'সহপাঠীদের জন্য নোট (ঐচ্ছিক)';
+
+  @override
+  String get noteHint => 'যেমন: শিক্ষক ছুটিতে';
+
+  @override
+  String get keepClass => 'ক্লাস থাকুক';
+
+  @override
+  String get confirmCancel => 'ক্লাস বাতিল করো';
+
+  @override
+  String onlyThisDay(String date) {
+    return 'শুধু $date তারিখের জন্য। সাপ্তাহিক রুটিন একই থাকবে।';
+  }
+
+  @override
+  String get dateLabel => 'তারিখ';
+
+  @override
+  String get upcomingChanges => 'আসন্ন পরিবর্তন';
+
+  @override
+  String wasTime(String time) {
+    return 'আগে ছিল $time';
+  }
+
+  @override
+  String get changeSaved => 'সংরক্ষিত। সহপাঠীরা অ্যাপ খুললেই দেখবে।';
+
+  @override
+  String get openGroupAction => 'ক্লাস গ্রুপ খোলো';
 }

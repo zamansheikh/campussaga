@@ -20,3 +20,5 @@ sql:
           - {db_type: timestamptz, nullable: true, go_type: {import: time, type: Time, pointer: true}}
           - {db_type: jsonb, go_type: encoding/json.RawMessage}
           - {db_type: jsonb, nullable: true, go_type: encoding/json.RawMessage}
+          # Only this module: calendar dates (routine changes).
+          - {db_type: date, go_type: time.Time}

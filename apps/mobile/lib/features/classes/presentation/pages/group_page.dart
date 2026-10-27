@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
+import '../../../../app/clock.dart';
 import '../../../../app/router.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
+import '../widgets/class_sheet.dart';
 import '../widgets/class_tile.dart';
 
 enum _Action { edit, leave, delete }
@@ -116,6 +119,7 @@ class GroupPage extends StatelessWidget {
             const SizedBox(height: CsSpace.md),
             _InviteCard(group: g),
             const SizedBox(height: CsSpace.lg),
+            ..._upcomingChanges(context, g),
             if (days.isEmpty)
               _EmptyRoutine(group: g)
             else
@@ -139,6 +143,33 @@ class GroupPage extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Changes from today on, each shown as the class on its date.
+List<Widget> _upcomingChanges(BuildContext context, ClassGroup g) {
+  final l10n = AppLocalizations.of(context);
+  final today = DateUtils.dateOnly(appNow());
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  final items = [
+    for (final c in g.changes)
+      if (!c.date.isBefore(today))
+        ...classesOn([g], c.date).where((i) => i.change?.id == c.id),
+  ];
+  if (items.isEmpty) return const [];
+  return [
+    CsSection(
+      title: l10n.upcomingChanges,
+      children: [
+        for (final i in items)
+          ClassTile.on(
+            i,
+            overline: DateFormat.MMMMEEEEd(locale).format(i.date),
+            onTap: () => showClassSheet(context, i),
+          ),
+      ],
+    ),
+    const SizedBox(height: CsSpace.lg),
+  ];
 }
 
 class _Header extends StatelessWidget {

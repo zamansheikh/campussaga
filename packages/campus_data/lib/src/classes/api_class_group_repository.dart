@@ -73,6 +73,18 @@ class ApiClassGroupRepository implements ClassGroupRepository {
   Future<void> deleteSlot(String groupId, String slotId) =>
       _api.delete('/groups/${_id(groupId)}/slots/${_id(slotId)}');
 
+  @override
+  Future<ClassChange> addChange(String groupId, ChangeDraft draft) async =>
+      ClassChange.fromJson(
+        _map(
+          await _api.post('/groups/${_id(groupId)}/changes', draft.toJson()),
+        ),
+      );
+
+  @override
+  Future<void> deleteChange(String groupId, String changeId) =>
+      _api.delete('/groups/${_id(groupId)}/changes/${_id(changeId)}');
+
   static String _code(String code) => code.trim().toUpperCase();
 
   // Ids go into the URL path: never let one carry a slash or query.

@@ -117,6 +117,10 @@ rewriting the app.
 | `PUT /groups/{id}` · `DELETE /groups/{id}` | CR | Edit details · delete for everyone |
 | `POST /groups/{id}/leave` | member | Leave; the last member deletes the group; the only CR can't leave while others remain (`CR_CANNOT_LEAVE`) |
 | `POST /groups/{id}/slots` · `PUT`/`DELETE /groups/{id}/slots/{slot}` | CR | Add · edit · remove a weekly class (`start`/`end` as `"HH:MM"`) |
+| `POST /groups/{id}/changes` `{kind, slotId?, date, start?, end?, room?, courseCode?…, note?}` | CR | One date only: `cancelled` / `moved` (new time, room `""` = unchanged) a weekly class, or an `extra` class. Dates today…+180 days (Bangladesh time), must match the class's weekday. A new change for a class on a date replaces the old one. Max 200 pending |
+| `DELETE /groups/{id}/changes/{change}` | CR | Undo a change |
+
+`GET /groups` includes each group's `changes` from yesterday on. Editing a weekly class to another weekday, or deleting it, removes its changes.
 
 Codes are looked up 30 times per hour per student and 120 per IP (24⁶ ≈ 191 million codes). A code of another university, or a group you're not in, answers `GROUP_NOT_FOUND`; a member editing answers `NOT_GROUP_CR`. Limits: 10 groups per student, 300 members per group, 100 classes per routine. The app keeps the last `GET /groups` on the phone (per account) so Today and Routine work offline.
 
@@ -338,6 +342,10 @@ class_group_members group_id, user_id, role ('cr'|'member'), joined_at
 routine_slots       id, group_id, course_code, course_title, teacher, room,
                     weekday (ISO 1–7), starts_min, ends_min (minutes after
                     midnight), kind ('theory'|'lab')
+routine_changes     id, group_id, slot_id NULL (extra), date, kind
+                    ('cancelled'|'moved'|'extra'), course fields (extra),
+                    room, starts_min, ends_min, note, created_by
+                    -- migration 00410; one per (slot_id, date)
 -- R1 My Class (planned)
                     co-CR role, CR transfer, semester archive, join code reset
 routine_changes     id, group_id, slot_id NULL, date, type ('cancelled'|
@@ -417,9 +425,12 @@ both the Today screen and the reminder scheduler.
 - All times stored as local wall-clock time + the university's timezone (`Asia/Dhaka`), never converted to UTC for weekly slots.
 
 **Change alerts.** When a CR cancels or moves a class, the API writes
-`routine_changes` → after the transaction commits, a worker sends an FCM push
-to members → the app syncs and re-schedules reminders. If the push is missed,
-the next app open fixes it.
+`routine_changes` (built). The app applies changes in `classesOn` (core):
+cancelled classes stay visible crossed out, moved ones use the new time and
+room, extra ones are added; reminders skip cancelled classes and follow
+moved ones. Today, members see changes on their next refresh (app open or
+resume). Planned: after the transaction commits, a worker sends an FCM push
+to members → the app syncs and re-schedules reminders.
 
 ---
 

@@ -1309,6 +1309,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick at least one day.'**
   String get errorPickDay;
+
+  /// No description provided for @changeCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get changeCancelled;
+
+  /// No description provided for @changeMoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Changed'**
+  String get changeMoved;
+
+  /// No description provided for @changeExtra.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra class'**
+  String get changeExtra;
+
+  /// No description provided for @cancelThisClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this class'**
+  String get cancelThisClass;
+
+  /// No description provided for @changeTimeOrRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Change time or room'**
+  String get changeTimeOrRoom;
+
+  /// No description provided for @undoChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo change'**
+  String get undoChange;
+
+  /// No description provided for @removeExtraClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove extra class'**
+  String get removeExtraClass;
+
+  /// No description provided for @editWeeklyClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit weekly class'**
+  String get editWeeklyClass;
+
+  /// No description provided for @addExtraClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Add extra class'**
+  String get addExtraClass;
+
+  /// No description provided for @cancelClassTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel {course} on {date}?'**
+  String cancelClassTitle(String course, String date);
+
+  /// No description provided for @cancelClassBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Classmates see it as cancelled, and its reminder is removed. The weekly routine stays the same.'**
+  String get cancelClassBody;
+
+  /// No description provided for @noteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Note for classmates (optional)'**
+  String get noteLabel;
+
+  /// No description provided for @noteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. The teacher is on leave'**
+  String get noteHint;
+
+  /// No description provided for @keepClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep class'**
+  String get keepClass;
+
+  /// No description provided for @confirmCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel class'**
+  String get confirmCancel;
+
+  /// No description provided for @onlyThisDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Only for {date}. The weekly routine stays the same.'**
+  String onlyThisDay(String date);
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get dateLabel;
+
+  /// No description provided for @upcomingChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming changes'**
+  String get upcomingChanges;
+
+  /// No description provided for @wasTime.
+  ///
+  /// In en, this message translates to:
+  /// **'was {time}'**
+  String wasTime(String time);
+
+  /// No description provided for @changeSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved. Classmates see it when they open the app.'**
+  String get changeSaved;
+
+  /// No description provided for @openGroupAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open class group'**
+  String get openGroupAction;
 }
 
 class _AppLocalizationsDelegate

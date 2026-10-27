@@ -746,4 +746,74 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorPickDay => 'Pick at least one day.';
+
+  @override
+  String get changeCancelled => 'Cancelled';
+
+  @override
+  String get changeMoved => 'Changed';
+
+  @override
+  String get changeExtra => 'Extra class';
+
+  @override
+  String get cancelThisClass => 'Cancel this class';
+
+  @override
+  String get changeTimeOrRoom => 'Change time or room';
+
+  @override
+  String get undoChange => 'Undo change';
+
+  @override
+  String get removeExtraClass => 'Remove extra class';
+
+  @override
+  String get editWeeklyClass => 'Edit weekly class';
+
+  @override
+  String get addExtraClass => 'Add extra class';
+
+  @override
+  String cancelClassTitle(String course, String date) {
+    return 'Cancel $course on $date?';
+  }
+
+  @override
+  String get cancelClassBody =>
+      'Classmates see it as cancelled, and its reminder is removed. The weekly routine stays the same.';
+
+  @override
+  String get noteLabel => 'Note for classmates (optional)';
+
+  @override
+  String get noteHint => 'e.g. The teacher is on leave';
+
+  @override
+  String get keepClass => 'Keep class';
+
+  @override
+  String get confirmCancel => 'Cancel class';
+
+  @override
+  String onlyThisDay(String date) {
+    return 'Only for $date. The weekly routine stays the same.';
+  }
+
+  @override
+  String get dateLabel => 'Date';
+
+  @override
+  String get upcomingChanges => 'Upcoming changes';
+
+  @override
+  String wasTime(String time) {
+    return 'was $time';
+  }
+
+  @override
+  String get changeSaved => 'Saved. Classmates see it when they open the app.';
+
+  @override
+  String get openGroupAction => 'Open class group';
 }

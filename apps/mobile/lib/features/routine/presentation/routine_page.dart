@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../../../app/clock.dart';
 import '../../../app/router.dart';
 import '../../classes/presentation/bloc/my_classes_cubit.dart';
+import '../../classes/presentation/widgets/class_sheet.dart';
 import '../../classes/presentation/widgets/class_tile.dart';
 
 /// Weekly routine. R1: day strip + classes per day, with changes marked.
@@ -40,7 +41,16 @@ class _RoutinePageState extends State<RoutinePage> {
       for (final g in classes.groups)
         for (final s in g.slots) s.weekday,
     };
+    final crGroups = classes.groups.where((g) => g.isCr).toList();
+    final today = DateUtils.dateOnly(appNow());
     return Scaffold(
+      floatingActionButton: crGroups.isEmpty || _selected.isBefore(today)
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () => _addExtra(context, crGroups),
+              icon: const Icon(Icons.add_rounded),
+              label: Text(l10n.addExtraClass),
+            ),
       appBar: AppBar(
         title: Text(l10n.navRoutine),
         actions: [
@@ -105,12 +115,12 @@ class _RoutinePageState extends State<RoutinePage> {
               CsSection(
                 children: [
                   for (final c in day)
-                    ClassTile(
-                      slot: c.slot,
+                    ClassTile.on(
+                      c,
                       groupTitle: classes.groups.length > 1
                           ? c.group.title
                           : null,
-                      onTap: () => context.push(Routes.group(c.group.id)),
+                      onTap: () => showClassSheet(context, c),
                     ),
                 ],
               ),
@@ -118,6 +128,27 @@ class _RoutinePageState extends State<RoutinePage> {
         ),
       ),
     );
+  }
+}
+
+extension on _RoutinePageState {
+  /// Extra class on the selected date; asks which group if CR of several.
+  Future<void> _addExtra(BuildContext context, List<ClassGroup> groups) async {
+    final l10n = AppLocalizations.of(context);
+    var g = groups.first;
+    if (groups.length > 1) {
+      final id = await CsOptionSheet.show<String>(
+        context: context,
+        title: l10n.classGroups,
+        selected: '',
+        options: [
+          for (final x in groups) CsOption(x.id, x.title, subtitle: x.semester),
+        ],
+      );
+      if (id == null || !context.mounted) return;
+      g = groups.firstWhere((x) => x.id == id);
+    }
+    await context.push(Routes.extraClass(g.id, _selected));
   }
 }
 

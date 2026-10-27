@@ -391,6 +391,47 @@ class FakeClassGroupRepository implements ClassGroupRepository {
     final g = _mine(groupId);
     _put(g.copyWith(slots: g.slots.where((x) => x.id != slotId).toList()));
   }
+
+  @override
+  Future<ClassChange> addChange(String groupId, ChangeDraft d) async {
+    _check();
+    final g = _mine(groupId);
+    final c = ClassChange(
+      id: _id('c'),
+      kind: d.kind,
+      slotId: d.slotId,
+      date: d.date,
+      courseCode: d.courseCode,
+      courseTitle: d.courseTitle,
+      teacher: d.teacher,
+      classKind: d.classKind,
+      room: d.room,
+      startMin: d.startMin,
+      endMin: d.endMin,
+      note: d.note,
+    );
+    _put(
+      g.copyWith(
+        changes: [
+          ...g.changes.where(
+            (x) =>
+                d.slotId == null || !(x.slotId == d.slotId && x.date == d.date),
+          ),
+          c,
+        ],
+      ),
+    );
+    return c;
+  }
+
+  @override
+  Future<void> deleteChange(String groupId, String changeId) async {
+    _check();
+    final g = _mine(groupId);
+    _put(
+      g.copyWith(changes: g.changes.where((x) => x.id != changeId).toList()),
+    );
+  }
 }
 
 /// A CSE 61 group with three classes: Tuesday 08:30 and 11:30, Wednesday 09:00.

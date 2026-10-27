@@ -13,6 +13,7 @@ import '../../../app/router.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../classes/presentation/bloc/my_classes_cubit.dart';
 import '../../classes/presentation/class_format.dart';
+import '../../classes/presentation/widgets/class_sheet.dart';
 import '../../classes/presentation/widgets/class_tile.dart';
 import '../../reminders/presentation/bloc/reminders_cubit.dart';
 import '../../reminders/presentation/reminder_prompt.dart';
@@ -100,10 +101,11 @@ class _TodayPageState extends State<TodayPage> {
   ) {
     final l10n = AppLocalizations.of(context);
     final today = classesOn(groups, now);
-    final current = today.where(
+    final happening = today.where((c) => !c.cancelled);
+    final current = happening.where(
       (c) => !c.startsAt.isAfter(now) && c.endsAt.isAfter(now),
     );
-    final upcoming = today.where((c) => c.startsAt.isAfter(now));
+    final upcoming = happening.where((c) => c.startsAt.isAfter(now));
     final many = groups.length > 1;
 
     final Widget hero;
@@ -124,7 +126,7 @@ class _TodayPageState extends State<TodayPage> {
     } else {
       hero = _NothingLeft(
         groups: groups,
-        title: today.isEmpty ? l10n.noClassesToday : l10n.doneForToday,
+        title: happening.isEmpty ? l10n.noClassesToday : l10n.doneForToday,
         now: now,
       );
     }
@@ -144,15 +146,15 @@ class _TodayPageState extends State<TodayPage> {
           title: l10n.todaysClasses,
           children: [
             for (final c in today)
-              ClassTile(
-                slot: c.slot,
+              ClassTile.on(
+                c,
                 groupTitle: many ? c.group.title : null,
                 state: !c.endsAt.isAfter(now)
                     ? ClassTileState.past
                     : !c.startsAt.isAfter(now)
                     ? ClassTileState.now
                     : ClassTileState.normal,
-                onTap: () => context.push(Routes.group(c.group.id)),
+                onTap: () => showClassSheet(context, c),
               ),
           ],
         ),
@@ -311,7 +313,7 @@ class _HeroCard extends StatelessWidget {
       color: white.withValues(alpha: 0.85),
     );
     return GestureDetector(
-      onTap: () => context.push(Routes.group(item.group.id)),
+      onTap: () => showClassSheet(context, item),
       child: _BrandCard(
         icon: Icons.schedule_rounded,
         child: Column(
@@ -336,6 +338,26 @@ class _HeroCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (item.moved || item.extra) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDE68A),
+                      borderRadius: BorderRadius.circular(CsRadius.full),
+                    ),
+                    child: Text(
+                      item.moved ? l10n.changeMoved : l10n.changeExtra,
+                      style: context.text.labelMedium?.copyWith(
+                        color: const Color(0xFF78350F),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(width: CsSpace.sm),
                 Flexible(
                   child: Text(
@@ -352,6 +374,14 @@ class _HeroCard extends StatelessWidget {
               style: context.text.headlineSmall?.copyWith(color: white),
             ),
             if (s.courseTitle.isNotEmpty) Text(s.courseTitle, style: soft),
+            if ((item.change?.note ?? '').isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: CsSpace.xs),
+                child: Text(
+                  item.change!.note,
+                  style: soft?.copyWith(fontStyle: FontStyle.italic),
+                ),
+              ),
             const SizedBox(height: CsSpace.md),
             Wrap(
               spacing: CsSpace.md,
@@ -359,12 +389,14 @@ class _HeroCard extends StatelessWidget {
               children: [
                 _Meta(
                   icon: Icons.access_time_rounded,
-                  text: rangeText(context, s),
+                  text:
+                      '${clockText(context, item.startMin)} – '
+                      '${clockText(context, item.endMin)}',
                 ),
-                if (s.room.isNotEmpty)
+                if (item.room.isNotEmpty)
                   _Meta(
                     icon: Icons.meeting_room_outlined,
-                    text: l10n.roomShort(s.room),
+                    text: l10n.roomShort(item.room),
                   ),
                 if (s.teacher.isNotEmpty)
                   _Meta(icon: Icons.person_outline_rounded, text: s.teacher),
@@ -417,7 +449,10 @@ class _NothingLeft extends StatelessWidget {
     final cs = context.cs;
     ClassOnDay? next;
     for (var i = 1; i <= 7 && next == null; i++) {
-      final list = classesOn(groups, now.add(Duration(days: i)));
+      final list = classesOn(
+        groups,
+        now.add(Duration(days: i)),
+      ).where((c) => !c.cancelled);
       if (list.isNotEmpty) next = list.first;
     }
     final crGroup = groups.where((g) => g.isCr && g.slots.isEmpty).firstOrNull;
@@ -452,10 +487,10 @@ class _NothingLeft extends StatelessWidget {
               const SizedBox(height: CsSpace.md),
               CsSection(
                 children: [
-                  ClassTile(
-                    slot: next.slot,
+                  ClassTile.on(
+                    next,
                     groupTitle: groups.length > 1 ? next.group.title : null,
-                    onTap: () => context.push(Routes.group(next!.group.id)),
+                    onTap: () => showClassSheet(context, next!),
                   ),
                 ],
               ),

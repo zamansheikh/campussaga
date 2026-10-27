@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/widgets/notice_banner.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
+import '../widgets/editor_widgets.dart';
 
 /// Add or edit a class (CR). Built for speed: a class can be put on several
 /// days at once (one entry per day, so each can later get its own room or
@@ -249,7 +250,7 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                     ),
                   ),
               optionsViewBuilder: (context, onSelected, options) =>
-                  _CourseOptions(options: options, onSelected: onSelected),
+                  CourseOptions(options: options, onSelected: onSelected),
             ),
             const SizedBox(height: CsSpace.md),
             TextField(
@@ -324,7 +325,7 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
             Row(
               children: [
                 Expanded(
-                  child: _TimeBox(
+                  child: TimeBox(
                     label: l10n.startsLabel,
                     minutes: _start,
                     onTap: _busy ? null : () => _pickTime(start: true),
@@ -332,7 +333,7 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                 ),
                 const SizedBox(width: CsSpace.md),
                 Expanded(
-                  child: _TimeBox(
+                  child: TimeBox(
                     label: l10n.endsLabel,
                     minutes: _end,
                     error: _timeWrong,
@@ -398,105 +399,6 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                 child: Text(l10n.saveAndAddAnother),
               ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TimeBox extends StatelessWidget {
-  const _TimeBox({
-    required this.label,
-    required this.minutes,
-    required this.onTap,
-    this.error = false,
-  });
-
-  final String label;
-  final int minutes;
-  final VoidCallback? onTap;
-  final bool error;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = context.cs;
-    return Material(
-      color: cs.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(CsRadius.md),
-        side: BorderSide(color: error ? cs.error : cs.border),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          child: Row(
-            children: [
-              Icon(Icons.schedule_rounded, color: cs.textSecondary, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(label, style: context.text.labelMedium),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(
-                        clockText(context, minutes),
-                        style: context.text.titleMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CourseOptions extends StatelessWidget {
-  const _CourseOptions({required this.options, required this.onSelected});
-
-  final Iterable<ClassSlot> options;
-  final AutocompleteOnSelected<ClassSlot> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(top: CsSpace.xs),
-        child: Material(
-          elevation: 6,
-          shadowColor: Colors.black26,
-          color: context.cs.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(CsRadius.md),
-            side: BorderSide(color: context.cs.border),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 240, maxWidth: 360),
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: CsSpace.xs),
-              shrinkWrap: true,
-              children: [
-                for (final o in options)
-                  ListTile(
-                    title: Text(o.courseCode),
-                    subtitle: o.courseTitle.isEmpty
-                        ? null
-                        : Text(o.courseTitle),
-                    onTap: () => onSelected(o),
-                  ),
-              ],
-            ),
-          ),
         ),
       ),
     );

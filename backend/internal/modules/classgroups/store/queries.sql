@@ -82,3 +82,34 @@ RETURNING *;
 
 -- name: DeleteSlot :execrows
 DELETE FROM routine_slots WHERE id = @id AND group_id = @group_id;
+
+-- ---- changes (one date) ------------------------------------------------------
+
+-- name: ListChangesForUser :many
+SELECT c.* FROM routine_changes c
+JOIN class_group_members m ON m.group_id = c.group_id
+WHERE m.user_id = @user_id AND c.date >= @from_date
+ORDER BY c.date, c.starts_min NULLS FIRST, c.id;
+
+-- name: CountUpcomingChanges :one
+SELECT count(*) FROM routine_changes WHERE group_id = @group_id AND date >= @from_date;
+
+-- name: GetSlot :one
+SELECT * FROM routine_slots WHERE id = @id AND group_id = @group_id;
+
+-- name: DeleteSlotChangeOn :exec
+DELETE FROM routine_changes WHERE slot_id = @slot_id AND date = @date;
+
+-- A class moved to another weekday: its one-date changes no longer apply.
+-- name: DeleteSlotChanges :exec
+DELETE FROM routine_changes WHERE slot_id = @slot_id;
+
+-- name: CreateChange :one
+INSERT INTO routine_changes (group_id, slot_id, date, kind, course_code, course_title, teacher,
+                             class_kind, room, starts_min, ends_min, note, created_by)
+VALUES (@group_id, @slot_id, @date, @kind, @course_code, @course_title, @teacher,
+        @class_kind, @room, @starts_min, @ends_min, @note, @created_by)
+RETURNING *;
+
+-- name: DeleteChange :execrows
+DELETE FROM routine_changes WHERE id = @id AND group_id = @group_id;

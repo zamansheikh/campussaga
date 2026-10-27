@@ -105,7 +105,7 @@ List<PlannedReminder> planReminders({
   for (var i = 0; i < days; i++) {
     final day = DateTime(now.year, now.month, now.day + i);
     for (final c in classesOn(groups, day)) {
-      if (settings.isMuted(c.slot.courseCode)) continue;
+      if (c.cancelled || settings.isMuted(c.slot.courseCode)) continue;
       final at = c.startsAt.subtract(before);
       if (!at.isAfter(now)) continue;
       // The same course at the same time in two groups: one reminder.

@@ -22,4 +22,8 @@ var (
 		"This routine already has the most classes allowed")
 	ErrSlotNotFound = apperr.New(http.StatusNotFound, "SLOT_NOT_FOUND",
 		"This class was not found")
+	ErrChangeNotFound = apperr.New(http.StatusNotFound, "CHANGE_NOT_FOUND",
+		"This change was not found")
+	ErrChangeLimit = apperr.New(http.StatusConflict, "CHANGE_LIMIT_REACHED",
+		"This routine already has the most upcoming changes allowed")
 )

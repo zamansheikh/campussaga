@@ -359,5 +359,50 @@
   },
   "daysLabel": "Days",
   "daysHint": "Pick every day this class meets at this time.",
-  "errorPickDay": "Pick at least one day."
+  "errorPickDay": "Pick at least one day.",
+  "changeCancelled": "Cancelled",
+  "changeMoved": "Changed",
+  "changeExtra": "Extra class",
+  "cancelThisClass": "Cancel this class",
+  "changeTimeOrRoom": "Change time or room",
+  "undoChange": "Undo change",
+  "removeExtraClass": "Remove extra class",
+  "editWeeklyClass": "Edit weekly class",
+  "addExtraClass": "Add extra class",
+  "cancelClassTitle": "Cancel {course} on {date}?",
+  "@cancelClassTitle": {
+    "placeholders": {
+      "course": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelClassBody": "Classmates see it as cancelled, and its reminder is removed. The weekly routine stays the same.",
+  "noteLabel": "Note for classmates (optional)",
+  "noteHint": "e.g. The teacher is on leave",
+  "keepClass": "Keep class",
+  "confirmCancel": "Cancel class",
+  "onlyThisDay": "Only for {date}. The weekly routine stays the same.",
+  "@onlyThisDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dateLabel": "Date",
+  "upcomingChanges": "Upcoming changes",
+  "wasTime": "was {time}",
+  "@wasTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "changeSaved": "Saved. Classmates see it when they open the app.",
+  "openGroupAction": "Open class group"
 }

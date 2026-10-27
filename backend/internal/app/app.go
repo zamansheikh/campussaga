@@ -89,7 +89,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		LogCodes: !cfg.IsProduction(),
 	}, now, log)
 	cfgSvc := appconfig.NewService(d)
-	groupSvc := classgroups.NewService(d)
+	groupSvc := classgroups.NewService(d, now)
 
 	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc}
 

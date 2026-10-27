@@ -25,4 +25,11 @@ abstract interface class ClassGroupRepository {
   Future<ClassSlot> updateSlot(String groupId, String slotId, SlotDraft draft);
 
   Future<void> deleteSlot(String groupId, String slotId);
+
+  /// Cancels or moves a class, or adds an extra one, on one date (CR).
+  /// A new change for a class on a date replaces the previous one.
+  Future<ClassChange> addChange(String groupId, ChangeDraft draft);
+
+  /// Undoes a change (CR).
+  Future<void> deleteChange(String groupId, String changeId);
 }

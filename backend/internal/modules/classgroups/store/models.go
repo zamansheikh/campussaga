@@ -23,6 +23,25 @@ type ClassGroup struct {
 	UpdatedAt    time.Time
 }
 
+type RoutineChange struct {
+	ID          uuid.UUID
+	GroupID     uuid.UUID
+	SlotID      *uuid.UUID
+	Date        time.Time
+	Kind        string
+	CourseCode  string
+	CourseTitle string
+	Teacher     string
+	ClassKind   string
+	Room        string
+	StartsMin   *int16
+	EndsMin     *int16
+	Note        string
+	CreatedBy   *uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
 type RoutineSlot struct {
 	ID          uuid.UUID
 	GroupID     uuid.UUID

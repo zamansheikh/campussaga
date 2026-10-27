@@ -11,6 +11,9 @@
 //   - POST   /groups/{id}/slots         add a class (CR)
 //   - PUT    /groups/{id}/slots/{slot}  edit a class (CR)
 //   - DELETE /groups/{id}/slots/{slot}  remove a class (CR)
+//   - POST   /groups/{id}/changes       cancel / move a class, or add an
+//     extra class, on one date (CR)
+//   - DELETE /groups/{id}/changes/{c}   undo a change (CR)
 //
 // Security notes:
 //   - A group is visible only to its members. Codes only work for students
@@ -54,10 +57,11 @@ const (
 
 // Service is the class groups module.
 type Service struct {
-	d *db.DB
+	d   *db.DB
+	now func() time.Time
 }
 
-func NewService(d *db.DB) *Service { return &Service{d: d} }
+func NewService(d *db.DB, now func() time.Time) *Service { return &Service{d: d, now: now} }
 
 // Group is one class group as its member sees it.
 type Group struct {
@@ -70,7 +74,9 @@ type Group struct {
 	Role        string    `json:"role"`
 	MemberCount int64     `json:"memberCount"`
 	Slots       []Slot    `json:"slots"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	// Changes from yesterday on (Bangladesh dates), earliest first.
+	Changes   []Change  `json:"changes"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 // Slot is one weekly class. Weekday is ISO (1 = Monday ... 7 = Sunday);
@@ -155,9 +161,22 @@ func (s *Service) MyGroups(ctx context.Context) ([]Group, error) {
 	for _, sl := range slots {
 		byGroup[sl.GroupID] = append(byGroup[sl.GroupID], slotView(sl))
 	}
+	changes, err := q.ListChangesForUser(ctx, store.ListChangesForUserParams{
+		UserID: c.UserID, FromDate: s.today().AddDate(0, 0, -1),
+	})
+	if err != nil {
+		return nil, err
+	}
+	changesByGroup := map[uuid.UUID][]Change{}
+	for _, ch := range changes {
+		changesByGroup[ch.GroupID] = append(changesByGroup[ch.GroupID], changeView(ch))
+	}
 	out := make([]Group, 0, len(rows))
 	for _, r := range rows {
 		g := groupView(r.ClassGroup, r.Role, r.MemberCount, byGroup[r.ClassGroup.ID])
+		if cs := changesByGroup[r.ClassGroup.ID]; cs != nil {
+			g.Changes = cs
+		}
 		out = append(out, g)
 	}
 	return out, nil
@@ -413,6 +432,18 @@ func (s *Service) UpdateSlot(ctx context.Context, groupID, slotID uuid.UUID, in 
 		if err := s.requireCR(ctx, q, groupID, c.UserID); err != nil {
 			return err
 		}
+		before, err := q.GetSlot(ctx, store.GetSlotParams{ID: slotID, GroupID: groupID})
+		if db.IsNoRows(err) {
+			return ErrSlotNotFound
+		}
+		if err != nil {
+			return err
+		}
+		if int(before.Weekday) != in.Weekday { // old one-date changes no longer fit
+			if err := q.DeleteSlotChanges(ctx, &slotID); err != nil {
+				return err
+			}
+		}
 		sl, err := q.UpdateSlot(ctx, store.UpdateSlotParams{
 			ID: slotID, GroupID: groupID, CourseCode: in.CourseCode, CourseTitle: in.CourseTitle,
 			Teacher: in.Teacher, Room: in.Room, Weekday: int16(in.Weekday),
@@ -497,7 +528,8 @@ func groupView(g store.ClassGroup, role string, members int64, slots []Slot) Gro
 	}
 	return Group{
 		ID: g.ID, Department: g.Department, Batch: g.Batch, Section: g.Section, Semester: g.Semester,
-		JoinCode: g.JoinCode, Role: role, MemberCount: members, Slots: slots, UpdatedAt: g.UpdatedAt,
+		JoinCode: g.JoinCode, Role: role, MemberCount: members, Slots: slots, Changes: []Change{},
+		UpdatedAt: g.UpdatedAt,
 	}
 }
 

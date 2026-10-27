@@ -28,6 +28,8 @@ func (s *Service) Routes(r *httpx.Router) {
 	r.Student().Post("/groups/{id}/slots", httpx.Handle(s.handleAddSlot, httpx.Status(http.StatusCreated)))
 	r.Student().Put("/groups/{id}/slots/{slot}", httpx.Handle(s.handleUpdateSlot))
 	r.Student().Delete("/groups/{id}/slots/{slot}", httpx.Handle(s.handleDeleteSlot, httpx.NoContent()))
+	r.Student().Post("/groups/{id}/changes", httpx.Handle(s.handleAddChange, httpx.Status(http.StatusCreated)))
+	r.Student().Delete("/groups/{id}/changes/{change}", httpx.Handle(s.handleDeleteChange, httpx.NoContent()))
 }
 
 type groupsRes struct {
@@ -108,4 +110,22 @@ func (s *Service) handleUpdateSlot(ctx context.Context, in *updateSlotReq) (*Slo
 
 func (s *Service) handleDeleteSlot(ctx context.Context, in *slotPath) (*httpx.Empty, error) {
 	return nil, s.DeleteSlot(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.Slot))
+}
+
+type addChangeReq struct {
+	groupPath
+	ChangeInput
+}
+
+func (s *Service) handleAddChange(ctx context.Context, in *addChangeReq) (*Change, error) {
+	return s.AddChange(ctx, uuid.MustParse(in.ID), &in.ChangeInput)
+}
+
+type changePath struct {
+	ID     string `json:"-" path:"id" validate:"required,uuid"`
+	Change string `json:"-" path:"change" validate:"required,uuid"`
+}
+
+func (s *Service) handleDeleteChange(ctx context.Context, in *changePath) (*httpx.Empty, error) {
+	return nil, s.DeleteChange(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.Change))
 }

@@ -111,6 +111,31 @@ class MyClassesCubit extends Cubit<MyClassesState> {
     }
   }
 
+  Future<void> addChange(String groupId, ChangeDraft draft) async {
+    final c = await _repo.addChange(groupId, draft);
+    final g = state.group(groupId);
+    if (g == null) return;
+    // A new change for a class on a date replaces the old one.
+    final kept = g.changes.where(
+      (x) => c.slotId == null || !(x.slotId == c.slotId && x.date == c.date),
+    );
+    _replace(
+      g.copyWith(
+        changes: [...kept, c]..sort((a, b) => a.date.compareTo(b.date)),
+      ),
+    );
+  }
+
+  Future<void> deleteChange(String groupId, String changeId) async {
+    await _repo.deleteChange(groupId, changeId);
+    final g = state.group(groupId);
+    if (g != null) {
+      _replace(
+        g.copyWith(changes: g.changes.where((x) => x.id != changeId).toList()),
+      );
+    }
+  }
+
   void _replace(ClassGroup g) =>
       _set([for (final x in state.groups) x.id == g.id ? g : x]);
 

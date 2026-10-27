@@ -161,7 +161,7 @@ class RemindersCubit extends Cubit<RemindersState> {
       title: l10n.notificationTitle(s.courseCode, state.settings.minutesBefore),
       body: [
         if (s.courseTitle.isNotEmpty) s.courseTitle,
-        if (s.room.isNotEmpty) l10n.roomShort(s.room),
+        if (r.item.room.isNotEmpty) l10n.roomShort(r.item.room),
         _time(r.item.startsAt),
       ].join(' · '),
       payload: r.item.group.id,

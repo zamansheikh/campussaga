@@ -16,6 +16,7 @@ import 'package:campussaga/app/clock.dart';
 import 'package:campussaga/app/router.dart';
 import 'package:campussaga/app/settings/bloc/settings_state.dart';
 import 'package:campussaga/app/settings/settings_storage.dart';
+import 'package:campussaga/features/classes/presentation/widgets/class_tile.dart';
 import 'package:campussaga/features/reminders/data/reminder_scheduler.dart';
 import 'package:campussaga/features/reminders/data/reminder_store.dart';
 import 'package:flutter/material.dart';
@@ -321,6 +322,46 @@ void main() {
       unawaited(router.push(Routes.reminders));
       await tester.pumpAndSettle();
       await capture(tester, 'reminders-${look.name}');
+    });
+
+    shot('changes ${look.name}', (tester) async {
+      final tue = DateTime(2026, 10, 27);
+      final g = _group(GroupRole.cr).copyWith(
+        changes: [
+          ClassChange(
+            id: 'c1',
+            kind: ChangeKind.moved,
+            slotId: '4',
+            date: tue,
+            startMin: 11 * 60,
+            endMin: 14 * 60,
+            room: 'Lab 5',
+            note: 'Lab 3 projector is broken',
+          ),
+          ClassChange(
+            id: 'c2',
+            kind: ChangeKind.cancelled,
+            slotId: '5',
+            date: tue,
+            note: 'Teacher is on leave',
+          ),
+        ],
+      );
+      final router = await start(tester, look, user: _student, groups: [g]);
+      await capture(tester, 'changes-${look.name}');
+      await tester.tap(find.byType(ClassTile).at(1));
+      await tester.pumpAndSettle();
+      await capture(tester, 'changes-${look.name}');
+      Navigator.of(tester.element(find.byType(BottomSheet))).pop();
+      await tester.pumpAndSettle();
+      unawaited(router.push(Routes.changeClass('g1', '3', tue)));
+      await tester.pumpAndSettle();
+      await capture(tester, 'changes-${look.name}');
+      router.pop();
+      await tester.pumpAndSettle();
+      unawaited(router.push(Routes.group('g1')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'changes-${look.name}');
     });
 
     shot('join ${look.name}', (tester) async {

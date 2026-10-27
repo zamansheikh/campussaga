@@ -7,6 +7,7 @@ package store
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -62,6 +63,22 @@ func (q *Queries) CountSlots(ctx context.Context, groupID uuid.UUID) (int64, err
 	return count, err
 }
 
+const countUpcomingChanges = `-- name: CountUpcomingChanges :one
+SELECT count(*) FROM routine_changes WHERE group_id = $1 AND date >= $2
+`
+
+type CountUpcomingChangesParams struct {
+	GroupID  uuid.UUID
+	FromDate time.Time
+}
+
+func (q *Queries) CountUpcomingChanges(ctx context.Context, arg CountUpcomingChangesParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countUpcomingChanges, arg.GroupID, arg.FromDate)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countUserGroups = `-- name: CountUserGroups :one
 SELECT count(*) FROM class_group_members WHERE user_id = $1
 `
@@ -71,6 +88,68 @@ func (q *Queries) CountUserGroups(ctx context.Context, userID uuid.UUID) (int64,
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const createChange = `-- name: CreateChange :one
+INSERT INTO routine_changes (group_id, slot_id, date, kind, course_code, course_title, teacher,
+                             class_kind, room, starts_min, ends_min, note, created_by)
+VALUES ($1, $2, $3, $4, $5, $6, $7,
+        $8, $9, $10, $11, $12, $13)
+RETURNING id, group_id, slot_id, date, kind, course_code, course_title, teacher, class_kind, room, starts_min, ends_min, note, created_by, created_at, updated_at
+`
+
+type CreateChangeParams struct {
+	GroupID     uuid.UUID
+	SlotID      *uuid.UUID
+	Date        time.Time
+	Kind        string
+	CourseCode  string
+	CourseTitle string
+	Teacher     string
+	ClassKind   string
+	Room        string
+	StartsMin   *int16
+	EndsMin     *int16
+	Note        string
+	CreatedBy   *uuid.UUID
+}
+
+func (q *Queries) CreateChange(ctx context.Context, arg CreateChangeParams) (RoutineChange, error) {
+	row := q.db.QueryRow(ctx, createChange,
+		arg.GroupID,
+		arg.SlotID,
+		arg.Date,
+		arg.Kind,
+		arg.CourseCode,
+		arg.CourseTitle,
+		arg.Teacher,
+		arg.ClassKind,
+		arg.Room,
+		arg.StartsMin,
+		arg.EndsMin,
+		arg.Note,
+		arg.CreatedBy,
+	)
+	var i RoutineChange
+	err := row.Scan(
+		&i.ID,
+		&i.GroupID,
+		&i.SlotID,
+		&i.Date,
+		&i.Kind,
+		&i.CourseCode,
+		&i.CourseTitle,
+		&i.Teacher,
+		&i.ClassKind,
+		&i.Room,
+		&i.StartsMin,
+		&i.EndsMin,
+		&i.Note,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const createGroup = `-- name: CreateGroup :one
@@ -165,6 +244,23 @@ func (q *Queries) CreateSlot(ctx context.Context, arg CreateSlotParams) (Routine
 	return i, err
 }
 
+const deleteChange = `-- name: DeleteChange :execrows
+DELETE FROM routine_changes WHERE id = $1 AND group_id = $2
+`
+
+type DeleteChangeParams struct {
+	ID      uuid.UUID
+	GroupID uuid.UUID
+}
+
+func (q *Queries) DeleteChange(ctx context.Context, arg DeleteChangeParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteChange, arg.ID, arg.GroupID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const deleteGroup = `-- name: DeleteGroup :exec
 DELETE FROM class_groups WHERE id = $1
 `
@@ -189,6 +285,30 @@ func (q *Queries) DeleteSlot(ctx context.Context, arg DeleteSlotParams) (int64, 
 		return 0, err
 	}
 	return result.RowsAffected(), nil
+}
+
+const deleteSlotChangeOn = `-- name: DeleteSlotChangeOn :exec
+DELETE FROM routine_changes WHERE slot_id = $1 AND date = $2
+`
+
+type DeleteSlotChangeOnParams struct {
+	SlotID *uuid.UUID
+	Date   time.Time
+}
+
+func (q *Queries) DeleteSlotChangeOn(ctx context.Context, arg DeleteSlotChangeOnParams) error {
+	_, err := q.db.Exec(ctx, deleteSlotChangeOn, arg.SlotID, arg.Date)
+	return err
+}
+
+const deleteSlotChanges = `-- name: DeleteSlotChanges :exec
+DELETE FROM routine_changes WHERE slot_id = $1
+`
+
+// A class moved to another weekday: its one-date changes no longer apply.
+func (q *Queries) DeleteSlotChanges(ctx context.Context, slotID *uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteSlotChanges, slotID)
+	return err
 }
 
 const getGroupByCode = `-- name: GetGroupByCode :one
@@ -249,6 +369,86 @@ func (q *Queries) GetRole(ctx context.Context, arg GetRoleParams) (string, error
 	var role string
 	err := row.Scan(&role)
 	return role, err
+}
+
+const getSlot = `-- name: GetSlot :one
+SELECT id, group_id, course_code, course_title, teacher, room, weekday, starts_min, ends_min, kind, created_at, updated_at FROM routine_slots WHERE id = $1 AND group_id = $2
+`
+
+type GetSlotParams struct {
+	ID      uuid.UUID
+	GroupID uuid.UUID
+}
+
+func (q *Queries) GetSlot(ctx context.Context, arg GetSlotParams) (RoutineSlot, error) {
+	row := q.db.QueryRow(ctx, getSlot, arg.ID, arg.GroupID)
+	var i RoutineSlot
+	err := row.Scan(
+		&i.ID,
+		&i.GroupID,
+		&i.CourseCode,
+		&i.CourseTitle,
+		&i.Teacher,
+		&i.Room,
+		&i.Weekday,
+		&i.StartsMin,
+		&i.EndsMin,
+		&i.Kind,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const listChangesForUser = `-- name: ListChangesForUser :many
+
+SELECT c.id, c.group_id, c.slot_id, c.date, c.kind, c.course_code, c.course_title, c.teacher, c.class_kind, c.room, c.starts_min, c.ends_min, c.note, c.created_by, c.created_at, c.updated_at FROM routine_changes c
+JOIN class_group_members m ON m.group_id = c.group_id
+WHERE m.user_id = $1 AND c.date >= $2
+ORDER BY c.date, c.starts_min NULLS FIRST, c.id
+`
+
+type ListChangesForUserParams struct {
+	UserID   uuid.UUID
+	FromDate time.Time
+}
+
+// ---- changes (one date) ------------------------------------------------------
+func (q *Queries) ListChangesForUser(ctx context.Context, arg ListChangesForUserParams) ([]RoutineChange, error) {
+	rows, err := q.db.Query(ctx, listChangesForUser, arg.UserID, arg.FromDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []RoutineChange{}
+	for rows.Next() {
+		var i RoutineChange
+		if err := rows.Scan(
+			&i.ID,
+			&i.GroupID,
+			&i.SlotID,
+			&i.Date,
+			&i.Kind,
+			&i.CourseCode,
+			&i.CourseTitle,
+			&i.Teacher,
+			&i.ClassKind,
+			&i.Room,
+			&i.StartsMin,
+			&i.EndsMin,
+			&i.Note,
+			&i.CreatedBy,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listMyGroups = `-- name: ListMyGroups :many

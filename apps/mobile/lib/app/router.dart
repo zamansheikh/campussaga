@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/email_sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
+import '../features/classes/presentation/pages/change_editor_page.dart';
 import '../features/classes/presentation/pages/group_form_page.dart';
 import '../features/classes/presentation/pages/group_page.dart';
 import '../features/classes/presentation/pages/groups_page.dart';
@@ -41,6 +43,14 @@ abstract final class Routes {
   static String newSlot(String groupId) => '/groups/$groupId/class/new';
   static String editSlot(String groupId, String slotId) =>
       '/groups/$groupId/class/$slotId';
+
+  /// Move one class on one date.
+  static String changeClass(String groupId, String slotId, DateTime date) =>
+      '/groups/$groupId/change?slot=$slotId&date=${formatDate(date)}';
+
+  /// Add an extra class on one date.
+  static String extraClass(String groupId, DateTime date) =>
+      '/groups/$groupId/change?date=${formatDate(date)}';
 }
 
 /// App routes. Signed-out students see the welcome slides once, then only
@@ -117,6 +127,14 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
                 path: 'edit',
                 builder: (context, state) =>
                     GroupFormPage(groupId: state.pathParameters['id']),
+              ),
+              GoRoute(
+                path: 'change',
+                builder: (context, state) => ChangeEditorPage(
+                  groupId: state.pathParameters['id']!,
+                  slotId: state.uri.queryParameters['slot'],
+                  date: parseDate(state.uri.queryParameters['date']!),
+                ),
               ),
               GoRoute(
                 path: 'class/new',

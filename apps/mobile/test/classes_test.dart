@@ -70,8 +70,11 @@ void main() {
     expect(find.text('CLASS GROUPS'), findsOneWidget);
     expect(find.text('CR'), findsOneWidget);
 
-    // The "next class" card opens the group, where the CR can edit.
+    // The "next class" card opens the class; from there, the group.
     await scrollAndTap(tester, find.text('MAT201'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit weekly class'), findsOneWidget);
+    await tester.tap(find.text('Open class group'));
     await tester.pumpAndSettle();
     expect(find.text('Invite classmates'), findsOneWidget);
     expect(find.byType(FloatingActionButton), findsOneWidget);
@@ -216,6 +219,8 @@ void main() {
       mine: [sampleGroup(role: GroupRole.cr)],
     );
     await scrollAndTap(tester, find.text('CSE313'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open class group'));
     await tester.pumpAndSettle();
     expect(find.text('Invite classmates'), findsOneWidget);
 
