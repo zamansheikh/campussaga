@@ -14,6 +14,8 @@ import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../classes/presentation/bloc/my_classes_cubit.dart';
 import '../../classes/presentation/class_format.dart';
 import '../../classes/presentation/widgets/class_tile.dart';
+import '../../reminders/presentation/bloc/reminders_cubit.dart';
+import '../../reminders/presentation/reminder_prompt.dart';
 
 /// Home screen: the next class with a countdown, then the rest of today.
 /// Before the student joins a class group it explains how that works.
@@ -127,8 +129,15 @@ class _TodayPageState extends State<TodayPage> {
       );
     }
 
+    final reminders = context.watch<RemindersCubit>().state;
+    final ask =
+        reminders.loaded &&
+        !reminders.settings.asked &&
+        !reminders.settings.enabled &&
+        groups.any((g) => g.slots.isNotEmpty);
     return [
       hero,
+      if (ask) ...[const SizedBox(height: CsSpace.md), const ReminderPrompt()],
       if (today.isNotEmpty) ...[
         const SizedBox(height: CsSpace.lg),
         CsSection(

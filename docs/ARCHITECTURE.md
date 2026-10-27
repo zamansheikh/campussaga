@@ -388,12 +388,13 @@ report_authors      report_id, user_id
 
 ## 7. Routine and reminders design
 
-**Offline first.** The phone keeps a copy of the student's groups, slots,
-changes and announcements in SQLite (`drift`). The Today screen reads only the
-local copy, so it opens instantly without internet.
+**Offline first.** The phone keeps a copy of the student's groups and slots
+(today: the last `GET /groups` as JSON in shared preferences, per account;
+SQLite with `drift` once changes and announcements make it larger). Today
+and Routine read the local copy first, so they open instantly offline.
 
-**Sync.** On app open and on push notification: fetch rows changed since
-`last_synced_at` (every table has `updated_at`).
+**Sync.** On app open, on resume and after every edit: fetch `GET /groups`.
+Later: rows changed since `last_synced_at`, and on push notification.
 
 **Effective routine for a date** = weekly slots valid on that date
 − hidden courses − cancelled changes ± rescheduled/room changes + extra
@@ -401,13 +402,17 @@ classes + personal slots − university holidays (R3).
 This is one pure Dart function in `campus_core`, fully unit-tested, used by
 both the Today screen and the reminder scheduler.
 
-**Reminders are local notifications, scheduled on the phone.** No server
-needed, and they work offline.
+**Reminders are local notifications, scheduled on the phone** (built:
+`flutter_local_notifications`, `features/reminders`, planning in
+`campus_core` `planReminders`). No server needed, and they work offline.
 
-- Keep a **rolling window**: schedule only the next 7 days (iOS allows max 64 pending notifications; it also limits work on Android).
-- Re-schedule on: app open, sync with changes, push about a change, timezone change, phone reboot (`RECEIVE_BOOT_COMPLETED`).
-- Android 12+: exact alarms need permission. Ask with a clear explanation and fall back to inexact alarms (± a few minutes) if denied. Check Play policy for `SCHEDULE_EXACT_ALARM` vs `USE_EXACT_ALARM` before release.
-- Android 13+: ask for notification permission at the right moment (after joining the first group), not at first launch.
+- **Rolling window**: the next 14 days, at most 60 (iOS keeps 64 pending per app). One-shot notifications, not weekly repeats, so a single cancelled class can be skipped later.
+- Re-planned on: app open and resume, any routine change, reminder setting change, language change. Android re-creates them after a reboot (`RECEIVE_BOOT_COMPLETED` + the plugin's boot receiver). The plan is only re-sent when it changed.
+- Choices on the phone: on/off, 5/10/15/30 minutes before (default 10), per-course off. The same course at the same time in two groups reminds once.
+- Android 12+: exact alarms use `SCHEDULE_EXACT_ALARM`; the reminders screen offers "Remind on time" when it isn't allowed, otherwise reminders are inexact (a few minutes late). Check Play policy before release (`USE_EXACT_ALARM` is for alarm and calendar apps).
+- Permission is asked from a card on Today once the student has classes ("Never miss a class"), never at first launch. Blocked notifications are explained with a "Try again".
+- Notification text follows the app language (Bengali digits in Bangla).
+- Signing out empties the routine, which removes every pending reminder.
 - Some brands (Xiaomi, Realme, Oppo, Vivo) kill background apps: show a one-time guide to turn off battery optimization.
 - All times stored as local wall-clock time + the university's timezone (`Asia/Dhaka`), never converted to UTC for weekly slots.
 

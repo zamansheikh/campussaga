@@ -650,4 +650,82 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteClassTitle => 'Delete this class for everyone?';
+
+  @override
+  String get reminders => 'Class reminders';
+
+  @override
+  String remindersOnValue(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString min before';
+  }
+
+  @override
+  String get remindersOff => 'Off';
+
+  @override
+  String get remindersSwitch => 'Remind me before each class';
+
+  @override
+  String get remindersSwitchHint => 'Works without internet.';
+
+  @override
+  String get remindBefore => 'When';
+
+  @override
+  String get courses => 'Courses';
+
+  @override
+  String get coursesHint => 'Turn off courses you don\'t attend.';
+
+  @override
+  String get noCoursesYet => 'Courses appear here once you join a class group.';
+
+  @override
+  String get notificationsBlocked =>
+      'Notifications are off for this app. Turn them on in your phone\'s settings, then try again.';
+
+  @override
+  String get tryAgain => 'Try again';
+
+  @override
+  String get exactAlarmTitle => 'Remind on time';
+
+  @override
+  String get exactAlarmHint =>
+      'Without this, Android may show reminders a few minutes late.';
+
+  @override
+  String get allow => 'Allow';
+
+  @override
+  String get reminderPromptTitle => 'Never miss a class';
+
+  @override
+  String get reminderPromptBody =>
+      'Get a notification 10 minutes before each class.';
+
+  @override
+  String get turnOn => 'Turn on';
+
+  @override
+  String get notNow => 'Not now';
+
+  @override
+  String notificationTitle(String course, int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$course in $minutesString min';
+  }
+
+  @override
+  String get notificationChannel => 'Class reminders';
+
+  @override
+  String get notificationChannelHint => 'A reminder before each class';
 }

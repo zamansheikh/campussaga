@@ -8,6 +8,8 @@ import 'package:campussaga/app/settings/settings_storage.dart';
 import 'package:campussaga/app/version/app_version.dart';
 import 'package:campussaga/features/auth/data/google_auth.dart';
 import 'package:campussaga/features/classes/data/routine_cache.dart';
+import 'package:campussaga/features/reminders/data/reminder_scheduler.dart';
+import 'package:campussaga/features/reminders/data/reminder_store.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -188,6 +190,8 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   SettingsStorage? settings,
   FakeClassGroupRepository? classes,
   RoutineCache? routineCache,
+  ReminderStore? reminderStore,
+  ReminderScheduler? reminderScheduler,
   int build = 1,
 }) async {
   await getIt.reset();
@@ -210,7 +214,11 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
     ..registerSingleton<ClassGroupRepository>(
       classes ?? FakeClassGroupRepository(),
     )
-    ..registerSingleton<RoutineCache>(routineCache ?? MemoryRoutineCache());
+    ..registerSingleton<RoutineCache>(routineCache ?? MemoryRoutineCache())
+    ..registerSingleton<ReminderStore>(reminderStore ?? MemoryReminderStore())
+    ..registerSingleton<ReminderScheduler>(
+      reminderScheduler ?? MemoryReminderScheduler(),
+    );
   return (repo, google);
 }
 

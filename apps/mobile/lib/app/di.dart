@@ -5,6 +5,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../features/auth/data/google_auth.dart';
 import '../features/classes/data/routine_cache.dart';
+import '../features/reminders/data/reminder_scheduler.dart';
+import '../features/reminders/data/reminder_store.dart';
 import 'crash/crash_reporter.dart';
 import 'env.dart';
 import 'settings/settings_storage.dart';
@@ -51,5 +53,7 @@ Future<void> configureDependencies({
       () => ApiClassGroupRepository(getIt<ApiClient>()),
     )
     ..registerLazySingleton<RoutineCache>(PrefsRoutineCache.new)
+    ..registerLazySingleton<ReminderStore>(PrefsReminderStore.new)
+    ..registerLazySingleton<ReminderScheduler>(LocalNotificationScheduler.new)
     ..registerLazySingleton<GoogleAuth>(FirebaseGoogleAuth.new);
 }

@@ -1171,6 +1171,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete this class for everyone?'**
   String get deleteClassTitle;
+
+  /// No description provided for @reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Class reminders'**
+  String get reminders;
+
+  /// No description provided for @remindersOnValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min before'**
+  String remindersOnValue(int minutes);
+
+  /// No description provided for @remindersOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get remindersOff;
+
+  /// No description provided for @remindersSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me before each class'**
+  String get remindersSwitch;
+
+  /// No description provided for @remindersSwitchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Works without internet.'**
+  String get remindersSwitchHint;
+
+  /// No description provided for @remindBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get remindBefore;
+
+  /// No description provided for @courses.
+  ///
+  /// In en, this message translates to:
+  /// **'Courses'**
+  String get courses;
+
+  /// No description provided for @coursesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off courses you don\'t attend.'**
+  String get coursesHint;
+
+  /// No description provided for @noCoursesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Courses appear here once you join a class group.'**
+  String get noCoursesYet;
+
+  /// No description provided for @notificationsBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are off for this app. Turn them on in your phone\'s settings, then try again.'**
+  String get notificationsBlocked;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgain;
+
+  /// No description provided for @exactAlarmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind on time'**
+  String get exactAlarmTitle;
+
+  /// No description provided for @exactAlarmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Without this, Android may show reminders a few minutes late.'**
+  String get exactAlarmHint;
+
+  /// No description provided for @allow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get allow;
+
+  /// No description provided for @reminderPromptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Never miss a class'**
+  String get reminderPromptTitle;
+
+  /// No description provided for @reminderPromptBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Get a notification 10 minutes before each class.'**
+  String get reminderPromptBody;
+
+  /// No description provided for @turnOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on'**
+  String get turnOn;
+
+  /// No description provided for @notNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get notNow;
+
+  /// No description provided for @notificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{course} in {minutes} min'**
+  String notificationTitle(String course, int minutes);
+
+  /// No description provided for @notificationChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Class reminders'**
+  String get notificationChannel;
+
+  /// No description provided for @notificationChannelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder before each class'**
+  String get notificationChannelHint;
 }
 
 class _AppLocalizationsDelegate

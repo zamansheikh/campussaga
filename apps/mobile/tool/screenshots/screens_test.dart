@@ -16,6 +16,8 @@ import 'package:campussaga/app/clock.dart';
 import 'package:campussaga/app/router.dart';
 import 'package:campussaga/app/settings/bloc/settings_state.dart';
 import 'package:campussaga/app/settings/settings_storage.dart';
+import 'package:campussaga/features/reminders/data/reminder_scheduler.dart';
+import 'package:campussaga/features/reminders/data/reminder_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -223,12 +225,17 @@ void main() {
     bool onboarded = true,
     List<ClassGroup> groups = const [],
     Map<String, ClassGroup> others = const {},
+    ReminderSettings reminders = const ReminderSettings(),
   }) async {
     tester.view
       ..physicalSize = const Size(390 * 3, 844 * 3)
       ..devicePixelRatio = 3;
     addTearDown(tester.view.reset);
     final (repo, _) = await registerFakes(
+      reminderStore: MemoryReminderStore(reminders),
+      reminderScheduler: MemoryReminderScheduler()
+        ..granted = reminders.enabled
+        ..exact = false,
       classes: FakeClassGroupRepository()
         ..mine.addAll(groups)
         ..others.addAll(others),
@@ -278,6 +285,31 @@ void main() {
       unawaited(router.push(Routes.editSlot('g1', '4')));
       await tester.pumpAndSettle();
       await capture(tester, 'classes-${look.name}');
+    });
+
+    shot('reminders ${look.name}', (tester) async {
+      await start(
+        tester,
+        look,
+        user: _student,
+        groups: [_group(GroupRole.member)],
+      );
+      await capture(tester, 'reminders-${look.name}');
+      await tester.pumpWidget(const SizedBox());
+      final router = await start(
+        tester,
+        look,
+        user: _student,
+        groups: [_group(GroupRole.member)],
+        reminders: const ReminderSettings(
+          enabled: true,
+          asked: true,
+          muted: {'ENG102'},
+        ),
+      );
+      unawaited(router.push(Routes.reminders));
+      await tester.pumpAndSettle();
+      await capture(tester, 'reminders-${look.name}');
     });
 
     shot('join ${look.name}', (tester) async {

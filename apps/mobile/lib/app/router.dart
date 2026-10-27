@@ -17,6 +17,7 @@ import '../features/onboarding/presentation/onboarding_page.dart';
 import '../features/profile/presentation/pages/edit_profile_page.dart';
 import '../features/profile/presentation/pages/profile_setup_page.dart';
 import '../features/profile/presentation/profile_page.dart';
+import '../features/reminders/presentation/reminders_page.dart';
 import '../features/routine/presentation/routine_page.dart';
 import '../features/today/presentation/today_page.dart';
 import 'settings/bloc/settings_cubit.dart';
@@ -31,6 +32,7 @@ abstract final class Routes {
   static const routine = '/routine';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
+  static const reminders = '/profile/reminders';
   static const groups = '/groups';
   static const joinGroup = '/groups/join';
   static const newGroup = '/groups/new';
@@ -160,6 +162,10 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
                   GoRoute(
                     path: 'edit',
                     builder: (context, state) => const EditProfilePage(),
+                  ),
+                  GoRoute(
+                    path: 'reminders',
+                    builder: (context, state) => const RemindersPage(),
                   ),
                 ],
               ),

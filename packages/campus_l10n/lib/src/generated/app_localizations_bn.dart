@@ -635,4 +635,82 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get deleteClassTitle => 'সবার জন্য এই ক্লাসটি মুছে ফেলবে?';
+
+  @override
+  String get reminders => 'ক্লাস রিমাইন্ডার';
+
+  @override
+  String remindersOnValue(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString মিনিট আগে';
+  }
+
+  @override
+  String get remindersOff => 'বন্ধ';
+
+  @override
+  String get remindersSwitch => 'প্রতিটি ক্লাসের আগে মনে করিয়ে দাও';
+
+  @override
+  String get remindersSwitchHint => 'ইন্টারনেট ছাড়াও কাজ করে।';
+
+  @override
+  String get remindBefore => 'কখন';
+
+  @override
+  String get courses => 'কোর্স';
+
+  @override
+  String get coursesHint => 'যে কোর্সে যাও না, সেটি বন্ধ করে দাও।';
+
+  @override
+  String get noCoursesYet => 'ক্লাস গ্রুপে যোগ দিলে কোর্সগুলো এখানে দেখাবে।';
+
+  @override
+  String get notificationsBlocked =>
+      'এই অ্যাপের নোটিফিকেশন বন্ধ। ফোনের সেটিংসে চালু করে আবার চেষ্টা করো।';
+
+  @override
+  String get tryAgain => 'আবার চেষ্টা করো';
+
+  @override
+  String get exactAlarmTitle => 'ঠিক সময়ে মনে করাও';
+
+  @override
+  String get exactAlarmHint =>
+      'এটি ছাড়া অ্যান্ড্রয়েড কয়েক মিনিট দেরিতে রিমাইন্ডার দেখাতে পারে।';
+
+  @override
+  String get allow => 'চালু করো';
+
+  @override
+  String get reminderPromptTitle => 'কোনো ক্লাস মিস কোরো না';
+
+  @override
+  String get reminderPromptBody =>
+      'প্রতিটি ক্লাসের ১০ মিনিট আগে নোটিফিকেশন পাও।';
+
+  @override
+  String get turnOn => 'চালু করো';
+
+  @override
+  String get notNow => 'এখন না';
+
+  @override
+  String notificationTitle(String course, int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString মিনিট পর $course';
+  }
+
+  @override
+  String get notificationChannel => 'ক্লাস রিমাইন্ডার';
+
+  @override
+  String get notificationChannelHint => 'প্রতিটি ক্লাসের আগে একটি রিমাইন্ডার';
 }

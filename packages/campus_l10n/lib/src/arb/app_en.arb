@@ -309,5 +309,45 @@
   "errorGroupFull": "This class group is full.",
   "errorCrCannotLeave": "You're the only CR, so you can't leave while classmates are in the group. You can delete the group instead.",
   "errorSlotLimit": "This routine already has the most classes allowed.",
-  "deleteClassTitle": "Delete this class for everyone?"
+  "deleteClassTitle": "Delete this class for everyone?",
+  "reminders": "Class reminders",
+  "remindersOnValue": "{minutes} min before",
+  "@remindersOnValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "remindersOff": "Off",
+  "remindersSwitch": "Remind me before each class",
+  "remindersSwitchHint": "Works without internet.",
+  "remindBefore": "When",
+  "courses": "Courses",
+  "coursesHint": "Turn off courses you don't attend.",
+  "noCoursesYet": "Courses appear here once you join a class group.",
+  "notificationsBlocked": "Notifications are off for this app. Turn them on in your phone's settings, then try again.",
+  "tryAgain": "Try again",
+  "exactAlarmTitle": "Remind on time",
+  "exactAlarmHint": "Without this, Android may show reminders a few minutes late.",
+  "allow": "Allow",
+  "reminderPromptTitle": "Never miss a class",
+  "reminderPromptBody": "Get a notification 10 minutes before each class.",
+  "turnOn": "Turn on",
+  "notNow": "Not now",
+  "notificationTitle": "{course} in {minutes} min",
+  "@notificationTitle": {
+    "placeholders": {
+      "course": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "notificationChannel": "Class reminders",
+  "notificationChannelHint": "A reminder before each class"
 }

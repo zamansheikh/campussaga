@@ -182,7 +182,7 @@ void main() {
       tester,
       mine: [sampleGroup(role: GroupRole.cr)],
     );
-    await tester.tap(find.text('CSE313'));
+    await scrollAndTap(tester, find.text('CSE313'));
     await tester.pumpAndSettle();
     expect(find.text('Invite classmates'), findsOneWidget);
 

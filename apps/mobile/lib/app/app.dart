@@ -11,6 +11,9 @@ import '../features/auth/data/google_auth.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/classes/data/routine_cache.dart';
 import '../features/classes/presentation/bloc/my_classes_cubit.dart';
+import '../features/reminders/data/reminder_scheduler.dart';
+import '../features/reminders/data/reminder_store.dart';
+import '../features/reminders/presentation/bloc/reminders_cubit.dart';
 import 'di.dart';
 import 'router.dart';
 import 'settings/bloc/settings_cubit.dart';
@@ -37,6 +40,11 @@ class _CampusAppState extends State<CampusApp> {
     getIt<RoutineCache>(),
   );
   late final StreamSubscription<AuthState> _authSub;
+  late final RemindersCubit _reminders = RemindersCubit(
+    getIt<ReminderStore>(),
+    getIt<ReminderScheduler>(),
+  );
+  late final StreamSubscription<List<ClassGroup>> _classesSub;
   late final SettingsCubit _settings = SettingsCubit(getIt<SettingsStorage>());
   late final GoRouter _router = buildRouter(_auth, _settings);
   late final VersionGateCubit _versionGate = VersionGateCubit(
@@ -50,6 +58,7 @@ class _CampusAppState extends State<CampusApp> {
     onResume: () {
       _versionGate.check();
       unawaited(_classes.refresh());
+      unawaited(_reminders.refresh());
     },
   );
 
@@ -59,6 +68,12 @@ class _CampusAppState extends State<CampusApp> {
     _lifecycle; // start listening
     _onAuth(_auth.state);
     _authSub = _auth.stream.listen(_onAuth);
+    // Reminders follow the routine (cleared with it on sign-out).
+    unawaited(_reminders.start());
+    _classesSub = _classes.stream
+        .map((s) => s.groups)
+        .distinct()
+        .listen((g) => unawaited(_reminders.updateGroups(g)));
   }
 
   /// The routine follows the signed-in student.
@@ -75,6 +90,8 @@ class _CampusAppState extends State<CampusApp> {
   void dispose() {
     _lifecycle.dispose();
     unawaited(_authSub.cancel());
+    unawaited(_classesSub.cancel());
+    _reminders.close();
     _classes.close();
     _router.dispose();
     _auth.close();
@@ -91,6 +108,7 @@ class _CampusAppState extends State<CampusApp> {
         BlocProvider.value(value: _versionGate),
         BlocProvider.value(value: _settings),
         BlocProvider.value(value: _classes),
+        BlocProvider.value(value: _reminders),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settings) => MaterialApp.router(
@@ -104,15 +122,39 @@ class _CampusAppState extends State<CampusApp> {
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: _router,
           // An unsupported build sees only the update screen.
-          builder: (context, child) =>
-              BlocBuilder<VersionGateCubit, VersionGateState>(
-                builder: (context, gate) =>
-                    gate.status == VersionStatus.updateRequired
-                    ? UpdateRequiredPage(storeUrl: gate.storeUrl)
-                    : child ?? const SizedBox.shrink(),
-              ),
+          builder: (context, child) => _ReminderLanguage(
+            reminders: _reminders,
+            child: BlocBuilder<VersionGateCubit, VersionGateState>(
+              builder: (context, gate) =>
+                  gate.status == VersionStatus.updateRequired
+                  ? UpdateRequiredPage(storeUrl: gate.storeUrl)
+                  : child ?? const SizedBox.shrink(),
+            ),
+          ),
         ),
       ),
     );
   }
+}
+
+/// Tells reminders the app's language, so notifications use it too.
+class _ReminderLanguage extends StatefulWidget {
+  const _ReminderLanguage({required this.reminders, required this.child});
+
+  final RemindersCubit reminders;
+  final Widget child;
+
+  @override
+  State<_ReminderLanguage> createState() => _ReminderLanguageState();
+}
+
+class _ReminderLanguageState extends State<_ReminderLanguage> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    unawaited(widget.reminders.setLocale(Localizations.localeOf(context)));
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }

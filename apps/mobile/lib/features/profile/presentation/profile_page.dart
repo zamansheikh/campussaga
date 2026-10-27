@@ -12,6 +12,7 @@ import '../../../app/settings/bloc/settings_cubit.dart';
 import '../../../app/version/app_version.dart';
 import '../../auth/presentation/auth_error_text.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
+import '../../reminders/presentation/bloc/reminders_cubit.dart';
 
 /// Who you are, your preferences, and account actions.
 class ProfilePage extends StatelessWidget {
@@ -21,6 +22,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final settings = context.watch<SettingsCubit>().state;
+    final reminders = context.watch<RemindersCubit>().state;
 
     final themeLabel = switch (settings.themeMode) {
       ThemeMode.system => l10n.themeSystem,
@@ -52,6 +54,14 @@ class ProfilePage extends StatelessWidget {
             CsSection(
               title: l10n.preferences,
               children: [
+                CsRow(
+                  icon: Icons.notifications_none_rounded,
+                  title: l10n.reminders,
+                  value: reminders.active
+                      ? l10n.remindersOnValue(reminders.settings.minutesBefore)
+                      : l10n.remindersOff,
+                  onTap: () => context.push(Routes.reminders),
+                ),
                 CsRow(
                   icon: Icons.palette_outlined,
                   title: l10n.theme,
