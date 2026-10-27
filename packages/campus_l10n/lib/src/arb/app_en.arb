@@ -246,7 +246,6 @@
   "classTheory": "Theory",
   "classLab": "Lab",
   "saveAndAddAnother": "Save and add another",
-  "classAdded": "Class added",
   "deleteClass": "Delete class",
   "errorEndBeforeStart": "It must end after it starts.",
   "nextClass": "Next class",
@@ -349,5 +348,17 @@
     }
   },
   "notificationChannel": "Class reminders",
-  "notificationChannelHint": "A reminder before each class"
+  "notificationChannelHint": "A reminder before each class",
+  "classesAdded": "{count, plural, =1{Class added} other{{count} classes added}}",
+  "@classesAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "daysLabel": "Days",
+  "daysHint": "Pick every day this class meets at this time.",
+  "errorPickDay": "Pick at least one day."
 }

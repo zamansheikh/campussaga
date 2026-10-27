@@ -139,14 +139,22 @@ void main() {
       'Database Systems',
     );
     await tester.enterText(find.widgetWithText(TextField, 'Room'), '504');
+    // No day picked yet: caught before saving.
     await scrollAndTap(tester, find.text('Save and add another'));
     await tester.pumpAndSettle();
-    expect(classes.mine.single.slots.single.courseCode, 'CSE311');
-    expect(
-      classes.mine.single.slots.single.weekday,
-      DateTime.tuesday,
-      reason: 'today by default',
-    );
+    expect(find.text('Pick at least one day.'), findsOneWidget);
+    expect(classes.mine.single.slots, isEmpty);
+
+    // The same class on Saturday and Tuesday: one save, one entry per day.
+    await scrollAndTap(tester, find.text('Sat'));
+    await scrollAndTap(tester, find.text('Tue'));
+    await scrollAndTap(tester, find.text('Save and add another'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 classes added'), findsOneWidget);
+    expect(classes.mine.single.slots.map((s) => (s.courseCode, s.weekday)), [
+      ('CSE311', DateTime.saturday),
+      ('CSE311', DateTime.tuesday),
+    ]);
 
     // The next one starts when the first ends; the course is suggested.
     await tester.enterText(
@@ -157,15 +165,19 @@ void main() {
     await tester.tap(find.text('Database Systems').last);
     await tester.pumpAndSettle();
     expect(find.widgetWithText(TextField, '504'), findsOneWidget);
-    await tester.tap(find.text('Wed'));
+    // The days stay picked; this one is only on Wednesday.
+    await scrollAndTap(tester, find.text('Sat'));
+    await scrollAndTap(tester, find.text('Tue'));
+    await scrollAndTap(tester, find.text('Wed'));
     await scrollAndTap(tester, find.text('Save'));
     await tester.pumpAndSettle();
 
     final slots = classes.mine.single.slots;
-    expect(slots, hasLength(2));
-    expect(slots[1].weekday, DateTime.wednesday);
-    expect(slots[1].startMin, 10 * 60, reason: 'starts when the last ended');
-    expect(slots[1].endMin, 11 * 60 + 30);
+    expect(slots, hasLength(3));
+    expect(slots[2].weekday, DateTime.wednesday);
+    expect(slots[2].startMin, 10 * 60, reason: 'starts when the last ended');
+    expect(slots[2].endMin, 11 * 60 + 30);
+    expect(find.text('SATURDAY'), findsOneWidget);
     expect(find.text('WEDNESDAY'), findsOneWidget);
 
     // A missing course code is caught before saving.
@@ -174,7 +186,7 @@ void main() {
     await scrollAndTap(tester, find.text('Save'));
     await tester.pumpAndSettle();
     expect(find.text('This is required.'), findsOneWidget);
-    expect(classes.mine.single.slots, hasLength(2));
+    expect(classes.mine.single.slots, hasLength(3));
   });
 
   testWidgets('the CR edits and deletes a class', (tester) async {

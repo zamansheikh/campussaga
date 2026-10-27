@@ -543,9 +543,6 @@ class AppLocalizationsBn extends AppLocalizations {
   String get saveAndAddAnother => 'সংরক্ষণ করে আরেকটি যোগ করো';
 
   @override
-  String get classAdded => 'ক্লাস যোগ হয়েছে';
-
-  @override
   String get deleteClass => 'ক্লাস মুছে ফেলো';
 
   @override
@@ -713,4 +710,22 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get notificationChannelHint => 'প্রতিটি ক্লাসের আগে একটি রিমাইন্ডার';
+
+  @override
+  String classesAdded(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countStringটি ক্লাস যোগ হয়েছে';
+  }
+
+  @override
+  String get daysLabel => 'দিন';
+
+  @override
+  String get daysHint => 'এই সময়ে ক্লাসটি যেসব দিনে হয়, সবগুলো বেছে নাও।';
+
+  @override
+  String get errorPickDay => 'অন্তত একটি দিন বেছে নাও।';
 }

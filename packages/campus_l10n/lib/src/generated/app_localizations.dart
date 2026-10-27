@@ -1040,12 +1040,6 @@ abstract class AppLocalizations {
   /// **'Save and add another'**
   String get saveAndAddAnother;
 
-  /// No description provided for @classAdded.
-  ///
-  /// In en, this message translates to:
-  /// **'Class added'**
-  String get classAdded;
-
   /// No description provided for @deleteClass.
   ///
   /// In en, this message translates to:
@@ -1297,6 +1291,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A reminder before each class'**
   String get notificationChannelHint;
+
+  /// No description provided for @classesAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Class added} other{{count} classes added}}'**
+  String classesAdded(int count);
+
+  /// No description provided for @daysLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get daysLabel;
+
+  /// No description provided for @daysHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick every day this class meets at this time.'**
+  String get daysHint;
+
+  /// No description provided for @errorPickDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick at least one day.'**
+  String get errorPickDay;
 }
 
 class _AppLocalizationsDelegate

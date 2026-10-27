@@ -157,7 +157,6 @@
   "classTheory": "থিওরি",
   "classLab": "ল্যাব",
   "saveAndAddAnother": "সংরক্ষণ করে আরেকটি যোগ করো",
-  "classAdded": "ক্লাস যোগ হয়েছে",
   "deleteClass": "ক্লাস মুছে ফেলো",
   "errorEndBeforeStart": "শেষের সময় শুরুর পরে হতে হবে।",
   "nextClass": "পরের ক্লাস",
@@ -199,5 +198,9 @@
   "notNow": "এখন না",
   "notificationTitle": "{minutes} মিনিট পর {course}",
   "notificationChannel": "ক্লাস রিমাইন্ডার",
-  "notificationChannelHint": "প্রতিটি ক্লাসের আগে একটি রিমাইন্ডার"
+  "notificationChannelHint": "প্রতিটি ক্লাসের আগে একটি রিমাইন্ডার",
+  "classesAdded": "{count}টি ক্লাস যোগ হয়েছে",
+  "daysLabel": "দিন",
+  "daysHint": "এই সময়ে ক্লাসটি যেসব দিনে হয়, সবগুলো বেছে নাও।",
+  "errorPickDay": "অন্তত একটি দিন বেছে নাও।"
 }

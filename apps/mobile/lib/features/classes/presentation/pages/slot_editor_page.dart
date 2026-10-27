@@ -5,14 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/clock.dart';
 import '../../../auth/presentation/widgets/notice_banner.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
 
-/// Add or edit one class (CR). Built for speed: course details already in
-/// the routine are suggested, and "Save and add another" keeps the day and
-/// starts the next class when this one ends.
+/// Add or edit a class (CR). Built for speed: a new class can be added on
+/// several days at once (one entry per day, so each can later get its own
+/// room or time), course details already in the routine are suggested, and
+/// "Save and add another" keeps the days and starts the next class when
+/// this one ends. Editing changes that one day only.
 class SlotEditorPage extends StatefulWidget {
   const SlotEditorPage({super.key, required this.groupId, this.slotId});
 
@@ -39,7 +40,9 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
   late final _room = TextEditingController(text: _slot?.room);
   final _codeFocus = FocusNode();
 
-  late int _weekday = _slot?.weekday ?? _defaultDay();
+  /// Editing: exactly the class's day. New: none until the CR picks, so a
+  /// tap never silently adds a second day.
+  late final Set<int> _days = {?_slot?.weekday};
   late int _start = _slot?.startMin ?? 8 * 60 + 30;
   late int _end = _slot?.endMin ?? 10 * 60;
   late ClassKind _kind = _slot?.kind ?? ClassKind.theory;
@@ -47,15 +50,11 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
   bool _busy = false;
   bool _codeMissing = false;
   bool _timeWrong = false;
+  bool _dayMissing = false;
+  Set<int> _lastDays = const {};
   Failure? _failure;
 
   bool get _editing => _slot != null;
-
-  /// Today, or Saturday on Friday (the weekend).
-  static int _defaultDay() {
-    final d = appNow().weekday;
-    return d == DateTime.friday ? DateTime.saturday : d;
-  }
 
   /// Courses already in the routine, latest details first.
   List<ClassSlot> get _courses {
@@ -107,31 +106,41 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
     });
   }
 
+  SlotDraft _draft(int weekday) => SlotDraft(
+    courseCode: _code.text.trim(),
+    courseTitle: _title.text.trim(),
+    teacher: _teacher.text.trim(),
+    room: _room.text.trim(),
+    weekday: weekday,
+    startMin: _start,
+    endMin: _end,
+    kind: _kind,
+  );
+
   Future<void> _save({bool another = false}) async {
-    final draft = SlotDraft(
-      courseCode: _code.text.trim(),
-      courseTitle: _title.text.trim(),
-      teacher: _teacher.text.trim(),
-      room: _room.text.trim(),
-      weekday: _weekday,
-      startMin: _start,
-      endMin: _end,
-      kind: _kind,
-    );
     setState(() {
       _failure = null;
-      _codeMissing = draft.courseCode.isEmpty;
-      _timeWrong = draft.endMin <= draft.startMin;
+      _codeMissing = _code.text.trim().isEmpty;
+      _timeWrong = _end <= _start;
+      _dayMissing = _days.isEmpty;
     });
-    if (_codeMissing || _timeWrong) return;
+    if (_codeMissing || _timeWrong || _dayMissing) return;
+    _lastDays = {..._days};
     setState(() => _busy = true);
     final l10n = AppLocalizations.of(context);
     final cubit = context.read<MyClassesCubit>();
+    var added = 0;
     try {
       if (_editing) {
-        await cubit.updateSlot(widget.groupId, _slot!.id, draft);
+        await cubit.updateSlot(widget.groupId, _slot!.id, _draft(_days.single));
       } else {
-        await cubit.addSlot(widget.groupId, draft);
+        // One entry per day, in week order. A day that was saved is taken
+        // off the selection, so "try again" after an error adds no twins.
+        for (final d in weekOrder.where(_days.contains).toList()) {
+          await cubit.addSlot(widget.groupId, _draft(d));
+          added++;
+          if (mounted) setState(() => _days.remove(d));
+        }
       }
       if (!mounted) return;
       if (!another) {
@@ -140,12 +149,13 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
       }
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(l10n.classAdded)));
+        ..showSnackBar(SnackBar(content: Text(l10n.classesAdded(added))));
       final length = _end - _start;
       for (final c in [_code, _title, _teacher, _room]) {
         c.clear();
       }
       setState(() {
+        _days.addAll(_lastDays);
         _start = _end;
         _end = (_start + length).clamp(_start + 5, 24 * 60);
         _kind = ClassKind.theory;
@@ -274,7 +284,11 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
               ],
             ),
             const SizedBox(height: CsSpace.lg),
-            Text(l10n.dayLabel, style: context.text.labelLarge),
+            Text(
+              _editing ? l10n.dayLabel : l10n.daysLabel,
+              style: context.text.labelLarge,
+            ),
+            if (!_editing) Text(l10n.daysHint, style: context.text.bodySmall),
             const SizedBox(height: CsSpace.sm),
             Wrap(
               spacing: CsSpace.sm,
@@ -283,14 +297,34 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                 for (final d in weekOrder)
                   ChoiceChip(
                     label: Text(weekdayShort(context, d)),
-                    selected: d == _weekday,
+                    selected: _days.contains(d),
                     showCheckmark: false,
                     onSelected: _busy
                         ? null
-                        : (_) => setState(() => _weekday = d),
+                        : (on) => setState(() {
+                            _dayMissing = false;
+                            if (_editing) {
+                              _days
+                                ..clear()
+                                ..add(d);
+                            } else if (on) {
+                              _days.add(d);
+                            } else {
+                              _days.remove(d);
+                            }
+                          }),
                   ),
               ],
             ),
+            if (_dayMissing) ...[
+              const SizedBox(height: CsSpace.xs),
+              Text(
+                l10n.errorPickDay,
+                style: context.text.bodySmall?.copyWith(
+                  color: context.cs.error,
+                ),
+              ),
+            ],
             const SizedBox(height: CsSpace.lg),
             Row(
               children: [

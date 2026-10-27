@@ -285,6 +285,17 @@ void main() {
       unawaited(router.push(Routes.editSlot('g1', '4')));
       await tester.pumpAndSettle();
       await capture(tester, 'classes-${look.name}');
+      router.pop();
+      await tester.pumpAndSettle();
+      unawaited(router.push(Routes.newSlot('g1')));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).first, 'CSE315');
+      FocusManager.instance.primaryFocus?.unfocus(); // closes suggestions
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(ChoiceChip).at(0)); // Saturday
+      await tester.tap(find.byType(ChoiceChip).at(2)); // Monday
+      await tester.pumpAndSettle();
+      await capture(tester, 'classes-${look.name}');
     });
 
     shot('reminders ${look.name}', (tester) async {

@@ -557,9 +557,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveAndAddAnother => 'Save and add another';
 
   @override
-  String get classAdded => 'Class added';
-
-  @override
   String get deleteClass => 'Delete class';
 
   @override
@@ -728,4 +725,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationChannelHint => 'A reminder before each class';
+
+  @override
+  String classesAdded(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString classes added',
+      one: 'Class added',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get daysLabel => 'Days';
+
+  @override
+  String get daysHint => 'Pick every day this class meets at this time.';
+
+  @override
+  String get errorPickDay => 'Pick at least one day.';
 }
