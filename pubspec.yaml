@@ -1,0 +1,17 @@
+# Workspace root. Every app and package below shares one dependency
+# resolution (Dart pub workspaces). Run `flutter pub get` here.
+name: campus_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+workspace:
+  - apps/mobile
+  - packages/campus_core
+  - packages/campus_ui
+  - packages/campus_data
+  - packages/campus_l10n
+
+dev_dependencies:
+  flutter_lints: ^6.0.0

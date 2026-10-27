@@ -1,126 +1,80 @@
-
-## Getting Started
-
 <div align="center">
 
-<img width="" src="assets/icon/Campus_Saga_Icon.png"  width=160 height=160  align="center">
+<img src="assets/icon/Campus_Saga_Icon.png" width="120" height="120" alt="Campus Saga icon (placeholder)">
 
 # Campus Saga
 
-### A satisfactory ranking platform for educational institutes.
-
-    Revolutionize university life with our app, enabling students to post, solve, and discuss academic challenges. Admins review and rate solutions, fostering collaboration. With Clean architecture and BloC state management, enjoy smooth navigation, user profiles, problem showcases, promotions, and university rankings!
-
-
-
-English
-&nbsp;&nbsp;
-
-
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/zamansheikh/Campus-Saga?color=black&label=Stable&logo=github)](https://github.com/zamansheikh/Campus-Saga/releases/latest/)
-[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/zamansheikh/Campus-Saga?include_prereleases&label=Preview&logo=Github)](https://github.com/zamansheikh/Campus-Saga/releases/)
-[![Keep a Changelog](https://img.shields.io/badge/Changelog-lightgray?style=flat&color=gray&logo=keep-a-changelog)](https://github.com/zamansheikh/Campus-Saga/blob/main/CHANGELOG.md)
-[![GitHub all releases](https://img.shields.io/github/downloads/zamansheikh/Campus-Saga/total?label=Downloads&logo=github)](https://github.com/zamansheikh/Campus-Saga/releases/)
-[![GitHub Repo stars](https://img.shields.io/github/stars/zamansheikh/Campus-Saga?color=informational&label=Stars)](https://github.com/zamansheikh/Campus-Saga)
-[![Supported Sites](https://img.shields.io/badge/Supported-Sites-9cf.svg?style=flat)](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
-[![Telegram Channel](https://img.shields.io/badge/Telegram-deCodersFamily-blue?style=flat&logo=telegram)](https://t.me/decodersfamily)
-
+**The daily app for university students:** class routine and reminders every
+morning, and a safe, anonymous voice to get campus problems fixed.
 
 </div>
 
+> v2 is a fresh start. The old v1 app is kept at the git tag `v1-archive`.
+> The name and logo are placeholders and will change.
 
-## 📱 Screenshots
+## Docs
 
-<div align="center">
-  <div>
-    <img src="assets/mockup/1.jpg" width="100%" />
-    <!-- <img src="assets/screenshots/2.jpg" width="30%" />
-    <img src="assets/screenshots/3.jpg" width="30%" /> -->
-  </div>
-  <div>
-    <img src="assets/mockup/2.jpg" width="100%" />
-    <!-- <img src="assets/screenshots/5.jpg" width="30%" />
-    <img src="assets/screenshots/6.jpg" width="30%" /> -->
-  </div>
-  <div>
-    <img src="assets/mockup/3.jpg" width="100%" />
-  </div>
-  <div>
-    <img src="assets/mockup/5.jpg" width="100%" />
-  </div>
-  <div>
-    <img src="assets/mockup/4.jpg" width="100%" />
-  </div>
-</div>
+| | |
+|---|---|
+| [PLAN.md](PLAN.md) | Vision, users, principles, growth, risks |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Releases R0–R5, scope, definition of done |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Database, system design, data model, app structure |
+| [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Colors, type, components, rebranding checklist |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Self-hosting Supabase on our VPS |
 
-<br>
+## Project layout
 
-## 📖 Features
+```
+apps/mobile/            Flutter app (Android, iOS)  · com.silifton.campussaga
+packages/campus_core/   Domain models, repository interfaces (pure Dart)
+packages/campus_ui/     Design system: tokens, theme, components
+packages/campus_data/   Backend (Supabase) implementations
+packages/campus_l10n/   English + Bangla strings
+supabase/               Backend: migrations, security tests, email templates, config
+tool/                   Scripts (test_all.sh)
+```
 
-- User registration and authentication.
-- Anonymous posting of university-related issues.
-- Rating of universities based on user reviews.
-- Interaction between users and university authorities.
-- Voting on the credibility of posted issues.
-- Prioritization of issues based on urgency.
-- Viewing and posting advertisements or promotions.
-- Institute identification via student ID cards.
-- No Ads
-- Virtual Campus 🤍
-- Easy to use and user-friendly.
-- [Material Design 3](https://m3.material.io/) style UI, with dynamic color theme.
-- MAD: UI and logic written with pure Kotlin. Single activity, no fragments, only composable destinations.
+It's a Dart pub workspace: one `flutter pub get` at the root resolves
+everything.
 
-## ⬇️ Download
+## Getting started
 
-For most devices, it is recommended to install the **arm64-v8a** version of the apks
+Requires Flutter 3.47+ (Dart 3.13+).
 
-- Download the latest stable version from [GitHub releases](https://github.com/zamansheikh/Campus-Saga/releases/latest)
-  - Install the [pre-release](https://github.com/zamansheikh/Campus-Saga/releases/) versions to help us test out new features & changes
+```bash
+flutter pub get
+cp apps/mobile/env/example.json apps/mobile/env/local.json   # fill in backend values later
+cd apps/mobile && flutter run --dart-define-from-file=env/local.json
+```
 
-## 💬 Contact
+The app runs without a backend for now; it connects once the env file has
+real values.
 
-Join our [Telegram Channel](https://t.me/decodersfamily) for discussion, announcements, and releases!
+## Backend (local)
 
-## 💖 Sponsors
+Needs Docker (OrbStack) and the Supabase CLI (`brew install supabase/tap/supabase`).
 
-  --No sponsors
-Campus Saga will be always free and open source for everyone. If you like it, please consider [sponsoring me](https://github.com/sponsors/zamansheikh)!
+```bash
+supabase start            # local backend: database, auth, API, test mailbox
+supabase db reset         # rebuild from migrations + seed.sql
+supabase test db          # security tests (supabase/tests/)
+supabase status           # URLs and local keys
+```
 
-## 💲Donate 
+Sign in locally with any address at `demo.ac.bd`; the 6-digit code arrives
+in Mailpit at http://127.0.0.1:54324. Put the local publishable key from
+`supabase status` in `apps/mobile/env/local.json` (the Android emulator
+reaches your Mac at `10.0.2.2`).
 
-<p><a href="https://www.buymeacoffee.com/zamansheikh"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="zamansheikh" /></a></p></br><br>
+## Everyday commands
 
+```bash
+dart format .                 # format
+flutter analyze               # lint the whole workspace
+./tool/test_all.sh            # run every test
+```
 
-## 🤝 Contributing
+Changing text: edit `packages/campus_l10n/lib/src/arb/*.arb`, then run
+`flutter gen-l10n` inside `packages/campus_l10n`.
 
-Contributions are welcome!
-
-
-	
->**Note**
-
->For submitting bug reports, feature requests, questions, or any other ideas to improve, please read [CONTRIBUTING.md](https://github.com/zamansheikh/Campus-Saga/blob/main/CONTRIBUTING.md) for instructions and guidelines first.
-
-
-
-## 🧱 Credits
-
-Youtube Tutorial 😁
-
-## 📃 License
-
-[![GitHub](https://img.shields.io/github/license/zamansheikh/Campus-Saga?style=for-the-badge)](https://github.com/zamansheikh/Campus-Saga/blob/main/LICENSE)
-
->**Warning**
-
->Except for the source code licensed under the GPLv3 license,
->all other parties are prohibited from using Campus Saga's name as a downloader app,
->and the same is true for Campus Saga's derivatives.
->Derivatives include but are not limited to forks and unofficial builds.
-
-<div align="right">
-<table><td>
-<a href="#start-of-content">👆 Scroll to top</a>
-</td></table>
-</div>
+Changing the launcher icon: see `apps/mobile/flutter_launcher_icons.yaml`.

@@ -351,8 +351,9 @@ writes `status_updates`, and enqueues notifications for all voters.
 ## 11. Setup checklist
 
 ```bash
-brew install supabase/tap/supabase          # Supabase CLI (not installed yet)
-supabase init && supabase start             # local stack in Docker
-flutter create --org com.programmernexus --project-name campus_saga apps/mobile
-# then: workspace pubspec, packages/, first migration (universities + profiles)
+brew install supabase/tap/supabase          # Supabase CLI
+supabase start                              # local stack in Docker (OrbStack)
+supabase db reset                           # re-apply migrations + seed.sql
+supabase test db                            # security tests in supabase/tests/
+flutter pub get && ./tool/test_all.sh       # app + packages
 ```

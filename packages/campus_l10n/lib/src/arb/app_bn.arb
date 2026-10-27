@@ -1,0 +1,19 @@
+{
+  "@@locale": "bn",
+  "appName": "ক্যাম্পাস সাগা",
+  "navToday": "আজ",
+  "navRoutine": "রুটিন",
+  "navProfile": "প্রোফাইল",
+  "todayEmptyTitle": "এখনো কোনো ক্লাস নেই",
+  "todayEmptyMessage": "আজকের ক্লাস দেখতে ও রিমাইন্ডার পেতে তোমার ক্লাস গ্রুপে যোগ দাও।",
+  "joinClassGroup": "ক্লাস গ্রুপে যোগ দাও",
+  "routineEmptyTitle": "তোমার সাপ্তাহিক রুটিন",
+  "routineEmptyMessage": "ক্লাস গ্রুপে যোগ দিলে পুরো সপ্তাহের রুটিন এখানে দেখাবে।",
+  "settings": "সেটিংস",
+  "theme": "থিম",
+  "themeSystem": "সিস্টেম",
+  "themeLight": "লাইট",
+  "themeDark": "ডার্ক",
+  "language": "ভাষা",
+  "comingSoon": "শীঘ্রই আসছে"
+}

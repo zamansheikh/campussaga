@@ -1,0 +1,24 @@
+# OS / editors
+.DS_Store
+*.swp
+.idea/
+*.iml
+
+# Dart / Flutter
+.dart_tool/
+.pub-cache/
+.flutter-plugins-dependencies
+build/
+coverage/
+**/doc/api/
+
+# Secrets and local config (never commit)
+.env
+*.env
+**/env/*.json
+!**/env/example.json
+*.jks
+*.keystore
+key.properties
+google-services.json
+GoogleService-Info.plist

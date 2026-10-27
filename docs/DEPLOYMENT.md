@@ -100,7 +100,9 @@ generate the JWT secret and the `ANON_KEY` / `SERVICE_ROLE_KEY` signed with it.
 | `SITE_URL`, `API_EXTERNAL_URL`, `SUPABASE_PUBLIC_URL` | `https://api.<domain>` |
 | `SMTP_*` | Resend/SES/Brevo credentials, sender `no-reply@<domain>` |
 | `ENABLE_EMAIL_AUTOCONFIRM` | `false` |
-| `DISABLE_SIGNUP` | `false` (sign-up is limited to university domains in our own hook / RPC) |
+| `GOTRUE_HOOK_BEFORE_USER_CREATED_ENABLED` / `_URI` | `true` / `pg-functions://postgres/private/hook_before_user_created` (only university emails can sign up; add to the auth service env in the compose file) |
+| `GOTRUE_MAILER_OTP_EXP` | `600` (codes expire after 10 minutes) |
+| `DISABLE_SIGNUP` | `false` (sign-up is limited to university domains by the hook above) |
 | Storage backend | S3-compatible → Cloudflare R2 bucket, so images don't fill the VPS disk |
 
 `docker-compose.override.yml`: bind published ports to localhost only:

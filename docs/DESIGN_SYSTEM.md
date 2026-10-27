@@ -39,7 +39,7 @@ In Flutter:
 | `primary` | `#0F766E` teal 700 | `#5EEAD4` teal 300 | Main actions, links, active tab |
 | `onPrimary` | `#FFFFFF` | `#042F2E` | Text on primary |
 | `primaryContainer` | `#CCFBF1` | `#134E4A` | Selected chips, highlights |
-| `accent` | `#D97706` amber 600 | `#FBBF24` amber 400 | "Me too" button, trending |
+| `accent` | `#B45309` amber 700 | `#FBBF24` amber 400 | "Me too" button, trending |
 | `background` | `#F8FAFC` | `#0B1220` | Screen background |
 | `surface` | `#FFFFFF` | `#111A2B` | Cards, sheets |
 | `surfaceVariant` | `#F1F5F9` | `#1E293B` | Inputs, subtle areas |
@@ -49,17 +49,22 @@ In Flutter:
 | `error` | `#DC2626` | `#F87171` | Errors, destructive |
 
 Teal reads as trust and calm, and stays clear of red (alarm) and of Facebook blue.
+The palette is chosen for the product's context, **not taken from the logo**:
+the name and logo are placeholders and will change (see section 9).
 
 ### Issue status (always icon + text + color, never color alone)
 
-| Status | Color (light) | Icon |
+| Status | Text color (light) | Icon |
 |---|---|---|
-| Open | `#2563EB` blue | `radio_button_unchecked` |
-| Acknowledged | `#7C3AED` violet | `visibility` |
-| In progress | `#D97706` amber | `autorenew` |
-| Solved | `#16A34A` green | `check_circle` |
-| Rejected | `#64748B` slate | `block` |
-| Removed | `#94A3B8` slate | `delete` |
+| Open | `#1D4ED8` blue | `radio_button_unchecked` |
+| Acknowledged | `#6D28D9` violet | `visibility` |
+| In progress | `#B45309` amber | `autorenew` |
+| Solved | `#15803D` green | `check_circle` |
+| Rejected | `#475569` slate | `block` |
+| Removed | `#475569` slate | `delete` |
+
+Exact light and dark values live in
+`packages/campus_ui/lib/src/tokens/color_tokens.dart`.
 
 Each status has `fg`, `bg` (≈10% tint) and `border` variants for light and
 dark mode, so chips are readable in both themes.
@@ -71,7 +76,8 @@ IT / Wi-Fi, Other. Each has one icon and one muted tint color. **Safety** is
 the only category that uses red, and it opens the private reporting flow.
 
 **Contrast rule:** text must reach WCAG AA (4.5:1 normal text, 3:1 large text
-and icons). Check every new token pair before adding it.
+and icons). `packages/campus_ui/test/color_contrast_test.dart` checks every
+pair in light and dark mode. Add new pairs there; CI fails if one is too low.
 
 ---
 
@@ -80,6 +86,7 @@ and icons). Check every new token pair before adding it.
 - **Latin:** Inter
 - **Bangla:** Noto Sans Bengali (set as `fontFamilyFallback`, so mixed Bangla/English text renders correctly)
 - Fonts are **bundled in the app**, not downloaded at runtime, so they work offline and send no requests to Google.
+- *Status:* not added yet; the app uses the system font. Add the font files during R0 and set them in `tokens/typography.dart`.
 
 | Token | Size / line height | Weight | Use |
 |---|---|---|---|
@@ -190,14 +197,13 @@ packages/campus_ui/lib/
   campus_ui.dart              # single export
   src/
     tokens/
-      primitives.dart         # raw palette, sizes
-      color_tokens.dart       # semantic light + dark
+      brand.dart              # app name + brand hues (the only brand file)
+      color_tokens.dart       # semantic light + dark, status colors
       typography.dart
-      spacing.dart, radius.dart, motion.dart
+      dimensions.dart         # spacing, radius, motion, touch size
     theme/
       cs_theme.dart           # builds ThemeData light/dark
-      cs_tokens_extension.dart
-      context_ext.dart        # context.cs
+      cs_tokens.dart          # ThemeExtension + context.cs
     components/
       button/  card/  chip/  issue_card/  status_chip/  ...
     icons/
@@ -210,3 +216,23 @@ packages/campus_ui/test/goldens/
 - No `Color(0x...)`, `EdgeInsets.all(13)` or `TextStyle(fontSize: ...)` outside `campus_ui`. Add a lint check in CI.
 - New component → design it in Figma, add it to Widgetbook, add a golden test, then use it.
 - Figma library mirrors the same token names, so designers and code speak the same language.
+
+---
+
+## 9. Rebranding checklist
+
+The product name and logo are placeholders. Brand values live in a few known
+places so a rename takes an hour, not a refactor:
+
+| What | Where |
+|---|---|
+| Brand colors | `packages/campus_ui/lib/src/tokens/brand.dart` (then run the contrast test) |
+| In-app name | `brand.dart` → `CsBrand.appName`, and `appName` in `packages/campus_l10n/lib/src/arb/app_en.arb` + `app_bn.arb` |
+| Android app name | `apps/mobile/android/app/src/main/AndroidManifest.xml` → `android:label` |
+| iOS app name | `apps/mobile/ios/Runner/Info.plist` → `CFBundleDisplayName` |
+| Launcher icon | replace files in `apps/mobile/assets/launcher/`, run `dart run flutter_launcher_icons` in `apps/mobile` |
+| README / docs | `README.md`, `assets/icon/` |
+
+**Do not change** the app ID `com.silifton.campussaga` after the first store
+release: stores treat a new ID as a different app. The package names
+(`campus_*`) and the `Cs` component prefix are generic and can stay.

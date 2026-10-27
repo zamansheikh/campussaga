@@ -1,0 +1,20 @@
+{
+  "@@locale": "en",
+  "appName": "Campus Saga",
+  "@appName": { "description": "Product name. Change here when rebranding." },
+  "navToday": "Today",
+  "navRoutine": "Routine",
+  "navProfile": "Profile",
+  "todayEmptyTitle": "No classes yet",
+  "todayEmptyMessage": "Join your class group to see today's classes and get reminders.",
+  "joinClassGroup": "Join class group",
+  "routineEmptyTitle": "Your weekly routine",
+  "routineEmptyMessage": "Once you join a class group, the full week appears here.",
+  "settings": "Settings",
+  "theme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "language": "Language",
+  "comingSoon": "Coming soon"
+}

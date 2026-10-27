@@ -1,0 +1,17 @@
+# Launcher icons. The current images are a PLACEHOLDER until the new logo
+# is designed. To change the icon: replace the files in assets/launcher/
+# and run `dart run flutter_launcher_icons` in apps/mobile.
+#
+#   icon.png             1024x1024 ideal (full icon, used for iOS and old Android)
+#   icon_foreground.png  logo inside the central 66% safe zone, transparent background
+#   icon_monochrome.png  (add with the new logo) single-color silhouette for
+#                        Android 13+ themed icons, then enable the line below
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/launcher/icon.png
+  remove_alpha_ios: true
+  background_color_ios: "#FFFFFF"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/launcher/icon_foreground.png
+  # adaptive_icon_monochrome: assets/launcher/icon_monochrome.png
