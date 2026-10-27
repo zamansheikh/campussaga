@@ -48,6 +48,21 @@ func (r *Router) Public() chi.Router { return r.root.With() }
 // is a verified student (accounts are created only after the email code).
 func (r *Router) Student() chi.Router { return r.root.With(r.requireUser) }
 
+// Admin: a signed-in admin (the superadmin panel). The role is read from
+// the database on every request (session check), so a demoted admin loses
+// access at once.
+func (r *Router) Admin() chi.Router { return r.root.With(r.requireUser, requireAdmin) }
+
+func requireAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if c, ok := auth.User(req.Context()); !ok || c.Role != "admin" {
+			WriteError(w, req, auth.ErrNotAdmin)
+			return
+		}
+		next.ServeHTTP(w, req)
+	})
+}
+
 // Limit returns a middleware allowing limit requests per window per client IP.
 func (r *Router) Limit(name string, limit int, window time.Duration) func(http.Handler) http.Handler {
 	return RateLimit(r.limiter, name, limit, window, PerIP)

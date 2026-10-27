@@ -106,6 +106,9 @@ func (s *Service) VerifyUniversityEmail(ctx context.Context, rawEmail, code stri
 			failure = bad
 			return nil // commit the attempt count
 		}
+		if row.UniversityID == nil {
+			return ErrCodeExpired // an admin sign-in code, not a university one
+		}
 		used, err := q.EmailInUse(ctx, store.EmailInUseParams{Email: email, ID: c.UserID})
 		if err != nil {
 			return err
@@ -114,7 +117,7 @@ func (s *Service) VerifyUniversityEmail(ctx context.Context, rawEmail, code stri
 			return ErrEmailInUse
 		}
 		u, err := q.VerifyUser(ctx, store.VerifyUserParams{
-			ID: c.UserID, UniversityEmail: &email, UniversityID: &row.UniversityID, VerifiedAt: &now,
+			ID: c.UserID, UniversityEmail: &email, UniversityID: row.UniversityID, VerifiedAt: &now,
 		})
 		if err != nil {
 			return err

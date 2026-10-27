@@ -4,10 +4,15 @@ import (
 	"net/http"
 
 	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
+	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
 )
 
 // Error codes are the wire contract with the app; never rename a shipped one.
 var (
+	ErrAccountBlocked = apperr.New(http.StatusForbidden, "ACCOUNT_BLOCKED",
+		"This account is blocked. Contact hello@silifton.com")
+	ErrNotAdmin = auth.ErrNotAdmin
+
 	ErrUniversityEmailRequired = apperr.New(http.StatusForbidden, "UNIVERSITY_EMAIL_REQUIRED",
 		"Please use your university email address")
 	ErrCodeResendTooSoon = apperr.New(http.StatusTooManyRequests, "CODE_RESEND_TOO_SOON",

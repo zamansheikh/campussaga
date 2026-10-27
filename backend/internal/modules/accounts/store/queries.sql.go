@@ -15,7 +15,7 @@ import (
 const changeUniversityUnverified = `-- name: ChangeUniversityUnverified :one
 UPDATE users SET university_id = $1, university_email = NULL, verified_at = NULL
 WHERE id = $2
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at
 `
 
 type ChangeUniversityUnverifiedParams struct {
@@ -39,6 +39,7 @@ func (q *Queries) ChangeUniversityUnverified(ctx context.Context, arg ChangeUniv
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UniversityEmail,
+		&i.BlockedAt,
 	)
 	return i, err
 }
@@ -154,7 +155,7 @@ func (q *Queries) FindSessionByPrevious(ctx context.Context, previousHash []byte
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email FROM users WHERE id = $1
+SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
@@ -172,13 +173,14 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UniversityEmail,
+		&i.BlockedAt,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
 
-SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email FROM users WHERE email = $1 OR university_email = $1
+SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at FROM users WHERE email = $1 OR university_email = $1
 ORDER BY (email = $1) DESC LIMIT 1
 `
 
@@ -200,6 +202,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UniversityEmail,
+		&i.BlockedAt,
 	)
 	return i, err
 }
@@ -246,7 +249,7 @@ func (q *Queries) InsertSession(ctx context.Context, arg InsertSessionParams) (S
 const insertUser = `-- name: InsertUser :one
 INSERT INTO users (email, university_id, university_email, verified_at)
 VALUES ($1, $2, $3, $4)
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at
 `
 
 type InsertUserParams struct {
@@ -276,6 +279,7 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UniversityEmail,
+		&i.BlockedAt,
 	)
 	return i, err
 }
@@ -420,9 +424,10 @@ func (q *Queries) RotateSession(ctx context.Context, arg RotateSessionParams) er
 }
 
 const sessionUser = `-- name: SessionUser :one
-SELECT u.university_id, (u.verified_at IS NOT NULL)::bool AS verified
+SELECT u.university_id, (u.verified_at IS NOT NULL)::bool AS verified, u.role
 FROM sessions s JOIN users u ON u.id = s.user_id
 WHERE s.id = $1 AND s.user_id = $2 AND s.revoked_at IS NULL AND s.expires_at > $3
+  AND u.blocked_at IS NULL
 `
 
 type SessionUserParams struct {
@@ -434,6 +439,7 @@ type SessionUserParams struct {
 type SessionUserRow struct {
 	UniversityID *uuid.UUID
 	Verified     bool
+	Role         UserRole
 }
 
 // The live session's student: their current university and whether they
@@ -442,13 +448,13 @@ type SessionUserRow struct {
 func (q *Queries) SessionUser(ctx context.Context, arg SessionUserParams) (SessionUserRow, error) {
 	row := q.db.QueryRow(ctx, sessionUser, arg.ID, arg.UserID, arg.Now)
 	var i SessionUserRow
-	err := row.Scan(&i.UniversityID, &i.Verified)
+	err := row.Scan(&i.UniversityID, &i.Verified, &i.Role)
 	return i, err
 }
 
 const setUniversity = `-- name: SetUniversity :one
 UPDATE users SET university_id = $1 WHERE id = $2 AND verified_at IS NULL
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at
 `
 
 type SetUniversityParams struct {
@@ -471,6 +477,7 @@ func (q *Queries) SetUniversity(ctx context.Context, arg SetUniversityParams) (U
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UniversityEmail,
+		&i.BlockedAt,
 	)
 	return i, err
 }
@@ -481,7 +488,7 @@ UPDATE users SET
     department   = $2,
     batch        = $3
 WHERE id = $4
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at
 `
 
 type UpdateProfileParams struct {
@@ -511,6 +518,7 @@ func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) (U
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UniversityEmail,
+		&i.BlockedAt,
 	)
 	return i, err
 }
@@ -530,7 +538,7 @@ ON CONFLICT (email) DO UPDATE SET
 
 type UpsertSignInCodeParams struct {
 	Email        string
-	UniversityID uuid.UUID
+	UniversityID *uuid.UUID
 	CodeHash     []byte
 	Sends        int32
 	WindowStart  time.Time
@@ -555,7 +563,7 @@ const verifyUser = `-- name: VerifyUser :one
 UPDATE users SET university_email = $1, university_id = $2,
     verified_at = $3
 WHERE id = $4
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at
 `
 
 type VerifyUserParams struct {
@@ -585,6 +593,7 @@ func (q *Queries) VerifyUser(ctx context.Context, arg VerifyUserParams) (User, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UniversityEmail,
+		&i.BlockedAt,
 	)
 	return i, err
 }

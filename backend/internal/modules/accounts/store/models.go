@@ -70,7 +70,7 @@ type Session struct {
 
 type SignInCode struct {
 	Email        string
-	UniversityID uuid.UUID
+	UniversityID *uuid.UUID
 	CodeHash     []byte
 	Attempts     int32
 	Sends        int32
@@ -91,4 +91,5 @@ type User struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	UniversityEmail *string
+	BlockedAt       *time.Time
 }

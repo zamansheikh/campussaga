@@ -3,6 +3,7 @@
 package app
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"log/slog"
@@ -13,6 +14,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/zamansheikh/campussaga/backend/internal/modules/accounts"
+	"github.com/zamansheikh/campussaga/backend/internal/modules/admin"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/appconfig"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/classgroups"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/push"
@@ -114,6 +116,25 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
 	})
 
+	adminSvc := admin.NewService(d, admin.SignIn{
+		RequestCode: func(ctx context.Context, email string) (any, error) {
+			return accSvc.RequestAdminCode(ctx, email)
+		},
+		VerifyCode: func(ctx context.Context, email, code string) (any, uuid.UUID, error) {
+			out, err := accSvc.VerifyAdminCode(ctx, email, code)
+			if err != nil {
+				return nil, uuid.Nil, err
+			}
+			return out, out.User.ID, nil
+		},
+	}, func(userIDs []uuid.UUID, t admin.PushText) {
+		texts := map[string]push.Text{"en": {Title: t.Title, Body: t.Body}}
+		if t.TitleBn != "" || t.BodyBn != "" {
+			texts["bn"] = push.Text{Title: cmp.Or(t.TitleBn, t.Title), Body: cmp.Or(t.BodyBn, t.Body)}
+		}
+		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: map[string]string{"type": "admin"}})
+	}, now)
+
 	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc}
 
 	root := chi.NewRouter()
@@ -129,6 +150,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		cfgSvc.Routes(r)
 		groupSvc.Routes(r)
 		pushSvc.Routes(r)
+		adminSvc.Routes(r)
 	})
 
 	var h http.Handler = root

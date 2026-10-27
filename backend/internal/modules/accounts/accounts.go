@@ -125,9 +125,9 @@ func (s *Service) RequestCode(ctx context.Context, rawEmail string) (*CodeSent, 
 	}, nil
 }
 
-// sendCode emails a fresh 6-digit code to a university address, with the
-// resend and hourly limits. Used by sign-in and by verifying a university
-// email later.
+// sendCode emails a fresh 6-digit code, with the resend and hourly limits.
+// Used by sign-in, by verifying a university email later, and by admin
+// sign-in (uni nil: the code can only sign in an existing account).
 func (s *Service) sendCode(ctx context.Context, email string, uni *University) error {
 	now := s.now()
 	return s.d.InTx(ctx, func(ctx context.Context) error {
@@ -156,8 +156,12 @@ func (s *Service) sendCode(ctx context.Context, email string, uni *University) e
 		if err != nil {
 			return err
 		}
+		var uniID *uuid.UUID
+		if uni != nil {
+			uniID = &uni.ID
+		}
 		if err := q.UpsertSignInCode(ctx, store.UpsertSignInCodeParams{
-			Email: email, UniversityID: uni.ID, CodeHash: s.codeHash(email, code),
+			Email: email, UniversityID: uniID, CodeHash: s.codeHash(email, code),
 			Sends: sends, WindowStart: windowStart, LastSentAt: now, ExpiresAt: now.Add(s.cfg.CodeTTL),
 		}); err != nil {
 			return err
@@ -197,6 +201,12 @@ type Tokens struct {
 
 // VerifyCode checks the code and signs the student in.
 func (s *Service) VerifyCode(ctx context.Context, rawEmail, code string) (*SignedIn, error) {
+	return s.verifyCode(ctx, rawEmail, code, false)
+}
+
+// verifyCode signs in with an email code. adminOnly: only an existing admin
+// account (the admin panel); anything else is ErrNotAdmin.
+func (s *Service) verifyCode(ctx context.Context, rawEmail, code string, adminOnly bool) (*SignedIn, error) {
 	email, err := normalizeEmail(rawEmail)
 	if err != nil {
 		return nil, err
@@ -223,14 +233,26 @@ func (s *Service) VerifyCode(ctx context.Context, rawEmail, code string) (*Signe
 
 		user, err := q.GetUserByEmail(ctx, email)
 		isNew := false
-		if db.IsNoRows(err) {
+		switch {
+		case db.IsNoRows(err) && (adminOnly || row.UniversityID == nil):
+			// An admin code never creates an account.
+			failure = ErrNotAdmin
+			if !adminOnly {
+				failure = ErrCodeExpired
+			}
+			return nil
+		case db.IsNoRows(err):
 			isNew = true
 			user, err = q.InsertUser(ctx, store.InsertUserParams{
-				Email: email, UniversityID: &row.UniversityID, UniversityEmail: &email, VerifiedAt: &now,
+				Email: email, UniversityID: row.UniversityID, UniversityEmail: &email, VerifiedAt: &now,
 			})
 		}
 		if err != nil {
 			return err
+		}
+		if adminOnly && user.Role != store.UserRoleAdmin {
+			failure = ErrNotAdmin
+			return nil
 		}
 		tokens, err := s.startSession(ctx, q, user, now)
 		if err != nil {
@@ -368,6 +390,9 @@ func (s *Service) SignInWithGoogle(ctx context.Context, idToken, nameHint string
 // ---- sessions -------------------------------------------------------------
 
 func (s *Service) startSession(ctx context.Context, q *store.Queries, u store.User, now time.Time) (*Tokens, error) {
+	if u.BlockedAt != nil {
+		return nil, ErrAccountBlocked
+	}
 	refresh := auth.RandomToken(32)
 	sess, err := q.InsertSession(ctx, store.InsertSessionParams{
 		UserID: u.ID, RefreshHash: auth.HashToken(refresh), UserAgent: userAgent(ctx),
@@ -428,6 +453,9 @@ func (s *Service) Refresh(ctx context.Context, refresh string) (*Tokens, error) 
 		if err != nil {
 			return err
 		}
+		if user.BlockedAt != nil {
+			return ErrAccountBlocked
+		}
 		next := auth.RandomToken(32)
 		exp := now.Add(s.cfg.RefreshTTL)
 		if err := q.RotateSession(ctx, store.RotateSessionParams{ID: sess.ID, NewHash: auth.HashToken(next), Now: now, ExpiresAt: exp}); err != nil {
@@ -458,7 +486,7 @@ func (s *Service) CheckSession(ctx context.Context, c *auth.Claims) error {
 	}
 	// Fresh from the database, not the token: picking a university or
 	// verifying applies to the very next request.
-	c.UniversityID, c.Verified = deref(u.UniversityID), u.Verified
+	c.UniversityID, c.Verified, c.Role = deref(u.UniversityID), u.Verified, string(u.Role)
 	return nil
 }
 
@@ -558,4 +586,40 @@ func retryAfter(d time.Duration) httpx.RetryAfter {
 		secs = 1
 	}
 	return httpx.RetryAfter{RetryAfterSeconds: secs}
+}
+
+// ---- admin panel sign-in ----------------------------------------------------
+
+// RequestAdminCode emails a sign-in code to an admin account, whatever its
+// email domain. For any other email it sends nothing but answers the same,
+// so the sign-in page doesn't reveal who is an admin.
+func (s *Service) RequestAdminCode(ctx context.Context, rawEmail string) (*CodeSent, error) {
+	email, err := normalizeEmail(rawEmail)
+	if err != nil {
+		return nil, err
+	}
+	out := &CodeSent{
+		Email:              email,
+		ExpiresInSeconds:   int(s.cfg.CodeTTL.Seconds()),
+		ResendAfterSeconds: int(s.cfg.ResendAfter.Seconds()),
+	}
+	u, err := store.New(s.d.Q(ctx)).GetUserByEmail(ctx, email)
+	if db.IsNoRows(err) {
+		return out, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if u.Role != store.UserRoleAdmin || u.BlockedAt != nil {
+		return out, nil
+	}
+	if err := s.sendCode(ctx, email, nil); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// VerifyAdminCode signs an admin in to the panel (ErrNotAdmin otherwise).
+func (s *Service) VerifyAdminCode(ctx context.Context, rawEmail, code string) (*SignedIn, error) {
+	return s.verifyCode(ctx, rawEmail, code, true)
 }

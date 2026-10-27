@@ -120,9 +120,10 @@ UPDATE sessions SET revoked_at = @now::timestamptz WHERE user_id = @user_id AND 
 -- are verified (read on every request, so changes apply at once). No row =
 -- session ended.
 -- name: SessionUser :one
-SELECT u.university_id, (u.verified_at IS NOT NULL)::bool AS verified
+SELECT u.university_id, (u.verified_at IS NOT NULL)::bool AS verified, u.role
 FROM sessions s JOIN users u ON u.id = s.user_id
-WHERE s.id = @id AND s.user_id = @user_id AND s.revoked_at IS NULL AND s.expires_at > @now;
+WHERE s.id = @id AND s.user_id = @user_id AND s.revoked_at IS NULL AND s.expires_at > @now
+  AND u.blocked_at IS NULL;
 
 -- name: PurgeSessions :execrows
 DELETE FROM sessions WHERE expires_at < @before OR revoked_at < @before;

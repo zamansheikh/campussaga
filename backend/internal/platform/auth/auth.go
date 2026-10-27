@@ -33,6 +33,8 @@ var (
 	ErrTokenExpired = apperr.New(http.StatusUnauthorized, "TOKEN_EXPIRED", "Your session expired")
 	// ErrTokenInvalid: malformed, wrong signature or wrong audience.
 	ErrTokenInvalid = apperr.New(http.StatusUnauthorized, "TOKEN_INVALID", "Please sign in again")
+	// ErrNotAdmin: signed in, but not an admin (admin panel).
+	ErrNotAdmin = apperr.New(http.StatusForbidden, "NOT_ADMIN", "This account is not an admin")
 )
 
 // Claims of a verified access token.

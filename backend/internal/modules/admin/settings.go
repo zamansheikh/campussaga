@@ -1,0 +1,284 @@
+package admin
+
+import (
+	"context"
+	"encoding/json"
+	"strings"
+	"time"
+	"unicode"
+
+	"github.com/google/uuid"
+
+	"github.com/zamansheikh/campussaga/backend/internal/modules/admin/store"
+	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
+	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
+)
+
+// ---- dashboard ----------------------------------------------------------------
+
+type Stats struct {
+	Users struct {
+		Total        int `json:"total"`
+		Verified     int `json:"verified"`
+		NotVerified  int `json:"notVerified"`
+		Admins       int `json:"admins"`
+		Blocked      int `json:"blocked"`
+		NewLast7Days int `json:"newLast7Days"`
+	} `json:"users"`
+	Groups struct {
+		Total         int `json:"total"`
+		Memberships   int `json:"memberships"`
+		Slots         int `json:"slots"`
+		Announcements int `json:"announcements"`
+	} `json:"groups"`
+	Devices struct {
+		Android int `json:"android"`
+		IOS     int `json:"ios"`
+	} `json:"devices"`
+	Universities struct {
+		Active int `json:"active"`
+		Total  int `json:"total"`
+	} `json:"universities"`
+	SignupsByDay    []DayCount      `json:"signupsByDay"`
+	TopUniversities []UniversityUse `json:"topUniversities"`
+}
+
+type DayCount struct {
+	Date  string `json:"date"`
+	Count int    `json:"count"`
+}
+
+type UniversityUse struct {
+	ID    uuid.UUID `json:"id"`
+	Name  string    `json:"name"`
+	Users int       `json:"users"`
+}
+
+func (s *Service) handleStats(ctx context.Context, _ *httpx.Empty) (*Stats, error) {
+	q := store.New(s.d.Q(ctx))
+	now := s.now()
+	out := &Stats{SignupsByDay: []DayCount{}, TopUniversities: []UniversityUse{}}
+
+	u, err := q.UserCounts(ctx, now.Add(-7*24*time.Hour))
+	if err != nil {
+		return nil, err
+	}
+	out.Users.Total, out.Users.Verified, out.Users.NotVerified = int(u.Total), int(u.Verified), int(u.NotVerified)
+	out.Users.Admins, out.Users.Blocked, out.Users.NewLast7Days = int(u.Admins), int(u.Blocked), int(u.NewSince)
+
+	o, err := q.OtherCounts(ctx)
+	if err != nil {
+		return nil, err
+	}
+	out.Groups.Total, out.Groups.Memberships = int(o.Groups), int(o.Memberships)
+	out.Groups.Slots, out.Groups.Announcements = int(o.Slots), int(o.Announcements)
+	out.Devices.Android, out.Devices.IOS = int(o.Android), int(o.Ios)
+	out.Universities.Active, out.Universities.Total = int(o.UniversitiesActive), int(o.UniversitiesTotal)
+
+	today := bdToday(now)
+	days, err := q.SignupsByDay(ctx, store.SignupsByDayParams{
+		FirstDay: today.AddDate(0, 0, -29).Format(time.DateOnly), LastDay: today.Format(time.DateOnly),
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, d := range days {
+		out.SignupsByDay = append(out.SignupsByDay, DayCount{Date: d.Day, Count: int(d.Count)})
+	}
+	top, err := q.TopUniversities(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, t := range top {
+		out.TopUniversities = append(out.TopUniversities, UniversityUse{ID: t.ID, Name: t.Name, Users: int(t.Users)})
+	}
+	return out, nil
+}
+
+// ---- app settings ---------------------------------------------------------------
+
+type ConfigItem struct {
+	Key       string          `json:"key"`
+	Value     json.RawMessage `json:"value"`
+	UpdatedAt time.Time       `json:"updatedAt"`
+}
+
+type configRes struct {
+	Items []ConfigItem `json:"items"`
+}
+
+func (s *Service) handleListConfig(ctx context.Context, _ *httpx.Empty) (*configRes, error) {
+	rows, err := store.New(s.d.Q(ctx)).ListConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	out := &configRes{Items: make([]ConfigItem, 0, len(rows))}
+	for _, r := range rows {
+		out.Items = append(out.Items, ConfigItem{Key: camel(r.Key), Value: r.Value, UpdatedAt: r.UpdatedAt})
+	}
+	return out, nil
+}
+
+type updateConfigReq struct {
+	Key   string          `json:"-" path:"key" validate:"required,max=60"`
+	Value json.RawMessage `json:"value" validate:"required"`
+}
+
+func (s *Service) handleUpdateConfig(ctx context.Context, in *updateConfigReq) (*ConfigItem, error) {
+	if err := checkConfig(in.Key, in.Value); err != nil {
+		return nil, err
+	}
+	var out *ConfigItem
+	err := s.d.InTx(ctx, func(ctx context.Context) error {
+		q := store.New(s.d.Q(ctx))
+		r, err := q.UpdateConfig(ctx, store.UpdateConfigParams{Key: snake(in.Key), Value: in.Value})
+		if db.IsNoRows(err) {
+			return ErrConfigKey
+		}
+		if err != nil {
+			return err
+		}
+		out = &ConfigItem{Key: camel(r.Key), Value: r.Value, UpdatedAt: r.UpdatedAt}
+		return s.audit(ctx, q, "config.update", "config", out.Key, map[string]json.RawMessage{"value": in.Value})
+	})
+	return out, err
+}
+
+// checkConfig knows the shape of the settings the app reads.
+func checkConfig(key string, v json.RawMessage) error {
+	switch key {
+	case "features":
+		var flags map[string]bool
+		if json.Unmarshal(v, &flags) != nil {
+			return ErrConfigValue.WithMessage("Feature flags must be on/off switches")
+		}
+	case "minSupportedBuild":
+		var n int
+		if json.Unmarshal(v, &n) != nil || n < 1 {
+			return ErrConfigValue.WithMessage("The minimum build must be a whole number of 1 or more")
+		}
+	default:
+		if !json.Valid(v) {
+			return ErrConfigValue
+		}
+	}
+	return nil
+}
+
+func camel(s string) string {
+	parts := strings.Split(s, "_")
+	for i := 1; i < len(parts); i++ {
+		if parts[i] != "" {
+			parts[i] = strings.ToUpper(parts[i][:1]) + parts[i][1:]
+		}
+	}
+	return strings.Join(parts, "")
+}
+
+func snake(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		if unicode.IsUpper(r) {
+			b.WriteByte('_')
+			r = unicode.ToLower(r)
+		}
+		b.WriteRune(r)
+	}
+	return b.String()
+}
+
+// ---- push ------------------------------------------------------------------------
+
+type pushReq struct {
+	Target  string `json:"target" validate:"required,oneof=user all"`
+	UserID  string `json:"userId" validate:"required_if=Target user,omitempty,uuid"`
+	Title   string `json:"title" validate:"required,max=100"`
+	Body    string `json:"body" validate:"required,max=500"`
+	TitleBn string `json:"titleBn" validate:"max=100"`
+	BodyBn  string `json:"bodyBn" validate:"max=500"`
+}
+
+type pushRes struct {
+	Users   int `json:"users"`
+	Devices int `json:"devices"`
+}
+
+func (s *Service) handlePush(ctx context.Context, in *pushReq) (*pushRes, error) {
+	var (
+		userID *uuid.UUID
+		users  []uuid.UUID
+	)
+	q := store.New(s.d.Q(ctx))
+	if in.Target == "user" {
+		id := uuid.MustParse(in.UserID)
+		if _, err := q.GetUser(ctx, id); db.IsNoRows(err) {
+			return nil, ErrUserNotFound
+		} else if err != nil {
+			return nil, err
+		}
+		userID, users = &id, []uuid.UUID{id}
+	} else {
+		var err error
+		if users, err = q.PushUsers(ctx); err != nil {
+			return nil, err
+		}
+	}
+	aud, err := q.PushAudience(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	t := PushText{
+		Title: strings.TrimSpace(in.Title), Body: strings.TrimSpace(in.Body),
+		TitleBn: strings.TrimSpace(in.TitleBn), BodyBn: strings.TrimSpace(in.BodyBn),
+	}
+	if err := s.audit(ctx, q, "push.send", "push", in.Target, map[string]any{
+		"userId": userID, "title": t.Title, "body": t.Body, "users": aud.Users, "devices": aud.Devices,
+	}); err != nil {
+		return nil, err
+	}
+	if aud.Devices > 0 {
+		s.push(users, t)
+	}
+	return &pushRes{Users: int(aud.Users), Devices: int(aud.Devices)}, nil
+}
+
+// ---- audit log -------------------------------------------------------------------
+
+type AuditEntry struct {
+	ID         int64           `json:"id"`
+	Actor      *Person         `json:"actor"`
+	Action     string          `json:"action"`
+	TargetType *string         `json:"targetType"`
+	TargetID   *string         `json:"targetId"`
+	Meta       json.RawMessage `json:"meta"`
+	CreatedAt  time.Time       `json:"createdAt"`
+}
+
+type auditReq struct {
+	Page
+}
+
+func (s *Service) handleAudit(ctx context.Context, in *auditReq) (*Paged[AuditEntry], error) {
+	page, size, lim, off := in.limits()
+	q := store.New(s.d.Q(ctx))
+	rows, err := q.ListAudit(ctx, store.ListAuditParams{Lim: lim, Off: off})
+	if err != nil {
+		return nil, err
+	}
+	total, err := q.CountAudit(ctx)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]AuditEntry, 0, len(rows))
+	for _, r := range rows {
+		e := AuditEntry{ID: r.ID, Action: r.Action, TargetType: r.TargetType, TargetID: r.TargetID, Meta: r.Meta, CreatedAt: r.CreatedAt}
+		if r.ActorID != nil {
+			e.Actor = &Person{ID: *r.ActorID, Name: r.ActorName}
+			if r.ActorEmail != nil {
+				e.Actor.Email = *r.ActorEmail
+			}
+		}
+		items = append(items, e)
+	}
+	return &Paged[AuditEntry]{Items: items, Total: int(total), Page: page, PageSize: size}, nil
+}
