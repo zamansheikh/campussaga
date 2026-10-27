@@ -114,4 +114,28 @@ void main() {
     expect(d.registered, isEmpty);
     expect(find.byType(NavigationBar), findsOneWidget);
   });
+
+  testWidgets('asks to show notifications once the student reaches the app', (
+    tester,
+  ) async {
+    await start(tester);
+    expect(push.permissionAsks, 1);
+    // Later changes (language, profile) don't ask again.
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    expect(push.permissionAsks, 1);
+  });
+
+  testWidgets('no permission prompt during profile setup', (tester) async {
+    usePhoneScreen(tester);
+    final p = MemoryPushMessaging();
+    final (repo, _) = await registerFakes(push: p);
+    repo.googleUser = gmailUser; // no university yet: profile setup first
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Continue with Google'));
+    await tester.pumpAndSettle();
+    expect(find.text('Set up your profile'), findsOneWidget);
+    expect(p.permissionAsks, 0);
+  });
 }

@@ -42,6 +42,16 @@ class PushController {
     if (first != null) onOpened(first);
   }
 
+  /// The student reached the app (signed in, profile done): ask to show
+  /// notifications, once per install.
+  Future<void> askPermission() async {
+    if (_asked) return;
+    _asked = true;
+    await _messaging.askPermissionOnce();
+  }
+
+  bool _asked = false;
+
   /// Signed out: the server already stopped pushes with the session.
   void signedOut() {
     _signedIn = false;

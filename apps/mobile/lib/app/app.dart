@@ -100,6 +100,9 @@ class _CampusAppState extends State<CampusApp> {
         _pushUser = id;
         unawaited(_push.signedIn());
       }
+      // Pushes are only shown with permission (Android 13+): ask once the
+      // student is past sign-in and profile setup.
+      if (!s.needsProfileSetup) unawaited(_push.askPermission());
     } else if (s.status == AuthStatus.signedOut) {
       unawaited(_classes.clear());
       _pushUser = null;

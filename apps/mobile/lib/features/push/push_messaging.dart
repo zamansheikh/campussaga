@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// A push notification as the app sees it.
 class PushNote {
@@ -35,6 +36,11 @@ abstract interface class PushMessaging {
 
   /// Tapped while the app was closed (it opened the app).
   Future<PushNote?> initial();
+
+  /// Asks to show notifications (Android 13+, iOS), once per install: a
+  /// "no" is not asked again. Without it the phone receives pushes but
+  /// never shows them.
+  Future<void> askPermissionOnce();
 }
 
 class FirebasePushMessaging implements PushMessaging {
@@ -75,6 +81,20 @@ class FirebasePushMessaging implements PushMessaging {
     return m == null ? null : _note(m);
   }
 
+  static const _askedKey = 'push.permissionAsked';
+
+  @override
+  Future<void> askPermissionOnce() async {
+    try {
+      final prefs = SharedPreferencesAsync();
+      if (await prefs.getBool(_askedKey) ?? false) return;
+      await prefs.setBool(_askedKey, true);
+      await _fm.requestPermission();
+    } on Object {
+      // No permission UI here (or storage failed): pushes stay silent.
+    }
+  }
+
   static PushNote _note(RemoteMessage m) => PushNote(
     title: m.notification?.title,
     body: m.notification?.body,
@@ -111,4 +131,9 @@ class MemoryPushMessaging implements PushMessaging {
     initialNote = null;
     return n;
   }
+
+  int permissionAsks = 0;
+
+  @override
+  Future<void> askPermissionOnce() async => permissionAsks++;
 }

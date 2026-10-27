@@ -430,10 +430,8 @@ class _UniversityRow extends StatelessWidget {
 }
 
 /// "Dhaka · diu.edu.bd": where it is and its student email.
-String universityMeta(University u) => [
-  if ((u.city ?? '').isNotEmpty) u.city!,
-  ?u.mainDomain,
-].join(' · ');
+String universityMeta(University u) =>
+    [if ((u.city ?? '').isNotEmpty) u.city!, ?u.mainDomain].join(' · ');
 
 /// A rounded square with the university's short name (DIU, BUET, ...).
 class UniversityBadge extends StatelessWidget {
