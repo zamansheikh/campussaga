@@ -18,7 +18,7 @@
   <main class="wrap">
     <section lang="en">
       <h1>Privacy Policy</h1>
-      <p class="muted">Effective 27 October 2026</p>
+      <p class="muted">Effective 28 October 2026</p>
       <p class="lang-switch"><a href="#bn">বাংলায় পড়ো</a></p>
 
       <p>Campus Saga ("the app", "we") is a student app for universities in Bangladesh, made by <a href="https://silifton.com">Silifton</a>. This policy explains what information the app and its server collect, why, who else handles it, how long we keep it, and the choices you have. We wrote it to match what the app actually does today. When we add features that use your information in a new way, we will update this page first and tell you in the app.</p>
@@ -26,7 +26,7 @@
       <h2>The short version</h2>
       <ul>
         <li>You sign in with your <strong>university email</strong>. We use it to confirm you are a student of a real university.</li>
-        <li>We store only what the app needs: your email, your university, and the name, department and batch you enter.</li>
+        <li>We store only what the app needs: your email, your university, the name, department and batch you enter, and the class groups, routines and personal classes you use.</li>
         <li><strong>No ads, no selling or renting your data, no tracking analytics.</strong></li>
         <li>You can edit your profile and <strong>delete your account at any time</strong> in the app.</li>
       </ul>
@@ -39,10 +39,13 @@
         <tr><td><strong>Name, department and batch</strong></td><td>Entered by you, so classmates can recognise you in class groups and so we can suggest the right class. If you sign in with Google, your name from Google is filled in for you and you can change it.</td></tr>
         <tr><td><strong>Sign-in codes</strong></td><td>The 6-digit code we email you. We store only a one-way scrambled (hashed) form of it, never the code itself. It expires after 10 minutes.</td></tr>
         <tr><td><strong>Session information</strong></td><td>To keep you signed in on each device: a session record with the time it was created and last used, your device's app identifier text (user agent), and a scrambled (hashed) form of the sign-in token. The token itself is kept only on your phone, in its secure storage (Keychain or Android Keystore).</td></tr>
+        <tr><td><strong>Class groups and routines</strong></td><td>The groups you create or join with a code, your role (CR or member), the weekly routine and one-day changes the CR enters (course, teacher, room, time, notes) and the CR's announcements. Everyone in a group sees its routine, changes and announcements. Only CRs see the member list, and only names (never emails). Courses you hide from your routine are stored so they stay hidden on your other devices.</td></tr>
+        <tr><td><strong>Personal classes</strong></td><td>Entries you add for yourself (for example a tuition): name, details, place, day and time. Only you can see them.</td></tr>
+        <tr><td><strong>Push notification token</strong></td><td>A token from Firebase Cloud Messaging, your phone type and the app language, so we can tell you when your CR changes a class or posts an announcement. It is tied to your sign-in on that phone: signing out stops notifications there.</td></tr>
         <tr><td><strong>Department suggestions</strong></td><td>When you type your department, we show department names other students at <em>your</em> university entered. Only the department names are shared, never who entered them.</td></tr>
         <tr><td><strong>Crash reports</strong></td><td>If the app crashes or hits an unexpected error, a report is sent so we can fix it: the error and where in the app it happened, device model, operating system and app version, and a random installation identifier. Crash reports do <strong>not</strong> include your email, name, profile or any user ID. They are sent only from released versions of the app.</td></tr>
         <tr><td><strong>Server logs</strong></td><td>To keep the service running and secure, our server records which part of the API was called, the result and how long it took. For signed-in requests this includes your internal account ID. Your IP address is used briefly, in memory only, to limit repeated sign-in attempts; it is not written to the logs.</td></tr>
-        <tr><td><strong>Settings on your phone</strong></td><td>Your theme and language choices are saved only on your phone and are never sent to us.</td></tr>
+        <tr><td><strong>Settings on your phone</strong></td><td>Your theme and language, class reminder choices, and a copy of your routine (so the app works offline) are saved only on your phone. Class reminders are scheduled on your phone; we don't need to know about them.</td></tr>
       </table>
       <p>We do not collect your phone number, contacts, location, photos or files. The app does not use advertising identifiers.</p>
 
@@ -52,6 +55,7 @@
         <tr><th>Provider</th><th>What they do for us</th><th>Information involved</th></tr>
         <tr><td>Google Firebase Authentication</td><td>Only if you choose "Continue with Google": handles the Google sign-in and confirms your Google account to our server.</td><td>Your Google account email, name and profile picture link, kept in Firebase's sign-in records.</td></tr>
         <tr><td>Google Firebase Crashlytics</td><td>Collects crash reports.</td><td>The crash report data described above.</td></tr>
+        <tr><td>Google Firebase Cloud Messaging</td><td>Delivers push notifications to your phone (and Apple's push service on iPhones).</td><td>Your push token and the notification text (for example "CSE311 cancelled tomorrow").</td></tr>
         <tr><td>Resend</td><td>Delivers the email with your sign-in code.</td><td>Your email address and the email's content.</td></tr>
         <tr><td>Server and storage providers</td><td>Run our server, database and encrypted backups.</td><td>The information stored in our database.</td></tr>
       </table>
@@ -61,6 +65,8 @@
       <h2>How long we keep it</h2>
       <ul>
         <li><strong>Your account and profile:</strong> until you delete your account.</li>
+        <li><strong>Class groups:</strong> until the CR deletes the group or its last member leaves. One-day changes are no longer shown a day after their date; announcements after 30 days (unless pinned). Your membership, hidden courses and personal classes are deleted with your account.</li>
+        <li><strong>Push tokens:</strong> stop being used when you sign out; deleted with your account or when Firebase reports the app was removed from the phone.</li>
         <li><strong>Sign-in codes:</strong> expire after 10 minutes; deleted within about an hour after that.</li>
         <li><strong>Ended sessions</strong> (signed out, expired or revoked): deleted after 7 days.</li>
         <li><strong>Server logs:</strong> deleted after at most 30 days.</li>
@@ -96,7 +102,7 @@
       <h2>সংক্ষেপে</h2>
       <ul>
         <li>তুমি সাইন ইন করো <strong>বিশ্ববিদ্যালয়ের ইমেইল</strong> দিয়ে। এটা দিয়ে আমরা নিশ্চিত হই যে তুমি একটি সত্যিকারের বিশ্ববিদ্যালয়ের শিক্ষার্থী।</li>
-        <li>আমরা শুধু প্রয়োজনীয় তথ্য রাখি: তোমার ইমেইল, বিশ্ববিদ্যালয়, এবং তুমি যে নাম, বিভাগ ও ব্যাচ দাও।</li>
+        <li>আমরা শুধু প্রয়োজনীয় তথ্য রাখি: তোমার ইমেইল, বিশ্ববিদ্যালয়, তুমি যে নাম, বিভাগ ও ব্যাচ দাও, এবং তোমার ক্লাস গ্রুপ, রুটিন ও ব্যক্তিগত ক্লাস।</li>
         <li><strong>কোনো বিজ্ঞাপন নেই, তথ্য বিক্রি বা ভাড়া দেওয়া হয় না, কোনো ট্র্যাকিং অ্যানালিটিক্স নেই।</strong></li>
         <li>যেকোনো সময় অ্যাপে প্রোফাইল বদলাতে এবং <strong>অ্যাকাউন্ট মুছে ফেলতে</strong> পারো।</li>
       </ul>
@@ -107,10 +113,13 @@
         <li><strong>নাম, বিভাগ ও ব্যাচ:</strong> তুমি নিজে দাও, যাতে ক্লাস গ্রুপে সহপাঠীরা তোমাকে চিনতে পারে। Google দিয়ে সাইন ইন করলে Google-এর নামটি আগে থেকে বসানো থাকে, তুমি বদলাতে পারো।</li>
         <li><strong>সাইন-ইন কোড:</strong> সার্ভারে কোডটি সরাসরি রাখা হয় না, শুধু একমুখী গোপন (হ্যাশ) রূপে রাখা হয়। ১০ মিনিট পর মেয়াদ শেষ।</li>
         <li><strong>সেশনের তথ্য:</strong> প্রতিটি ডিভাইসে সাইন ইন রাখার জন্য সেশনের সময়, ডিভাইসের অ্যাপ-পরিচয় (user agent) আর টোকেনের হ্যাশ। আসল টোকেন শুধু তোমার ফোনের নিরাপদ স্টোরেজে থাকে।</li>
+        <li><strong>ক্লাস গ্রুপ ও রুটিন:</strong> তুমি যে গ্রুপ তৈরি করো বা কোড দিয়ে যোগ দাও, তোমার ভূমিকা (সিআর বা সদস্য), সিআর-এর দেওয়া সাপ্তাহিক রুটিন ও এক দিনের পরিবর্তন (কোর্স, শিক্ষক, রুম, সময়, নোট) এবং সিআর-এর ঘোষণা। গ্রুপের সবাই এগুলো দেখে। সদস্য তালিকা শুধু সিআর দেখে, আর শুধু নাম (ইমেইল কখনো নয়)। রুটিন থেকে লুকানো কোর্সগুলো রাখা হয় যাতে অন্য ডিভাইসেও লুকানো থাকে।</li>
+        <li><strong>ব্যক্তিগত ক্লাস:</strong> নিজের জন্য যোগ করা এন্ট্রি (যেমন টিউশন): নাম, বিস্তারিত, জায়গা, দিন ও সময়। শুধু তুমি দেখো।</li>
+        <li><strong>পুশ নোটিফিকেশন টোকেন:</strong> Firebase Cloud Messaging-এর একটি টোকেন, ফোনের ধরন ও অ্যাপের ভাষা, যাতে সিআর ক্লাস বদলালে বা ঘোষণা দিলে তোমাকে জানাতে পারি। এটি ওই ফোনের সাইন-ইনের সাথে যুক্ত: সাইন আউট করলে ওই ফোনে নোটিফিকেশন বন্ধ হয়।</li>
         <li><strong>বিভাগের সাজেশন:</strong> তোমার বিশ্ববিদ্যালয়ের অন্য শিক্ষার্থীরা যে বিভাগের নাম লিখেছে, শুধু সেই নামগুলো দেখানো হয়, কে লিখেছে তা কখনো নয়।</li>
         <li><strong>ক্র্যাশ রিপোর্ট:</strong> অ্যাপ বন্ধ হয়ে গেলে ত্রুটির বিবরণ, ডিভাইসের মডেল, অপারেটিং সিস্টেম ও অ্যাপের সংস্করণ এবং একটি র‍্যান্ডম ইনস্টলেশন আইডি পাঠানো হয়। এতে তোমার ইমেইল, নাম, প্রোফাইল বা কোনো ইউজার আইডি থাকে <strong>না</strong>।</li>
         <li><strong>সার্ভার লগ:</strong> সেবা চালু ও নিরাপদ রাখতে কোন অংশ ব্যবহার হলো, ফলাফল ও সময় লেখা হয়; সাইন ইন অবস্থায় তোমার অভ্যন্তরীণ অ্যাকাউন্ট আইডিও থাকে। বারবার সাইন-ইন চেষ্টা আটকাতে তোমার IP ঠিকানা কিছুক্ষণ শুধু মেমরিতে ব্যবহার হয়, লগে লেখা হয় না।</li>
-        <li><strong>ফোনের সেটিংস:</strong> থিম ও ভাষা শুধু তোমার ফোনে থাকে, আমাদের কাছে পাঠানো হয় না।</li>
+        <li><strong>ফোনের সেটিংস:</strong> থিম, ভাষা, ক্লাস রিমাইন্ডারের পছন্দ এবং রুটিনের একটি কপি (অফলাইনে চালানোর জন্য) শুধু তোমার ফোনে থাকে। ক্লাস রিমাইন্ডার ফোনেই সেট হয়, আমাদের জানার দরকার হয় না।</li>
       </ul>
       <p>আমরা তোমার ফোন নম্বর, কন্টাক্ট, লোকেশন, ছবি বা ফাইল নিই না। অ্যাপে বিজ্ঞাপনের আইডি ব্যবহার হয় না।</p>
 
@@ -118,6 +127,7 @@
       <ul>
         <li><strong>Google Firebase Authentication:</strong> শুধু "Google দিয়ে চালিয়ে যাও" বেছে নিলে, Google সাইন-ইন সম্পন্ন করে (তোমার Google ইমেইল, নাম ও প্রোফাইল ছবির লিংক)।</li>
         <li><strong>Google Firebase Crashlytics:</strong> ক্র্যাশ রিপোর্ট সংগ্রহ করে।</li>
+        <li><strong>Google Firebase Cloud Messaging:</strong> তোমার ফোনে পুশ নোটিফিকেশন পৌঁছায় (আইফোনে Apple-এর পুশ সেবার মাধ্যমে); পুশ টোকেন ও নোটিফিকেশনের লেখা।</li>
         <li><strong>Resend:</strong> সাইন-ইন কোডসহ ইমেইল পাঠায় (তোমার ইমেইল ঠিকানা ও ইমেইলের লেখা)।</li>
         <li><strong>সার্ভার ও স্টোরেজ প্রদানকারী:</strong> আমাদের সার্ভার, ডাটাবেস ও এনক্রিপ্টেড ব্যাকআপ চালায়।</li>
       </ul>
@@ -126,6 +136,8 @@
       <h2>কতদিন রাখা হয়</h2>
       <ul>
         <li><strong>অ্যাকাউন্ট ও প্রোফাইল:</strong> তুমি মুছে না ফেলা পর্যন্ত।</li>
+        <li><strong>ক্লাস গ্রুপ:</strong> সিআর গ্রুপ মুছে না ফেলা বা শেষ সদস্য চলে না যাওয়া পর্যন্ত। এক দিনের পরিবর্তন তারিখের এক দিন পর আর দেখানো হয় না; ঘোষণা ৩০ দিন পর (পিন করা না থাকলে)। তোমার সদস্যপদ, লুকানো কোর্স ও ব্যক্তিগত ক্লাস অ্যাকাউন্টের সাথে মুছে যায়।</li>
+        <li><strong>পুশ টোকেন:</strong> সাইন আউট করলে আর ব্যবহার হয় না; অ্যাকাউন্ট মুছলে বা ফোন থেকে অ্যাপ সরানো হলে মুছে যায়।</li>
         <li><strong>সাইন-ইন কোড:</strong> ১০ মিনিটে মেয়াদ শেষ, তার প্রায় এক ঘণ্টার মধ্যে মুছে ফেলা হয়।</li>
         <li><strong>শেষ হওয়া সেশন:</strong> ৭ দিন পর মুছে ফেলা হয়।</li>
         <li><strong>সার্ভার লগ:</strong> সর্বোচ্চ ৩০ দিন পর মুছে ফেলা হয়।</li>

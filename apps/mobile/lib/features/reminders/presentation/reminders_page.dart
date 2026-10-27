@@ -4,8 +4,10 @@ import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../app/di.dart';
 import '../../auth/presentation/widgets/notice_banner.dart';
 import '../../classes/presentation/bloc/my_classes_cubit.dart';
+import '../data/phone_info.dart';
 import 'bloc/reminders_cubit.dart';
 
 /// Reminders on/off, how early, and which courses.
@@ -61,6 +63,7 @@ class RemindersPage extends StatelessWidget {
               ),
             ),
           ],
+          if (state.active) const _BatteryGuide(),
           if (state.active && !state.exactAllowed) ...[
             const SizedBox(height: CsSpace.md),
             CsSection(
@@ -141,6 +144,68 @@ class RemindersPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// On phones known to stop background apps: how to keep reminders on time.
+class _BatteryGuide extends StatelessWidget {
+  const _BatteryGuide();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cs = context.cs;
+    final phone = getIt<PhoneInfo>();
+    return FutureBuilder<String?>(
+      future: phone.strictBatteryBrand(),
+      builder: (context, snap) {
+        final brand = snap.data;
+        if (brand == null) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(top: CsSpace.md),
+          child: Container(
+            padding: const EdgeInsets.all(CsSpace.md),
+            decoration: BoxDecoration(
+              color: cs.statusInProgress.bg,
+              borderRadius: BorderRadius.circular(CsRadius.lg),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.battery_alert_rounded,
+                      color: cs.statusInProgress.fg,
+                    ),
+                    const SizedBox(width: CsSpace.sm),
+                    Expanded(
+                      child: Text(
+                        l10n.batteryTitle,
+                        style: context.text.titleSmall?.copyWith(
+                          color: cs.statusInProgress.fg,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: CsSpace.sm),
+                Text(
+                  l10n.batteryBody(brand, l10n.appName),
+                  style: context.text.bodyMedium,
+                ),
+                const SizedBox(height: CsSpace.sm),
+                OutlinedButton.icon(
+                  onPressed: phone.openBatterySettings,
+                  icon: const Icon(Icons.settings_outlined),
+                  label: Text(l10n.openSettings),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

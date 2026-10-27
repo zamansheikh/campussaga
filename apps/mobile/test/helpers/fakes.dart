@@ -11,6 +11,7 @@ import 'package:campussaga/features/announcements/data/seen_store.dart';
 import 'package:campussaga/features/auth/data/google_auth.dart';
 import 'package:campussaga/features/classes/data/routine_cache.dart';
 import 'package:campussaga/features/push/push_messaging.dart';
+import 'package:campussaga/features/reminders/data/phone_info.dart';
 import 'package:campussaga/features/reminders/data/reminder_scheduler.dart';
 import 'package:campussaga/features/reminders/data/reminder_store.dart';
 import 'package:flutter/widgets.dart';
@@ -198,6 +199,7 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   SeenStore? seenStore,
   PushMessaging? push,
   FakeDeviceRepository? devices,
+  PhoneInfo? phone,
   int build = 1,
 }) async {
   await getIt.reset();
@@ -227,7 +229,8 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
     )
     ..registerSingleton<SeenStore>(seenStore ?? MemorySeenStore())
     ..registerSingleton<PushMessaging>(push ?? MemoryPushMessaging())
-    ..registerSingleton<DeviceRepository>(devices ?? FakeDeviceRepository());
+    ..registerSingleton<DeviceRepository>(devices ?? FakeDeviceRepository())
+    ..registerSingleton<PhoneInfo>(phone ?? MemoryPhoneInfo());
   return (repo, google);
 }
 

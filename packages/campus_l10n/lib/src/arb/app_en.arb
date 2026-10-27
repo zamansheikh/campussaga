@@ -507,5 +507,7 @@
       }
     }
   },
-  "openSettings": "Open settings"
+  "openSettings": "Open settings",
+  "sendFeedback": "Send feedback",
+  "sendFeedbackHint": "Found a bug or have an idea? Tell us."
 }

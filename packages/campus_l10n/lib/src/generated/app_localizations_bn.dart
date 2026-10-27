@@ -1001,4 +1001,11 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get openSettings => 'সেটিংস খোলো';
+
+  @override
+  String get sendFeedback => 'মতামত পাঠাও';
+
+  @override
+  String get sendFeedbackHint =>
+      'কোনো সমস্যা পেলে বা কোনো আইডিয়া থাকলে জানাও।';
 }

@@ -3,6 +3,7 @@ import 'package:campussaga/app/app.dart';
 import 'package:campussaga/app/clock.dart';
 import 'package:campussaga/app/settings/bloc/settings_state.dart';
 import 'package:campussaga/app/settings/settings_storage.dart';
+import 'package:campussaga/features/reminders/data/phone_info.dart';
 import 'package:campussaga/features/reminders/data/reminder_scheduler.dart';
 import 'package:campussaga/features/reminders/data/reminder_store.dart';
 import 'package:flutter/material.dart';
@@ -130,6 +131,30 @@ void main() {
     await tester.pumpAndSettle();
     expect(scheduler.pending, isEmpty);
     expect(store.saved.enabled, isFalse);
+  });
+
+  testWidgets('Xiaomi and similar phones get a battery guide', (tester) async {
+    usePhoneScreen(tester);
+    final phone = MemoryPhoneInfo('Xiaomi');
+    final (repo, _) = await registerFakes(
+      classes: FakeClassGroupRepository()..mine.add(sampleGroup()),
+      reminderStore: MemoryReminderStore(
+        const ReminderSettings(enabled: true, asked: true),
+      ),
+      reminderScheduler: MemoryReminderScheduler()..granted = true,
+      phone: phone,
+    );
+    repo.savedUser = testUser;
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Class reminders'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reminders arriving late?'), findsOneWidget);
+    expect(find.textContaining('Xiaomi phones can stop apps'), findsOneWidget);
+    await tester.tap(find.text('Open settings'));
+    expect(phone.opened, 1);
   });
 
   testWidgets('Android: asks to allow on-time alarms when needed', (

@@ -1,17 +1,19 @@
 name: campussaga
 description: "Student app: class routine, reminders and campus voice."
 publish_to: none
-version: 0.1.0+1
+version: 0.9.0+2
 
 environment:
   sdk: ^3.13.0
 resolution: workspace
 
 dependencies:
+  app_settings: ^9.0.1
   campus_core:
   campus_data:
   campus_l10n:
   campus_ui:
+  device_info_plus: ^13.3.0
   equatable: ^3.0.0
   firebase_auth: ^7.0.1
   firebase_core: ^5.1.0

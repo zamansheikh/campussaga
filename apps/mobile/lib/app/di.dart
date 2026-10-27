@@ -7,6 +7,7 @@ import '../features/announcements/data/seen_store.dart';
 import '../features/auth/data/google_auth.dart';
 import '../features/classes/data/routine_cache.dart';
 import '../features/push/push_messaging.dart';
+import '../features/reminders/data/phone_info.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/data/reminder_store.dart';
 import 'crash/crash_reporter.dart';
@@ -61,6 +62,7 @@ Future<void> configureDependencies({
       () => ApiDeviceRepository(getIt<ApiClient>()),
     )
     ..registerLazySingleton<PushMessaging>(FirebasePushMessaging.new)
+    ..registerLazySingleton<PhoneInfo>(DevicePhoneInfo.new)
     ..registerLazySingleton<ReminderScheduler>(LocalNotificationScheduler.new)
     ..registerLazySingleton<GoogleAuth>(platformGoogleAuth);
 }

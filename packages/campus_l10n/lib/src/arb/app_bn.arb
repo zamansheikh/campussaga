@@ -280,5 +280,7 @@
   "editAction": "সম্পাদনা",
   "batteryTitle": "রিমাইন্ডার দেরিতে আসছে?",
   "batteryBody": "{brand} ফোন ব্যাকগ্রাউন্ডে অ্যাপ বন্ধ করে দিতে পারে। এই অ্যাপকে ব্যাটারি সীমা ছাড়া চলতে দাও: সেটিংস → অ্যাপস → {app} → ব্যাটারি → Unrestricted (বা No restrictions)।",
-  "openSettings": "সেটিংস খোলো"
+  "openSettings": "সেটিংস খোলো",
+  "sendFeedback": "মতামত পাঠাও",
+  "sendFeedbackHint": "কোনো সমস্যা পেলে বা কোনো আইডিয়া থাকলে জানাও।"
 }

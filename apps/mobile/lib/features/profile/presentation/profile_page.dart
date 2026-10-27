@@ -100,6 +100,12 @@ class ProfilePage extends StatelessWidget {
               title: l10n.about,
               children: [
                 CsRow(
+                  icon: Icons.chat_bubble_outline_rounded,
+                  title: l10n.sendFeedback,
+                  subtitle: l10n.sendFeedbackHint,
+                  onTap: () => _sendFeedback(context),
+                ),
+                CsRow(
                   icon: Icons.privacy_tip_outlined,
                   title: l10n.privacyPolicy,
                   trailing: Icon(
@@ -118,6 +124,30 @@ class ProfilePage extends StatelessWidget {
             const _Footer(),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Opens an email to us with what helps answer: version and phone.
+  Future<void> _sendFeedback(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final version = getIt.isRegistered<AppVersion>()
+        ? getIt<AppVersion>()
+        : null;
+    final body = [
+      '',
+      '',
+      '---',
+      '${l10n.appName} ${version?.version ?? ''} (${version?.build ?? ''})',
+      '${Theme.of(context).platform.name} · ${Localizations.localeOf(context).languageCode}',
+    ].join('\n');
+    await launchUrl(
+      Uri(
+        scheme: 'mailto',
+        path: Env.supportEmail,
+        query:
+            'subject=${Uri.encodeComponent('${l10n.appName}: ${l10n.sendFeedback}')}'
+            '&body=${Uri.encodeComponent(body)}',
       ),
     );
   }

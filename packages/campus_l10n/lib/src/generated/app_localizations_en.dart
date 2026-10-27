@@ -1026,4 +1026,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openSettings => 'Open settings';
+
+  @override
+  String get sendFeedback => 'Send feedback';
+
+  @override
+  String get sendFeedbackHint => 'Found a bug or have an idea? Tell us.';
 }

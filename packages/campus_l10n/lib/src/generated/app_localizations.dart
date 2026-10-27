@@ -1783,6 +1783,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open settings'**
   String get openSettings;
+
+  /// No description provided for @sendFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Send feedback'**
+  String get sendFeedback;
+
+  /// No description provided for @sendFeedbackHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Found a bug or have an idea? Tell us.'**
+  String get sendFeedbackHint;
 }
 
 class _AppLocalizationsDelegate

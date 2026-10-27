@@ -29,5 +29,8 @@ abstract final class Env {
   static const String siteUrl = 'https://zamansheikh.github.io/campussaga';
   static const String privacyPolicyUrl = '$siteUrl/privacy.html';
 
+  /// Where testers and students send feedback.
+  static const String supportEmail = 'hello@silifton.com';
+
   static bool get isProduction => appEnv == 'production';
 }
