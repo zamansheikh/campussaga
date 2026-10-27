@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:campus_core/campus_core.dart';
 import 'package:campussaga/app/crash/crash_reporter.dart';
 import 'package:campussaga/app/di.dart';
+import 'package:campussaga/app/settings/bloc/settings_state.dart';
 import 'package:campussaga/app/settings/settings_storage.dart';
 import 'package:campussaga/app/version/app_version.dart';
 import 'package:campussaga/features/auth/data/google_auth.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 const testUser = UserProfile(
   id: 'u1',
@@ -194,8 +197,28 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
     ..registerSingleton<AppConfigRepository>(
       config ?? FakeAppConfigRepository(),
     )
-    ..registerSingleton<SettingsStorage>(settings ?? MemorySettingsStorage())
+    ..registerSingleton<SettingsStorage>(
+      // Most tests start past the welcome slides.
+      settings ??
+          MemorySettingsStorage(const SettingsState(onboardingDone: true)),
+    )
     ..registerSingleton<AppVersion>(AppVersion(version: '0.1.0', build: build))
     ..registerSingleton<CrashReporter>(MemoryCrashReporter());
   return (repo, google);
+}
+
+/// Runs the test on a phone-sized screen (390 x 844, like an iPhone 14)
+/// instead of the default 800 x 600.
+void usePhoneScreen(WidgetTester tester) {
+  tester.view
+    ..physicalSize = const Size(1170, 2532)
+    ..devicePixelRatio = 3;
+  addTearDown(tester.view.reset);
+}
+
+/// Scrolls [finder] into view, then taps it.
+Future<void> scrollAndTap(WidgetTester tester, Finder finder) async {
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
 }

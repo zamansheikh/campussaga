@@ -152,12 +152,6 @@ abstract class AppLocalizations {
   /// **'Once you join a class group, the full week appears here.'**
   String get routineEmptyMessage;
 
-  /// No description provided for @settings.
-  ///
-  /// In en, this message translates to:
-  /// **'Settings'**
-  String get settings;
-
   /// No description provided for @theme.
   ///
   /// In en, this message translates to:
@@ -529,6 +523,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy policy'**
   String get privacyPolicy;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Get started'**
+  String get onboardingStart;
+
+  /// No description provided for @onboarding1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Your class, always on time'**
+  String get onboarding1Title;
+
+  /// No description provided for @onboarding1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s classes, room changes from your CR, and a reminder before every class.'**
+  String get onboarding1Body;
+
+  /// No description provided for @onboarding2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise campus issues together'**
+  String get onboarding2Title;
+
+  /// No description provided for @onboarding2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a problem, add your \"me too\", and follow it until it\'s solved.'**
+  String get onboarding2Body;
+
+  /// No description provided for @onboarding3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified students only'**
+  String get onboarding3Title;
+
+  /// No description provided for @onboarding3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Only verified university emails can join. Post campus issues without your name. We never sell your data.'**
+  String get onboarding3Body;
+
+  /// No description provided for @illusNextClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Next class'**
+  String get illusNextClass;
+
+  /// No description provided for @illusStartsIn.
+  ///
+  /// In en, this message translates to:
+  /// **'in 25 min'**
+  String get illusStartsIn;
+
+  /// No description provided for @illusRoomChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Room changed to 504'**
+  String get illusRoomChanged;
+
+  /// No description provided for @illusReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder set'**
+  String get illusReminder;
+
+  /// No description provided for @illusIssueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Library Wi-Fi keeps dropping'**
+  String get illusIssueTitle;
+
+  /// No description provided for @illusMeToo.
+  ///
+  /// In en, this message translates to:
+  /// **'Me too'**
+  String get illusMeToo;
+
+  /// No description provided for @illusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get illusInProgress;
+
+  /// No description provided for @illusAnonymous.
+  ///
+  /// In en, this message translates to:
+  /// **'Posted anonymously'**
+  String get illusAnonymous;
+
+  /// No description provided for @signInTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Your class and your campus, in one app.'**
+  String get signInTagline;
+
+  /// No description provided for @signInLegal.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to our {policy}.'**
+  String signInLegal(String policy);
+
+  /// No description provided for @orDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get orDivider;
+
+  /// No description provided for @greetingMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning, {name}'**
+  String greetingMorning(String name);
+
+  /// No description provided for @greetingAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon, {name}'**
+  String greetingAfternoon(String name);
+
+  /// No description provided for @greetingEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening, {name}'**
+  String greetingEvening(String name);
+
+  /// No description provided for @todayStepsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How it works'**
+  String get todayStepsTitle;
+
+  /// No description provided for @todayStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Join your class group with a code from your CR'**
+  String get todayStep1;
+
+  /// No description provided for @todayStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'See today\'s classes and rooms at a glance'**
+  String get todayStep2;
+
+  /// No description provided for @todayStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Get a reminder before each class'**
+  String get todayStep3;
+
+  /// No description provided for @verifiedStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified student'**
+  String get verifiedStudent;
+
+  /// No description provided for @completeProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Add department and batch'**
+  String get completeProfile;
+
+  /// No description provided for @preferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences'**
+  String get preferences;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @languageSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone language'**
+  String get languageSystem;
+
+  /// No description provided for @themeSystemHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Match your phone\'s setting'**
+  String get themeSystemHint;
+
+  /// No description provided for @versionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String versionLabel(String version);
+
+  /// No description provided for @madeFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Made for students in Bangladesh'**
+  String get madeFor;
+
+  /// No description provided for @deleteAccountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently remove your account'**
+  String get deleteAccountHint;
+
+  /// No description provided for @setupProfileStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Last step'**
+  String get setupProfileStep;
+
+  /// No description provided for @editProfileHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Classmates see your name in class groups.'**
+  String get editProfileHint;
 }
 
 class _AppLocalizationsDelegate

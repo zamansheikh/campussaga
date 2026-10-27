@@ -39,9 +39,6 @@ class AppLocalizationsBn extends AppLocalizations {
       'ক্লাস গ্রুপে যোগ দিলে পুরো সপ্তাহের রুটিন এখানে দেখাবে।';
 
   @override
-  String get settings => 'সেটিংস';
-
-  @override
   String get theme => 'থিম';
 
   @override
@@ -244,4 +241,131 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'গোপনীয়তা নীতি';
+
+  @override
+  String get onboardingSkip => 'এড়িয়ে যাও';
+
+  @override
+  String get onboardingNext => 'পরের';
+
+  @override
+  String get onboardingStart => 'শুরু করো';
+
+  @override
+  String get onboarding1Title => 'তোমার ক্লাস, সবসময় সময়মতো';
+
+  @override
+  String get onboarding1Body =>
+      'আজকের ক্লাস, সিআর-এর দেওয়া রুম পরিবর্তন, আর প্রতিটি ক্লাসের আগে রিমাইন্ডার।';
+
+  @override
+  String get onboarding2Title => 'একসাথে ক্যাম্পাসের সমস্যা তুলে ধরো';
+
+  @override
+  String get onboarding2Body =>
+      'সমস্যা জানাও, \"আমারও\" যোগ করো, আর সমাধান না হওয়া পর্যন্ত খোঁজ রাখো।';
+
+  @override
+  String get onboarding3Title => 'শুধু শিক্ষার্থীদের জন্য, গোপনীয়তা সবার আগে';
+
+  @override
+  String get onboarding3Body =>
+      'শুধু যাচাই করা বিশ্ববিদ্যালয়ের ইমেইল দিয়ে যোগ দেওয়া যায়। ক্যাম্পাসের সমস্যা নাম ছাড়াই জানাতে পারো। তোমার তথ্য আমরা কখনো বিক্রি করি না।';
+
+  @override
+  String get illusNextClass => 'পরের ক্লাস';
+
+  @override
+  String get illusStartsIn => '২৫ মিনিট পর';
+
+  @override
+  String get illusRoomChanged => 'রুম বদলে ৫০৪';
+
+  @override
+  String get illusReminder => 'রিমাইন্ডার চালু';
+
+  @override
+  String get illusIssueTitle => 'লাইব্রেরির ওয়াই-ফাই বারবার চলে যায়';
+
+  @override
+  String get illusMeToo => 'আমারও';
+
+  @override
+  String get illusInProgress => 'কাজ চলছে';
+
+  @override
+  String get illusAnonymous => 'নাম গোপন রেখে পোস্ট';
+
+  @override
+  String get signInTagline => 'তোমার ক্লাস আর ক্যাম্পাস, এক অ্যাপে।';
+
+  @override
+  String signInLegal(String policy) {
+    return 'চালিয়ে গেলে তুমি আমাদের $policy-তে সম্মত হচ্ছ।';
+  }
+
+  @override
+  String get orDivider => 'অথবা';
+
+  @override
+  String greetingMorning(String name) {
+    return 'শুভ সকাল, $name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return 'শুভ দুপুর, $name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return 'শুভ সন্ধ্যা, $name';
+  }
+
+  @override
+  String get todayStepsTitle => 'যেভাবে কাজ করে';
+
+  @override
+  String get todayStep1 => 'সিআর-এর দেওয়া কোড দিয়ে ক্লাস গ্রুপে যোগ দাও';
+
+  @override
+  String get todayStep2 => 'এক নজরে আজকের ক্লাস আর রুম দেখো';
+
+  @override
+  String get todayStep3 => 'প্রতিটি ক্লাসের আগে রিমাইন্ডার পাও';
+
+  @override
+  String get verifiedStudent => 'যাচাই করা শিক্ষার্থী';
+
+  @override
+  String get completeProfile => 'বিভাগ ও ব্যাচ যোগ করো';
+
+  @override
+  String get preferences => 'পছন্দসমূহ';
+
+  @override
+  String get about => 'সম্পর্কে';
+
+  @override
+  String get languageSystem => 'ফোনের ভাষা';
+
+  @override
+  String get themeSystemHint => 'ফোনের সেটিং অনুযায়ী';
+
+  @override
+  String versionLabel(String version) {
+    return 'ভার্সন $version';
+  }
+
+  @override
+  String get madeFor => 'বাংলাদেশের শিক্ষার্থীদের জন্য তৈরি';
+
+  @override
+  String get deleteAccountHint => 'অ্যাকাউন্ট স্থায়ীভাবে মুছে ফেলো';
+
+  @override
+  String get setupProfileStep => 'শেষ ধাপ';
+
+  @override
+  String get editProfileHint => 'ক্লাস গ্রুপে সহপাঠীরা তোমার নাম দেখবে।';
 }

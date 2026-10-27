@@ -5,13 +5,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../app/di.dart';
 import '../../../app/env.dart';
 import '../../../app/router.dart';
 import '../../../app/settings/bloc/settings_cubit.dart';
+import '../../../app/version/app_version.dart';
 import '../../auth/presentation/auth_error_text.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 
-/// Account (edit profile, sign out, delete account) and settings.
+/// Who you are, your preferences, and account actions.
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -19,7 +21,17 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final settings = context.watch<SettingsCubit>().state;
-    final controller = context.read<SettingsCubit>();
+
+    final themeLabel = switch (settings.themeMode) {
+      ThemeMode.system => l10n.themeSystem,
+      ThemeMode.light => l10n.themeLight,
+      ThemeMode.dark => l10n.themeDark,
+    };
+    final languageLabel = switch (settings.locale?.languageCode) {
+      'en' => 'English',
+      'bn' => 'বাংলা',
+      _ => l10n.languageSystem,
+    };
 
     return BlocListener<AuthBloc, AuthState>(
       // Deleting failed (e.g. offline): still signed in, say why.
@@ -33,77 +45,204 @@ class ProfilePage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(title: Text(l10n.navProfile)),
-        body: ListView(
-          padding: const EdgeInsets.symmetric(vertical: CsSpace.sm),
+        body: CsPage(
           children: [
-            _SectionLabel(l10n.account),
-            const _AccountCard(),
-            ListTile(
-              leading: const Icon(Icons.edit_outlined),
-              title: Text(l10n.editProfile),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push(Routes.editProfile),
-            ),
-            _SectionLabel(l10n.settings),
-            _Group(
-              title: l10n.theme,
-              child: SegmentedButton<ThemeMode>(
-                showSelectedIcon: false,
-                segments: [
-                  ButtonSegment(
-                    value: ThemeMode.system,
-                    label: Text(l10n.themeSystem),
-                  ),
-                  ButtonSegment(
-                    value: ThemeMode.light,
-                    label: Text(l10n.themeLight),
-                  ),
-                  ButtonSegment(
-                    value: ThemeMode.dark,
-                    label: Text(l10n.themeDark),
-                  ),
-                ],
-                selected: {settings.themeMode},
-                onSelectionChanged: (s) => controller.setThemeMode(s.first),
-              ),
-            ),
-            _Group(
-              title: l10n.language,
-              child: SegmentedButton<String>(
-                showSelectedIcon: false,
-                segments: [
-                  ButtonSegment(value: 'system', label: Text(l10n.themeSystem)),
-                  const ButtonSegment(value: 'en', label: Text('English')),
-                  const ButtonSegment(value: 'bn', label: Text('বাংলা')),
-                ],
-                selected: {settings.locale?.languageCode ?? 'system'},
-                onSelectionChanged: (s) => controller.setLocale(
-                  s.first == 'system' ? null : Locale(s.first),
+            const _ProfileHeader(),
+            const SizedBox(height: CsSpace.lg),
+            CsSection(
+              title: l10n.preferences,
+              children: [
+                CsRow(
+                  icon: Icons.palette_outlined,
+                  title: l10n.theme,
+                  value: themeLabel,
+                  onTap: () => _pickTheme(context, settings.themeMode),
                 ),
-              ),
+                CsRow(
+                  icon: Icons.translate_rounded,
+                  title: l10n.language,
+                  value: languageLabel,
+                  onTap: () => _pickLanguage(context, settings.locale),
+                ),
+              ],
             ),
             const SizedBox(height: CsSpace.lg),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: CsSpace.screen),
-              child: OutlinedButton.icon(
-                onPressed: () =>
-                    context.read<AuthBloc>().add(const AuthSignOutRequested()),
-                icon: const Icon(Icons.logout),
-                label: Text(l10n.signOut),
-              ),
+            CsSection(
+              title: l10n.account,
+              children: [
+                CsRow(
+                  icon: Icons.edit_outlined,
+                  title: l10n.editProfile,
+                  onTap: () => context.push(Routes.editProfile),
+                ),
+                CsRow(
+                  icon: Icons.logout_rounded,
+                  title: l10n.signOut,
+                  onTap: () => context.read<AuthBloc>().add(
+                    const AuthSignOutRequested(),
+                  ),
+                ),
+                const _DeleteAccountRow(),
+              ],
+            ),
+            const SizedBox(height: CsSpace.lg),
+            CsSection(
+              title: l10n.about,
+              children: [
+                CsRow(
+                  icon: Icons.privacy_tip_outlined,
+                  title: l10n.privacyPolicy,
+                  trailing: Icon(
+                    Icons.open_in_new_rounded,
+                    size: 18,
+                    color: context.cs.textSecondary,
+                  ),
+                  onTap: () => launchUrl(
+                    Uri.parse(Env.privacyPolicyUrl),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: CsSpace.xl),
+            const _Footer(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickTheme(BuildContext context, ThemeMode current) async {
+    final l10n = AppLocalizations.of(context);
+    final cubit = context.read<SettingsCubit>();
+    final picked = await CsOptionSheet.show<ThemeMode>(
+      context: context,
+      title: l10n.theme,
+      selected: current,
+      options: [
+        CsOption(
+          ThemeMode.system,
+          l10n.themeSystem,
+          subtitle: l10n.themeSystemHint,
+          icon: Icons.brightness_auto_outlined,
+        ),
+        CsOption(
+          ThemeMode.light,
+          l10n.themeLight,
+          icon: Icons.light_mode_outlined,
+        ),
+        CsOption(
+          ThemeMode.dark,
+          l10n.themeDark,
+          icon: Icons.dark_mode_outlined,
+        ),
+      ],
+    );
+    if (picked != null) cubit.setThemeMode(picked);
+  }
+
+  Future<void> _pickLanguage(BuildContext context, Locale? current) async {
+    final l10n = AppLocalizations.of(context);
+    final cubit = context.read<SettingsCubit>();
+    final picked = await CsOptionSheet.show<String>(
+      context: context,
+      title: l10n.language,
+      selected: current?.languageCode ?? 'system',
+      options: [
+        CsOption(
+          'system',
+          l10n.languageSystem,
+          icon: Icons.phone_android_rounded,
+        ),
+        const CsOption('en', 'English', subtitle: 'English'),
+        const CsOption('bn', 'বাংলা', subtitle: 'Bangla'),
+      ],
+    );
+    if (picked != null) {
+      cubit.setLocale(picked == 'system' ? null : Locale(picked));
+    }
+  }
+}
+
+/// Avatar, name, email, verified badge, university and class.
+class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cs = context.cs;
+    final user = context.select((AuthBloc b) => b.state.user);
+    if (user == null) return const SizedBox.shrink();
+    final lang = Localizations.localeOf(context).languageCode;
+    final name = (user.displayName?.trim().isNotEmpty ?? false)
+        ? user.displayName!.trim()
+        : user.email.split('@').first;
+    final classLine = [
+      user.department,
+      user.batch,
+    ].where((v) => v != null && v.isNotEmpty).join(' · ');
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(CsSpace.md + 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CsAvatar(name: name, size: 60),
+                const SizedBox(width: CsSpace.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: context.text.titleLarge,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        user.email,
+                        style: context.text.bodyMedium?.copyWith(
+                          color: cs.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: CsSpace.sm),
+                      CsBadge(
+                        label: l10n.verifiedStudent,
+                        icon: Icons.verified_rounded,
+                        tone: CsBadgeTone.success,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: CsSpace.md),
+            const Divider(),
+            const SizedBox(height: CsSpace.md),
+            _InfoLine(
+              icon: Icons.account_balance_outlined,
+              text: user.university.localName(lang),
             ),
             const SizedBox(height: CsSpace.sm),
-            const _DeleteAccountButton(),
-            ListTile(
-              leading: const Icon(Icons.privacy_tip_outlined),
-              title: Text(l10n.privacyPolicy),
-              trailing: const Icon(Icons.open_in_new, size: 18),
-              onTap: () => launchUrl(
-                Uri.parse(Env.privacyPolicyUrl),
-                mode: LaunchMode.externalApplication,
+            if (classLine.isNotEmpty)
+              _InfoLine(icon: Icons.school_outlined, text: classLine)
+            else
+              InkWell(
+                borderRadius: BorderRadius.circular(CsRadius.sm),
+                onTap: () => context.push(Routes.editProfile),
+                child: _InfoLine(
+                  icon: Icons.add_circle_outline_rounded,
+                  text: l10n.completeProfile,
+                  highlight: true,
+                ),
               ),
-            ),
-            const SizedBox(height: CsSpace.lg),
           ],
         ),
       ),
@@ -111,8 +250,45 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-class _DeleteAccountButton extends StatelessWidget {
-  const _DeleteAccountButton();
+class _InfoLine extends StatelessWidget {
+  const _InfoLine({
+    required this.icon,
+    required this.text,
+    this.highlight = false,
+  });
+
+  final IconData icon;
+  final String text;
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = context.cs;
+    final color = highlight ? cs.primary : cs.textSecondary;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 1),
+          child: Icon(icon, size: 20, color: color),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: context.text.bodyMedium?.copyWith(
+              color: highlight ? cs.primary : cs.textPrimary,
+              fontWeight: highlight ? FontWeight.w600 : null,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DeleteAccountRow extends StatelessWidget {
+  const _DeleteAccountRow();
 
   Future<void> _confirm(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
@@ -120,7 +296,7 @@ class _DeleteAccountButton extends StatelessWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: Icon(Icons.warning_amber_rounded, color: context.cs.error),
+        icon: Icon(Icons.delete_forever_rounded, color: context.cs.error),
         title: Text(l10n.deleteAccountTitle),
         content: Text(l10n.deleteAccountBody),
         actions: [
@@ -143,99 +319,42 @@ class _DeleteAccountButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final deleting = context.select((AuthBloc b) => b.state.deleting);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: CsSpace.screen),
-      child: TextButton.icon(
-        style: TextButton.styleFrom(foregroundColor: context.cs.error),
-        onPressed: deleting ? null : () => _confirm(context),
-        icon: deleting
-            ? const SizedBox.square(
-                dimension: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Icon(Icons.delete_forever_outlined),
-        label: Text(l10n.deleteAccount),
-      ),
+    return CsRow(
+      icon: Icons.delete_outline_rounded,
+      title: l10n.deleteAccount,
+      subtitle: l10n.deleteAccountHint,
+      destructive: true,
+      showChevron: false,
+      trailing: deleting
+          ? const SizedBox.square(
+              dimension: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : null,
+      onTap: deleting ? null : () => _confirm(context),
     );
   }
 }
 
-class _AccountCard extends StatelessWidget {
-  const _AccountCard();
+class _Footer extends StatelessWidget {
+  const _Footer();
 
   @override
   Widget build(BuildContext context) {
-    final user = context.select((AuthBloc b) => b.state.user);
-    if (user == null) return const SizedBox.shrink();
-    final lang = Localizations.localeOf(context).languageCode;
-    final name = user.displayName ?? user.email.split('@').first;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: CsSpace.screen),
-      child: Card(
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundColor: context.cs.primaryContainer,
-            foregroundColor: context.cs.onPrimaryContainer,
-            child: Text(name.characters.first.toUpperCase()),
-          ),
-          title: Text(name),
-          subtitle: Text(
-            [
-              user.email,
-              user.university.localName(lang),
-              [
-                user.department,
-                user.batch,
-              ].where((v) => v != null && v.isNotEmpty).join(' · '),
-            ].where((v) => v.isNotEmpty).join('\n'),
-          ),
-          isThreeLine: true,
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        CsSpace.screen,
-        CsSpace.md,
-        CsSpace.screen,
-        CsSpace.sm,
-      ),
-      child: Text(text, style: context.text.labelLarge),
-    );
-  }
-}
-
-class _Group extends StatelessWidget {
-  const _Group({required this.title, required this.child});
-
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: CsSpace.screen,
-        vertical: CsSpace.sm,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: context.text.bodyMedium),
-          const SizedBox(height: CsSpace.sm),
-          SizedBox(width: double.infinity, child: child),
-        ],
-      ),
+    final l10n = AppLocalizations.of(context);
+    final version = getIt.isRegistered<AppVersion>()
+        ? getIt<AppVersion>().version
+        : null;
+    return Column(
+      children: [
+        const CsBrandMark(size: 36),
+        const SizedBox(height: CsSpace.sm),
+        Text(l10n.appName, style: context.text.labelLarge),
+        if (version != null)
+          Text(l10n.versionLabel(version), style: context.text.bodySmall),
+        const SizedBox(height: CsSpace.xs),
+        Text(l10n.madeFor, style: context.text.bodySmall),
+      ],
     );
   }
 }

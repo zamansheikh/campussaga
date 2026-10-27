@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'bloc/settings_state.dart';
 
-/// Where theme and language are kept between app starts.
+/// Where theme, language and the onboarding flag are kept between starts.
 abstract interface class SettingsStorage {
   /// Read synchronously, so the first frame already has the right theme.
   SettingsState read();
@@ -16,7 +16,8 @@ class PrefsSettingsStorage implements SettingsStorage {
 
   static const themeKey = 'settings.theme';
   static const localeKey = 'settings.locale';
-  static const keys = {themeKey, localeKey};
+  static const onboardingKey = 'settings.onboardingDone';
+  static const keys = {themeKey, localeKey, onboardingKey};
 
   final SharedPreferencesWithCache _prefs;
 
@@ -38,12 +39,14 @@ class PrefsSettingsStorage implements SettingsStorage {
     return SettingsState(
       themeMode: theme,
       locale: lang == 'en' || lang == 'bn' ? Locale(lang!) : null,
+      onboardingDone: _prefs.getBool(onboardingKey) ?? false,
     );
   }
 
   @override
   Future<void> write(SettingsState s) async {
     await _prefs.setString(themeKey, s.themeMode.name);
+    await _prefs.setBool(onboardingKey, s.onboardingDone);
     final lang = s.locale?.languageCode;
     if (lang == null) {
       await _prefs.remove(localeKey);

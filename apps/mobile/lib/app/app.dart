@@ -28,7 +28,8 @@ class _CampusAppState extends State<CampusApp> {
     repository: getIt<AuthRepository>(),
     google: getIt<GoogleAuth>(),
   )..add(const AuthStarted());
-  late final GoRouter _router = buildRouter(_auth);
+  late final SettingsCubit _settings = SettingsCubit(getIt<SettingsStorage>());
+  late final GoRouter _router = buildRouter(_auth, _settings);
   late final VersionGateCubit _versionGate = VersionGateCubit(
     config: getIt<AppConfigRepository>(),
     currentBuild: getIt<AppVersion>().build,
@@ -50,6 +51,7 @@ class _CampusAppState extends State<CampusApp> {
     _lifecycle.dispose();
     _router.dispose();
     _auth.close();
+    _settings.close();
     _versionGate.close();
     super.dispose();
   }
@@ -60,7 +62,7 @@ class _CampusAppState extends State<CampusApp> {
       providers: [
         BlocProvider.value(value: _auth),
         BlocProvider.value(value: _versionGate),
-        BlocProvider(create: (_) => SettingsCubit(getIt<SettingsStorage>())),
+        BlocProvider.value(value: _settings),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settings) => MaterialApp.router(

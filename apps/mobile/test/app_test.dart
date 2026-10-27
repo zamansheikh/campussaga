@@ -1,5 +1,6 @@
 import 'package:campus_core/campus_core.dart';
 import 'package:campussaga/app/app.dart';
+import 'package:campussaga/app/settings/bloc/settings_state.dart';
 import 'package:campussaga/app/settings/settings_storage.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,7 @@ void main() {
   testWidgets('signed out: shows sign-in, Google sign-in opens the app', (
     tester,
   ) async {
+    usePhoneScreen(tester);
     final (repo, _) = await registerFakes();
     await tester.pumpWidget(const CampusApp());
     await tester.pumpAndSettle();
@@ -26,9 +28,57 @@ void main() {
     expect(find.byType(NavigationBar), findsOneWidget);
   });
 
+  testWidgets('first launch: welcome slides once, then sign-in', (
+    tester,
+  ) async {
+    usePhoneScreen(tester);
+    final storage = MemorySettingsStorage();
+    await registerFakes(settings: storage);
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your class, always on time'), findsOneWidget);
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Raise campus issues together'), findsOneWidget);
+    expect(find.text('Coming soon'), findsOneWidget);
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<TextButton>(find.widgetWithText(TextButton, 'Skip'))
+          .onPressed,
+      isNull,
+      reason: 'hidden on the last slide',
+    );
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Continue with Google'), findsOneWidget);
+    expect(storage.saved.onboardingDone, isTrue);
+
+    // Never again after a restart.
+    await registerFakes(settings: storage);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+    expect(find.text('Continue with Google'), findsOneWidget);
+  });
+
+  testWidgets('"Skip" goes straight to sign-in', (tester) async {
+    usePhoneScreen(tester);
+    await registerFakes(settings: MemorySettingsStorage());
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Skip'));
+    await tester.pumpAndSettle();
+    expect(find.text('Continue with Google'), findsOneWidget);
+  });
+
   testWidgets('a personal Google account shows why it was refused', (
     tester,
   ) async {
+    usePhoneScreen(tester);
     final (repo, _) = await registerFakes();
     repo.googleFailure = const RejectedFailure(
       code: 'UNIVERSITY_EMAIL_REQUIRED',
@@ -46,6 +96,7 @@ void main() {
   testWidgets('signed in: profile shows the account, Bangla, sign out', (
     tester,
   ) async {
+    usePhoneScreen(tester);
     final (repo, _) = await registerFakes();
     repo.savedUser = testUser;
     await tester.pumpWidget(const CampusApp());
@@ -56,6 +107,8 @@ void main() {
     expect(find.text('Rafi'), findsOneWidget);
     expect(find.textContaining('Demo University'), findsOneWidget);
 
+    await tester.tap(find.text('Language'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('বাংলা'));
     await tester.pumpAndSettle();
     expect(find.text('প্রোফাইল'), findsWidgets);
@@ -70,6 +123,7 @@ void main() {
   });
 
   testWidgets('email code: email -> code -> signed in', (tester) async {
+    usePhoneScreen(tester);
     final (repo, _) = await registerFakes();
     await tester.pumpWidget(const CampusApp());
     await tester.pumpAndSettle();
@@ -113,6 +167,7 @@ void main() {
   testWidgets('email code: a non-university email is explained', (
     tester,
   ) async {
+    usePhoneScreen(tester);
     final (repo, _) = await registerFakes();
     repo.requestFailure = const RejectedFailure(
       code: 'UNIVERSITY_EMAIL_REQUIRED',
@@ -136,6 +191,7 @@ void main() {
   testWidgets(
     'first sign-in asks for department and batch, then opens the app',
     (tester) async {
+      usePhoneScreen(tester);
       final profile = FakeProfileRepository();
       final (repo, _) = await registerFakes(profile: profile);
       repo.googleUser = newUser; // Google gave a name, nothing else
@@ -148,7 +204,7 @@ void main() {
       expect(find.text('Mim'), findsOneWidget, reason: 'name prefilled');
 
       // Saving with a missing field is refused on the spot.
-      await tester.tap(find.text('Save'));
+      await scrollAndTap(tester, find.text('Save'));
       await tester.pumpAndSettle();
       expect(find.text('This is required.'), findsNWidgets(2));
 
@@ -161,7 +217,7 @@ void main() {
       await tester.tap(find.text('Computer Science'));
       await tester.pumpAndSettle();
       await tester.enterText(find.widgetWithText(TextField, 'Batch'), '61');
-      await tester.tap(find.text('Save'));
+      await scrollAndTap(tester, find.text('Save'));
       await tester.pumpAndSettle();
 
       expect(profile.updates.last, ('Mim', 'Computer Science', '61'));
@@ -170,18 +226,20 @@ void main() {
   );
 
   testWidgets('"Later" skips setup for now', (tester) async {
+    usePhoneScreen(tester);
     final (repo, _) = await registerFakes();
     repo.savedUser = newUser;
     await tester.pumpWidget(const CampusApp());
     await tester.pumpAndSettle();
 
     expect(find.text('Set up your profile'), findsOneWidget);
-    await tester.tap(find.text('Later'));
+    await scrollAndTap(tester, find.text('Later'));
     await tester.pumpAndSettle();
     expect(find.text('No classes yet'), findsOneWidget);
   });
 
   testWidgets('edit profile from the Profile tab', (tester) async {
+    usePhoneScreen(tester);
     final profile = FakeProfileRepository();
     final (repo, _) = await registerFakes(profile: profile);
     repo.savedUser = testUser;
@@ -195,7 +253,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.widgetWithText(TextField, 'Batch'), '62');
-    await tester.tap(find.text('Save'));
+    await scrollAndTap(tester, find.text('Save'));
     await tester.pumpAndSettle();
 
     expect(profile.updates.last, ('Rafi', 'CSE', '62'));
@@ -204,6 +262,7 @@ void main() {
   });
 
   testWidgets('delete account asks first, then signs out', (tester) async {
+    usePhoneScreen(tester);
     final (repo, _) = await registerFakes();
     repo.savedUser = testUser;
     await tester.pumpWidget(const CampusApp());
@@ -211,8 +270,6 @@ void main() {
     await tester.tap(find.text('Profile'));
     await tester.pumpAndSettle();
 
-    // The list builds rows lazily: scroll down to the button first.
-    await tester.scrollUntilVisible(find.text('Delete account'), 200);
     await tester.ensureVisible(find.text('Delete account'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Delete account'));
@@ -235,6 +292,7 @@ void main() {
   testWidgets('an unsupported build sees only the update screen', (
     tester,
   ) async {
+    usePhoneScreen(tester);
     final config = FakeAppConfigRepository()
       ..config = const AppConfig(
         minSupportedBuild: 9,
@@ -251,12 +309,17 @@ void main() {
   });
 
   testWidgets('theme and language come back after a restart', (tester) async {
-    final storage = MemorySettingsStorage();
+    usePhoneScreen(tester);
+    final storage = MemorySettingsStorage(
+      const SettingsState(onboardingDone: true),
+    );
     final (repo, _) = await registerFakes(settings: storage);
     repo.savedUser = testUser;
     await tester.pumpWidget(const CampusApp());
     await tester.pumpAndSettle();
     await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Language'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('বাংলা'));
     await tester.pumpAndSettle();

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../auth/presentation/auth_error_text.dart';
+import '../../../auth/presentation/widgets/notice_banner.dart';
 import '../bloc/profile_form_cubit.dart';
 
 /// Name, department (with suggestions from classmates) and batch.
@@ -79,6 +80,7 @@ class _ProfileFormState extends State<ProfileForm> {
                 autofillHints: const [AutofillHints.name],
                 decoration: InputDecoration(
                   labelText: l10n.displayNameLabel,
+                  prefixIcon: const Icon(Icons.person_outline_rounded),
                   errorText: _error(l10n, s, 'displayName'),
                 ),
               ),
@@ -96,6 +98,7 @@ class _ProfileFormState extends State<ProfileForm> {
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         labelText: l10n.departmentLabel,
+                        prefixIcon: const Icon(Icons.apartment_rounded),
                         hintText: l10n.departmentHint,
                         errorText: _error(l10n, s, 'department'),
                       ),
@@ -111,18 +114,14 @@ class _ProfileFormState extends State<ProfileForm> {
                 onSubmitted: (_) => _submit(),
                 decoration: InputDecoration(
                   labelText: l10n.batchLabel,
+                  prefixIcon: const Icon(Icons.groups_outlined),
                   hintText: l10n.batchHint,
                   errorText: _error(l10n, s, 'batch'),
                 ),
               ),
               if (s.failure != null) ...[
                 const SizedBox(height: CsSpace.md),
-                Text(
-                  authErrorText(l10n, s.failure!),
-                  style: context.text.bodyMedium?.copyWith(
-                    color: context.cs.error,
-                  ),
-                ),
+                NoticeBanner(text: authErrorText(l10n, s.failure!)),
               ],
               const SizedBox(height: CsSpace.lg),
               FilledButton(
@@ -156,18 +155,31 @@ class _Suggestions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.topLeft,
-      child: Material(
-        elevation: 4,
-        borderRadius: BorderRadius.circular(CsRadius.md),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 240, maxWidth: 360),
-          child: ListView(
-            padding: EdgeInsets.zero,
-            shrinkWrap: true,
-            children: [
-              for (final o in options)
-                ListTile(title: Text(o), onTap: () => onSelected(o)),
-            ],
+      child: Padding(
+        padding: const EdgeInsets.only(top: CsSpace.xs),
+        child: Material(
+          elevation: 6,
+          shadowColor: Colors.black26,
+          color: context.cs.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(CsRadius.md),
+            side: BorderSide(color: context.cs.border),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 240, maxWidth: 360),
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: CsSpace.xs),
+              shrinkWrap: true,
+              children: [
+                for (final o in options)
+                  ListTile(
+                    leading: const Icon(Icons.history_rounded, size: 20),
+                    title: Text(o),
+                    onTap: () => onSelected(o),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

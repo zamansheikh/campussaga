@@ -12,7 +12,6 @@
   "joinClassGroup": "Join class group",
   "routineEmptyTitle": "Your weekly routine",
   "routineEmptyMessage": "Once you join a class group, the full week appears here.",
-  "settings": "Settings",
   "theme": "Theme",
   "themeSystem": "System",
   "themeLight": "Light",
@@ -95,5 +94,78 @@
   "updateRequiredBody": "This version of the app is no longer supported. Please update to keep using it.",
   "updateNow": "Update now",
   "updateFromStore": "Please update the app from your app store.",
-  "privacyPolicy": "Privacy policy"
+  "privacyPolicy": "Privacy policy",
+  "onboardingSkip": "Skip",
+  "onboardingNext": "Next",
+  "onboardingStart": "Get started",
+  "onboarding1Title": "Your class, always on time",
+  "onboarding1Body": "Today's classes, room changes from your CR, and a reminder before every class.",
+  "onboarding2Title": "Raise campus issues together",
+  "onboarding2Body": "Report a problem, add your \"me too\", and follow it until it's solved.",
+  "onboarding3Title": "Verified students only",
+  "onboarding3Body": "Only verified university emails can join. Post campus issues without your name. We never sell your data.",
+  "illusNextClass": "Next class",
+  "illusStartsIn": "in 25 min",
+  "illusRoomChanged": "Room changed to 504",
+  "illusReminder": "Reminder set",
+  "illusIssueTitle": "Library Wi-Fi keeps dropping",
+  "illusMeToo": "Me too",
+  "illusInProgress": "In progress",
+  "illusAnonymous": "Posted anonymously",
+  "signInTagline": "Your class and your campus, in one app.",
+  "signInLegal": "By continuing, you agree to our {policy}.",
+  "@signInLegal": {
+    "placeholders": {
+      "policy": {
+        "type": "String"
+      }
+    }
+  },
+  "orDivider": "or",
+  "greetingMorning": "Good morning, {name}",
+  "@greetingMorning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingAfternoon": "Good afternoon, {name}",
+  "@greetingAfternoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingEvening": "Good evening, {name}",
+  "@greetingEvening": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "todayStepsTitle": "How it works",
+  "todayStep1": "Join your class group with a code from your CR",
+  "todayStep2": "See today's classes and rooms at a glance",
+  "todayStep3": "Get a reminder before each class",
+  "verifiedStudent": "Verified student",
+  "completeProfile": "Add department and batch",
+  "preferences": "Preferences",
+  "about": "About",
+  "languageSystem": "Phone language",
+  "themeSystemHint": "Match your phone's setting",
+  "versionLabel": "Version {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "madeFor": "Made for students in Bangladesh",
+  "deleteAccountHint": "Permanently remove your account",
+  "setupProfileStep": "Last step",
+  "editProfileHint": "Classmates see your name in class groups."
 }

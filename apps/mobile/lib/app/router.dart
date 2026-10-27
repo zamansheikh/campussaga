@@ -8,14 +8,17 @@ import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/email_sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
+import '../features/onboarding/presentation/onboarding_page.dart';
 import '../features/profile/presentation/pages/edit_profile_page.dart';
 import '../features/profile/presentation/pages/profile_setup_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 import '../features/routine/presentation/routine_page.dart';
 import '../features/today/presentation/today_page.dart';
+import 'settings/bloc/settings_cubit.dart';
 
 abstract final class Routes {
   static const splash = '/splash';
+  static const welcome = '/welcome';
   static const signIn = '/sign-in';
   static const signInEmail = '/sign-in/email';
   static const setupProfile = '/setup-profile';
@@ -25,12 +28,12 @@ abstract final class Routes {
   static const editProfile = '/profile/edit';
 }
 
-/// App routes. Signed-out students only ever see the sign-in screen;
-/// signed-in students never see it.
-GoRouter buildRouter(AuthBloc auth) {
+/// App routes. Signed-out students see the welcome slides once, then only
+/// the sign-in screens; signed-in students never see either.
+GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
   return GoRouter(
     initialLocation: Routes.today,
-    refreshListenable: _StreamListenable(auth.stream),
+    refreshListenable: _StreamListenable([auth.stream, settings.stream]),
     redirect: (context, state) {
       final status = auth.state.status;
       final at = state.matchedLocation;
@@ -39,8 +42,12 @@ GoRouter buildRouter(AuthBloc auth) {
       }
       final atSignIn = at.startsWith(Routes.signIn);
       if (status != AuthStatus.signedIn) {
+        if (!settings.state.onboardingDone) {
+          return at == Routes.welcome ? null : Routes.welcome;
+        }
         return atSignIn ? null : Routes.signIn;
       }
+      if (at == Routes.welcome) return Routes.today;
       // Signed in: finish the profile first (unless "Later" was chosen).
       if (auth.state.needsProfileSetup) {
         return at == Routes.setupProfile ? null : Routes.setupProfile;
@@ -54,6 +61,10 @@ GoRouter buildRouter(AuthBloc auth) {
       GoRoute(
         path: Routes.splash,
         builder: (context, state) => const SplashPage(),
+      ),
+      GoRoute(
+        path: Routes.welcome,
+        builder: (context, state) => const OnboardingPage(),
       ),
       GoRoute(
         path: Routes.signIn,
@@ -108,17 +119,19 @@ GoRouter buildRouter(AuthBloc auth) {
   );
 }
 
-/// Re-runs the router's redirect whenever the auth state changes.
+/// Re-runs the router's redirect whenever auth or settings change.
 class _StreamListenable extends ChangeNotifier {
-  _StreamListenable(Stream<Object?> stream) {
-    _sub = stream.listen((_) => notifyListeners());
+  _StreamListenable(List<Stream<Object?>> streams) {
+    _subs = [for (final s in streams) s.listen((_) => notifyListeners())];
   }
 
-  late final StreamSubscription<Object?> _sub;
+  late final List<StreamSubscription<Object?>> _subs;
 
   @override
   void dispose() {
-    unawaited(_sub.cancel());
+    for (final s in _subs) {
+      unawaited(s.cancel());
+    }
     super.dispose();
   }
 }

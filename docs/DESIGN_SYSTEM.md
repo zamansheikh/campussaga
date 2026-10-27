@@ -129,7 +129,27 @@ check animation, the only playful moment.
 
 ## 5. Components (`Cs` prefix)
 
-### Foundations
+### Built so far (`packages/campus_ui/lib/src/components/`)
+- `CsPage` — scrollable page body with screen padding and the 480 px max width
+- `CsSection` + `CsRow` — titled group of rows on one card (settings style): icon tile, title, subtitle, value, chevron, destructive variant
+- `CsAvatar` — initials on a colour picked from the name
+- `CsBadge` — pill label; tones primary, success, neutral, accent
+- `CsBrandMark` — placeholder logo tile; the one widget to replace with the final logo
+- `CsCodeField` — 6-box one-time code; one hidden field underneath, so paste and code autofill work
+- `CsDots` — page indicator
+- `CsOptionSheet` — bottom sheet with a single-choice list (theme, language)
+- `CsEmptyState` — icon + title + message + action
+
+Buttons, inputs, sheets, dialogs and snackbars are styled in
+`cs_theme.dart`, so plain Material widgets already match.
+
+**Screenshot review:** `apps/mobile/tool/screenshots/screens_test.dart`
+renders every screen with real fonts in light, dark and Bangla and writes
+contact sheets:
+`flutter test tool/screenshots/screens_test.dart --dart-define=SHOTS_DIR=/abs/dir`
+(run in `apps/mobile`). Look at them before calling a screen done.
+
+### Foundations (planned)
 - `CsButton` — variants: primary, secondary, tonal, text, destructive; sizes: md, lg; states: loading, disabled
 - `CsIconButton`
 - `CsTextField` — label, helper, error, character counter
@@ -230,6 +250,7 @@ places so a rename takes an hour, not a refactor:
 | In-app name | `brand.dart` → `CsBrand.appName`, and `appName` in `packages/campus_l10n/lib/src/arb/app_en.arb` + `app_bn.arb` |
 | Android app name | `apps/mobile/android/app/src/main/AndroidManifest.xml` → `android:label` |
 | iOS app name | `apps/mobile/ios/Runner/Info.plist` → `CFBundleDisplayName` |
+| In-app logo | `CsBrandMark` in `packages/campus_ui/lib/src/components/cs_brand_mark.dart` (splash, sign-in, onboarding, profile footer) |
 | Launcher icon | replace files in `apps/mobile/assets/launcher/`, run `dart run flutter_launcher_icons` in `apps/mobile` |
 | README / docs | `README.md`, `assets/icon/` |
 | Website + policy links | `site/` pages (name, contact), and `siteUrl` in `apps/mobile/lib/app/env.dart` once the domain changes |

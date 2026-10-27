@@ -24,17 +24,39 @@ class EditProfilePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(title: Text(l10n.editProfile)),
         body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(CsSpace.lg),
-            child: ProfileForm(
-              initial: user,
-              onSaved: (u) {
-                context.read<AuthBloc>().add(AuthProfileUpdated(u));
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(l10n.profileSaved)));
-                context.pop(); // go_router's pop, not Navigator's
-              },
+          child: CsPage(
+            padding: const EdgeInsets.fromLTRB(
+              CsSpace.lg,
+              CsSpace.md,
+              CsSpace.lg,
+              CsSpace.lg,
             ),
+            children: [
+              Row(
+                children: [
+                  CsAvatar(name: user.displayName ?? user.email, size: 52),
+                  const SizedBox(width: CsSpace.md),
+                  Expanded(
+                    child: Text(
+                      l10n.editProfileHint,
+                      style: context.text.bodyMedium?.copyWith(
+                        color: context.cs.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: CsSpace.lg),
+              ProfileForm(
+                initial: user,
+                onSaved: (u) {
+                  context.read<AuthBloc>().add(AuthProfileUpdated(u));
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(l10n.profileSaved)));
+                  context.pop(); // go_router's pop, not Navigator's
+                },
+              ),
+            ],
           ),
         ),
       ),

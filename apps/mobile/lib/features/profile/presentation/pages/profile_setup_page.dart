@@ -20,50 +20,57 @@ class ProfileSetupPage extends StatelessWidget {
     final auth = context.read<AuthBloc>();
     final user = auth.state.user;
     if (user == null) return const SizedBox.shrink();
+    final lang = Localizations.localeOf(context).languageCode;
     return BlocProvider(
       create: (_) => ProfileFormCubit(getIt<ProfileRepository>()),
       child: Scaffold(
         body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(CsSpace.lg),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      l10n.setupProfileTitle,
-                      style: context.text.headlineSmall,
-                    ),
-                    const SizedBox(height: CsSpace.sm),
-                    Text(
-                      l10n.setupProfileSubtitle,
-                      style: context.text.bodyMedium?.copyWith(
-                        color: context.cs.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: CsSpace.sm),
-                    Text(
-                      user.university.localName(
-                        Localizations.localeOf(context).languageCode,
-                      ),
-                      style: context.text.labelLarge,
-                    ),
-                    const SizedBox(height: CsSpace.lg),
-                    ProfileForm(
-                      initial: user,
-                      onSaved: (u) => auth.add(AuthProfileUpdated(u)),
-                      secondary: TextButton(
-                        onPressed: () =>
-                            auth.add(const AuthProfileSetupSkipped()),
-                        child: Text(l10n.setupLater),
-                      ),
-                    ),
-                  ],
+          child: CsPage(
+            padding: const EdgeInsets.fromLTRB(
+              CsSpace.lg,
+              CsSpace.xl,
+              CsSpace.lg,
+              CsSpace.lg,
+            ),
+            children: [
+              Row(
+                children: [
+                  CsAvatar(name: user.displayName ?? user.email, size: 56),
+                  const Spacer(),
+                  CsBadge(
+                    label: l10n.setupProfileStep,
+                    icon: Icons.flag_rounded,
+                  ),
+                ],
+              ),
+              const SizedBox(height: CsSpace.lg),
+              Text(l10n.setupProfileTitle, style: context.text.headlineSmall),
+              const SizedBox(height: CsSpace.sm),
+              Text(
+                l10n.setupProfileSubtitle,
+                style: context.text.bodyLarge?.copyWith(
+                  color: context.cs.textSecondary,
                 ),
               ),
-            ),
+              const SizedBox(height: CsSpace.md),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: CsBadge(
+                  label: user.university.localName(lang),
+                  icon: Icons.account_balance_outlined,
+                  tone: CsBadgeTone.neutral,
+                ),
+              ),
+              const SizedBox(height: CsSpace.lg),
+              ProfileForm(
+                initial: user,
+                onSaved: (u) => auth.add(AuthProfileUpdated(u)),
+                secondary: TextButton(
+                  onPressed: () => auth.add(const AuthProfileSetupSkipped()),
+                  child: Text(l10n.setupLater),
+                ),
+              ),
+            ],
           ),
         ),
       ),

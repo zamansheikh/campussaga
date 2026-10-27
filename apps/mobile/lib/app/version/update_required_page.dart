@@ -18,17 +18,29 @@ class UpdateRequiredPage extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(CsSpace.lg),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
+              constraints: const BoxConstraints(
+                maxWidth: CsSize.contentMaxWidth,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Icon(
-                    Icons.system_update_rounded,
-                    size: 56,
-                    color: context.cs.primary,
+                  Center(
+                    child: Container(
+                      width: 88,
+                      height: 88,
+                      decoration: BoxDecoration(
+                        color: context.cs.primaryContainer,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.system_update_rounded,
+                        size: 42,
+                        color: context.cs.onPrimaryContainer,
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: CsSpace.md),
+                  const SizedBox(height: CsSpace.lg),
                   Text(
                     l10n.updateRequiredTitle,
                     textAlign: TextAlign.center,

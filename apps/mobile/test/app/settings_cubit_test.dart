@@ -25,11 +25,13 @@ void main() {
     act: (c) => c
       ..setThemeMode(ThemeMode.dark)
       ..setLocale(const Locale('bn'))
-      ..setLocale(null),
+      ..setLocale(null)
+      ..completeOnboarding(),
     expect: () => [
       const SettingsState(themeMode: ThemeMode.dark),
       const SettingsState(themeMode: ThemeMode.dark, locale: Locale('bn')),
       const SettingsState(themeMode: ThemeMode.dark),
+      const SettingsState(themeMode: ThemeMode.dark, onboardingDone: true),
     ],
   );
 
@@ -39,13 +41,18 @@ void main() {
     final first = await PrefsSettingsStorage.open();
     SettingsCubit(first)
       ..setThemeMode(ThemeMode.light)
-      ..setLocale(const Locale('bn'));
+      ..setLocale(const Locale('bn'))
+      ..completeOnboarding();
     await Future<void>.delayed(Duration.zero);
 
     final afterRestart = await PrefsSettingsStorage.open();
     expect(
       afterRestart.read(),
-      const SettingsState(themeMode: ThemeMode.light, locale: Locale('bn')),
+      const SettingsState(
+        themeMode: ThemeMode.light,
+        locale: Locale('bn'),
+        onboardingDone: true,
+      ),
     );
     expect(SharedPreferencesWithCache, isNotNull);
   });

@@ -39,9 +39,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Once you join a class group, the full week appears here.';
 
   @override
-  String get settings => 'Settings';
-
-  @override
   String get theme => 'Theme';
 
   @override
@@ -251,4 +248,131 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Privacy policy';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingStart => 'Get started';
+
+  @override
+  String get onboarding1Title => 'Your class, always on time';
+
+  @override
+  String get onboarding1Body =>
+      'Today\'s classes, room changes from your CR, and a reminder before every class.';
+
+  @override
+  String get onboarding2Title => 'Raise campus issues together';
+
+  @override
+  String get onboarding2Body =>
+      'Report a problem, add your \"me too\", and follow it until it\'s solved.';
+
+  @override
+  String get onboarding3Title => 'Verified students only';
+
+  @override
+  String get onboarding3Body =>
+      'Only verified university emails can join. Post campus issues without your name. We never sell your data.';
+
+  @override
+  String get illusNextClass => 'Next class';
+
+  @override
+  String get illusStartsIn => 'in 25 min';
+
+  @override
+  String get illusRoomChanged => 'Room changed to 504';
+
+  @override
+  String get illusReminder => 'Reminder set';
+
+  @override
+  String get illusIssueTitle => 'Library Wi-Fi keeps dropping';
+
+  @override
+  String get illusMeToo => 'Me too';
+
+  @override
+  String get illusInProgress => 'In progress';
+
+  @override
+  String get illusAnonymous => 'Posted anonymously';
+
+  @override
+  String get signInTagline => 'Your class and your campus, in one app.';
+
+  @override
+  String signInLegal(String policy) {
+    return 'By continuing, you agree to our $policy.';
+  }
+
+  @override
+  String get orDivider => 'or';
+
+  @override
+  String greetingMorning(String name) {
+    return 'Good morning, $name';
+  }
+
+  @override
+  String greetingAfternoon(String name) {
+    return 'Good afternoon, $name';
+  }
+
+  @override
+  String greetingEvening(String name) {
+    return 'Good evening, $name';
+  }
+
+  @override
+  String get todayStepsTitle => 'How it works';
+
+  @override
+  String get todayStep1 => 'Join your class group with a code from your CR';
+
+  @override
+  String get todayStep2 => 'See today\'s classes and rooms at a glance';
+
+  @override
+  String get todayStep3 => 'Get a reminder before each class';
+
+  @override
+  String get verifiedStudent => 'Verified student';
+
+  @override
+  String get completeProfile => 'Add department and batch';
+
+  @override
+  String get preferences => 'Preferences';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get languageSystem => 'Phone language';
+
+  @override
+  String get themeSystemHint => 'Match your phone\'s setting';
+
+  @override
+  String versionLabel(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get madeFor => 'Made for students in Bangladesh';
+
+  @override
+  String get deleteAccountHint => 'Permanently remove your account';
+
+  @override
+  String get setupProfileStep => 'Last step';
+
+  @override
+  String get editProfileHint => 'Classmates see your name in class groups.';
 }

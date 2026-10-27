@@ -18,6 +18,8 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// null follows the phone's language.
   void setLocale(Locale? locale) => _set(state.copyWith(locale: () => locale));
 
+  void completeOnboarding() => _set(state.copyWith(onboardingDone: true));
+
   void _set(SettingsState next) {
     emit(next);
     unawaited(_storage.write(next));

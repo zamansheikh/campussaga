@@ -16,8 +16,9 @@ abstract final class CsSpace {
 
 abstract final class CsRadius {
   static const double sm = 8;
-  static const double md = 12;
-  static const double lg = 16;
+  static const double md = 14;
+  static const double lg = 20;
+  static const double xl = 28;
   static const double full = 999;
 }
 
@@ -30,4 +31,10 @@ abstract final class CsMotion {
 abstract final class CsSize {
   /// Minimum touch target (accessibility).
   static const double minTouch = 48;
+
+  /// Height of primary buttons.
+  static const double button = 52;
+
+  /// Max content width on tablets and landscape.
+  static const double contentMaxWidth = 480;
 }

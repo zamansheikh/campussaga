@@ -1,3 +1,4 @@
+import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 
 /// Shown for a moment while the saved session is restored.
@@ -6,6 +7,6 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(body: Center(child: CsBrandMark(size: 88)));
   }
 }
