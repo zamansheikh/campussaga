@@ -56,7 +56,10 @@ void main() {
           '${req.method} ${req.url.path} ${req.headers['Authorization']}',
         );
         if (req.url.path.endsWith('/auth/google')) {
-          expect(jsonDecode(req.body), {'idToken': 'fb-token'});
+          expect(jsonDecode(req.body), {
+            'idToken': 'fb-token',
+            'name': 'Lina Akter',
+          });
           return ok({'tokens': tokens('1'), 'user': user, 'isNewUser': true});
         }
         return ok(user);
@@ -64,7 +67,10 @@ void main() {
     );
     final repo = ApiAuthRepository(api, store);
 
-    final result = await repo.signInWithGoogle('fb-token');
+    final result = await repo.signInWithGoogle(
+      'fb-token',
+      name: ' Lina Akter ',
+    );
     expect(result.isNewUser, isTrue);
     expect(result.user.university!.name, 'Demo University');
     expect(store.tokens?.refreshToken, 'refresh-1');

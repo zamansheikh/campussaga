@@ -3,12 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
 
+/// A Firebase ID token and the Google account name the phone saw (the
+/// token doesn't always carry the name).
+typedef GoogleSignedIn = ({String idToken, String name});
+
 /// Google sign-in through Firebase Auth. It only produces a Firebase ID
 /// token; our backend checks it and starts the real session.
 abstract interface class GoogleAuth {
-  /// Shows the Google account picker. Returns a Firebase ID token, or null
+  /// Shows the Google account picker. Returns the Firebase ID token, or null
   /// when the student cancels. Throws a [Failure] on errors.
-  Future<String?> signIn();
+  Future<GoogleSignedIn?> signIn();
 
   /// Forgets the Firebase session on this device.
   Future<void> signOut();
@@ -37,7 +41,7 @@ class AndroidGoogleAuth implements GoogleAuth {
   Future<void>? _ready;
 
   @override
-  Future<String?> signIn() async {
+  Future<GoogleSignedIn?> signIn() async {
     try {
       await (_ready ??= _google.init(const InitParameters()));
       final result = await _google.authenticate(const AuthenticateParameters());
@@ -57,11 +61,14 @@ class AndroidGoogleAuth implements GoogleAuth {
       // name, so our server can't fill in the student's name. Give Firebase
       // the Google name, then ask for a fresh token that carries it.
       final name = result.user.displayName?.trim() ?? '';
+      final String? token;
       if ((user.displayName ?? '').trim().isEmpty && name.isNotEmpty) {
         await user.updateDisplayName(name);
-        return await user.getIdToken(true);
+        token = await user.getIdToken(true);
+      } else {
+        token = await user.getIdToken();
       }
-      return await user.getIdToken();
+      return token == null ? null : (idToken: token, name: name);
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) return null;
       throw RejectedFailure(
@@ -111,14 +118,17 @@ class FirebaseGoogleAuth implements GoogleAuth {
   };
 
   @override
-  Future<String?> signIn() async {
+  Future<GoogleSignedIn?> signIn() async {
     // Always show the account chooser, so a student who picked a personal
     // account by mistake can pick their university account next time.
     final provider = GoogleAuthProvider()
       ..setCustomParameters({'prompt': 'select_account'});
     try {
       final credential = await _firebase.signInWithProvider(provider);
-      return await credential.user?.getIdToken();
+      final user = credential.user;
+      final token = await user?.getIdToken();
+      if (token == null) return null;
+      return (idToken: token, name: user?.displayName?.trim() ?? '');
     } on FirebaseAuthException catch (e) {
       if (_cancelCodes.contains(e.code)) return null;
       if (e.code == 'network-request-failed') {

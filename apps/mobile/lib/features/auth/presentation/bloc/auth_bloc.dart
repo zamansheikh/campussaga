@@ -59,12 +59,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (state.status == AuthStatus.signingIn) return; // ignore double taps
     emit(const AuthState(status: AuthStatus.signingIn));
     try {
-      final idToken = await _googleAuth.signIn();
-      if (idToken == null) {
+      final google = await _googleAuth.signIn();
+      if (google == null) {
         emit(const AuthState(status: AuthStatus.signedOut)); // cancelled
         return;
       }
-      final result = await _repo.signInWithGoogle(idToken);
+      final result = await _repo.signInWithGoogle(
+        google.idToken,
+        name: google.name,
+      );
       emit(
         AuthState(
           status: AuthStatus.signedIn,

@@ -57,6 +57,8 @@
   "batchHint": "যেমন: 61 বা Spring 2024",
   "saveProfile": "সংরক্ষণ করো",
   "setupLater": "পরে",
+  "signedInAs": "{email} দিয়ে সাইন ইন করা আছে",
+  "useAnotherAccount": "অন্য অ্যাকাউন্ট ব্যবহার করুন",
   "editProfile": "প্রোফাইল সম্পাদনা",
   "profileSaved": "প্রোফাইল সংরক্ষিত হয়েছে",
   "errorFieldRequired": "এটি পূরণ করা জরুরি।",

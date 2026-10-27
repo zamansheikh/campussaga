@@ -202,6 +202,14 @@ class AppLocalizationsBn extends AppLocalizations {
   String get setupLater => 'পরে';
 
   @override
+  String signedInAs(String email) {
+    return '$email দিয়ে সাইন ইন করা আছে';
+  }
+
+  @override
+  String get useAnotherAccount => 'অন্য অ্যাকাউন্ট ব্যবহার করুন';
+
+  @override
   String get editProfile => 'প্রোফাইল সম্পাদনা';
 
   @override

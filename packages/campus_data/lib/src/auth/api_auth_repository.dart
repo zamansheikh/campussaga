@@ -98,8 +98,13 @@ class ApiAuthRepository implements AuthRepository {
       _signIn('/auth/verify', {'email': email, 'code': code});
 
   @override
-  Future<SignInResult> signInWithGoogle(String firebaseIdToken) =>
-      _signIn('/auth/google', {'idToken': firebaseIdToken});
+  Future<SignInResult> signInWithGoogle(
+    String firebaseIdToken, {
+    String? name,
+  }) => _signIn('/auth/google', {
+    'idToken': firebaseIdToken,
+    if (name != null && name.trim().isNotEmpty) 'name': name.trim(),
+  });
 
   Future<SignInResult> _signIn(String path, Map<String, Object?> body) async {
     final data = (await _api.post(path, body, false))! as Map<String, Object?>;

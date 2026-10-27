@@ -440,6 +440,18 @@ abstract class AppLocalizations {
   /// **'Later'**
   String get setupLater;
 
+  /// No description provided for @signedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String signedInAs(String email);
+
+  /// No description provided for @useAnotherAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a different account'**
+  String get useAnotherAccount;
+
   /// No description provided for @editProfile.
   ///
   /// In en, this message translates to:

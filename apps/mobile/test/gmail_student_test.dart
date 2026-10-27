@@ -101,4 +101,21 @@ void main() {
     expect(find.text('Not verified'), findsOneWidget);
     expect(profile.edited?.university?.slug, 'buet');
   });
+
+  testWidgets('the wrong Google account: start over from profile setup', (
+    tester,
+  ) async {
+    usePhoneScreen(tester);
+    final (repo, _) = await registerFakes();
+    repo.googleUser = gmailUser;
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continue with Google'));
+    await tester.pumpAndSettle();
+    expect(find.text('Signed in as ${gmailUser.email}'), findsOneWidget);
+    await scrollAndTap(tester, find.text('Use a different account'));
+    await tester.pumpAndSettle();
+    expect(find.text('Continue with Google'), findsOneWidget);
+  });
 }

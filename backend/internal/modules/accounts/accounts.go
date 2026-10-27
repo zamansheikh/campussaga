@@ -295,7 +295,9 @@ func (s *Service) consumeCode(ctx context.Context, q *store.Queries, email, code
 // NOT verified student who picks their university and can verify later
 // with a university email.
 // The same email always maps to the same account, whichever way they sign in.
-func (s *Service) SignInWithGoogle(ctx context.Context, idToken string) (*SignedIn, error) {
+// nameHint is the Google account name sent by the app; the token's own name
+// wins when it has one. Either fills in a name the account doesn't have yet.
+func (s *Service) SignInWithGoogle(ctx context.Context, idToken, nameHint string) (*SignedIn, error) {
 	if s.google == nil {
 		return nil, ErrGoogleUnavailable
 	}
@@ -335,8 +337,11 @@ func (s *Service) SignInWithGoogle(ctx context.Context, idToken string) (*Signed
 		if err != nil {
 			return err
 		}
-		if isNew && id.Name != "" {
-			name := id.Name
+		name := strings.TrimSpace(id.Name)
+		if name == "" {
+			name = strings.TrimSpace(nameHint)
+		}
+		if name != "" && (user.DisplayName == nil || *user.DisplayName == "") {
 			for utf8.RuneCountInString(name) > 60 {
 				name = string([]rune(name)[:60])
 			}

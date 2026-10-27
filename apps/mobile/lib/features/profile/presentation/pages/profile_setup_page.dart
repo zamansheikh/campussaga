@@ -82,6 +82,17 @@ class ProfileSetupPage extends StatelessWidget {
                         child: Text(l10n.setupLater),
                       ),
               ),
+              // A wrong Google account picked by mistake: start over.
+              const SizedBox(height: CsSpace.lg),
+              Text(
+                l10n.signedInAs(user.email),
+                textAlign: TextAlign.center,
+                style: context.text.bodySmall,
+              ),
+              TextButton(
+                onPressed: () => auth.add(const AuthSignOutRequested()),
+                child: Text(l10n.useAnotherAccount),
+              ),
             ],
           ),
         ),

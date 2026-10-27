@@ -73,6 +73,7 @@ class FakeAuthRepository implements AuthRepository {
   /// A non-Failure error (a bug) thrown by Google sign-in.
   Object? googleCrash;
   String? lastGoogleToken;
+  String? lastGoogleName;
   int signOuts = 0;
   final ended = StreamController<void>.broadcast();
 
@@ -83,8 +84,12 @@ class FakeAuthRepository implements AuthRepository {
   Future<UserProfile?> restoreSession() async => savedUser;
 
   @override
-  Future<SignInResult> signInWithGoogle(String firebaseIdToken) async {
+  Future<SignInResult> signInWithGoogle(
+    String firebaseIdToken, {
+    String? name,
+  }) async {
     lastGoogleToken = firebaseIdToken;
+    lastGoogleName = name;
     if (googleCrash != null) throw googleCrash!;
     if (googleFailure != null) throw googleFailure!;
     savedUser = googleUser;
@@ -141,13 +146,15 @@ class FakeAuthRepository implements AuthRepository {
 class FakeGoogleAuth implements GoogleAuth {
   /// null = the student cancels the picker.
   String? token = 'firebase-id-token';
+  String name = 'Rafi Ahmed';
   Failure? failure;
   int signOuts = 0;
 
   @override
-  Future<String?> signIn() async {
+  Future<GoogleSignedIn?> signIn() async {
     if (failure != null) throw failure!;
-    return token;
+    final t = token;
+    return t == null ? null : (idToken: t, name: name);
   }
 
   @override

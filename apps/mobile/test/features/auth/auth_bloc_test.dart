@@ -47,6 +47,7 @@ void main() {
     ],
     verify: (_) {
       expect(repo.lastGoogleToken, 'firebase-id-token');
+      expect(repo.lastGoogleName, 'Rafi Ahmed');
       expect(google.signOuts, 1, reason: 'picker shows again next time');
     },
   );

@@ -55,10 +55,13 @@ func (s *Service) handleVerify(ctx context.Context, in *verifyReq) (*SignedIn, e
 
 type googleReq struct {
 	IDToken string `json:"idToken" validate:"required,max=8192"`
+	// Name is the Google account name as the phone saw it; used only when
+	// the token carries none.
+	Name string `json:"name" validate:"max=200"`
 }
 
 func (s *Service) handleGoogle(ctx context.Context, in *googleReq) (*SignedIn, error) {
-	return s.SignInWithGoogle(ctx, in.IDToken)
+	return s.SignInWithGoogle(ctx, in.IDToken, in.Name)
 }
 
 type refreshReq struct {

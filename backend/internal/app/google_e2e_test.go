@@ -68,3 +68,37 @@ func TestLaunchUniversityGoogleAccount(t *testing.T) {
 	assert.Equal(t, "diu", s.User.University.Slug)
 	assert.Equal(t, "Daffodil International University", s.User.University.Name)
 }
+
+// The Google name fills an empty profile name: the token's own name first,
+// else the name the phone sends; a name the student already has is kept.
+func TestGoogleSignInName(t *testing.T) {
+	h := newHarness(t)
+	post := func(tok, name string) signedIn {
+		t.Helper()
+		r := h.do("POST", "/auth/google", "", map[string]string{"idToken": tok, "name": name})
+		require.Equal(t, http.StatusOK, r.Status, r.Raw)
+		var s signedIn
+		r.into(t, &s)
+		return s
+	}
+
+	withName := h.google.Sign(firebasetest.Token{Email: "a@gmail.com", EmailVerified: true, IssuedAt: h.Now(), Name: "Token Name"})
+	s := post(withName, "Phone Name")
+	require.NotNil(t, s.User.DisplayName)
+	assert.Equal(t, "Token Name", *s.User.DisplayName)
+
+	s = post(h.googleToken("b@gmail.com", true), "  Phone Name  ")
+	require.NotNil(t, s.User.DisplayName)
+	assert.Equal(t, "Phone Name", *s.User.DisplayName)
+
+	// An account made without any name gets one on a later sign-in.
+	s = post(h.googleToken("c@gmail.com", true), "")
+	assert.True(t, s.User.DisplayName == nil || *s.User.DisplayName == "")
+	s = post(h.googleToken("c@gmail.com", true), "Later Name")
+	require.NotNil(t, s.User.DisplayName)
+	assert.Equal(t, "Later Name", *s.User.DisplayName)
+
+	// Never overwrites a name the student has.
+	s = post(h.googleToken("b@gmail.com", true), "Someone Else")
+	assert.Equal(t, "Phone Name", *s.User.DisplayName)
+}

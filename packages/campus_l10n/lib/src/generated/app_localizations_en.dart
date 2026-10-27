@@ -210,6 +210,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setupLater => 'Later';
 
   @override
+  String signedInAs(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get useAnotherAccount => 'Use a different account';
+
+  @override
   String get editProfile => 'Edit profile';
 
   @override

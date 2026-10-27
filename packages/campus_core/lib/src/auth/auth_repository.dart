@@ -13,8 +13,9 @@ abstract interface class AuthRepository {
   /// Signs in with the emailed code.
   Future<SignInResult> verifyCode(String email, String code);
 
-  /// Signs in with a Firebase ID token from Google sign-in.
-  Future<SignInResult> signInWithGoogle(String firebaseIdToken);
+  /// Signs in with a Firebase ID token from Google sign-in. [name] is the
+  /// Google account name, used when the token has none.
+  Future<SignInResult> signInWithGoogle(String firebaseIdToken, {String? name});
 
   /// Ends this device's session (best effort on the server) and forgets it.
   Future<void> signOut();

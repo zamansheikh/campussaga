@@ -37,6 +37,7 @@ type Token struct {
 	UID           string
 	Email         string
 	EmailVerified bool
+	Name          string    // the Google name; empty = no name claim
 	Provider      string    // default google.com
 	IssuedAt      time.Time // default now
 	Audience      string    // default ProjectID
@@ -60,7 +61,7 @@ func (s *Signer) Sign(t Token) string {
 	if t.UID == "" {
 		t.UID = "uid-" + t.Email
 	}
-	tok := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+	claims := jwt.MapClaims{
 		"iss":            t.Issuer,
 		"aud":            t.Audience,
 		"sub":            t.UID,
@@ -70,7 +71,11 @@ func (s *Signer) Sign(t Token) string {
 		"email":          t.Email,
 		"email_verified": t.EmailVerified,
 		"firebase":       map[string]any{"sign_in_provider": t.Provider},
-	})
+	}
+	if t.Name != "" {
+		claims["name"] = t.Name
+	}
+	tok := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 	tok.Header["kid"] = s.KeyID
 	out, err := tok.SignedString(s.key)
 	if err != nil {
