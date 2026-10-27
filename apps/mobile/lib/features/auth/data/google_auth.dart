@@ -1,5 +1,7 @@
 import 'package:campus_core/campus_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
 
 /// Google sign-in through Firebase Auth. It only produces a Firebase ID
 /// token; our backend checks it and starts the real session.
@@ -12,10 +14,79 @@ abstract interface class GoogleAuth {
   Future<void> signOut();
 }
 
-/// Uses Firebase Auth's own Google flow (`signInWithProvider`): a secure
-/// browser sheet on Android and iOS, no separate Google Sign-In SDK. That
-/// keeps Firebase on its latest version (the google_sign_in iOS plugin still
-/// ships an older Google SDK that conflicts with Firebase iOS 13).
+/// The right Google sign-in for this phone.
+GoogleAuth platformGoogleAuth() =>
+    defaultTargetPlatform == TargetPlatform.android
+    ? AndroidGoogleAuth()
+    : FirebaseGoogleAuth();
+
+/// Android: the phone's own account picker (Credential Manager, through the
+/// google_sign_in_android plugin), then a Firebase sign-in with that Google
+/// ID token. Only the Android plugin is used: the google_sign_in iOS plugin
+/// ships a Google SDK that conflicts with Firebase iOS 13.
+///
+/// Needs the app's signing SHA-1 in the Firebase project (debug and release)
+/// and the web client ID, which the plugin reads from google-services.json.
+class AndroidGoogleAuth implements GoogleAuth {
+  AndroidGoogleAuth({FirebaseAuth? firebase, GoogleSignInPlatform? google})
+    : _firebase = firebase ?? FirebaseAuth.instance,
+      _google = google ?? GoogleSignInPlatform.instance;
+
+  final FirebaseAuth _firebase;
+  final GoogleSignInPlatform _google;
+  Future<void>? _ready;
+
+  @override
+  Future<String?> signIn() async {
+    try {
+      await (_ready ??= _google.init(const InitParameters()));
+      final result = await _google.authenticate(const AuthenticateParameters());
+      final idToken = result.authenticationTokens.idToken;
+      if (idToken == null) {
+        throw const RejectedFailure(
+          code: 'GOOGLE_SIGN_IN_FAILED',
+          message: 'No ID token from Google',
+        );
+      }
+      final user = await _firebase.signInWithCredential(
+        GoogleAuthProvider.credential(idToken: idToken),
+      );
+      return await user.user?.getIdToken();
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) return null;
+      throw RejectedFailure(
+        code: 'GOOGLE_SIGN_IN_FAILED',
+        message: '${e.code.name}: ${e.description}',
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'network-request-failed') {
+        throw NetworkFailure(message: e.message);
+      }
+      throw RejectedFailure(
+        code: 'GOOGLE_SIGN_IN_FAILED',
+        message: '${e.code}: ${e.message}',
+      );
+    }
+  }
+
+  @override
+  Future<void> signOut() async {
+    try {
+      // Forget the chosen account too, so next time the picker shows all
+      // accounts (a personal account picked by mistake isn't reused).
+      await (_ready ??= _google.init(const InitParameters()));
+      await _google.signOut(const SignOutParams());
+      await _firebase.signOut();
+    } on Object {
+      // Nothing to undo if it fails; the next sign-in still works.
+    }
+  }
+}
+
+/// iOS (and others): Firebase Auth's own Google flow (`signInWithProvider`),
+/// a secure browser sheet, no separate Google Sign-In SDK. That keeps
+/// Firebase on its latest version (the google_sign_in iOS plugin ships an
+/// older Google SDK that conflicts with Firebase iOS 13).
 class FirebaseGoogleAuth implements GoogleAuth {
   FirebaseGoogleAuth({FirebaseAuth? firebase})
     : _firebase = firebase ?? FirebaseAuth.instance;

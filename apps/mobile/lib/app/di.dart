@@ -62,5 +62,5 @@ Future<void> configureDependencies({
     )
     ..registerLazySingleton<PushMessaging>(FirebasePushMessaging.new)
     ..registerLazySingleton<ReminderScheduler>(LocalNotificationScheduler.new)
-    ..registerLazySingleton<GoogleAuth>(FirebaseGoogleAuth.new);
+    ..registerLazySingleton<GoogleAuth>(platformGoogleAuth);
 }
