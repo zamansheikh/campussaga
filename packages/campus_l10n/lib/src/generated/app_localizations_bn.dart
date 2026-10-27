@@ -94,4 +94,82 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get signOut => 'সাইন আউট';
+
+  @override
+  String get emailSignInTitle => 'ইমেইল দিয়ে সাইন ইন';
+
+  @override
+  String get emailStepTitle => 'তোমার বিশ্ববিদ্যালয়ের ইমেইল দাও';
+
+  @override
+  String get emailStepSubtitle =>
+      'আমরা একটি ৬ সংখ্যার কোড পাঠাব। শুধু বিশ্ববিদ্যালয়ের দেওয়া ইমেইলই কাজ করবে।';
+
+  @override
+  String get emailLabel => 'বিশ্ববিদ্যালয়ের ইমেইল';
+
+  @override
+  String get emailHint => 'yourname@university.edu.bd';
+
+  @override
+  String get sendCode => 'কোড পাঠাও';
+
+  @override
+  String get codeStepTitle => 'কোডটি লেখো';
+
+  @override
+  String codeSentTo(String email) {
+    return '$email ঠিকানায় একটি ৬ সংখ্যার কোড পাঠানো হয়েছে';
+  }
+
+  @override
+  String get codeLabel => '৬ সংখ্যার কোড';
+
+  @override
+  String get verifyCode => 'যাচাই করো';
+
+  @override
+  String get resendCode => 'আবার কোড পাঠাও';
+
+  @override
+  String resendCodeIn(String time) {
+    return '$time পর আবার কোড পাঠানো যাবে';
+  }
+
+  @override
+  String get useDifferentEmail => 'অন্য ইমেইল ব্যবহার করো';
+
+  @override
+  String get codeSpamHint => 'খুঁজে পাচ্ছ না? স্প্যাম ফোল্ডারটা দেখো।';
+
+  @override
+  String get errorEmailInvalid => 'একটি সঠিক ইমেইল ঠিকানা দাও।';
+
+  @override
+  String get errorNotUniversityEmail =>
+      'এই ইমেইলটি কোনো যুক্ত বিশ্ববিদ্যালয়ের নয়। তোমার বিশ্ববিদ্যালয়ের দেওয়া ইমেইল ব্যবহার করো।';
+
+  @override
+  String errorCodeInvalid(int count) {
+    return 'কোডটি সঠিক নয়। আর $count বার চেষ্টা করা যাবে।';
+  }
+
+  @override
+  String get errorCodeExpired =>
+      'কোডটির মেয়াদ শেষ। নতুন কোড পেতে \"আবার কোড পাঠাও\" চাপো।';
+
+  @override
+  String get errorCodeTooManyAttempts =>
+      'অনেকবার ভুল কোড দেওয়া হয়েছে। নতুন কোড পেতে \"আবার কোড পাঠাও\" চাপো।';
+
+  @override
+  String get errorCodeLimit =>
+      'অনেকবার কোড চাওয়া হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করো।';
+
+  @override
+  String get errorEmailSendFailed => 'ইমেইল পাঠানো যায়নি। আবার চেষ্টা করো।';
+
+  @override
+  String get errorTooManyRequests =>
+      'অনেকবার চেষ্টা করা হয়েছে। একটু অপেক্ষা করে আবার চেষ্টা করো।';
 }

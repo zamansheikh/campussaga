@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/presentation/bloc/auth_bloc.dart';
+import '../features/auth/presentation/pages/email_sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
 import '../features/profile/presentation/profile_page.dart';
@@ -14,6 +15,7 @@ import '../features/today/presentation/today_page.dart';
 abstract final class Routes {
   static const splash = '/splash';
   static const signIn = '/sign-in';
+  static const signInEmail = '/sign-in/email';
   static const today = '/today';
   static const routine = '/routine';
   static const profile = '/profile';
@@ -31,10 +33,11 @@ GoRouter buildRouter(AuthBloc auth) {
       if (status == AuthStatus.unknown) {
         return at == Routes.splash ? null : Routes.splash;
       }
+      final atSignIn = at.startsWith(Routes.signIn);
       if (status != AuthStatus.signedIn) {
-        return at == Routes.signIn ? null : Routes.signIn;
+        return atSignIn ? null : Routes.signIn;
       }
-      if (at == Routes.signIn || at == Routes.splash) return Routes.today;
+      if (atSignIn || at == Routes.splash) return Routes.today;
       return null;
     },
     routes: [
@@ -45,6 +48,12 @@ GoRouter buildRouter(AuthBloc auth) {
       GoRoute(
         path: Routes.signIn,
         builder: (context, state) => const SignInPage(),
+        routes: [
+          GoRoute(
+            path: 'email',
+            builder: (context, state) => const EmailSignInPage(),
+          ),
+        ],
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => _HomeShell(shell: shell),

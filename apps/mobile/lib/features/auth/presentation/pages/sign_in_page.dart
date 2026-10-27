@@ -2,6 +2,9 @@ import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../app/router.dart';
 
 import '../auth_error_text.dart';
 import '../bloc/auth_bloc.dart';
@@ -75,9 +78,7 @@ class SignInPage extends StatelessWidget {
                       OutlinedButton(
                         onPressed: busy
                             ? null
-                            : () => ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(l10n.comingSoon)),
-                              ),
+                            : () => context.push(Routes.signInEmail),
                         child: Text(l10n.useUniversityEmail),
                       ),
                     ],

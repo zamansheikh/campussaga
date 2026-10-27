@@ -94,4 +94,89 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signOut => 'Sign out';
+
+  @override
+  String get emailSignInTitle => 'Sign in with email';
+
+  @override
+  String get emailStepTitle => 'Enter your university email';
+
+  @override
+  String get emailStepSubtitle =>
+      'We\'ll send you a 6-digit code. Only the email your university gave you works.';
+
+  @override
+  String get emailLabel => 'University email';
+
+  @override
+  String get emailHint => 'yourname@university.edu.bd';
+
+  @override
+  String get sendCode => 'Send code';
+
+  @override
+  String get codeStepTitle => 'Enter the code';
+
+  @override
+  String codeSentTo(String email) {
+    return 'We sent a 6-digit code to $email';
+  }
+
+  @override
+  String get codeLabel => '6-digit code';
+
+  @override
+  String get verifyCode => 'Verify';
+
+  @override
+  String get resendCode => 'Resend code';
+
+  @override
+  String resendCodeIn(String time) {
+    return 'Resend code in $time';
+  }
+
+  @override
+  String get useDifferentEmail => 'Use a different email';
+
+  @override
+  String get codeSpamHint => 'Can\'t find it? Check your spam folder.';
+
+  @override
+  String get errorEmailInvalid => 'Enter a valid email address.';
+
+  @override
+  String get errorNotUniversityEmail =>
+      'This email isn\'t from a supported university. Use the email your university gave you.';
+
+  @override
+  String errorCodeInvalid(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tries left.',
+      one: '1 try left.',
+    );
+    return 'That code isn\'t right. $_temp0';
+  }
+
+  @override
+  String get errorCodeExpired =>
+      'This code has expired. Tap \"Resend code\" to get a new one.';
+
+  @override
+  String get errorCodeTooManyAttempts =>
+      'Too many wrong codes. Tap \"Resend code\" to get a new one.';
+
+  @override
+  String get errorCodeLimit =>
+      'Too many codes requested. Please try again later.';
+
+  @override
+  String get errorEmailSendFailed =>
+      'We couldn\'t send the email. Please try again.';
+
+  @override
+  String get errorTooManyRequests =>
+      'Too many attempts. Please wait a moment and try again.';
 }

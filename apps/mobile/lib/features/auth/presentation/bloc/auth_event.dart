@@ -17,6 +17,16 @@ final class AuthGoogleRequested extends AuthEvent {
   const AuthGoogleRequested();
 }
 
+/// Signed in another way (email code); the result is already saved.
+final class AuthSignedIn extends AuthEvent {
+  const AuthSignedIn(this.result);
+
+  final SignInResult result;
+
+  @override
+  List<Object?> get props => [result.user.id];
+}
+
 /// "Sign out" tapped.
 final class AuthSignOutRequested extends AuthEvent {
   const AuthSignOutRequested();

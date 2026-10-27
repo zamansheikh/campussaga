@@ -18,6 +18,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       super(const AuthState()) {
     on<AuthStarted>(_onStarted);
     on<AuthGoogleRequested>(_onGoogle);
+    on<AuthSignedIn>(_onSignedIn);
     on<AuthSignOutRequested>(_onSignOut);
     on<_AuthSessionEnded>(_onSessionEnded);
     _ended = _repo.sessionEnded.listen((_) => add(const _AuthSessionEnded()));
@@ -68,6 +69,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // the picker shows again (e.g. if a personal account was chosen).
       unawaited(_googleAuth.signOut());
     }
+  }
+
+  void _onSignedIn(AuthSignedIn event, Emitter<AuthState> emit) {
+    emit(
+      AuthState(
+        status: AuthStatus.signedIn,
+        user: event.result.user,
+        isNewUser: event.result.isNewUser,
+      ),
+    );
   }
 
   Future<void> _onSignOut(

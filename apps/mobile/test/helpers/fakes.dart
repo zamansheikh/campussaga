@@ -44,12 +44,38 @@ class FakeAuthRepository implements AuthRepository {
     savedUser = null;
   }
 
-  @override
-  Future<CodeSent> requestCode(String email) => throw UnimplementedError();
+  /// Email-code flow: [requestFailure] / [verifyFailures] make calls fail;
+  /// '123456' is the right code.
+  Failure? requestFailure;
+  final verifyFailures = <Failure>[];
+  final requested = <String>[];
+  final verified = <(String, String)>[];
 
   @override
-  Future<SignInResult> verifyCode(String email, String code) =>
-      throw UnimplementedError();
+  Future<CodeSent> requestCode(String email) async {
+    requested.add(email);
+    if (requestFailure != null) throw requestFailure!;
+    return CodeSent(
+      email: email,
+      university: testUser.university,
+      expiresIn: const Duration(minutes: 10),
+      resendAfter: const Duration(seconds: 60),
+    );
+  }
+
+  @override
+  Future<SignInResult> verifyCode(String email, String code) async {
+    verified.add((email, code));
+    if (verifyFailures.isNotEmpty) throw verifyFailures.removeAt(0);
+    if (code != '123456') {
+      throw const RejectedFailure(
+        code: 'CODE_INVALID',
+        details: {'remainingAttempts': 4},
+      );
+    }
+    savedUser = testUser;
+    return const SignInResult(user: testUser, isNewUser: false);
+  }
 }
 
 class FakeGoogleAuth implements GoogleAuth {

@@ -259,6 +259,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign out'**
   String get signOut;
+
+  /// No description provided for @emailSignInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with email'**
+  String get emailSignInTitle;
+
+  /// No description provided for @emailStepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your university email'**
+  String get emailStepTitle;
+
+  /// No description provided for @emailStepSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll send you a 6-digit code. Only the email your university gave you works.'**
+  String get emailStepSubtitle;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'University email'**
+  String get emailLabel;
+
+  /// No description provided for @emailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'yourname@university.edu.bd'**
+  String get emailHint;
+
+  /// No description provided for @sendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send code'**
+  String get sendCode;
+
+  /// No description provided for @codeStepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code'**
+  String get codeStepTitle;
+
+  /// No description provided for @codeSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a 6-digit code to {email}'**
+  String codeSentTo(String email);
+
+  /// No description provided for @codeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'6-digit code'**
+  String get codeLabel;
+
+  /// No description provided for @verifyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verifyCode;
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get resendCode;
+
+  /// No description provided for @resendCodeIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {time}'**
+  String resendCodeIn(String time);
+
+  /// No description provided for @useDifferentEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a different email'**
+  String get useDifferentEmail;
+
+  /// No description provided for @codeSpamHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t find it? Check your spam folder.'**
+  String get codeSpamHint;
+
+  /// No description provided for @errorEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get errorEmailInvalid;
+
+  /// No description provided for @errorNotUniversityEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'This email isn\'t from a supported university. Use the email your university gave you.'**
+  String get errorNotUniversityEmail;
+
+  /// No description provided for @errorCodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That code isn\'t right. {count, plural, =1{1 try left.} other{{count} tries left.}}'**
+  String errorCodeInvalid(int count);
+
+  /// No description provided for @errorCodeExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This code has expired. Tap \"Resend code\" to get a new one.'**
+  String get errorCodeExpired;
+
+  /// No description provided for @errorCodeTooManyAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many wrong codes. Tap \"Resend code\" to get a new one.'**
+  String get errorCodeTooManyAttempts;
+
+  /// No description provided for @errorCodeLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many codes requested. Please try again later.'**
+  String get errorCodeLimit;
+
+  /// No description provided for @errorEmailSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t send the email. Please try again.'**
+  String get errorEmailSendFailed;
+
+  /// No description provided for @errorTooManyRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please wait a moment and try again.'**
+  String get errorTooManyRequests;
 }
 
 class _AppLocalizationsDelegate
