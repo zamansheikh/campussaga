@@ -117,6 +117,72 @@ class ApiClassGroupRepository implements ClassGroupRepository {
   Future<void> deleteAnnouncement(String groupId, String announcementId) => _api
       .delete('/groups/${_id(groupId)}/announcements/${_id(announcementId)}');
 
+  @override
+  Future<ClassGroup> setHiddenCourses(
+    String groupId,
+    Set<String> courses,
+  ) async => ClassGroup.fromJson(
+    _map(
+      await _api.put('/groups/${_id(groupId)}/hidden', {
+        'courses': courses.toList(),
+      }),
+    ),
+  );
+
+  @override
+  Future<ClassGroup> newSemester(String groupId, String semester) async =>
+      ClassGroup.fromJson(
+        _map(
+          await _api.post('/groups/${_id(groupId)}/new-semester', {
+            'semester': semester,
+          }),
+        ),
+      );
+
+  @override
+  Future<List<GroupMember>> members(String groupId) async {
+    final data = _map(await _api.get('/groups/${_id(groupId)}/members'));
+    return [
+      for (final m in data['members']! as List<Object?>)
+        GroupMember.fromJson(_map(m)),
+    ];
+  }
+
+  @override
+  Future<void> setMemberRole(String groupId, String userId, GroupRole role) =>
+      _api.put('/groups/${_id(groupId)}/members/${_id(userId)}', {
+        'role': role.name,
+      });
+
+  @override
+  Future<void> removeMember(String groupId, String userId) =>
+      _api.delete('/groups/${_id(groupId)}/members/${_id(userId)}');
+
+  @override
+  Future<List<ClassSlot>> personalClasses() async {
+    final data = _map(await _api.get('/me/classes'));
+    return [
+      for (final c in data['classes']! as List<Object?>)
+        ClassSlot.fromPersonalJson(_map(c)),
+    ];
+  }
+
+  @override
+  Future<ClassSlot> addPersonal(SlotDraft draft) async =>
+      ClassSlot.fromPersonalJson(
+        _map(await _api.post('/me/classes', draft.toPersonalJson())),
+      );
+
+  @override
+  Future<ClassSlot> updatePersonal(String id, SlotDraft draft) async =>
+      ClassSlot.fromPersonalJson(
+        _map(await _api.put('/me/classes/${_id(id)}', draft.toPersonalJson())),
+      );
+
+  @override
+  Future<void> deletePersonal(String id) =>
+      _api.delete('/me/classes/${_id(id)}');
+
   static String _code(String code) => code.trim().toUpperCase();
 
   // Ids go into the URL path: never let one carry a slash or query.

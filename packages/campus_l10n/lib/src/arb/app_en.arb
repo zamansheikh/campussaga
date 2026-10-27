@@ -305,7 +305,7 @@
   "errorNotCr": "Only the CR can change this group.",
   "errorGroupLimit": "You're already in 10 class groups. Leave one to join another.",
   "errorGroupFull": "This class group is full.",
-  "errorCrCannotLeave": "You're the only CR, so you can't leave while classmates are in the group. You can delete the group instead.",
+  "errorCrCannotLeave": "You're the only CR. Make someone else CR in Members first, or delete the group.",
   "errorSlotLimit": "This routine already has the most classes allowed.",
   "deleteClassTitle": "Delete this class for everyone?",
   "reminders": "Class reminders",
@@ -442,5 +442,70 @@
   "timeYesterday": "yesterday",
   "errorAnnouncementGone": "This announcement was already deleted.",
   "pushChannel": "Class updates",
-  "pushChannelHint": "Changes and announcements from your CR"
+  "pushChannelHint": "Changes and announcements from your CR",
+  "myCourses": "My courses",
+  "myCoursesHint": "Turn off courses you don't take in this section, e.g. if you joined only for a retake. Only your own routine and reminders change.",
+  "coursesShown": "{shown} of {total} courses in your routine",
+  "@coursesShown": {
+    "placeholders": {
+      "shown": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "members": "Members",
+  "youLabel": "You",
+  "makeCr": "Make CR",
+  "makeMember": "Make member",
+  "stepDown": "Step down as CR",
+  "removeFromGroup": "Remove from group",
+  "removeMemberTitle": "Remove {name} from the group?",
+  "@removeMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "removeMemberBody": "They stop seeing this routine. They could join again with the code.",
+  "crHint": "CRs edit the routine, post announcements and manage members. Up to 3 per group.",
+  "unnamedStudent": "Student",
+  "errorCrLimit": "A group can have at most 3 CRs.",
+  "errorLastCr": "Make someone else CR first.",
+  "errorRemoveCr": "Make them a member first, then remove them.",
+  "errorPersonalLimit": "You already have the most personal classes allowed.",
+  "newSemester": "Start new semester",
+  "newSemesterBody": "This clears the weekly routine and its changes. Members, the join code and announcements stay, and classmates are told.",
+  "startAction": "Start",
+  "personalClasses": "Personal",
+  "addPersonalClass": "Add personal class",
+  "editPersonalClass": "Edit personal class",
+  "personalHint": "Only you see these: tuition, a job, a lab with another section.",
+  "personalNameLabel": "Name",
+  "personalNameHint": "e.g. Tuition",
+  "personalDetailsLabel": "Details",
+  "placeLabel": "Place",
+  "addToRoutine": "Add to your routine",
+  "extraClassHint": "For your class group, one day only",
+  "deletePersonalTitle": "Delete this personal class?",
+  "addAction": "Add",
+  "editAction": "Edit",
+  "batteryTitle": "Reminders arriving late?",
+  "batteryBody": "{brand} phones can stop apps in the background. Let this app run without battery limits: Settings → Apps → {app} → Battery → Unrestricted (or No restrictions).",
+  "@batteryBody": {
+    "placeholders": {
+      "brand": {
+        "type": "String"
+      },
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "openSettings": "Open settings"
 }

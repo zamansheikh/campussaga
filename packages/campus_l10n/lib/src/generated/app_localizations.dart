@@ -1145,7 +1145,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorCrCannotLeave.
   ///
   /// In en, this message translates to:
-  /// **'You\'re the only CR, so you can\'t leave while classmates are in the group. You can delete the group instead.'**
+  /// **'You\'re the only CR. Make someone else CR in Members first, or delete the group.'**
   String get errorCrCannotLeave;
 
   /// No description provided for @errorSlotLimit.
@@ -1567,6 +1567,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Changes and announcements from your CR'**
   String get pushChannelHint;
+
+  /// No description provided for @myCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'My courses'**
+  String get myCourses;
+
+  /// No description provided for @myCoursesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off courses you don\'t take in this section, e.g. if you joined only for a retake. Only your own routine and reminders change.'**
+  String get myCoursesHint;
+
+  /// No description provided for @coursesShown.
+  ///
+  /// In en, this message translates to:
+  /// **'{shown} of {total} courses in your routine'**
+  String coursesShown(int shown, int total);
+
+  /// No description provided for @members.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get members;
+
+  /// No description provided for @youLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get youLabel;
+
+  /// No description provided for @makeCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Make CR'**
+  String get makeCr;
+
+  /// No description provided for @makeMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Make member'**
+  String get makeMember;
+
+  /// No description provided for @stepDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Step down as CR'**
+  String get stepDown;
+
+  /// No description provided for @removeFromGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from group'**
+  String get removeFromGroup;
+
+  /// No description provided for @removeMemberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from the group?'**
+  String removeMemberTitle(String name);
+
+  /// No description provided for @removeMemberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They stop seeing this routine. They could join again with the code.'**
+  String get removeMemberBody;
+
+  /// No description provided for @crHint.
+  ///
+  /// In en, this message translates to:
+  /// **'CRs edit the routine, post announcements and manage members. Up to 3 per group.'**
+  String get crHint;
+
+  /// No description provided for @unnamedStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Student'**
+  String get unnamedStudent;
+
+  /// No description provided for @errorCrLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'A group can have at most 3 CRs.'**
+  String get errorCrLimit;
+
+  /// No description provided for @errorLastCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Make someone else CR first.'**
+  String get errorLastCr;
+
+  /// No description provided for @errorRemoveCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Make them a member first, then remove them.'**
+  String get errorRemoveCr;
+
+  /// No description provided for @errorPersonalLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have the most personal classes allowed.'**
+  String get errorPersonalLimit;
+
+  /// No description provided for @newSemester.
+  ///
+  /// In en, this message translates to:
+  /// **'Start new semester'**
+  String get newSemester;
+
+  /// No description provided for @newSemesterBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This clears the weekly routine and its changes. Members, the join code and announcements stay, and classmates are told.'**
+  String get newSemesterBody;
+
+  /// No description provided for @startAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get startAction;
+
+  /// No description provided for @personalClasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal'**
+  String get personalClasses;
+
+  /// No description provided for @addPersonalClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Add personal class'**
+  String get addPersonalClass;
+
+  /// No description provided for @editPersonalClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit personal class'**
+  String get editPersonalClass;
+
+  /// No description provided for @personalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Only you see these: tuition, a job, a lab with another section.'**
+  String get personalHint;
+
+  /// No description provided for @personalNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get personalNameLabel;
+
+  /// No description provided for @personalNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Tuition'**
+  String get personalNameHint;
+
+  /// No description provided for @personalDetailsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get personalDetailsLabel;
+
+  /// No description provided for @placeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Place'**
+  String get placeLabel;
+
+  /// No description provided for @addToRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to your routine'**
+  String get addToRoutine;
+
+  /// No description provided for @extraClassHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For your class group, one day only'**
+  String get extraClassHint;
+
+  /// No description provided for @deletePersonalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this personal class?'**
+  String get deletePersonalTitle;
+
+  /// No description provided for @addAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get addAction;
+
+  /// No description provided for @editAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editAction;
+
+  /// No description provided for @batteryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders arriving late?'**
+  String get batteryTitle;
+
+  /// No description provided for @batteryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{brand} phones can stop apps in the background. Let this app run without battery limits: Settings → Apps → {app} → Battery → Unrestricted (or No restrictions).'**
+  String batteryBody(String brand, String app);
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get openSettings;
 }
 
 class _AppLocalizationsDelegate

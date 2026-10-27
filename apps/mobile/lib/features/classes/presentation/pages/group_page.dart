@@ -16,7 +16,7 @@ import '../class_format.dart';
 import '../widgets/class_sheet.dart';
 import '../widgets/class_tile.dart';
 
-enum _Action { edit, leave, delete }
+enum _Action { edit, semester, leave, delete }
 
 /// One group: invite code and the weekly routine. The CR edits it here.
 class GroupPage extends StatelessWidget {
@@ -29,6 +29,21 @@ class GroupPage extends StatelessWidget {
     final cubit = context.read<MyClassesCubit>();
     if (a == _Action.edit) {
       await context.push(Routes.editGroup(g.id));
+      return;
+    }
+    if (a == _Action.semester) {
+      final semester = await showDialog<String>(
+        context: context,
+        builder: (_) => _NewSemesterDialog(current: g.semester),
+      );
+      if (semester == null || !context.mounted) return;
+      try {
+        await cubit.newSemester(g.id, semester);
+      } on Failure catch (f) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(classErrorText(l10n, f))));
+      }
       return;
     }
     final leaving = a == _Action.leave;
@@ -91,6 +106,11 @@ class GroupPage extends StatelessWidget {
             itemBuilder: (context) => [
               if (g.isCr)
                 PopupMenuItem(value: _Action.edit, child: Text(l10n.editGroup)),
+              if (g.isCr)
+                PopupMenuItem(
+                  value: _Action.semester,
+                  child: Text(l10n.newSemester),
+                ),
               PopupMenuItem(value: _Action.leave, child: Text(l10n.leaveGroup)),
               if (g.isCr)
                 PopupMenuItem(
@@ -124,6 +144,25 @@ class GroupPage extends StatelessWidget {
             _Header(group: g),
             const SizedBox(height: CsSpace.md),
             _InviteCard(group: g),
+            const SizedBox(height: CsSpace.md),
+            CsSection(
+              children: [
+                if (g.slots.isNotEmpty)
+                  CsRow(
+                    icon: Icons.checklist_rounded,
+                    title: l10n.myCourses,
+                    subtitle: _coursesShown(l10n, g),
+                    onTap: () => context.push(Routes.groupCourses(g.id)),
+                  ),
+                if (g.isCr)
+                  CsRow(
+                    icon: Icons.people_alt_outlined,
+                    title: l10n.members,
+                    subtitle: l10n.membersCount(g.memberCount),
+                    onTap: () => context.push(Routes.groupMembers(g.id)),
+                  ),
+              ],
+            ),
             const SizedBox(height: CsSpace.lg),
             AnnouncementsSection(group: g),
             const SizedBox(height: CsSpace.lg),
@@ -149,6 +188,82 @@ class GroupPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+String _coursesShown(AppLocalizations l10n, ClassGroup g) {
+  final all = {for (final s in g.slots) courseKey(s.courseCode)};
+  return l10n.coursesShown(
+    all.where((c) => !g.hiddenCourses.contains(c)).length,
+    all.length,
+  );
+}
+
+/// Asks for the new semester's name ("Spring 2027").
+class _NewSemesterDialog extends StatefulWidget {
+  const _NewSemesterDialog({required this.current});
+
+  final String current;
+
+  @override
+  State<_NewSemesterDialog> createState() => _NewSemesterDialogState();
+}
+
+class _NewSemesterDialogState extends State<_NewSemesterDialog> {
+  late final _name = TextEditingController(text: _next(widget.current));
+
+  /// "Fall 2026" -> "Spring 2027", "Spring 2027" -> "Summer 2027", ...
+  static String _next(String current) {
+    const terms = ['Spring', 'Summer', 'Fall'];
+    final m = RegExp(r'^(Spring|Summer|Fall)\s+(\d{4})$').firstMatch(current);
+    if (m == null) return '';
+    final i = terms.indexOf(m[1]!);
+    final year = int.parse(m[2]!) + (i == 2 ? 1 : 0);
+    return '${terms[(i + 1) % 3]} $year';
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(l10n.newSemester),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.newSemesterBody),
+            const SizedBox(height: CsSpace.md),
+            TextField(
+              controller: _name,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: l10n.semesterLabel,
+                hintText: l10n.semesterHint,
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+        TextButton(
+          onPressed: () {
+            final v = _name.text.trim();
+            if (v.isNotEmpty) Navigator.of(context).pop(v);
+          },
+          child: Text(l10n.startAction),
+        ),
+      ],
     );
   }
 }

@@ -25,7 +25,15 @@ class MyClassesCubit extends Cubit<MyClassesState> {
     emit(MyClassesState(userId: userId));
     final saved = await _cache.read(userId);
     if (isClosed || state.userId != userId) return;
-    if (saved != null) emit(state.copyWith(groups: saved, loaded: true));
+    if (saved != null) {
+      emit(
+        state.copyWith(
+          groups: saved.groups,
+          personal: saved.personal,
+          loaded: true,
+        ),
+      );
+    }
     await refresh();
   }
 
@@ -41,9 +49,25 @@ class MyClassesCubit extends Cubit<MyClassesState> {
     if (userId == null || state.refreshing) return;
     emit(state.copyWith(refreshing: true));
     try {
-      final groups = await _repo.myGroups();
+      final (groups, personal) = await (
+        _repo.myGroups(),
+        _repo.personalClasses(),
+      ).wait;
       if (isClosed || state.userId != userId) return;
-      _set(groups);
+      _set(groups, personal: personal);
+    } on ParallelWaitError<
+      (List<ClassGroup>?, List<ClassSlot>?),
+      (AsyncError?, AsyncError?)
+    > catch (e) {
+      if (isClosed || state.userId != userId) return;
+      final f = e.errors.$1?.error ?? e.errors.$2?.error;
+      emit(
+        state.copyWith(
+          refreshing: false,
+          loaded: true,
+          failure: () => f is Failure ? f : const UnexpectedFailure(),
+        ),
+      );
     } on Failure catch (f) {
       if (isClosed || state.userId != userId) return;
       emit(state.copyWith(refreshing: false, loaded: true, failure: () => f));
@@ -80,6 +104,11 @@ class MyClassesCubit extends Cubit<MyClassesState> {
   }
 
   Future<void> addSlot(String groupId, SlotDraft draft) async {
+    if (groupId == personalGroupId) {
+      final p = await _repo.addPersonal(draft);
+      _setPersonal([...state.personal, p]);
+      return;
+    }
     final s = await _repo.addSlot(groupId, draft);
     final g = state.group(groupId);
     if (g != null) _replace(g.copyWith(slots: _sorted([...g.slots, s])));
@@ -102,6 +131,11 @@ class MyClassesCubit extends Cubit<MyClassesState> {
   }
 
   Future<void> deleteSlot(String groupId, String slotId) async {
+    if (groupId == personalGroupId) {
+      await _repo.deletePersonal(slotId);
+      _setPersonal(state.personal.where((x) => x.id != slotId).toList());
+      return;
+    }
     await _repo.deleteSlot(groupId, slotId);
     final g = state.group(groupId);
     if (g != null) {
@@ -187,20 +221,52 @@ class MyClassesCubit extends Cubit<MyClassesState> {
     }
   }
 
+  Future<void> setHiddenCourses(String groupId, Set<String> courses) async =>
+      _replace(await _repo.setHiddenCourses(groupId, courses));
+
+  Future<void> newSemester(String groupId, String semester) async =>
+      _replace(await _repo.newSemester(groupId, semester));
+
+  Future<List<GroupMember>> members(String groupId) => _repo.members(groupId);
+
+  /// Changing roles (incl. stepping down yourself): fetch the group again.
+  Future<void> setMemberRole(
+    String groupId,
+    String userId,
+    GroupRole role,
+  ) async {
+    await _repo.setMemberRole(groupId, userId, role);
+    await refresh();
+  }
+
+  Future<void> removeMember(String groupId, String userId) async {
+    await _repo.removeMember(groupId, userId);
+    final g = state.group(groupId);
+    if (g != null) _replace(g.copyWith(memberCount: g.memberCount - 1));
+  }
+
+  void _setPersonal(List<ClassSlot> personal) =>
+      _set(state.groups, personal: _sorted(personal));
+
   void _replace(ClassGroup g) =>
       _set([for (final x in state.groups) x.id == g.id ? g : x]);
 
-  void _set(List<ClassGroup> groups) {
+  void _set(List<ClassGroup> groups, {List<ClassSlot>? personal}) {
     emit(
       state.copyWith(
         groups: groups,
+        personal: personal,
         loaded: true,
         refreshing: false,
         failure: () => null,
       ),
     );
     final userId = state.userId;
-    if (userId != null) unawaited(_cache.write(userId, groups));
+    if (userId != null) {
+      unawaited(
+        _cache.write(userId, (groups: groups, personal: state.personal)),
+      );
+    }
   }
 
   static List<ClassSlot> _sorted(List<ClassSlot> slots) => slots

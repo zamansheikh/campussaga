@@ -14,6 +14,36 @@ enum ClassKind {
   static ClassKind parse(String? v) => v == 'lab' ? lab : theory;
 }
 
+/// The id of the pseudo-group that holds the student's personal classes.
+const personalGroupId = 'personal';
+
+/// A course code in upper case without spaces ("cse 311" -> "CSE311"):
+/// how hidden and muted courses are matched (same rule as the server).
+String courseKey(String courseCode) =>
+    courseCode.toUpperCase().replaceAll(RegExp(r'\s+'), '');
+
+/// A student in a group, as a CR sees them (a name, never an email).
+class GroupMember {
+  const GroupMember({
+    required this.userId,
+    required this.name,
+    required this.role,
+    this.isMe = false,
+  });
+
+  factory GroupMember.fromJson(Map<String, Object?> json) => GroupMember(
+    userId: json['userId']! as String,
+    name: json['name'] as String? ?? '',
+    role: GroupRole.parse(json['role'] as String?),
+    isMe: json['isMe'] as bool? ?? false,
+  );
+
+  final String userId;
+  final String name;
+  final GroupRole role;
+  final bool isMe;
+}
+
 /// Minutes after midnight <-> "HH:MM".
 abstract final class Clock {
   static int parse(String hhmm) {
@@ -75,6 +105,17 @@ class ClassSlot {
     'kind': kind.name,
   };
 
+  /// A personal class from the API: title/details/place.
+  factory ClassSlot.fromPersonalJson(Map<String, Object?> json) => ClassSlot(
+    id: json['id']! as String,
+    courseCode: json['title']! as String,
+    courseTitle: json['details'] as String? ?? '',
+    room: json['place'] as String? ?? '',
+    weekday: json['weekday']! as int,
+    startMin: Clock.parse(json['start']! as String),
+    endMin: Clock.parse(json['end']! as String),
+  );
+
   SlotDraft toDraft() => SlotDraft(
     courseCode: courseCode,
     courseTitle: courseTitle,
@@ -101,7 +142,20 @@ class ClassGroup {
     this.slots = const [],
     this.changes = const [],
     this.announcements = const [],
+    this.hiddenCourses = const {},
   });
+
+  /// The student's own classes, shown in the routine like a group.
+  factory ClassGroup.personal(List<ClassSlot> slots) => ClassGroup(
+    id: personalGroupId,
+    department: '',
+    batch: '',
+    semester: '',
+    joinCode: '',
+    role: GroupRole.cr,
+    memberCount: 1,
+    slots: slots,
+  );
 
   factory ClassGroup.fromJson(Map<String, Object?> json) => ClassGroup(
     id: json['id']! as String,
@@ -124,6 +178,10 @@ class ClassGroup {
       for (final a in json['announcements'] as List<Object?>? ?? const [])
         Announcement.fromJson(a! as Map<String, Object?>),
     ],
+    hiddenCourses: {
+      for (final c in json['hiddenCourses'] as List<Object?>? ?? const [])
+        c! as String,
+    },
   );
 
   final String id;
@@ -142,7 +200,15 @@ class ClassGroup {
   /// The pinned one first, then the last 30 days' newest first.
   final List<Announcement> announcements;
 
+  /// Course keys (see [courseKey]) the student doesn't take in this group.
+  final Set<String> hiddenCourses;
+
   bool get isCr => role == GroupRole.cr;
+
+  bool get isPersonal => id == personalGroupId;
+
+  bool hides(String courseCode) =>
+      hiddenCourses.contains(courseKey(courseCode));
 
   /// "CSE 61 · A"
   String get title =>
@@ -160,25 +226,30 @@ class ClassGroup {
     'slots': [for (final s in slots) s.toJson()],
     'changes': [for (final c in changes) c.toJson()],
     'announcements': [for (final a in announcements) a.toJson()],
+    'hiddenCourses': hiddenCourses.toList()..sort(),
   };
 
   ClassGroup copyWith({
     List<ClassSlot>? slots,
     List<ClassChange>? changes,
     List<Announcement>? announcements,
+    Set<String>? hiddenCourses,
+    String? semester,
+    GroupRole? role,
     int? memberCount,
   }) => ClassGroup(
     id: id,
     department: department,
     batch: batch,
     section: section,
-    semester: semester,
+    semester: semester ?? this.semester,
     joinCode: joinCode,
-    role: role,
+    role: role ?? this.role,
     memberCount: memberCount ?? this.memberCount,
     slots: slots ?? this.slots,
     changes: changes ?? this.changes,
     announcements: announcements ?? this.announcements,
+    hiddenCourses: hiddenCourses ?? this.hiddenCourses,
   );
 }
 
@@ -312,6 +383,16 @@ class SlotDraft {
     'start': Clock.format(startMin),
     'end': Clock.format(endMin),
     'kind': kind.name,
+  };
+
+  /// A personal class: the name, details and place.
+  Map<String, Object?> toPersonalJson() => {
+    'title': courseCode,
+    'details': courseTitle,
+    'place': room,
+    'weekday': weekday,
+    'start': Clock.format(startMin),
+    'end': Clock.format(endMin),
   };
 }
 
@@ -525,12 +606,12 @@ List<ClassOnDay> classesOn(List<ClassGroup> groups, DateTime day) {
         if (c.date == date) c.slotId ?? c.id: c,
     };
     for (final s in g.slots) {
-      if (s.weekday == date.weekday) {
+      if (s.weekday == date.weekday && !g.hides(s.courseCode)) {
         out.add(ClassOnDay(slot: s, group: g, date: date, change: today[s.id]));
       }
     }
     for (final c in today.values) {
-      if (c.kind != ChangeKind.extra) continue;
+      if (c.kind != ChangeKind.extra || g.hides(c.courseCode)) continue;
       out.add(
         ClassOnDay(
           slot: ClassSlot(

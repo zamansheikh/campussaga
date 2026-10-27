@@ -1,5 +1,8 @@
 import 'class_models.dart';
 
+// Outside the class, where [courseKey] means the top-level function.
+String _key(String code) => courseKey(code);
+
 /// The student's reminder choices (saved on the phone).
 class ReminderSettings {
   const ReminderSettings({
@@ -32,10 +35,9 @@ class ReminderSettings {
   /// The student has been asked once (the Today prompt is not shown again).
   final bool asked;
 
-  static String courseKey(String courseCode) =>
-      courseCode.toUpperCase().replaceAll(RegExp(r'\s+'), '');
+  static String courseKey(String code) => _key(code);
 
-  bool isMuted(String courseCode) => muted.contains(courseKey(courseCode));
+  bool isMuted(String courseCode) => muted.contains(_key(courseCode));
 
   ReminderSettings copyWith({
     bool? enabled,
@@ -109,8 +111,7 @@ List<PlannedReminder> planReminders({
       final at = c.startsAt.subtract(before);
       if (!at.isAfter(now)) continue;
       // The same course at the same time in two groups: one reminder.
-      final key =
-          '${ReminderSettings.courseKey(c.slot.courseCode)}@${c.startsAt}';
+      final key = '${_key(c.slot.courseCode)}@${c.startsAt}';
       if (seen.add(key)) out.add((at, c));
     }
   }

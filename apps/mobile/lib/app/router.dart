@@ -14,6 +14,8 @@ import '../features/classes/presentation/pages/group_form_page.dart';
 import '../features/classes/presentation/pages/group_page.dart';
 import '../features/classes/presentation/pages/groups_page.dart';
 import '../features/classes/presentation/pages/join_group_page.dart';
+import '../features/classes/presentation/pages/members_page.dart';
+import '../features/classes/presentation/pages/my_courses_page.dart';
 import '../features/classes/presentation/pages/slot_editor_page.dart';
 import '../features/onboarding/presentation/onboarding_page.dart';
 import '../features/profile/presentation/pages/edit_profile_page.dart';
@@ -38,6 +40,10 @@ abstract final class Routes {
   static const groups = '/groups';
   static const joinGroup = '/groups/join';
   static const newGroup = '/groups/new';
+  static const newPersonal = '/personal/new';
+  static String editPersonal(String id) => '/personal/$id';
+  static String groupCourses(String id) => '/groups/$id/courses';
+  static String groupMembers(String id) => '/groups/$id/members';
   static String group(String id) => '/groups/$id';
   static String editGroup(String id) => '/groups/$id/edit';
   static String newSlot(String groupId) => '/groups/$groupId/class/new';
@@ -107,6 +113,16 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
       ),
       // Full-screen pages over the tabs.
       GoRoute(
+        path: '/personal/:slotId',
+        builder: (context, state) {
+          final id = state.pathParameters['slotId']!;
+          return SlotEditorPage(
+            groupId: personalGroupId,
+            slotId: id == 'new' ? null : id,
+          );
+        },
+      ),
+      GoRoute(
         path: Routes.groups,
         builder: (context, state) => const GroupsPage(),
         routes: [
@@ -127,6 +143,16 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
                 path: 'edit',
                 builder: (context, state) =>
                     GroupFormPage(groupId: state.pathParameters['id']),
+              ),
+              GoRoute(
+                path: 'courses',
+                builder: (context, state) =>
+                    MyCoursesPage(groupId: state.pathParameters['id']!),
+              ),
+              GoRoute(
+                path: 'members',
+                builder: (context, state) =>
+                    MembersPage(groupId: state.pathParameters['id']!),
               ),
               GoRoute(
                 path: 'change',

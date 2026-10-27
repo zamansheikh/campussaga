@@ -622,7 +622,7 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get errorCrCannotLeave =>
-      'তুমি একমাত্র সিআর, তাই সহপাঠীরা থাকতে গ্রুপ ছাড়তে পারবে না। চাইলে গ্রুপটি মুছে ফেলতে পারো।';
+      'তুমি একমাত্র সিআর। আগে সদস্য তালিকা থেকে অন্য কাউকে সিআর বানাও, অথবা গ্রুপটি মুছে ফেলো।';
 
   @override
   String get errorSlotLimit => 'এই রুটিনে সর্বোচ্চ সংখ্যক ক্লাস আছে।';
@@ -875,4 +875,130 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get pushChannelHint => 'সিআর-এর পরিবর্তন ও ঘোষণা';
+
+  @override
+  String get myCourses => 'আমার কোর্স';
+
+  @override
+  String get myCoursesHint =>
+      'এই সেকশনে যে কোর্স নাও না, সেগুলো বন্ধ করো, যেমন শুধু রিটেকের জন্য যোগ দিলে। শুধু তোমার রুটিন ও রিমাইন্ডার বদলাবে।';
+
+  @override
+  String coursesShown(int shown, int total) {
+    final intl.NumberFormat shownNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String shownString = shownNumberFormat.format(shown);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$totalStringটির মধ্যে $shownStringটি কোর্স তোমার রুটিনে';
+  }
+
+  @override
+  String get members => 'সদস্য';
+
+  @override
+  String get youLabel => 'তুমি';
+
+  @override
+  String get makeCr => 'সিআর বানাও';
+
+  @override
+  String get makeMember => 'সাধারণ সদস্য বানাও';
+
+  @override
+  String get stepDown => 'সিআর পদ ছাড়ো';
+
+  @override
+  String get removeFromGroup => 'গ্রুপ থেকে সরাও';
+
+  @override
+  String removeMemberTitle(String name) {
+    return '$name-কে গ্রুপ থেকে সরাবে?';
+  }
+
+  @override
+  String get removeMemberBody =>
+      'সে আর এই রুটিন দেখবে না। কোড দিয়ে আবার যোগ দিতে পারবে।';
+
+  @override
+  String get crHint =>
+      'সিআর রুটিন সম্পাদনা, ঘোষণা পোস্ট ও সদস্য পরিচালনা করে। প্রতি গ্রুপে সর্বোচ্চ ৩ জন।';
+
+  @override
+  String get unnamedStudent => 'শিক্ষার্থী';
+
+  @override
+  String get errorCrLimit => 'একটি গ্রুপে সর্বোচ্চ ৩ জন সিআর থাকতে পারে।';
+
+  @override
+  String get errorLastCr => 'আগে অন্য কাউকে সিআর বানাও।';
+
+  @override
+  String get errorRemoveCr => 'আগে তাকে সাধারণ সদস্য বানাও, তারপর সরাও।';
+
+  @override
+  String get errorPersonalLimit => 'তোমার সর্বোচ্চ সংখ্যক ব্যক্তিগত ক্লাস আছে।';
+
+  @override
+  String get newSemester => 'নতুন সেমিস্টার শুরু করো';
+
+  @override
+  String get newSemesterBody =>
+      'এতে সাপ্তাহিক রুটিন ও এর পরিবর্তনগুলো মুছে যাবে। সদস্য, যোগদানের কোড ও ঘোষণা থাকবে, আর সহপাঠীদের জানানো হবে।';
+
+  @override
+  String get startAction => 'শুরু করো';
+
+  @override
+  String get personalClasses => 'ব্যক্তিগত';
+
+  @override
+  String get addPersonalClass => 'ব্যক্তিগত ক্লাস যোগ করো';
+
+  @override
+  String get editPersonalClass => 'ব্যক্তিগত ক্লাস সম্পাদনা';
+
+  @override
+  String get personalHint =>
+      'এগুলো শুধু তুমি দেখবে: টিউশন, চাকরি, অন্য সেকশনের ল্যাব।';
+
+  @override
+  String get personalNameLabel => 'নাম';
+
+  @override
+  String get personalNameHint => 'যেমন: টিউশন';
+
+  @override
+  String get personalDetailsLabel => 'বিস্তারিত';
+
+  @override
+  String get placeLabel => 'জায়গা';
+
+  @override
+  String get addToRoutine => 'রুটিনে যোগ করো';
+
+  @override
+  String get extraClassHint => 'তোমার ক্লাস গ্রুপের জন্য, শুধু এক দিনের';
+
+  @override
+  String get deletePersonalTitle => 'এই ব্যক্তিগত ক্লাসটি মুছে ফেলবে?';
+
+  @override
+  String get addAction => 'যোগ করো';
+
+  @override
+  String get editAction => 'সম্পাদনা';
+
+  @override
+  String get batteryTitle => 'রিমাইন্ডার দেরিতে আসছে?';
+
+  @override
+  String batteryBody(String brand, String app) {
+    return '$brand ফোন ব্যাকগ্রাউন্ডে অ্যাপ বন্ধ করে দিতে পারে। এই অ্যাপকে ব্যাটারি সীমা ছাড়া চলতে দাও: সেটিংস → অ্যাপস → $app → ব্যাটারি → Unrestricted (বা No restrictions)।';
+  }
+
+  @override
+  String get openSettings => 'সেটিংস খোলো';
 }

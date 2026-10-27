@@ -34,6 +34,15 @@ func (s *Service) Routes(r *httpx.Router) {
 		Post("/groups/{id}/announcements", httpx.Handle(s.handlePost, httpx.Status(http.StatusCreated)))
 	r.Student().Patch("/groups/{id}/announcements/{a}", httpx.Handle(s.handlePin))
 	r.Student().Delete("/groups/{id}/announcements/{a}", httpx.Handle(s.handleDeleteAnnouncement, httpx.NoContent()))
+	r.Student().Get("/groups/{id}/members", httpx.Handle(s.handleMembers))
+	r.Student().Put("/groups/{id}/members/{user}", httpx.Handle(s.handleSetRole, httpx.NoContent()))
+	r.Student().Delete("/groups/{id}/members/{user}", httpx.Handle(s.handleRemoveMember, httpx.NoContent()))
+	r.Student().Put("/groups/{id}/hidden", httpx.Handle(s.handleHidden))
+	r.Student().Post("/groups/{id}/new-semester", httpx.Handle(s.handleNewSemester))
+	r.Student().Get("/me/classes", httpx.Handle(s.handleMyPersonal))
+	r.Student().Post("/me/classes", httpx.Handle(s.handleAddPersonal, httpx.Status(http.StatusCreated)))
+	r.Student().Put("/me/classes/{id}", httpx.Handle(s.handleUpdatePersonal))
+	r.Student().Delete("/me/classes/{id}", httpx.Handle(s.handleDeletePersonal, httpx.NoContent()))
 }
 
 type groupsRes struct {
@@ -159,4 +168,85 @@ func (s *Service) handlePin(ctx context.Context, in *pinReq) (*Announcement, err
 
 func (s *Service) handleDeleteAnnouncement(ctx context.Context, in *announcementPath) (*httpx.Empty, error) {
 	return nil, s.DeleteAnnouncement(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.A))
+}
+
+type membersRes struct {
+	Members []Member `json:"members"`
+}
+
+func (s *Service) handleMembers(ctx context.Context, in *groupPath) (*membersRes, error) {
+	m, err := s.Members(ctx, uuid.MustParse(in.ID))
+	if err != nil {
+		return nil, err
+	}
+	return &membersRes{Members: m}, nil
+}
+
+type memberPath struct {
+	ID   string `json:"-" path:"id" validate:"required,uuid"`
+	User string `json:"-" path:"user" validate:"required,uuid"`
+}
+
+type setRoleReq struct {
+	memberPath
+	Role string `json:"role" validate:"required,oneof=cr member"`
+}
+
+func (s *Service) handleSetRole(ctx context.Context, in *setRoleReq) (*httpx.Empty, error) {
+	return nil, s.SetMemberRole(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.User), in.Role)
+}
+
+func (s *Service) handleRemoveMember(ctx context.Context, in *memberPath) (*httpx.Empty, error) {
+	return nil, s.RemoveMember(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.User))
+}
+
+type hiddenReq struct {
+	groupPath
+	Courses []string `json:"courses" validate:"max=100,dive,max=40"`
+}
+
+func (s *Service) handleHidden(ctx context.Context, in *hiddenReq) (*Group, error) {
+	return s.SetHidden(ctx, uuid.MustParse(in.ID), in.Courses)
+}
+
+type semesterReq struct {
+	groupPath
+	Semester string `json:"semester" validate:"required,max=30"`
+}
+
+func (s *Service) handleNewSemester(ctx context.Context, in *semesterReq) (*Group, error) {
+	return s.NewSemester(ctx, uuid.MustParse(in.ID), in.Semester)
+}
+
+type personalRes struct {
+	Classes []PersonalClass `json:"classes"`
+}
+
+func (s *Service) handleMyPersonal(ctx context.Context, _ *httpx.Empty) (*personalRes, error) {
+	p, err := s.MyPersonal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &personalRes{Classes: p}, nil
+}
+
+func (s *Service) handleAddPersonal(ctx context.Context, in *PersonalInput) (*PersonalClass, error) {
+	return s.AddPersonal(ctx, in)
+}
+
+type personalPath struct {
+	ID string `json:"-" path:"id" validate:"required,uuid"`
+}
+
+type updatePersonalReq struct {
+	personalPath
+	PersonalInput
+}
+
+func (s *Service) handleUpdatePersonal(ctx context.Context, in *updatePersonalReq) (*PersonalClass, error) {
+	return s.UpdatePersonal(ctx, uuid.MustParse(in.ID), &in.PersonalInput)
+}
+
+func (s *Service) handleDeletePersonal(ctx context.Context, in *personalPath) (*httpx.Empty, error) {
+	return nil, s.DeletePersonal(ctx, uuid.MustParse(in.ID))
 }

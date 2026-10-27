@@ -95,6 +95,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('No classes on this day'), findsOneWidget);
 
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Add extra class'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Only for Thursday'), findsOneWidget);

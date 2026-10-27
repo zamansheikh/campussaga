@@ -491,6 +491,99 @@ class FakeClassGroupRepository implements ClassGroupRepository {
     );
   }
 
+  final personal = <ClassSlot>[];
+  final membersOf = <String, List<GroupMember>>{};
+
+  @override
+  Future<ClassGroup> setHiddenCourses(
+    String groupId,
+    Set<String> courses,
+  ) async {
+    _check();
+    final g = _mine(groupId)
+        .copyWith(hiddenCourses: {for (final c in courses) courseKey(c)});
+    _put(g);
+    return g;
+  }
+
+  @override
+  Future<ClassGroup> newSemester(String groupId, String semester) async {
+    _check();
+    final g = _mine(groupId)
+        .copyWith(semester: semester, slots: const [], changes: const []);
+    _put(g);
+    return g;
+  }
+
+  @override
+  Future<List<GroupMember>> members(String groupId) async {
+    _check();
+    return List.of(membersOf[groupId] ?? const []);
+  }
+
+  @override
+  Future<void> setMemberRole(
+    String groupId,
+    String userId,
+    GroupRole role,
+  ) async {
+    _check();
+    final list = membersOf[groupId] ?? [];
+    membersOf[groupId] = [
+      for (final m in list)
+        m.userId == userId
+            ? GroupMember(
+                userId: m.userId,
+                name: m.name,
+                role: role,
+                isMe: m.isMe,
+              )
+            : m,
+    ];
+    final me = membersOf[groupId]!.where((m) => m.isMe).firstOrNull;
+    if (me != null) _put(_mine(groupId).copyWith(role: me.role));
+  }
+
+  @override
+  Future<void> removeMember(String groupId, String userId) async {
+    _check();
+    membersOf[groupId] = [
+      for (final m in membersOf[groupId] ?? <GroupMember>[])
+        if (m.userId != userId) m,
+    ];
+    final g = _mine(groupId);
+    _put(g.copyWith(memberCount: g.memberCount - 1));
+  }
+
+  @override
+  Future<List<ClassSlot>> personalClasses() async {
+    _check();
+    return List.of(personal);
+  }
+
+  @override
+  Future<ClassSlot> addPersonal(SlotDraft d) async {
+    _check();
+    final s = _slot(_id('p'), d);
+    personal.add(s);
+    return s;
+  }
+
+  @override
+  Future<ClassSlot> updatePersonal(String id, SlotDraft d) async {
+    _check();
+    final s = _slot(id, d);
+    final i = personal.indexWhere((x) => x.id == id);
+    personal[i] = s;
+    return s;
+  }
+
+  @override
+  Future<void> deletePersonal(String id) async {
+    _check();
+    personal.removeWhere((x) => x.id == id);
+  }
+
   @override
   Future<void> deleteChange(String groupId, String changeId) async {
     _check();

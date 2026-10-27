@@ -45,7 +45,9 @@ class _ClassSheet extends StatelessWidget {
     final cs = context.cs;
     final s = item.slot;
     final today = DateUtils.dateOnly(appNow());
-    final canChange = item.group.isCr && !item.date.isBefore(today);
+    final personal = item.group.isPersonal;
+    final canChange =
+        item.group.isCr && !personal && !item.date.isBefore(today);
 
     void close(void Function() then) {
       Navigator.of(context).pop();
@@ -121,7 +123,7 @@ class _ClassSheet extends StatelessWidget {
               ),
             if (s.teacher.isNotEmpty)
               _Line(Icons.person_outline_rounded, s.teacher),
-            _Line(Icons.groups_outlined, item.group.title),
+            if (!personal) _Line(Icons.groups_outlined, item.group.title),
             if ((item.change?.note ?? '').isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: CsSpace.sm),
@@ -162,30 +164,80 @@ class _ClassSheet extends StatelessWidget {
               ),
               const SizedBox(height: CsSpace.sm),
             ],
-            Row(
-              children: [
-                if (item.group.isCr && !item.extra)
+            if (personal)
+              Row(
+                children: [
                   Expanded(
-                    child: TextButton(
-                      onPressed: () => close(
-                        () => host.push(Routes.editSlot(item.group.id, s.id)),
-                      ),
-                      child: Text(l10n.editWeeklyClass),
+                    child: TextButton.icon(
+                      onPressed: () =>
+                          close(() => host.push(Routes.editPersonal(s.id))),
+                      icon: const Icon(Icons.edit_outlined),
+                      label: Text(l10n.editAction),
                     ),
                   ),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () =>
-                        close(() => host.push(Routes.group(item.group.id))),
-                    child: Text(l10n.openGroupAction),
+                  Expanded(
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(foregroundColor: cs.error),
+                      onPressed: () => close(() => _deletePersonal(host, s)),
+                      icon: const Icon(Icons.delete_outline_rounded),
+                      label: Text(l10n.deleteAction),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              )
+            else
+              Row(
+                children: [
+                  if (item.group.isCr && !item.extra)
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => close(
+                          () => host.push(Routes.editSlot(item.group.id, s.id)),
+                        ),
+                        child: Text(l10n.editWeeklyClass),
+                      ),
+                    ),
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () =>
+                          close(() => host.push(Routes.group(item.group.id))),
+                      child: Text(l10n.openGroupAction),
+                    ),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
     );
+  }
+
+  static Future<void> _deletePersonal(BuildContext context, ClassSlot s) async {
+    final l10n = AppLocalizations.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: Text(l10n.deletePersonalTitle),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialog).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: dialog.cs.error),
+            onPressed: () => Navigator.of(dialog).pop(true),
+            child: Text(l10n.deleteAction),
+          ),
+        ],
+      ),
+    );
+    if (!(ok ?? false) || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await context.read<MyClassesCubit>().deleteSlot(personalGroupId, s.id);
+    } on Failure catch (f) {
+      messenger.showSnackBar(SnackBar(content: Text(classErrorText(l10n, f))));
+    }
   }
 
   static Future<void> _undo(BuildContext context, ClassOnDay item) => runChange(

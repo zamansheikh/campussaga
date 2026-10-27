@@ -13,6 +13,7 @@ import 'dart:ui' as ui;
 import 'package:campus_core/campus_core.dart';
 import 'package:campussaga/app/app.dart';
 import 'package:campussaga/app/clock.dart';
+import 'package:campussaga/app/di.dart';
 import 'package:campussaga/app/router.dart';
 import 'package:campussaga/app/settings/bloc/settings_state.dart';
 import 'package:campussaga/app/settings/settings_storage.dart';
@@ -402,6 +403,47 @@ void main() {
       );
       await tester.pumpAndSettle();
       await capture(tester, 'news-${look.name}');
+    });
+
+    shot('step5 ${look.name}', (tester) async {
+      final router = await start(
+        tester,
+        look,
+        user: _student,
+        groups: [
+          _group(GroupRole.cr).copyWith(hiddenCourses: {'ENG102'}),
+        ],
+      );
+      final repo = getIt<ClassGroupRepository>() as FakeClassGroupRepository;
+      repo.membersOf['g1'] = const [
+        GroupMember(
+          userId: 'u1',
+          name: 'Rafiul Islam',
+          role: GroupRole.cr,
+          isMe: true,
+        ),
+        GroupMember(userId: 'u2', name: 'Nabila Rahman', role: GroupRole.cr),
+        GroupMember(userId: 'u3', name: 'Tanvir Ahmed', role: GroupRole.member),
+        GroupMember(userId: 'u4', name: 'Sadia Khan', role: GroupRole.member),
+      ];
+      unawaited(router.push(Routes.group('g1')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'step5-${look.name}');
+      unawaited(router.push(Routes.groupCourses('g1')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'step5-${look.name}');
+      router.pop();
+      await tester.pumpAndSettle();
+      unawaited(router.push(Routes.groupMembers('g1')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'step5-${look.name}');
+      router.pop();
+      await tester.pumpAndSettle();
+      unawaited(router.push(Routes.newPersonal));
+      await tester.pumpAndSettle();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
+      await capture(tester, 'step5-${look.name}');
     });
 
     shot('join ${look.name}', (tester) async {

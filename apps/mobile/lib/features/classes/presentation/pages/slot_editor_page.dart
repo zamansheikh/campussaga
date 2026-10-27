@@ -60,6 +60,10 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
 
   bool get _editing => _slot != null;
 
+  /// The student's own class: a name, details and place; no teacher or
+  /// theory/lab, and only they see it.
+  bool get _personal => widget.groupId == personalGroupId;
+
   /// Courses already in the routine, latest details first.
   List<ClassSlot> get _courses {
     final seen = <String>{};
@@ -181,7 +185,9 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.deleteClassTitle),
+        title: Text(
+          _personal ? l10n.deletePersonalTitle : l10n.deleteClassTitle,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -212,7 +218,13 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
     final l10n = AppLocalizations.of(context);
     if (_group == null) return const Scaffold(body: SizedBox.shrink());
     return Scaffold(
-      appBar: AppBar(title: Text(_editing ? l10n.editClass : l10n.addClass)),
+      appBar: AppBar(
+        title: Text(
+          _personal
+              ? (_editing ? l10n.editPersonalClass : l10n.addPersonalClass)
+              : (_editing ? l10n.editClass : l10n.addClass),
+        ),
+      ),
       body: SafeArea(
         child: CsPage(
           padding: const EdgeInsets.fromLTRB(
@@ -222,6 +234,25 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
             CsSpace.lg,
           ),
           children: [
+            if (_personal && !_editing) ...[
+              Row(
+                children: [
+                  Icon(
+                    Icons.lock_outline_rounded,
+                    size: 16,
+                    color: context.cs.textSecondary,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      l10n.personalHint,
+                      style: context.text.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: CsSpace.md),
+            ],
             RawAutocomplete<ClassSlot>(
               textEditingController: _code,
               focusNode: _codeFocus,
@@ -240,12 +271,20 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                     focusNode: focus,
                     enabled: !_busy,
                     autofocus: !_editing,
-                    textCapitalization: TextCapitalization.characters,
+                    textCapitalization: _personal
+                        ? TextCapitalization.sentences
+                        : TextCapitalization.characters,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
-                      labelText: l10n.courseCodeLabel,
-                      hintText: l10n.courseCodeHint,
-                      prefixIcon: const Icon(Icons.tag_rounded),
+                      labelText: _personal
+                          ? l10n.personalNameLabel
+                          : l10n.courseCodeLabel,
+                      hintText: _personal
+                          ? l10n.personalNameHint
+                          : l10n.courseCodeHint,
+                      prefixIcon: Icon(
+                        _personal ? Icons.edit_note_rounded : Icons.tag_rounded,
+                      ),
                       errorText: _codeMissing ? l10n.errorFieldRequired : null,
                     ),
                   ),
@@ -259,37 +298,49 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
               textCapitalization: TextCapitalization.words,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
-                labelText: l10n.courseTitleLabel,
+                labelText: _personal
+                    ? l10n.personalDetailsLabel
+                    : l10n.courseTitleLabel,
                 prefixIcon: const Icon(Icons.menu_book_outlined),
               ),
             ),
             const SizedBox(height: CsSpace.md),
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: TextField(
-                    controller: _teacher,
-                    enabled: !_busy,
-                    textCapitalization: TextCapitalization.words,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      labelText: l10n.teacherLabel,
-                      prefixIcon: const Icon(Icons.person_outline_rounded),
+            if (_personal)
+              TextField(
+                controller: _room,
+                enabled: !_busy,
+                decoration: InputDecoration(
+                  labelText: l10n.placeLabel,
+                  prefixIcon: const Icon(Icons.place_outlined),
+                ),
+              )
+            else
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: TextField(
+                      controller: _teacher,
+                      enabled: !_busy,
+                      textCapitalization: TextCapitalization.words,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelText: l10n.teacherLabel,
+                        prefixIcon: const Icon(Icons.person_outline_rounded),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: CsSpace.md),
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                    controller: _room,
-                    enabled: !_busy,
-                    decoration: InputDecoration(labelText: l10n.roomLabel),
+                  const SizedBox(width: CsSpace.md),
+                  Expanded(
+                    flex: 2,
+                    child: TextField(
+                      controller: _room,
+                      enabled: !_busy,
+                      decoration: InputDecoration(labelText: l10n.roomLabel),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             const SizedBox(height: CsSpace.lg),
             Text(l10n.daysLabel, style: context.text.labelLarge),
             Text(l10n.daysHint, style: context.text.bodySmall),
@@ -351,26 +402,28 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                 ),
               ),
             ],
-            const SizedBox(height: CsSpace.lg),
-            SegmentedButton<ClassKind>(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(
-                  value: ClassKind.theory,
-                  label: Text(l10n.classTheory),
-                  icon: const Icon(Icons.menu_book_outlined),
-                ),
-                ButtonSegment(
-                  value: ClassKind.lab,
-                  label: Text(l10n.classLab),
-                  icon: const Icon(Icons.science_outlined),
-                ),
-              ],
-              selected: {_kind},
-              onSelectionChanged: _busy
-                  ? null
-                  : (v) => setState(() => _kind = v.first),
-            ),
+            if (!_personal) ...[
+              const SizedBox(height: CsSpace.lg),
+              SegmentedButton<ClassKind>(
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(
+                    value: ClassKind.theory,
+                    label: Text(l10n.classTheory),
+                    icon: const Icon(Icons.menu_book_outlined),
+                  ),
+                  ButtonSegment(
+                    value: ClassKind.lab,
+                    label: Text(l10n.classLab),
+                    icon: const Icon(Icons.science_outlined),
+                  ),
+                ],
+                selected: {_kind},
+                onSelectionChanged: _busy
+                    ? null
+                    : (v) => setState(() => _kind = v.first),
+              ),
+            ],
             if (_failure != null) ...[
               const SizedBox(height: CsSpace.md),
               NoticeBanner(text: classErrorText(l10n, _failure!)),

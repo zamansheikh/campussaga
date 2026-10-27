@@ -80,12 +80,13 @@ class _CampusAppState extends State<CampusApp> {
     _lifecycle; // start listening
     _onAuth(_auth.state);
     _authSub = _auth.stream.listen(_onAuth);
-    // Reminders follow the routine (cleared with it on sign-out).
+    // Reminders follow the routine, personal classes included (cleared
+    // with it on sign-out).
     unawaited(_reminders.start());
     unawaited(_seen.start());
     _push.start();
     _classesSub = _classes.stream
-        .map((s) => s.groups)
+        .map((s) => s.routine)
         .distinct()
         .listen((g) => unawaited(_reminders.updateGroups(g)));
   }

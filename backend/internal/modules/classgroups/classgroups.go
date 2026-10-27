@@ -17,6 +17,12 @@
 //   - POST   /groups/{id}/announcements post a message (CR)
 //   - PATCH  /groups/{id}/announcements/{a}  pin / unpin (CR)
 //   - DELETE /groups/{id}/announcements/{a}  delete (CR)
+//   - GET    /groups/{id}/members       names and roles (CR)
+//   - PUT    /groups/{id}/members/{u}   {role}: make CR / member (CR)
+//   - DELETE /groups/{id}/members/{u}   remove a student (CR)
+//   - PUT    /groups/{id}/hidden        {courses}: courses I don't take
+//   - POST   /groups/{id}/new-semester  {semester}: clear the routine (CR)
+//   - GET/POST /me/classes, PUT/DELETE /me/classes/{id}: personal classes
 //
 // Security notes:
 //   - A group is visible only to its members. Codes only work for students
@@ -82,7 +88,9 @@ type Group struct {
 	Changes []Change `json:"changes"`
 	// The pinned one first, then the last 30 days' newest first.
 	Announcements []Announcement `json:"announcements"`
-	UpdatedAt     time.Time      `json:"updatedAt"`
+	// Course keys the caller doesn't take here (hidden from their routine).
+	HiddenCourses []string  `json:"hiddenCourses"`
+	UpdatedAt     time.Time `json:"updatedAt"`
 }
 
 // Slot is one weekly class. Weekday is ISO (1 = Monday ... 7 = Sunday);
@@ -181,6 +189,14 @@ func (s *Service) MyGroups(ctx context.Context) ([]Group, error) {
 	if err != nil {
 		return nil, err
 	}
+	hiddenRows, err := q.ListHiddenForUser(ctx, c.UserID)
+	if err != nil {
+		return nil, err
+	}
+	hidden := map[uuid.UUID][]string{}
+	for _, h := range hiddenRows {
+		hidden[h.GroupID] = append(hidden[h.GroupID], h.CourseKey)
+	}
 	out := make([]Group, 0, len(rows))
 	for _, r := range rows {
 		g := groupView(r.ClassGroup, r.Role, r.MemberCount, byGroup[r.ClassGroup.ID])
@@ -189,6 +205,9 @@ func (s *Service) MyGroups(ctx context.Context) ([]Group, error) {
 		}
 		if as := news[r.ClassGroup.ID]; as != nil {
 			g.Announcements = as
+		}
+		if hs := hidden[r.ClassGroup.ID]; hs != nil {
+			g.HiddenCourses = hs
 		}
 		out = append(out, g)
 	}
@@ -542,7 +561,7 @@ func groupView(g store.ClassGroup, role string, members int64, slots []Slot) Gro
 	return Group{
 		ID: g.ID, Department: g.Department, Batch: g.Batch, Section: g.Section, Semester: g.Semester,
 		JoinCode: g.JoinCode, Role: role, MemberCount: members, Slots: slots, Changes: []Change{},
-		Announcements: []Announcement{}, UpdatedAt: g.UpdatedAt,
+		Announcements: []Announcement{}, HiddenCourses: []string{}, UpdatedAt: g.UpdatedAt,
 	}
 }
 

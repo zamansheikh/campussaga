@@ -12,6 +12,22 @@ import (
 	"github.com/google/uuid"
 )
 
+const addHidden = `-- name: AddHidden :exec
+INSERT INTO class_member_hidden_courses (group_id, user_id, course_key)
+VALUES ($1, $2, $3) ON CONFLICT DO NOTHING
+`
+
+type AddHiddenParams struct {
+	GroupID   uuid.UUID
+	UserID    uuid.UUID
+	CourseKey string
+}
+
+func (q *Queries) AddHidden(ctx context.Context, arg AddHiddenParams) error {
+	_, err := q.db.Exec(ctx, addHidden, arg.GroupID, arg.UserID, arg.CourseKey)
+	return err
+}
+
 const addMember = `-- name: AddMember :exec
 
 INSERT INTO class_group_members (group_id, user_id, role) VALUES ($1, $2, $3)
@@ -27,6 +43,20 @@ type AddMemberParams struct {
 // ---- members --------------------------------------------------------------
 func (q *Queries) AddMember(ctx context.Context, arg AddMemberParams) error {
 	_, err := q.db.Exec(ctx, addMember, arg.GroupID, arg.UserID, arg.Role)
+	return err
+}
+
+const clearHidden = `-- name: ClearHidden :exec
+DELETE FROM class_member_hidden_courses WHERE group_id = $1 AND user_id = $2
+`
+
+type ClearHiddenParams struct {
+	GroupID uuid.UUID
+	UserID  uuid.UUID
+}
+
+func (q *Queries) ClearHidden(ctx context.Context, arg ClearHiddenParams) error {
+	_, err := q.db.Exec(ctx, clearHidden, arg.GroupID, arg.UserID)
 	return err
 }
 
@@ -47,6 +77,17 @@ SELECT count(*) FROM class_group_members WHERE group_id = $1
 
 func (q *Queries) CountMembers(ctx context.Context, groupID uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, countMembers, groupID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countPersonal = `-- name: CountPersonal :one
+SELECT count(*) FROM personal_slots WHERE user_id = $1
+`
+
+func (q *Queries) CountPersonal(ctx context.Context, userID uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, countPersonal, userID)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -229,6 +270,48 @@ func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Class
 	return i, err
 }
 
+const createPersonal = `-- name: CreatePersonal :one
+INSERT INTO personal_slots (user_id, title, details, place, weekday, starts_min, ends_min)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+RETURNING id, user_id, title, details, place, weekday, starts_min, ends_min, created_at, updated_at
+`
+
+type CreatePersonalParams struct {
+	UserID    uuid.UUID
+	Title     string
+	Details   string
+	Place     string
+	Weekday   int16
+	StartsMin int16
+	EndsMin   int16
+}
+
+func (q *Queries) CreatePersonal(ctx context.Context, arg CreatePersonalParams) (PersonalSlot, error) {
+	row := q.db.QueryRow(ctx, createPersonal,
+		arg.UserID,
+		arg.Title,
+		arg.Details,
+		arg.Place,
+		arg.Weekday,
+		arg.StartsMin,
+		arg.EndsMin,
+	)
+	var i PersonalSlot
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Details,
+		&i.Place,
+		&i.Weekday,
+		&i.StartsMin,
+		&i.EndsMin,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const createSlot = `-- name: CreateSlot :one
 INSERT INTO routine_slots (group_id, course_code, course_title, teacher, room, weekday, starts_min, ends_min, kind)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -318,6 +401,34 @@ DELETE FROM class_groups WHERE id = $1
 func (q *Queries) DeleteGroup(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, deleteGroup, id)
 	return err
+}
+
+const deleteGroupSlots = `-- name: DeleteGroupSlots :exec
+
+DELETE FROM routine_slots WHERE group_id = $1
+`
+
+// ---- new semester ------------------------------------------------------------
+func (q *Queries) DeleteGroupSlots(ctx context.Context, groupID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteGroupSlots, groupID)
+	return err
+}
+
+const deletePersonal = `-- name: DeletePersonal :execrows
+DELETE FROM personal_slots WHERE id = $1 AND user_id = $2
+`
+
+type DeletePersonalParams struct {
+	ID     uuid.UUID
+	UserID uuid.UUID
+}
+
+func (q *Queries) DeletePersonal(ctx context.Context, arg DeletePersonalParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deletePersonal, arg.ID, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
 const deleteSlot = `-- name: DeleteSlot :execrows
@@ -599,6 +710,38 @@ func (q *Queries) ListChangesForUser(ctx context.Context, arg ListChangesForUser
 	return items, nil
 }
 
+const listHiddenForUser = `-- name: ListHiddenForUser :many
+
+SELECT group_id, course_key FROM class_member_hidden_courses WHERE user_id = $1
+ORDER BY group_id, course_key
+`
+
+type ListHiddenForUserRow struct {
+	GroupID   uuid.UUID
+	CourseKey string
+}
+
+// ---- hidden courses ----------------------------------------------------------
+func (q *Queries) ListHiddenForUser(ctx context.Context, userID uuid.UUID) ([]ListHiddenForUserRow, error) {
+	rows, err := q.db.Query(ctx, listHiddenForUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListHiddenForUserRow{}
+	for rows.Next() {
+		var i ListHiddenForUserRow
+		if err := rows.Scan(&i.GroupID, &i.CourseKey); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listMemberIDs = `-- name: ListMemberIDs :many
 
 SELECT user_id FROM class_group_members WHERE group_id = $1
@@ -618,6 +761,49 @@ func (q *Queries) ListMemberIDs(ctx context.Context, groupID uuid.UUID) ([]uuid.
 			return nil, err
 		}
 		items = append(items, user_id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listMembers = `-- name: ListMembers :many
+
+SELECT m.user_id, m.role, m.joined_at, u.display_name
+FROM class_group_members m
+JOIN users u ON u.id = m.user_id
+WHERE m.group_id = $1
+ORDER BY (m.role = 'cr') DESC, m.joined_at, m.user_id
+`
+
+type ListMembersRow struct {
+	UserID      uuid.UUID
+	Role        string
+	JoinedAt    time.Time
+	DisplayName *string
+}
+
+// ---- members (CR) ----------------------------------------------------------
+// Names only (no emails): what a CR needs to manage the group.
+func (q *Queries) ListMembers(ctx context.Context, groupID uuid.UUID) ([]ListMembersRow, error) {
+	rows, err := q.db.Query(ctx, listMembers, groupID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListMembersRow{}
+	for rows.Next() {
+		var i ListMembersRow
+		if err := rows.Scan(
+			&i.UserID,
+			&i.Role,
+			&i.JoinedAt,
+			&i.DisplayName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -662,6 +848,43 @@ func (q *Queries) ListMyGroups(ctx context.Context, userID uuid.UUID) ([]ListMyG
 			&i.ClassGroup.UpdatedAt,
 			&i.Role,
 			&i.MemberCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listPersonal = `-- name: ListPersonal :many
+
+SELECT id, user_id, title, details, place, weekday, starts_min, ends_min, created_at, updated_at FROM personal_slots WHERE user_id = $1 ORDER BY weekday, starts_min, title, id
+`
+
+// ---- personal classes --------------------------------------------------------
+func (q *Queries) ListPersonal(ctx context.Context, userID uuid.UUID) ([]PersonalSlot, error) {
+	rows, err := q.db.Query(ctx, listPersonal, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []PersonalSlot{}
+	for rows.Next() {
+		var i PersonalSlot
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.Details,
+			&i.Place,
+			&i.Weekday,
+			&i.StartsMin,
+			&i.EndsMin,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -793,6 +1016,38 @@ func (q *Queries) SetAnnouncementPinned(ctx context.Context, arg SetAnnouncement
 	return i, err
 }
 
+const setRole = `-- name: SetRole :execrows
+UPDATE class_group_members SET role = $1 WHERE group_id = $2 AND user_id = $3
+`
+
+type SetRoleParams struct {
+	Role    string
+	GroupID uuid.UUID
+	UserID  uuid.UUID
+}
+
+func (q *Queries) SetRole(ctx context.Context, arg SetRoleParams) (int64, error) {
+	result, err := q.db.Exec(ctx, setRole, arg.Role, arg.GroupID, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const setSemester = `-- name: SetSemester :exec
+UPDATE class_groups SET semester = $1 WHERE id = $2
+`
+
+type SetSemesterParams struct {
+	Semester string
+	ID       uuid.UUID
+}
+
+func (q *Queries) SetSemester(ctx context.Context, arg SetSemesterParams) error {
+	_, err := q.db.Exec(ctx, setSemester, arg.Semester, arg.ID)
+	return err
+}
+
 const touchGroup = `-- name: TouchGroup :exec
 UPDATE class_groups SET updated_at = now() WHERE id = $1
 `
@@ -845,6 +1100,52 @@ func (q *Queries) UpdateGroup(ctx context.Context, arg UpdateGroupParams) (Class
 		&i.Semester,
 		&i.JoinCode,
 		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updatePersonal = `-- name: UpdatePersonal :one
+UPDATE personal_slots
+SET title = $1, details = $2, place = $3, weekday = $4,
+    starts_min = $5, ends_min = $6
+WHERE id = $7 AND user_id = $8
+RETURNING id, user_id, title, details, place, weekday, starts_min, ends_min, created_at, updated_at
+`
+
+type UpdatePersonalParams struct {
+	Title     string
+	Details   string
+	Place     string
+	Weekday   int16
+	StartsMin int16
+	EndsMin   int16
+	ID        uuid.UUID
+	UserID    uuid.UUID
+}
+
+func (q *Queries) UpdatePersonal(ctx context.Context, arg UpdatePersonalParams) (PersonalSlot, error) {
+	row := q.db.QueryRow(ctx, updatePersonal,
+		arg.Title,
+		arg.Details,
+		arg.Place,
+		arg.Weekday,
+		arg.StartsMin,
+		arg.EndsMin,
+		arg.ID,
+		arg.UserID,
+	)
+	var i PersonalSlot
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Details,
+		&i.Place,
+		&i.Weekday,
+		&i.StartsMin,
+		&i.EndsMin,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

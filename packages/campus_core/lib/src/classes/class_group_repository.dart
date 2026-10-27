@@ -47,4 +47,28 @@ abstract interface class ClassGroupRepository {
   });
 
   Future<void> deleteAnnouncement(String groupId, String announcementId);
+
+  /// Courses the student doesn't take in this group (hidden from their
+  /// own routine and reminders only).
+  Future<ClassGroup> setHiddenCourses(String groupId, Set<String> courses);
+
+  /// Clears the weekly routine and renames the semester (CR).
+  Future<ClassGroup> newSemester(String groupId, String semester);
+
+  /// Names and roles (CR only).
+  Future<List<GroupMember>> members(String groupId);
+
+  /// Makes a member a CR or a CR a member again (CR only).
+  Future<void> setMemberRole(String groupId, String userId, GroupRole role);
+
+  Future<void> removeMember(String groupId, String userId);
+
+  /// The student's own classes (only they see them).
+  Future<List<ClassSlot>> personalClasses();
+
+  Future<ClassSlot> addPersonal(SlotDraft draft);
+
+  Future<ClassSlot> updatePersonal(String id, SlotDraft draft);
+
+  Future<void> deletePersonal(String id);
 }

@@ -127,6 +127,41 @@ void main() {
     expect(back.copyWith(slots: const []).announcements, hasLength(1));
   });
 
+  test('hidden courses leave the routine and reminders', () {
+    final g = group(changes).copyWith(hiddenCourses: {'CSE313', 'MAT201'});
+    expect(classesOn([g], wed).map((c) => c.slot.courseCode), ['CSE311']);
+    expect(g.hides('cse 313'), isTrue);
+    expect(
+      planReminders(
+        groups: [g.copyWith(changes: const [])],
+        now: DateTime(2026, 10, 27, 20),
+        settings: const ReminderSettings(enabled: true),
+        days: 2,
+      ).map((r) => r.item.slot.courseCode),
+      ['CSE311'],
+    );
+    expect(ClassGroup.fromJson(g.toJson()).hiddenCourses, g.hiddenCourses);
+  });
+
+  test('personal classes join the routine', () {
+    final mine = ClassGroup.personal([
+      ClassSlot.fromPersonalJson(const {
+        'id': 'p1',
+        'title': 'Tuition',
+        'details': 'Class 9 maths',
+        'place': 'Dhanmondi',
+        'weekday': 3,
+        'start': '17:00',
+        'end': '18:30',
+      }),
+    ]);
+    expect(mine.isPersonal, isTrue);
+    final day = classesOn([group(const []), mine], wed);
+    expect(day.last.slot.courseCode, 'Tuition');
+    expect(day.last.room, 'Dhanmondi');
+    expect(day.last.slot.toDraft().toPersonalJson()['title'], 'Tuition');
+  });
+
   test('copyWith keeps the changes', () {
     expect(group(changes).copyWith(slots: const []).changes, hasLength(3));
   });

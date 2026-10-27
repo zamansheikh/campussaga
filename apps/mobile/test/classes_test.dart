@@ -329,7 +329,7 @@ void main() {
 
     test("another student never sees someone else's saved routine", () async {
       final cache = MemoryRoutineCache();
-      await cache.write('u1', [sampleGroup()]);
+      await cache.write('u1', (groups: [sampleGroup()], personal: const []));
       expect(await cache.read('u2'), isNull);
 
       final cubit = MyClassesCubit(FakeClassGroupRepository(), cache);

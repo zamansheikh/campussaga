@@ -179,3 +179,14 @@ func join(sep string, parts ...string) string {
 	}
 	return strings.Join(out, sep)
 }
+
+func semesterNotice(g store.ClassGroup) Notice {
+	gt := groupTitle(g)
+	return Notice{
+		Texts: map[string]NoticeText{
+			"en": {Title: gt + ": " + g.Semester + " started", Body: "The CR is setting up the new routine."},
+			"bn": {Title: gt + ": " + g.Semester + " শুরু", Body: "সিআর নতুন রুটিন সাজাচ্ছে।"},
+		},
+		Data: map[string]string{"type": "semester", "groupId": g.ID.String()},
+	}
+}

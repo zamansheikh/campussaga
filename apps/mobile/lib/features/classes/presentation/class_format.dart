@@ -37,6 +37,10 @@ String classErrorText(AppLocalizations l10n, Failure f) => switch (f.code) {
   'CR_CANNOT_LEAVE' => l10n.errorCrCannotLeave,
   'SLOT_LIMIT_REACHED' => l10n.errorSlotLimit,
   'ANNOUNCEMENT_NOT_FOUND' => l10n.errorAnnouncementGone,
+  'CR_LIMIT_REACHED' => l10n.errorCrLimit,
+  'LAST_CR' => l10n.errorLastCr,
+  'REMOVE_CR' => l10n.errorRemoveCr,
+  'PERSONAL_LIMIT_REACHED' => l10n.errorPersonalLimit,
   _ when f is RateLimitedFailure => l10n.errorTooManyRequests,
   _ => authErrorText(l10n, f),
 };
@@ -54,3 +58,7 @@ String agoText(BuildContext context, DateTime t, DateTime now) {
   }
   return DateFormat.MMMd(_locale(context)).format(t);
 }
+
+/// How a group is named in lists: its title, or "Personal".
+String groupLabel(BuildContext context, ClassGroup g) =>
+    g.isPersonal ? AppLocalizations.of(context).personalClasses : g.title;

@@ -33,6 +33,19 @@ type ClassGroup struct {
 	UpdatedAt    time.Time
 }
 
+type PersonalSlot struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Title     string
+	Details   string
+	Place     string
+	Weekday   int16
+	StartsMin int16
+	EndsMin   int16
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 type RoutineChange struct {
 	ID          uuid.UUID
 	GroupID     uuid.UUID

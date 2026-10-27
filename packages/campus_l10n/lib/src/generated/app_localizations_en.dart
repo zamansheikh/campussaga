@@ -636,7 +636,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorCrCannotLeave =>
-      'You\'re the only CR, so you can\'t leave while classmates are in the group. You can delete the group instead.';
+      'You\'re the only CR. Make someone else CR in Members first, or delete the group.';
 
   @override
   String get errorSlotLimit =>
@@ -899,4 +899,131 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pushChannelHint => 'Changes and announcements from your CR';
+
+  @override
+  String get myCourses => 'My courses';
+
+  @override
+  String get myCoursesHint =>
+      'Turn off courses you don\'t take in this section, e.g. if you joined only for a retake. Only your own routine and reminders change.';
+
+  @override
+  String coursesShown(int shown, int total) {
+    final intl.NumberFormat shownNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String shownString = shownNumberFormat.format(shown);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$shownString of $totalString courses in your routine';
+  }
+
+  @override
+  String get members => 'Members';
+
+  @override
+  String get youLabel => 'You';
+
+  @override
+  String get makeCr => 'Make CR';
+
+  @override
+  String get makeMember => 'Make member';
+
+  @override
+  String get stepDown => 'Step down as CR';
+
+  @override
+  String get removeFromGroup => 'Remove from group';
+
+  @override
+  String removeMemberTitle(String name) {
+    return 'Remove $name from the group?';
+  }
+
+  @override
+  String get removeMemberBody =>
+      'They stop seeing this routine. They could join again with the code.';
+
+  @override
+  String get crHint =>
+      'CRs edit the routine, post announcements and manage members. Up to 3 per group.';
+
+  @override
+  String get unnamedStudent => 'Student';
+
+  @override
+  String get errorCrLimit => 'A group can have at most 3 CRs.';
+
+  @override
+  String get errorLastCr => 'Make someone else CR first.';
+
+  @override
+  String get errorRemoveCr => 'Make them a member first, then remove them.';
+
+  @override
+  String get errorPersonalLimit =>
+      'You already have the most personal classes allowed.';
+
+  @override
+  String get newSemester => 'Start new semester';
+
+  @override
+  String get newSemesterBody =>
+      'This clears the weekly routine and its changes. Members, the join code and announcements stay, and classmates are told.';
+
+  @override
+  String get startAction => 'Start';
+
+  @override
+  String get personalClasses => 'Personal';
+
+  @override
+  String get addPersonalClass => 'Add personal class';
+
+  @override
+  String get editPersonalClass => 'Edit personal class';
+
+  @override
+  String get personalHint =>
+      'Only you see these: tuition, a job, a lab with another section.';
+
+  @override
+  String get personalNameLabel => 'Name';
+
+  @override
+  String get personalNameHint => 'e.g. Tuition';
+
+  @override
+  String get personalDetailsLabel => 'Details';
+
+  @override
+  String get placeLabel => 'Place';
+
+  @override
+  String get addToRoutine => 'Add to your routine';
+
+  @override
+  String get extraClassHint => 'For your class group, one day only';
+
+  @override
+  String get deletePersonalTitle => 'Delete this personal class?';
+
+  @override
+  String get addAction => 'Add';
+
+  @override
+  String get editAction => 'Edit';
+
+  @override
+  String get batteryTitle => 'Reminders arriving late?';
+
+  @override
+  String batteryBody(String brand, String app) {
+    return '$brand phones can stop apps in the background. Let this app run without battery limits: Settings → Apps → $app → Battery → Unrestricted (or No restrictions).';
+  }
+
+  @override
+  String get openSettings => 'Open settings';
 }

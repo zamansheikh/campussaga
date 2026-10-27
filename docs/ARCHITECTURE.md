@@ -123,6 +123,8 @@ rewriting the app.
 | `POST /groups/{id}/announcements` `{body, pinned}` | CR | Post a message (≤1000 chars, line breaks kept); pinning unpins the previous one. 30 a day per CR |
 | `PATCH /groups/{id}/announcements/{a}` `{pinned}` · `DELETE …` | CR | Pin / unpin · delete for everyone |
 
+**Step 5** (migration 00440): `PUT /groups/{id}/hidden {courses}` hides courses a member doesn't take (retake students; only their routine and reminders change); `POST /groups/{id}/new-semester {semester}` clears the weekly routine and its changes (CR; members, code and announcements stay; members are notified); `GET /groups/{id}/members`, `PUT|DELETE /groups/{id}/members/{user}` let CRs see names (never emails), make up to 3 CRs, step down (never the last) and remove members; a trigger makes the longest member CR if the last CR disappears (account deleted). Personal classes: `GET|POST /me/classes`, `PUT|DELETE /me/classes/{id}` (max 50, owner only); the app shows them in Today, Routine and reminders as a private "Personal" group.
+
 **Pushes** (`push` module, migration 00430): the app registers its FCM token with `POST /me/devices {token, platform, language}`; the token belongs to that sign-in session, so signing out or a revoked session stops pushes. After a CR posts an announcement or adds/undoes a change, every other member's phone gets a notification in its language (EN/BN, Bengali digits), sent in the background after commit; tokens Firebase reports as gone are deleted. Without `FCM_CREDENTIALS_FILE` the server only logs them. iPhones also need the APNs key (docs/DEPLOYMENT.md).
 
 `GET /groups` includes each group's `changes` from yesterday on, and its `announcements`: the pinned one plus the newest 20 of the last 30 days. The app keeps "seen" times per group on the phone for the "New" badge. Editing a weekly class to another weekday, or deleting it, removes its changes.
@@ -355,8 +357,11 @@ announcements       id, group_id, body, pinned (one per group), created_by,
                     created_at  -- migration 00420
 device_tokens       token, user_id, session_id, platform, language
                     -- migration 00430 (push)
+class_member_hidden_courses  group_id, user_id, course_key  -- 00440
+personal_slots      id, user_id, title, details, place, weekday,
+                    starts_min, ends_min  -- 00440, owner only
 -- R1 My Class (planned)
-                    co-CR role, CR transfer, semester archive, join code reset
+                    join code reset
 routine_changes     id, group_id, slot_id NULL, date, type ('cancelled'|
                     'rescheduled'|'room_changed'|'extra'), new_start, new_end,
                     new_room, note, created_by, created_at

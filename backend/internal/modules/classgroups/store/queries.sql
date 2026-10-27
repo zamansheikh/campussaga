@@ -148,3 +148,60 @@ SELECT * FROM class_groups WHERE id = @id;
 
 -- name: GetChange :one
 SELECT * FROM routine_changes WHERE id = @id AND group_id = @group_id;
+
+-- ---- members (CR) ----------------------------------------------------------
+
+-- Names only (no emails): what a CR needs to manage the group.
+-- name: ListMembers :many
+SELECT m.user_id, m.role, m.joined_at, u.display_name
+FROM class_group_members m
+JOIN users u ON u.id = m.user_id
+WHERE m.group_id = @group_id
+ORDER BY (m.role = 'cr') DESC, m.joined_at, m.user_id;
+
+-- name: SetRole :execrows
+UPDATE class_group_members SET role = @role WHERE group_id = @group_id AND user_id = @user_id;
+
+-- ---- hidden courses ----------------------------------------------------------
+
+-- name: ListHiddenForUser :many
+SELECT group_id, course_key FROM class_member_hidden_courses WHERE user_id = @user_id
+ORDER BY group_id, course_key;
+
+-- name: ClearHidden :exec
+DELETE FROM class_member_hidden_courses WHERE group_id = @group_id AND user_id = @user_id;
+
+-- name: AddHidden :exec
+INSERT INTO class_member_hidden_courses (group_id, user_id, course_key)
+VALUES (@group_id, @user_id, @course_key) ON CONFLICT DO NOTHING;
+
+-- ---- new semester ------------------------------------------------------------
+
+-- name: DeleteGroupSlots :exec
+DELETE FROM routine_slots WHERE group_id = @group_id;
+
+-- name: SetSemester :exec
+UPDATE class_groups SET semester = @semester WHERE id = @id;
+
+-- ---- personal classes --------------------------------------------------------
+
+-- name: ListPersonal :many
+SELECT * FROM personal_slots WHERE user_id = @user_id ORDER BY weekday, starts_min, title, id;
+
+-- name: CountPersonal :one
+SELECT count(*) FROM personal_slots WHERE user_id = @user_id;
+
+-- name: CreatePersonal :one
+INSERT INTO personal_slots (user_id, title, details, place, weekday, starts_min, ends_min)
+VALUES (@user_id, @title, @details, @place, @weekday, @starts_min, @ends_min)
+RETURNING *;
+
+-- name: UpdatePersonal :one
+UPDATE personal_slots
+SET title = @title, details = @details, place = @place, weekday = @weekday,
+    starts_min = @starts_min, ends_min = @ends_min
+WHERE id = @id AND user_id = @user_id
+RETURNING *;
+
+-- name: DeletePersonal :execrows
+DELETE FROM personal_slots WHERE id = @id AND user_id = @user_id;

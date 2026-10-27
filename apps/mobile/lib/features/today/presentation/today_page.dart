@@ -76,7 +76,7 @@ class _TodayPageState extends State<TodayPage> {
                   padding: EdgeInsets.all(CsSpace.xl),
                   child: Center(child: CircularProgressIndicator()),
                 )
-              else if (!classes.hasGroups) ...[
+              else if (!classes.hasGroups && classes.personal.isEmpty) ...[
                 const _JoinCard(),
                 const SizedBox(height: CsSpace.lg),
                 CsSection(
@@ -88,7 +88,7 @@ class _TodayPageState extends State<TodayPage> {
                   ],
                 ),
               ] else
-                ..._schedule(context, classes.groups, now),
+                ..._schedule(context, classes.routine, now),
             ],
           ),
         ),
@@ -142,7 +142,10 @@ class _TodayPageState extends State<TodayPage> {
     return [
       hero,
       if (ask) ...[const SizedBox(height: CsSpace.md), const ReminderPrompt()],
-      _RecentAnnouncements(groups: groups, now: now),
+      _RecentAnnouncements(
+        groups: groups.where((g) => !g.isPersonal).toList(),
+        now: now,
+      ),
       if (today.isNotEmpty) ...[
         const SizedBox(height: CsSpace.lg),
         CsSection(
@@ -151,7 +154,7 @@ class _TodayPageState extends State<TodayPage> {
             for (final c in today)
               ClassTile.on(
                 c,
-                groupTitle: many ? c.group.title : null,
+                groupTitle: many ? groupLabel(context, c.group) : null,
                 state: !c.endsAt.isAfter(now)
                     ? ClassTileState.past
                     : !c.startsAt.isAfter(now)
@@ -163,7 +166,7 @@ class _TodayPageState extends State<TodayPage> {
         ),
       ],
       const SizedBox(height: CsSpace.lg),
-      _MyGroups(groups: groups),
+      _MyGroups(groups: groups.where((g) => !g.isPersonal).toList()),
     ];
   }
 
@@ -514,7 +517,9 @@ class _NothingLeft extends StatelessWidget {
       ).where((c) => !c.cancelled);
       if (list.isNotEmpty) next = list.first;
     }
-    final crGroup = groups.where((g) => g.isCr && g.slots.isEmpty).firstOrNull;
+    final crGroup = groups
+        .where((g) => g.isCr && !g.isPersonal && g.slots.isEmpty)
+        .firstOrNull;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(CsSpace.lg),
@@ -548,7 +553,9 @@ class _NothingLeft extends StatelessWidget {
                 children: [
                   ClassTile.on(
                     next,
-                    groupTitle: groups.length > 1 ? next.group.title : null,
+                    groupTitle: groups.length > 1
+                        ? groupLabel(context, next.group)
+                        : null,
                     onTap: () => showClassSheet(context, next!),
                   ),
                 ],

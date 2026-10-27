@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../../../app/clock.dart';
 import '../../../app/router.dart';
 import '../../classes/presentation/bloc/my_classes_cubit.dart';
+import '../../classes/presentation/class_format.dart';
 import '../../classes/presentation/widgets/class_sheet.dart';
 import '../../classes/presentation/widgets/class_tile.dart';
 
@@ -36,20 +37,22 @@ class _RoutinePageState extends State<RoutinePage> {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
     final classes = context.watch<MyClassesCubit>().state;
-    final day = classesOn(classes.groups, _selected);
+    final routine = classes.routine;
+    final day = classesOn(routine, _selected);
     final busyDays = {
-      for (final g in classes.groups)
-        for (final s in g.slots) s.weekday,
+      for (final g in routine)
+        for (final s in g.slots)
+          if (!g.hides(s.courseCode)) s.weekday,
     };
     final crGroups = classes.groups.where((g) => g.isCr).toList();
     final today = DateUtils.dateOnly(appNow());
     return Scaffold(
-      floatingActionButton: crGroups.isEmpty || _selected.isBefore(today)
+      floatingActionButton: _selected.isBefore(today)
           ? null
           : FloatingActionButton.extended(
-              onPressed: () => _addExtra(context, crGroups),
+              onPressed: () => _add(context, crGroups),
               icon: const Icon(Icons.add_rounded),
-              label: Text(l10n.addExtraClass),
+              label: Text(l10n.addAction),
             ),
       appBar: AppBar(
         title: Text(l10n.navRoutine),
@@ -77,7 +80,7 @@ class _RoutinePageState extends State<RoutinePage> {
               style: context.text.titleMedium,
             ),
             const SizedBox(height: CsSpace.md),
-            if (!classes.hasGroups)
+            if (!classes.hasGroups && classes.personal.isEmpty)
               Card(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: CsSpace.md),
@@ -117,8 +120,8 @@ class _RoutinePageState extends State<RoutinePage> {
                   for (final c in day)
                     ClassTile.on(
                       c,
-                      groupTitle: classes.groups.length > 1
-                          ? c.group.title
+                      groupTitle: routine.length > 1
+                          ? groupLabel(context, c.group)
                           : null,
                       onTap: () => showClassSheet(context, c),
                     ),
@@ -132,6 +135,40 @@ class _RoutinePageState extends State<RoutinePage> {
 }
 
 extension on _RoutinePageState {
+  /// A personal class, or (CRs) an extra class on the selected date.
+  Future<void> _add(BuildContext context, List<ClassGroup> crGroups) async {
+    final l10n = AppLocalizations.of(context);
+    if (crGroups.isEmpty) {
+      await context.push(Routes.newPersonal);
+      return;
+    }
+    final what = await CsOptionSheet.show<String>(
+      context: context,
+      title: l10n.addToRoutine,
+      selected: '',
+      options: [
+        CsOption(
+          'personal',
+          l10n.addPersonalClass,
+          subtitle: l10n.personalHint,
+          icon: Icons.person_outline_rounded,
+        ),
+        CsOption(
+          'extra',
+          l10n.addExtraClass,
+          subtitle: l10n.extraClassHint,
+          icon: Icons.event_available_outlined,
+        ),
+      ],
+    );
+    if (!context.mounted || what == null) return;
+    if (what == 'personal') {
+      await context.push(Routes.newPersonal);
+    } else {
+      await _addExtra(context, crGroups);
+    }
+  }
+
   /// Extra class on the selected date; asks which group if CR of several.
   Future<void> _addExtra(BuildContext context, List<ClassGroup> groups) async {
     final l10n = AppLocalizations.of(context);
