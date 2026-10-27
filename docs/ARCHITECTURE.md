@@ -211,7 +211,7 @@ issue_authors   (issue_id, user_id)   ← no endpoint ever returns this table
 campussaga/
 ├─ apps/
 │  ├─ mobile/                 # the student app
-│  └─ admin_web/              # authority + moderator dashboard (R4)
+│  └─ web/                    # campus.silifton.com: public pages + superadmin panel (Next.js, docs/ADMIN.md)
 ├─ packages/
 │  ├─ campus_ui/              # design system: tokens, theme, components
 │  ├─ campus_core/            # domain models, repository interfaces, errors

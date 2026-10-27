@@ -46,6 +46,8 @@ services:
       PORT: "7031"
       HOSTNAME: 0.0.0.0
       API_URL: http://api:8090/api/v1
+      SITE_URL: https://campus.silifton.com
+    # One replica only: token refreshes are merged in this process's memory.
     depends_on: [api]
     ports: ["127.0.0.1:7031:7031"]
     # Shared VPS: keep the Node server small.
