@@ -13,7 +13,7 @@ critical bugs**, Android first. iPhones follow once the Apple push key is set.
 | Upload key in Firebase | SHA-1 and SHA-256 registered (Google sign-in works in release builds) |
 | Privacy policy / account deletion page | Updated for groups, personal classes, announcements and pushes (`site/`; publishes on push to `main`) |
 | Backend on a public server | **Live (2026-10-28): https://api-campus.silifton.com** on the Tecsior VPS, `/opt/campussaga`, compose project `campussaga` (127.0.0.1:7030), nginx `fx-api-campus.silifton.com.conf`, Let's Encrypt (auto-renew), direct DNS. Redeploy: `backend/deploy/deploy.sh`. Nightly DB dump + weekly log wipe: `/etc/cron.d/campussaga` (from `backend/deploy/campussaga.cron`). Off-site backups still to set up |
-| Push delivery | Needs the Firebase service-account key on the server (pushes are only logged until then) |
+| Push delivery | **Live (2026-10-28)** on Android: FCM API enabled in `bitlaabuzz`, service-account key on the server (`deploy/secrets/fcm-service-account.json`; local copy in `~/campussaga-secrets/`, back it up with the upload key) |
 | iPhone | Builds; pushes need the APNs key; sign-in uses the browser sheet |
 
 ## 1. Server address (decided: `api-campus.silifton.com`)
