@@ -40,7 +40,15 @@ curl https://<api-host>/api/v1/health      # {"status":"ok","db":"ok"}
 
 ## 3. Build the beta app
 
-`apps/mobile/env/beta.json` (git-ignored):
+Easiest: `apps/mobile/tool/build.sh`. It asks which server (beta, this Mac
+over USB, this Mac on Wi-Fi, or a URL), APK / App Bundle / per-CPU APKs,
+whether to raise the build number, and which connected phone to install on.
+Plain-http servers get a debug build (release builds only talk HTTPS).
+The result is copied to `apps/mobile/build/out/` with the version and server
+in its name. Without questions:
+`tool/build.sh --server beta --type aab --bump --install none --yes`.
+
+By hand, `apps/mobile/env/beta.json` (git-ignored):
 
 ```json
 { "APP_ENV": "production", "API_BASE_URL": "https://api-campus.silifton.com/api/v1" }
