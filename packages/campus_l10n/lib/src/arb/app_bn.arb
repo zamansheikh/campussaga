@@ -298,5 +298,15 @@
   "errorAlreadyVerified": "তুমি ইতিমধ্যে যাচাই করা।",
   "errorUniversityRequired": "আগে প্রোফাইলে তোমার বিশ্ববিদ্যালয় বেছে নাও।",
   "errorChooseUniversity": "চালিয়ে যেতে বিশ্ববিদ্যালয় বেছে নাও।",
-  "errorNotUniversityEmailVerify": "এই ইমেইল কোনো সমর্থিত বিশ্ববিদ্যালয়ের নয়। বিশ্ববিদ্যালয়ের দেওয়া ইমেইল ব্যবহার করো।"
+  "errorNotUniversityEmailVerify": "এই ইমেইল কোনো সমর্থিত বিশ্ববিদ্যালয়ের নয়। বিশ্ববিদ্যালয়ের দেওয়া ইমেইল ব্যবহার করো।",
+  "changeUniversity": "বিশ্ববিদ্যালয় বদলাও",
+  "changeWithEmail": "নতুন বিশ্ববিদ্যালয়ের ইমেইল দিয়ে",
+  "changeWithEmailHint": "নতুন বিশ্ববিদ্যালয়ে যাচাই করা থাকো",
+  "changeWithoutEmail": "বিশ্ববিদ্যালয়ের ইমেইল ছাড়া",
+  "changeWithoutEmailHint": "তালিকা থেকে বেছে নাও; যাচাই করা হয়নি হিসেবে দেখাবে",
+  "leaveVerifiedTitle": "{university}-এ যাবে?",
+  "leaveVerifiedBody": "নতুন বিশ্ববিদ্যালয়ের ইমেইল দিয়ে যাচাই না করা পর্যন্ত তুমি যাচাই করা হয়নি হিসেবে দেখাবে। তোমার ক্লাস গ্রুপগুলো থাকবে।",
+  "changeUniversitySubtitle": "নতুন বিশ্ববিদ্যালয়ের ইমেইল লেখো। সেখানে একটি ৬ অঙ্কের কোড পাঠাব।",
+  "universityChanged": "বিশ্ববিদ্যালয় বদলানো হয়েছে",
+  "moveAction": "বদলাও"
 }

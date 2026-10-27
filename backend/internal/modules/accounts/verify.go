@@ -11,9 +11,10 @@ import (
 )
 
 // SetUniversity: a not-verified student (signed in with Gmail) picks their
-// university. A verified student's university comes from their email and
-// can't be changed here.
-func (s *Service) SetUniversity(ctx context.Context, universityID uuid.UUID) (*Me, error) {
+// university. A verified student's university comes from their email: they
+// change it by verifying the new university's email, or (leaveVerified, e.g.
+// the new university gives no email) pick it here and become not verified.
+func (s *Service) SetUniversity(ctx context.Context, universityID uuid.UUID, leaveVerified bool) (*Me, error) {
 	c := auth.MustUser(ctx)
 	uni, err := s.unis.Get(ctx, universityID)
 	if db.IsNoRows(err) || (err == nil && uni == nil) {
@@ -22,9 +23,15 @@ func (s *Service) SetUniversity(ctx context.Context, universityID uuid.UUID) (*M
 	if err != nil {
 		return nil, err
 	}
-	u, err := store.New(s.d.Q(ctx)).SetUniversity(ctx, store.SetUniversityParams{ID: c.UserID, UniversityID: &uni.ID})
+	q := store.New(s.d.Q(ctx))
+	var u store.User
+	if c.Verified && leaveVerified {
+		u, err = q.ChangeUniversityUnverified(ctx, store.ChangeUniversityUnverifiedParams{ID: c.UserID, UniversityID: &uni.ID})
+	} else {
+		u, err = q.SetUniversity(ctx, store.SetUniversityParams{ID: c.UserID, UniversityID: &uni.ID})
+	}
 	if db.IsNoRows(err) {
-		return nil, ErrAlreadyVerified
+		return nil, ErrAlreadyVerified // verified, and didn't agree to leave it
 	}
 	if err != nil {
 		return nil, err
@@ -33,14 +40,15 @@ func (s *Service) SetUniversity(ctx context.Context, universityID uuid.UUID) (*M
 }
 
 // RequestVerifyCode sends a code to a university email the student wants
-// to verify with (not-verified students only).
+// to verify with: to become verified, or (already verified) to move to
+// another university, e.g. for a master's.
 func (s *Service) RequestVerifyCode(ctx context.Context, rawEmail string) (*CodeSent, error) {
 	c := auth.MustUser(ctx)
-	if c.Verified {
-		return nil, ErrAlreadyVerified
-	}
 	email, err := normalizeEmail(rawEmail)
 	if err != nil {
+		return nil, err
+	}
+	if err := s.notCurrentEmail(ctx, c, email); err != nil {
 		return nil, err
 	}
 	uni, err := s.unis.ForEmail(ctx, email)
@@ -68,14 +76,15 @@ func (s *Service) RequestVerifyCode(ctx context.Context, rawEmail string) (*Code
 }
 
 // VerifyUniversityEmail checks the code: the student becomes verified at
-// that email's university (replacing any university they picked).
+// that email's university (replacing the university and any previous
+// university email).
 func (s *Service) VerifyUniversityEmail(ctx context.Context, rawEmail, code string) (*Me, error) {
 	c := auth.MustUser(ctx)
-	if c.Verified {
-		return nil, ErrAlreadyVerified
-	}
 	email, err := normalizeEmail(rawEmail)
 	if err != nil {
+		return nil, err
+	}
+	if err := s.notCurrentEmail(ctx, c, email); err != nil {
 		return nil, err
 	}
 	now := s.now()
@@ -120,4 +129,20 @@ func (s *Service) VerifyUniversityEmail(ctx context.Context, rawEmail, code stri
 		return nil, failure
 	}
 	return out, nil
+}
+
+// notCurrentEmail: verifying the email you're already verified with is
+// pointless (ALREADY_VERIFIED).
+func (s *Service) notCurrentEmail(ctx context.Context, c *auth.Claims, email string) error {
+	if !c.Verified {
+		return nil
+	}
+	u, err := store.New(s.d.Q(ctx)).GetUser(ctx, c.UserID)
+	if err != nil {
+		return err
+	}
+	if u.UniversityEmail != nil && *u.UniversityEmail == email {
+		return ErrAlreadyVerified
+	}
+	return nil
 }

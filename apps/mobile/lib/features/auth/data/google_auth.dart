@@ -48,10 +48,20 @@ class AndroidGoogleAuth implements GoogleAuth {
           message: 'No ID token from Google',
         );
       }
-      final user = await _firebase.signInWithCredential(
+      final signedIn = await _firebase.signInWithCredential(
         GoogleAuthProvider.credential(idToken: idToken),
       );
-      return await user.user?.getIdToken();
+      final user = signedIn.user;
+      if (user == null) return null;
+      // A new Firebase user made from this ID token can come without a
+      // name, so our server can't fill in the student's name. Give Firebase
+      // the Google name, then ask for a fresh token that carries it.
+      final name = result.user.displayName?.trim() ?? '';
+      if ((user.displayName ?? '').trim().isEmpty && name.isNotEmpty) {
+        await user.updateDisplayName(name);
+        return await user.getIdToken(true);
+      }
+      return await user.getIdToken();
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) return null;
       throw RejectedFailure(

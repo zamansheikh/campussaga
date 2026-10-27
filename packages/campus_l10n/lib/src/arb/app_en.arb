@@ -525,5 +525,22 @@
   "errorAlreadyVerified": "You're already verified.",
   "errorUniversityRequired": "Choose your university first in your profile.",
   "errorChooseUniversity": "Choose your university to continue.",
-  "errorNotUniversityEmailVerify": "This email isn't from a supported university. Use the email your university gave you."
+  "errorNotUniversityEmailVerify": "This email isn't from a supported university. Use the email your university gave you.",
+  "changeUniversity": "Change university",
+  "changeWithEmail": "With my new university email",
+  "changeWithEmailHint": "Stay verified at your new university",
+  "changeWithoutEmail": "Without a university email",
+  "changeWithoutEmailHint": "Pick it from the list; you'll show as not verified",
+  "leaveVerifiedTitle": "Move to {university}?",
+  "@leaveVerifiedTitle": {
+    "placeholders": {
+      "university": {
+        "type": "String"
+      }
+    }
+  },
+  "leaveVerifiedBody": "You'll show as not verified until you verify with an email from your new university. Your class groups stay.",
+  "changeUniversitySubtitle": "Enter your email at your new university. We'll send a 6-digit code to it.",
+  "universityChanged": "University changed",
+  "moveAction": "Move"
 }

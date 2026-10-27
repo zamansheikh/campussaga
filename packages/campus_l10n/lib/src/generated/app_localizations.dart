@@ -1891,6 +1891,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This email isn\'t from a supported university. Use the email your university gave you.'**
   String get errorNotUniversityEmailVerify;
+
+  /// No description provided for @changeUniversity.
+  ///
+  /// In en, this message translates to:
+  /// **'Change university'**
+  String get changeUniversity;
+
+  /// No description provided for @changeWithEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'With my new university email'**
+  String get changeWithEmail;
+
+  /// No description provided for @changeWithEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay verified at your new university'**
+  String get changeWithEmailHint;
+
+  /// No description provided for @changeWithoutEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Without a university email'**
+  String get changeWithoutEmail;
+
+  /// No description provided for @changeWithoutEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick it from the list; you\'ll show as not verified'**
+  String get changeWithoutEmailHint;
+
+  /// No description provided for @leaveVerifiedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to {university}?'**
+  String leaveVerifiedTitle(String university);
+
+  /// No description provided for @leaveVerifiedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll show as not verified until you verify with an email from your new university. Your class groups stay.'**
+  String get leaveVerifiedBody;
+
+  /// No description provided for @changeUniversitySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email at your new university. We\'ll send a 6-digit code to it.'**
+  String get changeUniversitySubtitle;
+
+  /// No description provided for @universityChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'University changed'**
+  String get universityChanged;
+
+  /// No description provided for @moveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Move'**
+  String get moveAction;
 }
 
 class _AppLocalizationsDelegate

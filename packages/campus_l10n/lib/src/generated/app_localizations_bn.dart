@@ -1061,4 +1061,39 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get errorNotUniversityEmailVerify =>
       'এই ইমেইল কোনো সমর্থিত বিশ্ববিদ্যালয়ের নয়। বিশ্ববিদ্যালয়ের দেওয়া ইমেইল ব্যবহার করো।';
+
+  @override
+  String get changeUniversity => 'বিশ্ববিদ্যালয় বদলাও';
+
+  @override
+  String get changeWithEmail => 'নতুন বিশ্ববিদ্যালয়ের ইমেইল দিয়ে';
+
+  @override
+  String get changeWithEmailHint => 'নতুন বিশ্ববিদ্যালয়ে যাচাই করা থাকো';
+
+  @override
+  String get changeWithoutEmail => 'বিশ্ববিদ্যালয়ের ইমেইল ছাড়া';
+
+  @override
+  String get changeWithoutEmailHint =>
+      'তালিকা থেকে বেছে নাও; যাচাই করা হয়নি হিসেবে দেখাবে';
+
+  @override
+  String leaveVerifiedTitle(String university) {
+    return '$university-এ যাবে?';
+  }
+
+  @override
+  String get leaveVerifiedBody =>
+      'নতুন বিশ্ববিদ্যালয়ের ইমেইল দিয়ে যাচাই না করা পর্যন্ত তুমি যাচাই করা হয়নি হিসেবে দেখাবে। তোমার ক্লাস গ্রুপগুলো থাকবে।';
+
+  @override
+  String get changeUniversitySubtitle =>
+      'নতুন বিশ্ববিদ্যালয়ের ইমেইল লেখো। সেখানে একটি ৬ অঙ্কের কোড পাঠাব।';
+
+  @override
+  String get universityChanged => 'বিশ্ববিদ্যালয় বদলানো হয়েছে';
+
+  @override
+  String get moveAction => 'বদলাও';
 }

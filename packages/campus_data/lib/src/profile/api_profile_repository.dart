@@ -41,11 +41,16 @@ class ApiProfileRepository implements ProfileRepository {
   }
 
   @override
-  Future<UserProfile> setUniversity(String universityId) async =>
-      UserProfile.fromJson(
-        (await _api.put('/me/university', {'universityId': universityId}))!
-            as Map<String, Object?>,
-      );
+  Future<UserProfile> setUniversity(
+    String universityId, {
+    bool leaveVerified = false,
+  }) async => UserProfile.fromJson(
+    (await _api.put('/me/university', {
+          'universityId': universityId,
+          'leaveVerified': leaveVerified,
+        }))!
+        as Map<String, Object?>,
+  );
 
   @override
   Future<CodeSent> requestVerifyCode(String email) async => CodeSent.fromJson(

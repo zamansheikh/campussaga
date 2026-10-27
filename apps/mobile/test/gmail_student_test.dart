@@ -67,4 +67,38 @@ void main() {
     expect(find.text('Not verified'), findsNothing);
     expect(find.text('Verify with university email'), findsNothing);
   });
+
+  testWidgets('a verified student moves to a university without its email', (
+    tester,
+  ) async {
+    usePhoneScreen(tester);
+    final profile = FakeProfileRepository()..me = testUser;
+    final (repo, _) = await registerFakes(profile: profile);
+    repo.savedUser = testUser;
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    expect(find.text('Verified student'), findsOneWidget);
+
+    await tester.tap(find.text('Change'));
+    await tester.pumpAndSettle();
+    expect(find.text('With my new university email'), findsOneWidget);
+    await tester.tap(find.text('Without a university email'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.text('Bangladesh University of Engineering and Technology'),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Move to Bangladesh University of Engineering and Technology?'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Move'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('University changed'), findsOneWidget);
+    expect(find.text('Not verified'), findsOneWidget);
+    expect(profile.edited?.university?.slug, 'buet');
+  });
 }

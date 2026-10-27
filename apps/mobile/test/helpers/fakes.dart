@@ -205,8 +205,14 @@ class FakeProfileRepository implements ProfileRepository {
   }
 
   @override
-  Future<UserProfile> setUniversity(String universityId) async {
+  Future<UserProfile> setUniversity(
+    String universityId, {
+    bool leaveVerified = false,
+  }) async {
     if (failure != null) throw failure!;
+    if (me.verified && !leaveVerified) {
+      throw const RejectedFailure(code: 'ALREADY_VERIFIED');
+    }
     final uni = (await universities()).firstWhere((u) => u.id == universityId);
     return me = edited = UserProfile(
       id: me.id,

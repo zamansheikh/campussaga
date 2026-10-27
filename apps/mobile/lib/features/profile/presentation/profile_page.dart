@@ -1,3 +1,4 @@
+import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
@@ -283,9 +284,25 @@ class _ProfileHeader extends StatelessWidget {
             const Divider(),
             const SizedBox(height: CsSpace.md),
             if (user.verified)
-              _InfoLine(
-                icon: Icons.account_balance_outlined,
-                text: user.university?.localName(lang) ?? '',
+              InkWell(
+                borderRadius: BorderRadius.circular(CsRadius.sm),
+                onTap: () => _changeUniversity(context),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _InfoLine(
+                        icon: Icons.account_balance_outlined,
+                        text: user.university?.localName(lang) ?? '',
+                      ),
+                    ),
+                    Text(
+                      l10n.changeAction,
+                      style: context.text.labelLarge?.copyWith(
+                        color: context.cs.primary,
+                      ),
+                    ),
+                  ],
+                ),
               )
             else
               const UniversityField(),
@@ -306,6 +323,70 @@ class _ProfileHeader extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// A verified student moves university (e.g. a master's elsewhere): with
+/// the new university's email (stays verified), or picked from the list
+/// (becomes not verified).
+Future<void> _changeUniversity(BuildContext context) async {
+  final l10n = AppLocalizations.of(context);
+  final how = await CsOptionSheet.show<String>(
+    context: context,
+    title: l10n.changeUniversity,
+    selected: '',
+    options: [
+      CsOption(
+        'email',
+        l10n.changeWithEmail,
+        subtitle: l10n.changeWithEmailHint,
+        icon: Icons.verified_outlined,
+      ),
+      CsOption(
+        'pick',
+        l10n.changeWithoutEmail,
+        subtitle: l10n.changeWithoutEmailHint,
+        icon: Icons.account_balance_outlined,
+      ),
+    ],
+  );
+  if (how == null || !context.mounted) return;
+  if (how == 'email') {
+    await context.push(Routes.verifyEmail);
+    return;
+  }
+  final uni = await showUniversityPicker(context);
+  if (uni == null || !context.mounted) return;
+  final lang = Localizations.localeOf(context).languageCode;
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (dialog) => AlertDialog(
+      title: Text(l10n.leaveVerifiedTitle(uni.localName(lang))),
+      content: Text(l10n.leaveVerifiedBody),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialog).pop(false),
+          child: Text(l10n.cancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(dialog).pop(true),
+          child: Text(l10n.moveAction),
+        ),
+      ],
+    ),
+  );
+  if (!(ok ?? false) || !context.mounted) return;
+  final auth = context.read<AuthBloc>();
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    final user = await getIt<ProfileRepository>().setUniversity(
+      uni.id,
+      leaveVerified: true,
+    );
+    auth.add(AuthProfileUpdated(user));
+    messenger.showSnackBar(SnackBar(content: Text(l10n.universityChanged)));
+  } on Failure catch (f) {
+    messenger.showSnackBar(SnackBar(content: Text(authErrorText(l10n, f))));
   }
 }
 

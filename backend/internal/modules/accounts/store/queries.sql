@@ -47,6 +47,12 @@ SELECT EXISTS (
 UPDATE users SET university_id = @university_id WHERE id = @id AND verified_at IS NULL
 RETURNING *;
 
+-- Moving university without a university email there: not verified any more.
+-- name: ChangeUniversityUnverified :one
+UPDATE users SET university_id = @university_id, university_email = NULL, verified_at = NULL
+WHERE id = @id
+RETURNING *;
+
 -- name: VerifyUser :one
 UPDATE users SET university_email = @university_email, university_id = @university_id,
     verified_at = @verified_at

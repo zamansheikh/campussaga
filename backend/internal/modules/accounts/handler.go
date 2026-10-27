@@ -107,10 +107,13 @@ func (s *Service) handleDeleteMe(ctx context.Context, _ *httpx.Empty) (*httpx.Em
 
 type universityReq struct {
 	UniversityID string `json:"universityId" validate:"required,uuid"`
+	// LeaveVerified: a verified student moving to a university without
+	// using its email agrees to become not verified.
+	LeaveVerified bool `json:"leaveVerified"`
 }
 
 func (s *Service) handleSetUniversity(ctx context.Context, in *universityReq) (*Me, error) {
-	return s.SetUniversity(ctx, uuid.MustParse(in.UniversityID))
+	return s.SetUniversity(ctx, uuid.MustParse(in.UniversityID), in.LeaveVerified)
 }
 
 func (s *Service) handleVerifyCode(ctx context.Context, in *requestCodeReq) (*CodeSent, error) {

@@ -110,12 +110,47 @@ func TestGmailStudentNotVerified(t *testing.T) {
 	assert.Equal(t, "rafi.student@gmail.com", verified.Email, "still signs in with Gmail")
 	assert.True(t, h.me(tok).Verified)
 
-	// Now verified: the university comes from the email.
+	// Now verified: the university comes from the email (changing it means
+	// leaving verified, see TestMovingUniversity).
 	assert.Equal(t, "ALREADY_VERIFIED", h.do("PUT", "/me/university", tok, map[string]string{"universityId": uni}).code())
-	assert.Equal(t, "ALREADY_VERIFIED", h.do("POST", "/me/verify/code", tok, map[string]string{"email": "x@test.ac.bd"}).code())
+	assert.Equal(t, "ALREADY_VERIFIED", h.do("POST", "/me/verify/code", tok, map[string]string{"email": "rafi@test.ac.bd"}).code())
 
 	// Whoever controls the university email gets the same account.
 	h.advance(61e9)
 	viaCode := h.signIn("rafi@test.ac.bd")
 	assert.Equal(t, me.ID, viaCode.User.ID)
+}
+
+// A verified student starts a master's at another university.
+func TestMovingUniversity(t *testing.T) {
+	h := newHarness(t)
+	_, err := h.app.DB.Pool.Exec(context.Background(), `
+		WITH u AS (INSERT INTO universities (slug, name) VALUES ('other-uni', 'Other University') RETURNING id)
+		INSERT INTO university_domains (domain, university_id) SELECT 'other.ac.bd', id FROM u`)
+	require.NoError(t, err)
+	other := h.universityID("other-uni")
+
+	// With the new university's email: stays verified, there.
+	tok := h.signIn("bsc@test.ac.bd").Tokens.AccessToken
+	require.Equal(t, http.StatusAccepted, h.do("POST", "/me/verify/code", tok, map[string]string{"email": "msc@other.ac.bd"}).Status)
+	r := h.do("POST", "/me/verify", tok, map[string]string{"email": "msc@other.ac.bd", "code": h.lastCode("msc@other.ac.bd")})
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	m := h.me(tok)
+	assert.True(t, m.Verified)
+	assert.Equal(t, "other-uni", m.University.Slug)
+	assert.Equal(t, "msc@other.ac.bd", *m.UniversityEmail)
+	assert.Equal(t, "bsc@test.ac.bd", m.Email, "still signs in with the old address")
+
+	// Without an email there: picks it and becomes not verified.
+	h.advance(61e9)
+	tok2 := h.signIn("student@test.ac.bd").Tokens.AccessToken
+	assert.Equal(t, "ALREADY_VERIFIED", h.do("PUT", "/me/university", tok2, map[string]string{"universityId": other}).code(), "must agree to leave verified")
+	r = h.do("PUT", "/me/university", tok2, map[string]any{"universityId": other, "leaveVerified": true})
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	m = h.me(tok2)
+	assert.False(t, m.Verified)
+	assert.Equal(t, "other-uni", m.University.Slug)
+	assert.Nil(t, m.UniversityEmail)
+	// The next request already sees the new university.
+	assert.Equal(t, http.StatusCreated, h.do("POST", "/groups", tok2, map[string]string{"department": "CSE", "batch": "1", "semester": "Fall 2026"}).Status)
 }

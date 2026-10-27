@@ -16,10 +16,16 @@ abstract interface class ProfileRepository {
   /// Every supported university (for a not-verified student to pick).
   Future<List<University>> universities();
 
-  /// A not-verified student picks their university.
-  Future<UserProfile> setUniversity(String universityId);
+  /// A not-verified student picks their university. A verified student
+  /// moving to a university without using its email passes
+  /// [leaveVerified] and becomes not verified.
+  Future<UserProfile> setUniversity(
+    String universityId, {
+    bool leaveVerified = false,
+  });
 
-  /// Sends a code to a university email to verify the student.
+  /// Sends a code to a university email to verify the student (or, already
+  /// verified, to move to that email's university).
   Future<CodeSent> requestVerifyCode(String email);
 
   /// Checks the code: the student becomes verified at that university.

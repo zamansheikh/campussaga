@@ -1086,4 +1086,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorNotUniversityEmailVerify =>
       'This email isn\'t from a supported university. Use the email your university gave you.';
+
+  @override
+  String get changeUniversity => 'Change university';
+
+  @override
+  String get changeWithEmail => 'With my new university email';
+
+  @override
+  String get changeWithEmailHint => 'Stay verified at your new university';
+
+  @override
+  String get changeWithoutEmail => 'Without a university email';
+
+  @override
+  String get changeWithoutEmailHint =>
+      'Pick it from the list; you\'ll show as not verified';
+
+  @override
+  String leaveVerifiedTitle(String university) {
+    return 'Move to $university?';
+  }
+
+  @override
+  String get leaveVerifiedBody =>
+      'You\'ll show as not verified until you verify with an email from your new university. Your class groups stay.';
+
+  @override
+  String get changeUniversitySubtitle =>
+      'Enter your email at your new university. We\'ll send a 6-digit code to it.';
+
+  @override
+  String get universityChanged => 'University changed';
+
+  @override
+  String get moveAction => 'Move';
 }

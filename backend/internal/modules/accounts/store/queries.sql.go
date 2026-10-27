@@ -12,6 +12,37 @@ import (
 	"github.com/google/uuid"
 )
 
+const changeUniversityUnverified = `-- name: ChangeUniversityUnverified :one
+UPDATE users SET university_id = $1, university_email = NULL, verified_at = NULL
+WHERE id = $2
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email
+`
+
+type ChangeUniversityUnverifiedParams struct {
+	UniversityID *uuid.UUID
+	ID           uuid.UUID
+}
+
+// Moving university without a university email there: not verified any more.
+func (q *Queries) ChangeUniversityUnverified(ctx context.Context, arg ChangeUniversityUnverifiedParams) (User, error) {
+	row := q.db.QueryRow(ctx, changeUniversityUnverified, arg.UniversityID, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.UniversityID,
+		&i.DisplayName,
+		&i.Department,
+		&i.Batch,
+		&i.Role,
+		&i.VerifiedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UniversityEmail,
+	)
+	return i, err
+}
+
 const countFailedAttempt = `-- name: CountFailedAttempt :one
 UPDATE sign_in_codes SET attempts = attempts + 1 WHERE email = $1 RETURNING attempts
 `

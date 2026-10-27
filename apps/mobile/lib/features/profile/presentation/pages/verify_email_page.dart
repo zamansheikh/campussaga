@@ -11,7 +11,8 @@ import '../../../auth/presentation/email_error_text.dart';
 import '../../../auth/presentation/widgets/notice_banner.dart';
 
 /// A student who signed in with Gmail proves a university email with a
-/// 6-digit code and becomes verified (at that email's university).
+/// 6-digit code and becomes verified (at that email's university). A
+/// verified student uses the same page to move to another university.
 class VerifyEmailPage extends StatefulWidget {
   const VerifyEmailPage({super.key});
 
@@ -63,8 +64,13 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
         _sent!.email,
         code,
       );
+      final moving = auth.state.user?.verified ?? false;
       auth.add(AuthProfileUpdated(user));
-      messenger.showSnackBar(SnackBar(content: Text(l10n.verifiedNow)));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(moving ? l10n.universityChanged : l10n.verifiedNow),
+        ),
+      );
       if (mounted) context.pop();
     } on Failure {
       _code.clear();
@@ -84,8 +90,13 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     final cs = context.cs;
     final lang = Localizations.localeOf(context).languageCode;
     final sent = _sent;
+    final moving = context.select(
+      (AuthBloc b) => b.state.user?.verified ?? false,
+    );
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.verifyTitle)),
+      appBar: AppBar(
+        title: Text(moving ? l10n.changeUniversity : l10n.verifyTitle),
+      ),
       body: SafeArea(
         child: CsPage(
           padding: const EdgeInsets.fromLTRB(
@@ -112,7 +123,11 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
             ),
             const SizedBox(height: CsSpace.lg),
             Text(
-              sent == null ? l10n.verifySubtitle : l10n.codeSentTo(sent.email),
+              sent != null
+                  ? l10n.codeSentTo(sent.email)
+                  : moving
+                  ? l10n.changeUniversitySubtitle
+                  : l10n.verifySubtitle,
               style: context.text.bodyLarge?.copyWith(color: cs.textSecondary),
             ),
             if (sent?.university case final uni?) ...[
