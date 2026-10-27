@@ -24,9 +24,10 @@ abstract final class Env {
       ? _apiBaseUrl
       : (kReleaseMode ? '' : localApiBaseUrl);
 
-  /// Public web pages (site/ on GitHub Pages). Move to the product domain
-  /// once it is chosen; the rebranding checklist lists this line.
-  static const String siteUrl = 'https://zamansheikh.github.io/campussaga';
+  /// Public web pages (apps/web on campus.silifton.com; GitHub Pages keeps
+  /// a copy). Move to the product domain once it is chosen; the rebranding
+  /// checklist lists this line.
+  static const String siteUrl = 'https://campus.silifton.com';
   static const String privacyPolicyUrl = '$siteUrl/privacy.html';
 
   /// Where testers and students send feedback.

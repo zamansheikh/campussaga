@@ -34,5 +34,25 @@ services:
       driver: json-file
       options: {max-size: "10m", max-file: "3"}
 
+  # campus.silifton.com: public pages + admin panel (apps/web, Next.js).
+  # nginx proxies the site to 127.0.0.1:7031; the web server talks to the
+  # API over the compose network. Deploy with deploy/deploy-web.sh.
+  web:
+    build: ../web
+    image: campusweb:latest
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "7031"
+      HOSTNAME: 0.0.0.0
+      API_URL: http://api:8090/api/v1
+    depends_on: [api]
+    ports: ["127.0.0.1:7031:7031"]
+    # Shared VPS: keep the Node server small.
+    mem_limit: 384m
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
 volumes:
   pgdata:
