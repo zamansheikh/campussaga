@@ -1,0 +1,111 @@
+package classgroups
+
+import (
+	"context"
+	"net/http"
+	"time"
+
+	"github.com/google/uuid"
+
+	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
+)
+
+// Routes mounts the module's endpoints. Looking up codes (preview + join)
+// is limited per student and per IP, so codes can't be guessed.
+func (s *Service) Routes(r *httpx.Router) {
+	codes := []func(http.Handler) http.Handler{
+		r.LimitUser("group-code-user", 30, time.Hour),
+		r.Limit("group-code-ip", 120, time.Hour),
+	}
+	r.Student().Get("/groups", httpx.Handle(s.handleList))
+	r.Student().With(r.LimitUser("group-create", 10, 24*time.Hour)).
+		Post("/groups", httpx.Handle(s.handleCreate, httpx.Status(http.StatusCreated)))
+	r.Student().With(codes...).Get("/groups/preview", httpx.Handle(s.handlePreview))
+	r.Student().With(codes...).Post("/groups/join", httpx.Handle(s.handleJoin))
+	r.Student().Put("/groups/{id}", httpx.Handle(s.handleUpdate))
+	r.Student().Delete("/groups/{id}", httpx.Handle(s.handleDelete, httpx.NoContent()))
+	r.Student().Post("/groups/{id}/leave", httpx.Handle(s.handleLeave, httpx.NoContent()))
+	r.Student().Post("/groups/{id}/slots", httpx.Handle(s.handleAddSlot, httpx.Status(http.StatusCreated)))
+	r.Student().Put("/groups/{id}/slots/{slot}", httpx.Handle(s.handleUpdateSlot))
+	r.Student().Delete("/groups/{id}/slots/{slot}", httpx.Handle(s.handleDeleteSlot, httpx.NoContent()))
+}
+
+type groupsRes struct {
+	Groups []Group `json:"groups"`
+}
+
+func (s *Service) handleList(ctx context.Context, _ *httpx.Empty) (*groupsRes, error) {
+	g, err := s.MyGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &groupsRes{Groups: g}, nil
+}
+
+func (s *Service) handleCreate(ctx context.Context, in *GroupInput) (*Group, error) {
+	return s.Create(ctx, in)
+}
+
+type previewReq struct {
+	Code string `json:"-" query:"code" validate:"required,len=6,alpha"`
+}
+
+func (s *Service) handlePreview(ctx context.Context, in *previewReq) (*Preview, error) {
+	return s.Preview(ctx, in.Code)
+}
+
+type joinReq struct {
+	Code string `json:"code" validate:"required,len=6,alpha"`
+}
+
+func (s *Service) handleJoin(ctx context.Context, in *joinReq) (*Group, error) {
+	return s.Join(ctx, in.Code)
+}
+
+type groupPath struct {
+	ID string `json:"-" path:"id" validate:"required,uuid"`
+}
+
+type updateGroupReq struct {
+	groupPath
+	GroupInput
+}
+
+func (s *Service) handleUpdate(ctx context.Context, in *updateGroupReq) (*Group, error) {
+	return s.Update(ctx, uuid.MustParse(in.ID), &in.GroupInput)
+}
+
+func (s *Service) handleDelete(ctx context.Context, in *groupPath) (*httpx.Empty, error) {
+	return nil, s.Delete(ctx, uuid.MustParse(in.ID))
+}
+
+func (s *Service) handleLeave(ctx context.Context, in *groupPath) (*httpx.Empty, error) {
+	return nil, s.Leave(ctx, uuid.MustParse(in.ID))
+}
+
+type addSlotReq struct {
+	groupPath
+	SlotInput
+}
+
+func (s *Service) handleAddSlot(ctx context.Context, in *addSlotReq) (*Slot, error) {
+	return s.AddSlot(ctx, uuid.MustParse(in.ID), &in.SlotInput)
+}
+
+type slotPath struct {
+	ID   string `json:"-" path:"id" validate:"required,uuid"`
+	Slot string `json:"-" path:"slot" validate:"required,uuid"`
+}
+
+type updateSlotReq struct {
+	slotPath
+	SlotInput
+}
+
+func (s *Service) handleUpdateSlot(ctx context.Context, in *updateSlotReq) (*Slot, error) {
+	return s.UpdateSlot(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.Slot), &in.SlotInput)
+}
+
+func (s *Service) handleDeleteSlot(ctx context.Context, in *slotPath) (*httpx.Empty, error) {
+	return nil, s.DeleteSlot(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.Slot))
+}

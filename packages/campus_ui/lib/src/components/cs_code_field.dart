@@ -16,6 +16,7 @@ class CsCodeField extends StatefulWidget {
     this.hasError = false,
     this.autofocus = true,
     this.semanticLabel,
+    this.letters = false,
   });
 
   final TextEditingController controller;
@@ -25,6 +26,9 @@ class CsCodeField extends StatefulWidget {
   final bool hasError;
   final bool autofocus;
   final String? semanticLabel;
+
+  /// Letters (shown in capitals) instead of digits, e.g. a join code.
+  final bool letters;
 
   @override
   State<CsCodeField> createState() => _CsCodeFieldState();
@@ -103,10 +107,23 @@ class _CsCodeFieldState extends State<CsCodeField> {
                   focusNode: _focus,
                   autofocus: widget.autofocus,
                   enabled: widget.enabled,
-                  keyboardType: TextInputType.number,
-                  autofillHints: const [AutofillHints.oneTimeCode],
+                  keyboardType: widget.letters
+                      ? TextInputType.text
+                      : TextInputType.number,
+                  textCapitalization: widget.letters
+                      ? TextCapitalization.characters
+                      : TextCapitalization.none,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  autofillHints: widget.letters
+                      ? null
+                      : const [AutofillHints.oneTimeCode],
                   inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
+                    if (widget.letters) ...[
+                      FilteringTextInputFormatter.allow(RegExp('[A-Za-z]')),
+                      _UpperCase(),
+                    ] else
+                      FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(widget.length),
                   ],
                   showCursor: false,
@@ -127,4 +144,12 @@ class _CsCodeFieldState extends State<CsCodeField> {
       ),
     );
   }
+}
+
+class _UpperCase extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) => newValue.copyWith(text: newValue.text.toUpperCase());
 }

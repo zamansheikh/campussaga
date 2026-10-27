@@ -63,7 +63,8 @@
   "@errorCodeInvalid": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -167,5 +168,146 @@
   "madeFor": "Made for students in Bangladesh",
   "deleteAccountHint": "Permanently remove your account",
   "setupProfileStep": "Last step",
-  "editProfileHint": "Classmates see your name in class groups."
+  "editProfileHint": "Classmates see your name in class groups.",
+  "classGroups": "Class groups",
+  "joinWithCode": "Join with a code",
+  "createGroup": "Create a class group",
+  "createGroupHint": "For CRs: enter your section's routine once and share the code.",
+  "imTheCr": "I'm the CR, create a group",
+  "roleCr": "CR",
+  "membersCount": "{count, plural, =1{1 student} other{{count} students}}",
+  "@membersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "classesCount": "{count, plural, =0{No classes yet} =1{1 class a week} other{{count} classes a week}}",
+  "@classesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "joinTitle": "Join your class group",
+  "joinSubtitle": "Enter the 6-letter code from your CR.",
+  "joinCodeLabel": "Join code",
+  "joinAction": "Join group",
+  "alreadyMember": "You're already in this group",
+  "openGroup": "Open group",
+  "createSubtitle": "You'll be the CR. Classmates join with a code and see the routine you enter.",
+  "sectionLabel": "Section",
+  "sectionHint": "e.g. A",
+  "semesterLabel": "Semester",
+  "semesterHint": "e.g. Fall 2026",
+  "createAction": "Create group",
+  "editGroup": "Edit group details",
+  "inviteTitle": "Invite classmates",
+  "inviteHint": "Share this code in your class Messenger group.",
+  "copyInvite": "Copy invite",
+  "inviteCopied": "Invite copied. Paste it in your class group.",
+  "inviteMessage": "Join {group} on {app}: open the app, tap \"Join with a code\" and enter {code}",
+  "@inviteMessage": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      },
+      "app": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "weeklyRoutine": "Weekly routine",
+  "addClass": "Add class",
+  "editClass": "Edit class",
+  "noClassesYetCr": "Add your section's classes. It takes a few minutes, once a semester.",
+  "noClassesYetMember": "Your CR hasn't added classes yet.",
+  "leaveGroup": "Leave group",
+  "leaveGroupTitle": "Leave this group?",
+  "leaveGroupBody": "Its classes disappear from your routine. You can join again with the code.",
+  "deleteGroup": "Delete group",
+  "deleteGroupTitle": "Delete this group for everyone?",
+  "deleteGroupBody": "The routine is removed for every student in the group. This can't be undone.",
+  "courseCodeLabel": "Course code",
+  "courseCodeHint": "e.g. CSE311",
+  "courseTitleLabel": "Course title",
+  "teacherLabel": "Teacher",
+  "roomLabel": "Room",
+  "dayLabel": "Day",
+  "startsLabel": "Starts",
+  "endsLabel": "Ends",
+  "classTheory": "Theory",
+  "classLab": "Lab",
+  "saveAndAddAnother": "Save and add another",
+  "classAdded": "Class added",
+  "deleteClass": "Delete class",
+  "errorEndBeforeStart": "It must end after it starts.",
+  "nextClass": "Next class",
+  "nowInClass": "Now",
+  "startsInMinutes": "in {minutes} min",
+  "@startsInMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "startsInHours": "in {hours} h {minutes} min",
+  "@startsInHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "minutes": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "endsInMinutes": "ends in {minutes} min",
+  "@endsInMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "todaysClasses": "Today's classes",
+  "noClassesToday": "No classes today",
+  "doneForToday": "Done for today",
+  "nextOn": "Next class: {day}",
+  "@nextOn": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineNotice": "Offline. Showing your saved routine.",
+  "roomShort": "Room {room}",
+  "@roomShort": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
+  },
+  "routineNoClassesDay": "No classes on this day",
+  "errorGroupNotFound": "No class group with this code at your university. Check the code with your CR.",
+  "errorNotCr": "Only the CR can change this group.",
+  "errorGroupLimit": "You're already in 10 class groups. Leave one to join another.",
+  "errorGroupFull": "This class group is full.",
+  "errorCrCannotLeave": "You're the only CR, so you can't leave while classmates are in the group. You can delete the group instead.",
+  "errorSlotLimit": "This routine already has the most classes allowed.",
+  "deleteClassTitle": "Delete this class for everyone?"
 }

@@ -14,6 +14,7 @@ import (
 
 	"github.com/zamansheikh/campussaga/backend/internal/modules/accounts"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/appconfig"
+	"github.com/zamansheikh/campussaga/backend/internal/modules/classgroups"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/universities"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/config"
@@ -33,6 +34,7 @@ type App struct {
 	Universities *universities.Service
 	Accounts     *accounts.Service
 	Config       *appconfig.Service
+	ClassGroups  *classgroups.Service
 
 	handler http.Handler
 }
@@ -87,8 +89,9 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		LogCodes: !cfg.IsProduction(),
 	}, now, log)
 	cfgSvc := appconfig.NewService(d)
+	groupSvc := classgroups.NewService(d)
 
-	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc}
+	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc}
 
 	root := chi.NewRouter()
 	root.NotFound(httpx.NotFoundHandler)
@@ -101,6 +104,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		uniSvc.Routes(r)
 		accSvc.Routes(r)
 		cfgSvc.Routes(r)
+		groupSvc.Routes(r)
 	})
 
 	var h http.Handler = root

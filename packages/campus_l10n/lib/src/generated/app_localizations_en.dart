@@ -148,10 +148,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String errorCodeInvalid(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count tries left.',
+      other: '$countString tries left.',
       one: '1 try left.',
     );
     return 'That code isn\'t right. $_temp0';
@@ -375,4 +379,275 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editProfileHint => 'Classmates see your name in class groups.';
+
+  @override
+  String get classGroups => 'Class groups';
+
+  @override
+  String get joinWithCode => 'Join with a code';
+
+  @override
+  String get createGroup => 'Create a class group';
+
+  @override
+  String get createGroupHint =>
+      'For CRs: enter your section\'s routine once and share the code.';
+
+  @override
+  String get imTheCr => 'I\'m the CR, create a group';
+
+  @override
+  String get roleCr => 'CR';
+
+  @override
+  String membersCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString students',
+      one: '1 student',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String classesCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString classes a week',
+      one: '1 class a week',
+      zero: 'No classes yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get joinTitle => 'Join your class group';
+
+  @override
+  String get joinSubtitle => 'Enter the 6-letter code from your CR.';
+
+  @override
+  String get joinCodeLabel => 'Join code';
+
+  @override
+  String get joinAction => 'Join group';
+
+  @override
+  String get alreadyMember => 'You\'re already in this group';
+
+  @override
+  String get openGroup => 'Open group';
+
+  @override
+  String get createSubtitle =>
+      'You\'ll be the CR. Classmates join with a code and see the routine you enter.';
+
+  @override
+  String get sectionLabel => 'Section';
+
+  @override
+  String get sectionHint => 'e.g. A';
+
+  @override
+  String get semesterLabel => 'Semester';
+
+  @override
+  String get semesterHint => 'e.g. Fall 2026';
+
+  @override
+  String get createAction => 'Create group';
+
+  @override
+  String get editGroup => 'Edit group details';
+
+  @override
+  String get inviteTitle => 'Invite classmates';
+
+  @override
+  String get inviteHint => 'Share this code in your class Messenger group.';
+
+  @override
+  String get copyInvite => 'Copy invite';
+
+  @override
+  String get inviteCopied => 'Invite copied. Paste it in your class group.';
+
+  @override
+  String inviteMessage(String group, String app, String code) {
+    return 'Join $group on $app: open the app, tap \"Join with a code\" and enter $code';
+  }
+
+  @override
+  String get weeklyRoutine => 'Weekly routine';
+
+  @override
+  String get addClass => 'Add class';
+
+  @override
+  String get editClass => 'Edit class';
+
+  @override
+  String get noClassesYetCr =>
+      'Add your section\'s classes. It takes a few minutes, once a semester.';
+
+  @override
+  String get noClassesYetMember => 'Your CR hasn\'t added classes yet.';
+
+  @override
+  String get leaveGroup => 'Leave group';
+
+  @override
+  String get leaveGroupTitle => 'Leave this group?';
+
+  @override
+  String get leaveGroupBody =>
+      'Its classes disappear from your routine. You can join again with the code.';
+
+  @override
+  String get deleteGroup => 'Delete group';
+
+  @override
+  String get deleteGroupTitle => 'Delete this group for everyone?';
+
+  @override
+  String get deleteGroupBody =>
+      'The routine is removed for every student in the group. This can\'t be undone.';
+
+  @override
+  String get courseCodeLabel => 'Course code';
+
+  @override
+  String get courseCodeHint => 'e.g. CSE311';
+
+  @override
+  String get courseTitleLabel => 'Course title';
+
+  @override
+  String get teacherLabel => 'Teacher';
+
+  @override
+  String get roomLabel => 'Room';
+
+  @override
+  String get dayLabel => 'Day';
+
+  @override
+  String get startsLabel => 'Starts';
+
+  @override
+  String get endsLabel => 'Ends';
+
+  @override
+  String get classTheory => 'Theory';
+
+  @override
+  String get classLab => 'Lab';
+
+  @override
+  String get saveAndAddAnother => 'Save and add another';
+
+  @override
+  String get classAdded => 'Class added';
+
+  @override
+  String get deleteClass => 'Delete class';
+
+  @override
+  String get errorEndBeforeStart => 'It must end after it starts.';
+
+  @override
+  String get nextClass => 'Next class';
+
+  @override
+  String get nowInClass => 'Now';
+
+  @override
+  String startsInMinutes(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return 'in $minutesString min';
+  }
+
+  @override
+  String startsInHours(int hours, int minutes) {
+    final intl.NumberFormat hoursNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String hoursString = hoursNumberFormat.format(hours);
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return 'in $hoursString h $minutesString min';
+  }
+
+  @override
+  String endsInMinutes(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return 'ends in $minutesString min';
+  }
+
+  @override
+  String get todaysClasses => 'Today\'s classes';
+
+  @override
+  String get noClassesToday => 'No classes today';
+
+  @override
+  String get doneForToday => 'Done for today';
+
+  @override
+  String nextOn(String day) {
+    return 'Next class: $day';
+  }
+
+  @override
+  String get offlineNotice => 'Offline. Showing your saved routine.';
+
+  @override
+  String roomShort(String room) {
+    return 'Room $room';
+  }
+
+  @override
+  String get routineNoClassesDay => 'No classes on this day';
+
+  @override
+  String get errorGroupNotFound =>
+      'No class group with this code at your university. Check the code with your CR.';
+
+  @override
+  String get errorNotCr => 'Only the CR can change this group.';
+
+  @override
+  String get errorGroupLimit =>
+      'You\'re already in 10 class groups. Leave one to join another.';
+
+  @override
+  String get errorGroupFull => 'This class group is full.';
+
+  @override
+  String get errorCrCannotLeave =>
+      'You\'re the only CR, so you can\'t leave while classmates are in the group. You can delete the group instead.';
+
+  @override
+  String get errorSlotLimit =>
+      'This routine already has the most classes allowed.';
+
+  @override
+  String get deleteClassTitle => 'Delete this class for everyone?';
 }

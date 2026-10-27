@@ -1,7 +1,15 @@
+import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+
+import '../../../app/clock.dart';
+import '../../../app/router.dart';
+import '../../classes/presentation/bloc/my_classes_cubit.dart';
+import '../../classes/presentation/widgets/class_tile.dart';
 
 /// Weekly routine. R1: day strip + classes per day, with changes marked.
 class RoutinePage extends StatefulWidget {
@@ -12,11 +20,11 @@ class RoutinePage extends StatefulWidget {
 }
 
 class _RoutinePageState extends State<RoutinePage> {
-  late DateTime _selected = DateUtils.dateOnly(DateTime.now());
+  late DateTime _selected = DateUtils.dateOnly(appNow());
 
   /// Saturday-first week, as most Bangladeshi university routines are.
   List<DateTime> get _week {
-    final today = DateUtils.dateOnly(DateTime.now());
+    final today = DateUtils.dateOnly(appNow());
     final fromSaturday = (today.weekday - DateTime.saturday) % 7;
     final start = today.subtract(Duration(days: fromSaturday));
     return [for (var i = 0; i < 7; i++) start.add(Duration(days: i))];
@@ -26,32 +34,88 @@ class _RoutinePageState extends State<RoutinePage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
+    final classes = context.watch<MyClassesCubit>().state;
+    final day = classesOn(classes.groups, _selected);
+    final busyDays = {
+      for (final g in classes.groups)
+        for (final s in g.slots) s.weekday,
+    };
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navRoutine)),
-      body: CsPage(
-        children: [
-          _WeekStrip(
-            days: _week,
-            selected: _selected,
-            onSelected: (d) => setState(() => _selected = d),
-          ),
-          const SizedBox(height: CsSpace.lg),
-          Text(
-            DateFormat.MMMMEEEEd(locale).format(_selected),
-            style: context.text.titleMedium,
-          ),
-          const SizedBox(height: CsSpace.md),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: CsSpace.md),
-              child: CsEmptyState(
-                icon: Icons.event_note_rounded,
-                title: l10n.routineEmptyTitle,
-                message: l10n.routineEmptyMessage,
-              ),
-            ),
+      appBar: AppBar(
+        title: Text(l10n.navRoutine),
+        actions: [
+          IconButton(
+            tooltip: l10n.classGroups,
+            onPressed: () => context.push(Routes.groups),
+            icon: const Icon(Icons.groups_outlined),
           ),
         ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: context.read<MyClassesCubit>().refresh,
+        child: CsPage(
+          children: [
+            _WeekStrip(
+              days: _week,
+              selected: _selected,
+              busyDays: busyDays,
+              onSelected: (d) => setState(() => _selected = d),
+            ),
+            const SizedBox(height: CsSpace.lg),
+            Text(
+              DateFormat.MMMMEEEEd(locale).format(_selected),
+              style: context.text.titleMedium,
+            ),
+            const SizedBox(height: CsSpace.md),
+            if (!classes.hasGroups)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: CsSpace.md),
+                  child: CsEmptyState(
+                    icon: Icons.event_note_rounded,
+                    title: l10n.routineEmptyTitle,
+                    message: l10n.routineEmptyMessage,
+                    actionLabel: l10n.joinClassGroup,
+                    onAction: () => context.push(Routes.groups),
+                  ),
+                ),
+              )
+            else if (day.isEmpty)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(CsSpace.lg),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.event_available_outlined,
+                        color: context.cs.textSecondary,
+                      ),
+                      const SizedBox(width: CsSpace.md),
+                      Expanded(
+                        child: Text(
+                          l10n.routineNoClassesDay,
+                          style: context.text.bodyLarge,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              CsSection(
+                children: [
+                  for (final c in day)
+                    ClassTile(
+                      slot: c.slot,
+                      groupTitle: classes.groups.length > 1
+                          ? c.group.title
+                          : null,
+                      onTap: () => context.push(Routes.group(c.group.id)),
+                    ),
+                ],
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -61,18 +125,22 @@ class _WeekStrip extends StatelessWidget {
   const _WeekStrip({
     required this.days,
     required this.selected,
+    required this.busyDays,
     required this.onSelected,
   });
 
   final List<DateTime> days;
   final DateTime selected;
+
+  /// Weekdays that have classes get a dot.
+  final Set<int> busyDays;
   final ValueChanged<DateTime> onSelected;
 
   @override
   Widget build(BuildContext context) {
     final cs = context.cs;
     final locale = Localizations.localeOf(context).toLanguageTag();
-    final today = DateUtils.dateOnly(DateTime.now());
+    final today = DateUtils.dateOnly(appNow());
     return Row(
       children: [
         for (final d in days)
@@ -84,6 +152,7 @@ class _WeekStrip extends StatelessWidget {
                 day: DateFormat.d(locale).format(d),
                 selected: d == selected,
                 today: d == today,
+                busy: busyDays.contains(d.weekday),
                 onTap: () => onSelected(d),
                 colors: cs,
               ),
@@ -100,6 +169,7 @@ class _Day extends StatelessWidget {
     required this.day,
     required this.selected,
     required this.today,
+    required this.busy,
     required this.onTap,
     required this.colors,
   });
@@ -108,6 +178,7 @@ class _Day extends StatelessWidget {
   final String day;
   final bool selected;
   final bool today;
+  final bool busy;
   final VoidCallback onTap;
   final CsColors colors;
 
@@ -156,7 +227,7 @@ class _Day extends StatelessWidget {
                   height: 5,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: today
+                    color: busy
                         ? (selected ? cs.onPrimary : cs.primary)
                         : Colors.transparent,
                   ),

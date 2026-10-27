@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../features/auth/data/google_auth.dart';
+import '../features/classes/data/routine_cache.dart';
 import 'crash/crash_reporter.dart';
 import 'env.dart';
 import 'settings/settings_storage.dart';
@@ -46,5 +47,9 @@ Future<void> configureDependencies({
     ..registerLazySingleton<AppConfigRepository>(
       () => ApiAppConfigRepository(getIt<ApiClient>()),
     )
+    ..registerLazySingleton<ClassGroupRepository>(
+      () => ApiClassGroupRepository(getIt<ApiClient>()),
+    )
+    ..registerLazySingleton<RoutineCache>(PrefsRoutineCache.new)
     ..registerLazySingleton<GoogleAuth>(FirebaseGoogleAuth.new);
 }

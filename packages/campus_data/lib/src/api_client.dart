@@ -68,6 +68,9 @@ class ApiClient {
   Future<Object?> patch(String path, Object? body) =>
       send('PATCH', path, body: body);
 
+  Future<Object?> put(String path, Object? body) =>
+      send('PUT', path, body: body);
+
   Future<Object?> delete(String path) => send('DELETE', path);
 
   /// [authenticated] false sends no token (sign-in endpoints).

@@ -8,6 +8,11 @@ import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/email_sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
+import '../features/classes/presentation/pages/group_form_page.dart';
+import '../features/classes/presentation/pages/group_page.dart';
+import '../features/classes/presentation/pages/groups_page.dart';
+import '../features/classes/presentation/pages/join_group_page.dart';
+import '../features/classes/presentation/pages/slot_editor_page.dart';
 import '../features/onboarding/presentation/onboarding_page.dart';
 import '../features/profile/presentation/pages/edit_profile_page.dart';
 import '../features/profile/presentation/pages/profile_setup_page.dart';
@@ -26,6 +31,14 @@ abstract final class Routes {
   static const routine = '/routine';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
+  static const groups = '/groups';
+  static const joinGroup = '/groups/join';
+  static const newGroup = '/groups/new';
+  static String group(String id) => '/groups/$id';
+  static String editGroup(String id) => '/groups/$id/edit';
+  static String newSlot(String groupId) => '/groups/$groupId/class/new';
+  static String editSlot(String groupId, String slotId) =>
+      '/groups/$groupId/class/$slotId';
 }
 
 /// App routes. Signed-out students see the welcome slides once, then only
@@ -79,6 +92,45 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
       GoRoute(
         path: Routes.setupProfile,
         builder: (context, state) => const ProfileSetupPage(),
+      ),
+      // Full-screen pages over the tabs.
+      GoRoute(
+        path: Routes.groups,
+        builder: (context, state) => const GroupsPage(),
+        routes: [
+          GoRoute(
+            path: 'join',
+            builder: (context, state) => const JoinGroupPage(),
+          ),
+          GoRoute(
+            path: 'new',
+            builder: (context, state) => const GroupFormPage(),
+          ),
+          GoRoute(
+            path: ':id',
+            builder: (context, state) =>
+                GroupPage(groupId: state.pathParameters['id']!),
+            routes: [
+              GoRoute(
+                path: 'edit',
+                builder: (context, state) =>
+                    GroupFormPage(groupId: state.pathParameters['id']),
+              ),
+              GoRoute(
+                path: 'class/new',
+                builder: (context, state) =>
+                    SlotEditorPage(groupId: state.pathParameters['id']!),
+              ),
+              GoRoute(
+                path: 'class/:slotId',
+                builder: (context, state) => SlotEditorPage(
+                  groupId: state.pathParameters['id']!,
+                  slotId: state.pathParameters['slotId'],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => _HomeShell(shell: shell),

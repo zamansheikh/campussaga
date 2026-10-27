@@ -751,6 +751,426 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Classmates see your name in class groups.'**
   String get editProfileHint;
+
+  /// No description provided for @classGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Class groups'**
+  String get classGroups;
+
+  /// No description provided for @joinWithCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Join with a code'**
+  String get joinWithCode;
+
+  /// No description provided for @createGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a class group'**
+  String get createGroup;
+
+  /// No description provided for @createGroupHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For CRs: enter your section\'s routine once and share the code.'**
+  String get createGroupHint;
+
+  /// No description provided for @imTheCr.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m the CR, create a group'**
+  String get imTheCr;
+
+  /// No description provided for @roleCr.
+  ///
+  /// In en, this message translates to:
+  /// **'CR'**
+  String get roleCr;
+
+  /// No description provided for @membersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 student} other{{count} students}}'**
+  String membersCount(int count);
+
+  /// No description provided for @classesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No classes yet} =1{1 class a week} other{{count} classes a week}}'**
+  String classesCount(int count);
+
+  /// No description provided for @joinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join your class group'**
+  String get joinTitle;
+
+  /// No description provided for @joinSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-letter code from your CR.'**
+  String get joinSubtitle;
+
+  /// No description provided for @joinCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Join code'**
+  String get joinCodeLabel;
+
+  /// No description provided for @joinAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Join group'**
+  String get joinAction;
+
+  /// No description provided for @alreadyMember.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re already in this group'**
+  String get alreadyMember;
+
+  /// No description provided for @openGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Open group'**
+  String get openGroup;
+
+  /// No description provided for @createSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll be the CR. Classmates join with a code and see the routine you enter.'**
+  String get createSubtitle;
+
+  /// No description provided for @sectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Section'**
+  String get sectionLabel;
+
+  /// No description provided for @sectionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. A'**
+  String get sectionHint;
+
+  /// No description provided for @semesterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Semester'**
+  String get semesterLabel;
+
+  /// No description provided for @semesterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Fall 2026'**
+  String get semesterHint;
+
+  /// No description provided for @createAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create group'**
+  String get createAction;
+
+  /// No description provided for @editGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit group details'**
+  String get editGroup;
+
+  /// No description provided for @inviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite classmates'**
+  String get inviteTitle;
+
+  /// No description provided for @inviteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Share this code in your class Messenger group.'**
+  String get inviteHint;
+
+  /// No description provided for @copyInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy invite'**
+  String get copyInvite;
+
+  /// No description provided for @inviteCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite copied. Paste it in your class group.'**
+  String get inviteCopied;
+
+  /// No description provided for @inviteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Join {group} on {app}: open the app, tap \"Join with a code\" and enter {code}'**
+  String inviteMessage(String group, String app, String code);
+
+  /// No description provided for @weeklyRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly routine'**
+  String get weeklyRoutine;
+
+  /// No description provided for @addClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Add class'**
+  String get addClass;
+
+  /// No description provided for @editClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit class'**
+  String get editClass;
+
+  /// No description provided for @noClassesYetCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your section\'s classes. It takes a few minutes, once a semester.'**
+  String get noClassesYetCr;
+
+  /// No description provided for @noClassesYetMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Your CR hasn\'t added classes yet.'**
+  String get noClassesYetMember;
+
+  /// No description provided for @leaveGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave group'**
+  String get leaveGroup;
+
+  /// No description provided for @leaveGroupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this group?'**
+  String get leaveGroupTitle;
+
+  /// No description provided for @leaveGroupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Its classes disappear from your routine. You can join again with the code.'**
+  String get leaveGroupBody;
+
+  /// No description provided for @deleteGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete group'**
+  String get deleteGroup;
+
+  /// No description provided for @deleteGroupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this group for everyone?'**
+  String get deleteGroupTitle;
+
+  /// No description provided for @deleteGroupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The routine is removed for every student in the group. This can\'t be undone.'**
+  String get deleteGroupBody;
+
+  /// No description provided for @courseCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Course code'**
+  String get courseCodeLabel;
+
+  /// No description provided for @courseCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. CSE311'**
+  String get courseCodeHint;
+
+  /// No description provided for @courseTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Course title'**
+  String get courseTitleLabel;
+
+  /// No description provided for @teacherLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Teacher'**
+  String get teacherLabel;
+
+  /// No description provided for @roomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get roomLabel;
+
+  /// No description provided for @dayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get dayLabel;
+
+  /// No description provided for @startsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts'**
+  String get startsLabel;
+
+  /// No description provided for @endsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends'**
+  String get endsLabel;
+
+  /// No description provided for @classTheory.
+  ///
+  /// In en, this message translates to:
+  /// **'Theory'**
+  String get classTheory;
+
+  /// No description provided for @classLab.
+  ///
+  /// In en, this message translates to:
+  /// **'Lab'**
+  String get classLab;
+
+  /// No description provided for @saveAndAddAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and add another'**
+  String get saveAndAddAnother;
+
+  /// No description provided for @classAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Class added'**
+  String get classAdded;
+
+  /// No description provided for @deleteClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete class'**
+  String get deleteClass;
+
+  /// No description provided for @errorEndBeforeStart.
+  ///
+  /// In en, this message translates to:
+  /// **'It must end after it starts.'**
+  String get errorEndBeforeStart;
+
+  /// No description provided for @nextClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Next class'**
+  String get nextClass;
+
+  /// No description provided for @nowInClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get nowInClass;
+
+  /// No description provided for @startsInMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'in {minutes} min'**
+  String startsInMinutes(int minutes);
+
+  /// No description provided for @startsInHours.
+  ///
+  /// In en, this message translates to:
+  /// **'in {hours} h {minutes} min'**
+  String startsInHours(int hours, int minutes);
+
+  /// No description provided for @endsInMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'ends in {minutes} min'**
+  String endsInMinutes(int minutes);
+
+  /// No description provided for @todaysClasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s classes'**
+  String get todaysClasses;
+
+  /// No description provided for @noClassesToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No classes today'**
+  String get noClassesToday;
+
+  /// No description provided for @doneForToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Done for today'**
+  String get doneForToday;
+
+  /// No description provided for @nextOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Next class: {day}'**
+  String nextOn(String day);
+
+  /// No description provided for @offlineNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline. Showing your saved routine.'**
+  String get offlineNotice;
+
+  /// No description provided for @roomShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Room {room}'**
+  String roomShort(String room);
+
+  /// No description provided for @routineNoClassesDay.
+  ///
+  /// In en, this message translates to:
+  /// **'No classes on this day'**
+  String get routineNoClassesDay;
+
+  /// No description provided for @errorGroupNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No class group with this code at your university. Check the code with your CR.'**
+  String get errorGroupNotFound;
+
+  /// No description provided for @errorNotCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the CR can change this group.'**
+  String get errorNotCr;
+
+  /// No description provided for @errorGroupLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re already in 10 class groups. Leave one to join another.'**
+  String get errorGroupLimit;
+
+  /// No description provided for @errorGroupFull.
+  ///
+  /// In en, this message translates to:
+  /// **'This class group is full.'**
+  String get errorGroupFull;
+
+  /// No description provided for @errorCrCannotLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re the only CR, so you can\'t leave while classmates are in the group. You can delete the group instead.'**
+  String get errorCrCannotLeave;
+
+  /// No description provided for @errorSlotLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'This routine already has the most classes allowed.'**
+  String get errorSlotLimit;
+
+  /// No description provided for @deleteClassTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this class for everyone?'**
+  String get deleteClassTitle;
 }
 
 class _AppLocalizationsDelegate

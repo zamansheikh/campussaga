@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 
 	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
@@ -34,6 +35,9 @@ func newValidator() *validator.Validate {
 		if name := f.Tag.Get("query"); name != "" {
 			return name
 		}
+		if name := f.Tag.Get("path"); name != "" {
+			return name
+		}
 		return f.Name
 	})
 	return v
@@ -42,10 +46,20 @@ func newValidator() *validator.Validate {
 // Validator exposes the shared validator (for module-specific tags).
 func Validator() *validator.Validate { return validate }
 
-// Bind fills dst from the query string (string fields tagged `query:"name"`)
+// Bind fills dst from the URL path (string fields tagged `path:"name"`,
+// matching a {name} route parameter), the query string (`query:"name"`)
 // and the JSON body (if any), then validates it.
 func Bind(r *http.Request, dst any) error {
-	bindQuery(r, dst)
+	bindStrings(dst, "query", func(name string) (string, bool) {
+		q := r.URL.Query()
+		return q.Get(name), q.Has(name)
+	})
+	if rc := chi.RouteContext(r.Context()); rc != nil {
+		bindStrings(dst, "path", func(name string) (string, bool) {
+			v := rc.URLParam(name)
+			return v, v != ""
+		})
+	}
 	if r.Body != nil && r.ContentLength != 0 && r.Method != http.MethodGet {
 		dec := json.NewDecoder(r.Body)
 		dec.DisallowUnknownFields()
@@ -64,23 +78,33 @@ func Bind(r *http.Request, dst any) error {
 	return Validate(dst)
 }
 
-// bindQuery copies ?name=value into string fields tagged `query:"name"`.
-// The body is decoded afterwards with DisallowUnknownFields, and query
-// fields carry `json:"-"`, so a body can never set them.
-func bindQuery(r *http.Request, dst any) {
+// bindStrings copies values into string fields tagged `<tag>:"name"`,
+// including fields of embedded structs. The body is decoded afterwards with
+// DisallowUnknownFields, and query and path fields carry `json:"-"`, so a
+// body can never set them.
+func bindStrings(dst any, tag string, get func(name string) (string, bool)) {
 	v := reflect.ValueOf(dst)
 	if v.Kind() != reflect.Pointer || v.Elem().Kind() != reflect.Struct {
 		return
 	}
-	v = v.Elem()
+	bindStruct(v.Elem(), tag, get)
+}
+
+func bindStruct(v reflect.Value, tag string, get func(name string) (string, bool)) {
 	t := v.Type()
-	q := r.URL.Query()
 	for i := 0; i < t.NumField(); i++ {
-		name := t.Field(i).Tag.Get("query")
-		if name == "" || t.Field(i).Type.Kind() != reflect.String || !q.Has(name) {
+		f := t.Field(i)
+		if f.Anonymous && f.Type.Kind() == reflect.Struct {
+			bindStruct(v.Field(i), tag, get)
 			continue
 		}
-		v.Field(i).SetString(q.Get(name))
+		name := f.Tag.Get(tag)
+		if name == "" || f.Type.Kind() != reflect.String || !f.IsExported() {
+			continue
+		}
+		if val, ok := get(name); ok {
+			v.Field(i).SetString(val)
+		}
 	}
 }
 

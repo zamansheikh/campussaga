@@ -7,6 +7,7 @@ import 'package:campussaga/app/settings/bloc/settings_state.dart';
 import 'package:campussaga/app/settings/settings_storage.dart';
 import 'package:campussaga/app/version/app_version.dart';
 import 'package:campussaga/features/auth/data/google_auth.dart';
+import 'package:campussaga/features/classes/data/routine_cache.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -185,6 +186,8 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   FakeProfileRepository? profile,
   FakeAppConfigRepository? config,
   SettingsStorage? settings,
+  FakeClassGroupRepository? classes,
+  RoutineCache? routineCache,
   int build = 1,
 }) async {
   await getIt.reset();
@@ -203,7 +206,11 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
           MemorySettingsStorage(const SettingsState(onboardingDone: true)),
     )
     ..registerSingleton<AppVersion>(AppVersion(version: '0.1.0', build: build))
-    ..registerSingleton<CrashReporter>(MemoryCrashReporter());
+    ..registerSingleton<CrashReporter>(MemoryCrashReporter())
+    ..registerSingleton<ClassGroupRepository>(
+      classes ?? FakeClassGroupRepository(),
+    )
+    ..registerSingleton<RoutineCache>(routineCache ?? MemoryRoutineCache());
   return (repo, google);
 }
 
@@ -222,3 +229,202 @@ Future<void> scrollAndTap(WidgetTester tester, Finder finder) async {
   await tester.pumpAndSettle();
   await tester.tap(finder);
 }
+
+/// In-memory class groups. [others] are groups the student can join by code.
+class FakeClassGroupRepository implements ClassGroupRepository {
+  final mine = <ClassGroup>[];
+  final others = <String, ClassGroup>{};
+
+  /// Every call fails with this (e.g. NetworkFailure: offline).
+  Failure? failure;
+  var _ids = 0;
+
+  String _id(String p) => '$p${++_ids}';
+
+  void _check() {
+    if (failure != null) throw failure!;
+  }
+
+  ClassGroup _mine(String id) => mine.firstWhere(
+    (g) => g.id == id,
+    orElse: () => throw const NotFoundFailure(code: 'GROUP_NOT_FOUND'),
+  );
+
+  void _put(ClassGroup g) {
+    final i = mine.indexWhere((x) => x.id == g.id);
+    if (i < 0) {
+      mine.add(g);
+    } else {
+      mine[i] = g;
+    }
+  }
+
+  @override
+  Future<List<ClassGroup>> myGroups() async {
+    _check();
+    return List.of(mine);
+  }
+
+  @override
+  Future<ClassGroup> create(GroupDraft d) async {
+    _check();
+    final g = ClassGroup(
+      id: _id('g'),
+      department: d.department,
+      batch: d.batch,
+      section: d.section,
+      semester: d.semester,
+      joinCode: 'KQWZRT',
+      role: GroupRole.cr,
+      memberCount: 1,
+    );
+    mine.add(g);
+    return g;
+  }
+
+  @override
+  Future<GroupPreview> preview(String code) async {
+    _check();
+    final g = others[code] ?? mine.where((x) => x.joinCode == code).firstOrNull;
+    if (g == null) throw const NotFoundFailure(code: 'GROUP_NOT_FOUND');
+    return GroupPreview(
+      department: g.department,
+      batch: g.batch,
+      section: g.section,
+      semester: g.semester,
+      memberCount: g.memberCount,
+      classCount: g.slots.length,
+      isMember: mine.any((x) => x.id == g.id),
+    );
+  }
+
+  @override
+  Future<ClassGroup> join(String code) async {
+    _check();
+    final g = others.remove(code);
+    if (g == null) throw const NotFoundFailure(code: 'GROUP_NOT_FOUND');
+    final joined = g.copyWith(memberCount: g.memberCount + 1);
+    mine.add(joined);
+    return joined;
+  }
+
+  @override
+  Future<ClassGroup> update(String id, GroupDraft d) async {
+    _check();
+    final old = _mine(id);
+    final g = ClassGroup(
+      id: id,
+      department: d.department,
+      batch: d.batch,
+      section: d.section,
+      semester: d.semester,
+      joinCode: old.joinCode,
+      role: old.role,
+      memberCount: old.memberCount,
+      slots: old.slots,
+    );
+    _put(g);
+    return g;
+  }
+
+  @override
+  Future<void> delete(String id) async {
+    _check();
+    mine.removeWhere((g) => g.id == id);
+  }
+
+  @override
+  Future<void> leave(String id) async {
+    _check();
+    final g = _mine(id);
+    if (g.isCr && g.memberCount > 1) {
+      throw const RejectedFailure(code: 'CR_CANNOT_LEAVE');
+    }
+    mine.remove(g);
+  }
+
+  ClassSlot _slot(String id, SlotDraft d) => ClassSlot(
+    id: id,
+    courseCode: d.courseCode,
+    courseTitle: d.courseTitle,
+    teacher: d.teacher,
+    room: d.room,
+    weekday: d.weekday,
+    startMin: d.startMin,
+    endMin: d.endMin,
+    kind: d.kind,
+  );
+
+  @override
+  Future<ClassSlot> addSlot(String groupId, SlotDraft d) async {
+    _check();
+    final g = _mine(groupId);
+    final s = _slot(_id('s'), d);
+    _put(g.copyWith(slots: [...g.slots, s]));
+    return s;
+  }
+
+  @override
+  Future<ClassSlot> updateSlot(
+    String groupId,
+    String slotId,
+    SlotDraft d,
+  ) async {
+    _check();
+    final g = _mine(groupId);
+    final s = _slot(slotId, d);
+    _put(g.copyWith(slots: [for (final x in g.slots) x.id == slotId ? s : x]));
+    return s;
+  }
+
+  @override
+  Future<void> deleteSlot(String groupId, String slotId) async {
+    _check();
+    final g = _mine(groupId);
+    _put(g.copyWith(slots: g.slots.where((x) => x.id != slotId).toList()));
+  }
+}
+
+/// A CSE 61 group with three classes: Tuesday 08:30 and 11:30, Wednesday 09:00.
+ClassGroup sampleGroup({
+  GroupRole role = GroupRole.member,
+  String id = 'g-cse',
+}) => ClassGroup(
+  id: id,
+  department: 'CSE',
+  batch: '61',
+  section: 'A',
+  semester: 'Fall 2026',
+  joinCode: 'ABCDEF',
+  role: role,
+  memberCount: 41,
+  slots: const [
+    ClassSlot(
+      id: 's-311',
+      courseCode: 'CSE311',
+      courseTitle: 'Database Systems',
+      teacher: 'Dr. Rahman',
+      room: '504',
+      weekday: DateTime.tuesday,
+      startMin: 8 * 60 + 30,
+      endMin: 10 * 60,
+    ),
+    ClassSlot(
+      id: 's-313',
+      courseCode: 'CSE313',
+      courseTitle: 'Operating Systems',
+      room: '602',
+      weekday: DateTime.tuesday,
+      startMin: 11 * 60 + 30,
+      endMin: 13 * 60,
+      kind: ClassKind.lab,
+    ),
+    ClassSlot(
+      id: 's-mat',
+      courseCode: 'MAT201',
+      weekday: DateTime.wednesday,
+      startMin: 9 * 60,
+      endMin: 10 * 60 + 30,
+    ),
+  ],
+);

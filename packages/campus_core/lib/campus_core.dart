@@ -6,6 +6,8 @@ library;
 
 export 'src/auth/auth_models.dart';
 export 'src/auth/auth_repository.dart';
+export 'src/classes/class_group_repository.dart';
+export 'src/classes/class_models.dart';
 export 'src/config/app_config.dart';
 export 'src/failure.dart';
 export 'src/profile/profile_repository.dart';

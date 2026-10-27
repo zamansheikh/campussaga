@@ -57,7 +57,7 @@ rewriting the app.
 │            auth (JWT, sessions) · ratelimit ·   │
 │            mail (SMTP)                          │
 │  modules:  universities · accounts · appconfig  │
-│            (R1+: classgroups, routine, issues…) │
+│            classgroups (R1+: changes, issues…)  │
 │  workers:  goroutines for push, moderation,     │
 │            nightly scorecards                   │
 └───────────────┬─────────────────────────────────┘
@@ -105,6 +105,20 @@ rewriting the app.
 | `PATCH /me` | student | `displayName`, `department`, `batch` only (empty string clears); unknown fields such as `role` are rejected with 400 |
 | `GET /me/department-suggestions?q=` | student | Departments other students at the same university entered (most used first, case-insensitive); names only |
 | `DELETE /me` | student | Deletes the account and everything it owns |
+
+### R1 endpoints: class groups (`classgroups` module)
+
+| Endpoint | Who | What |
+|---|---|---|
+| `GET /groups` | student | My groups, each with its full routine (`slots`) |
+| `POST /groups` `{department, batch, section, semester}` | student | Create; the caller becomes CR. 10 per day per student |
+| `GET /groups/preview?code=` | student | What a code leads to (title, counts) before joining |
+| `POST /groups/join` `{code}` | student | Join; joining again is harmless |
+| `PUT /groups/{id}` · `DELETE /groups/{id}` | CR | Edit details · delete for everyone |
+| `POST /groups/{id}/leave` | member | Leave; the last member deletes the group; the only CR can't leave while others remain (`CR_CANNOT_LEAVE`) |
+| `POST /groups/{id}/slots` · `PUT`/`DELETE /groups/{id}/slots/{slot}` | CR | Add · edit · remove a weekly class (`start`/`end` as `"HH:MM"`) |
+
+Codes are looked up 30 times per hour per student and 120 per IP (24⁶ ≈ 191 million codes). A code of another university, or a group you're not in, answers `GROUP_NOT_FOUND`; a member editing answers `NOT_GROUP_CR`. Limits: 10 groups per student, 300 members per group, 100 classes per routine. The app keeps the last `GET /groups` on the phone (per account) so Today and Routine work offline.
 
 ### Authentication
 
@@ -270,6 +284,7 @@ backend/                          module github.com/zamansheikh/campussaga/backe
 │  ├─ modules/
 │  │  ├─ universities/            handler · service · store/ (sqlc) · queries.sql
 │  │  ├─ accounts/                sign-in codes, sessions, profile, delete account
+│  │  ├─ classgroups/             class groups, join codes, weekly routine (My Class)
 │  │  └─ appconfig/               min build, feature flags
 │  ├─ app/                        wiring (router + modules) and end-to-end tests
 │  └─ testkit/                    fresh Postgres DB per test, cloned from a migrated template
@@ -315,14 +330,16 @@ app_config          key, value jsonb   -- min_supported_build, feature flags
 audit_log           id, actor_id, action, target_type, target_id, meta, created_at
 device_tokens       user_id, token, platform, updated_at   -- R1 (push)
 
--- R1 My Class
-class_groups        id, university_id, department, program, batch, section,
-                    semester_label ('Spring 2027'), invite_code, status
-                    ('active'|'archived'), created_at
-group_members       group_id, user_id, role ('cr'|'co_cr'|'member'), joined_at
-courses             id, group_id, code ('CSE 301'), title, teacher_name, color
-routine_slots       id, group_id, course_id, weekday (1–7), start_time, end_time,
-                    room, kind ('theory'|'lab'|'tutorial'), valid_from, valid_to
+-- R1 My Class (built: migration 00400)
+class_groups        id, university_id, department, batch, section, semester
+                    ('Fall 2026'), join_code (6 letters, no I/O), created_by,
+                    created_at, updated_at
+class_group_members group_id, user_id, role ('cr'|'member'), joined_at
+routine_slots       id, group_id, course_code, course_title, teacher, room,
+                    weekday (ISO 1–7), starts_min, ends_min (minutes after
+                    midnight), kind ('theory'|'lab')
+-- R1 My Class (planned)
+                    co-CR role, CR transfer, semester archive, join code reset
 routine_changes     id, group_id, slot_id NULL, date, type ('cancelled'|
                     'rescheduled'|'room_changed'|'extra'), new_start, new_end,
                     new_room, note, created_by, created_at

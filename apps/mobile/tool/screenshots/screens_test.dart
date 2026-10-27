@@ -12,6 +12,7 @@ import 'dart:ui' as ui;
 
 import 'package:campus_core/campus_core.dart';
 import 'package:campussaga/app/app.dart';
+import 'package:campussaga/app/clock.dart';
 import 'package:campussaga/app/router.dart';
 import 'package:campussaga/app/settings/bloc/settings_state.dart';
 import 'package:campussaga/app/settings/settings_storage.dart';
@@ -39,6 +40,103 @@ const _student = UserProfile(
   displayName: 'Rafiul Islam',
   department: 'CSE',
   batch: '61',
+);
+
+ClassSlot _c(
+  String id,
+  String code,
+  String title,
+  int day,
+  String start,
+  String end, {
+  String room = '',
+  String teacher = '',
+  ClassKind kind = ClassKind.theory,
+}) => ClassSlot(
+  id: id,
+  courseCode: code,
+  courseTitle: title,
+  teacher: teacher,
+  room: room,
+  weekday: day,
+  startMin: Clock.parse(start),
+  endMin: Clock.parse(end),
+  kind: kind,
+);
+
+ClassGroup _group(GroupRole role) => ClassGroup(
+  id: 'g1',
+  department: 'CSE',
+  batch: '61',
+  section: 'A',
+  semester: 'Fall 2026',
+  joinCode: 'KQWZRT',
+  role: role,
+  memberCount: 42,
+  slots: [
+    _c(
+      '1',
+      'CSE311',
+      'Database Systems',
+      6,
+      '08:30',
+      '10:00',
+      room: '504',
+      teacher: 'Dr. Rahman',
+    ),
+    _c(
+      '2',
+      'CSE313',
+      'Operating Systems',
+      6,
+      '10:00',
+      '11:30',
+      room: '602',
+      teacher: 'Nusrat Jahan',
+    ),
+    _c(
+      '3',
+      'CSE311',
+      'Database Systems',
+      2,
+      '08:30',
+      '10:00',
+      room: '504',
+      teacher: 'Dr. Rahman',
+    ),
+    _c(
+      '4',
+      'CSE312',
+      'Database Lab',
+      2,
+      '10:30',
+      '13:30',
+      room: 'Lab 3',
+      teacher: 'Dr. Rahman',
+      kind: ClassKind.lab,
+    ),
+    _c(
+      '5',
+      'MAT201',
+      'Linear Algebra',
+      2,
+      '14:30',
+      '16:00',
+      room: '410',
+      teacher: 'Kamrul Hasan',
+    ),
+    _c(
+      '6',
+      'CSE313',
+      'Operating Systems',
+      3,
+      '09:00',
+      '10:30',
+      room: '602',
+      teacher: 'Nusrat Jahan',
+    ),
+    _c('7', 'ENG102', 'Technical Writing', 4, '11:30', '13:00', room: '305'),
+  ],
 );
 
 const _newStudent = UserProfile(
@@ -123,12 +221,17 @@ void main() {
     _Look look, {
     UserProfile? user,
     bool onboarded = true,
+    List<ClassGroup> groups = const [],
+    Map<String, ClassGroup> others = const {},
   }) async {
     tester.view
       ..physicalSize = const Size(390 * 3, 844 * 3)
       ..devicePixelRatio = 3;
     addTearDown(tester.view.reset);
     final (repo, _) = await registerFakes(
+      classes: FakeClassGroupRepository()
+        ..mine.addAll(groups)
+        ..others.addAll(others),
       settings: MemorySettingsStorage(
         SettingsState(
           themeMode: look.theme,
@@ -154,8 +257,48 @@ void main() {
     }
   }
 
+  setUp(() => appNow = () => DateTime(2026, 10, 27, 10, 5));
+  tearDown(() => appNow = DateTime.now);
+
   for (final look in _looks) {
-    testWidgets('onboarding ${look.name}', (tester) async {
+    shot('classes ${look.name}', (tester) async {
+      final router = await start(
+        tester,
+        look,
+        user: _student,
+        groups: [_group(GroupRole.cr)],
+      );
+      await capture(tester, 'classes-${look.name}');
+      router.go(Routes.routine);
+      await tester.pumpAndSettle();
+      await capture(tester, 'classes-${look.name}');
+      unawaited(router.push(Routes.group('g1')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'classes-${look.name}');
+      unawaited(router.push(Routes.editSlot('g1', '4')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'classes-${look.name}');
+    });
+
+    shot('join ${look.name}', (tester) async {
+      final router = await start(
+        tester,
+        look,
+        user: _student,
+        others: {'KQWZRT': _group(GroupRole.member)},
+      );
+      await capture(tester, 'join-${look.name}');
+      unawaited(router.push(Routes.joinGroup));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'KQWZRT');
+      await tester.pumpAndSettle();
+      await capture(tester, 'join-${look.name}');
+      unawaited(router.push(Routes.newGroup));
+      await tester.pumpAndSettle();
+      await capture(tester, 'join-${look.name}');
+    });
+
+    shot('onboarding ${look.name}', (tester) async {
       await start(tester, look, onboarded: false);
       for (var i = 0; i < 3; i++) {
         await capture(tester, 'onboarding');
@@ -166,7 +309,7 @@ void main() {
       }
     });
 
-    testWidgets('sign-in ${look.name}', (tester) async {
+    shot('sign-in ${look.name}', (tester) async {
       final router = await start(tester, look);
       await capture(tester, 'sign-in-${look.name}');
       unawaited(router.push(Routes.signInEmail));
@@ -181,12 +324,12 @@ void main() {
       await tester.pumpWidget(const SizedBox()); // stops the countdown
     });
 
-    testWidgets('setup ${look.name}', (tester) async {
+    shot('setup ${look.name}', (tester) async {
       await start(tester, look, user: _newStudent);
       await capture(tester, 'home-${look.name}');
     });
 
-    testWidgets('home ${look.name}', (tester) async {
+    shot('home ${look.name}', (tester) async {
       final router = await start(tester, look, user: _student);
       await capture(tester, 'home-${look.name}');
       router.go(Routes.routine);
@@ -213,6 +356,18 @@ void main() {
 }
 
 final _boundaryKey = GlobalKey();
+
+/// A screenshot test with real shadows (tests draw outlines by default).
+void shot(String name, Future<void> Function(WidgetTester tester) body) {
+  testWidgets(name, (tester) async {
+    debugDisableShadows = false;
+    try {
+      await body(tester);
+    } finally {
+      debugDisableShadows = true;
+    }
+  });
+}
 
 /// Puts the screenshots side by side on one image.
 Future<List<int>> _sheet(List<ui.Image> images) async {

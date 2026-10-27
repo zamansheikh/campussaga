@@ -53,6 +53,12 @@ func (r *Router) Limit(name string, limit int, window time.Duration) func(http.H
 	return RateLimit(r.limiter, name, limit, window, PerIP)
 }
 
+// LimitUser allows limit requests per window per signed-in student. Use it
+// on Student() routes (it runs after the token check).
+func (r *Router) LimitUser(name string, limit int, window time.Duration) func(http.Handler) http.Handler {
+	return RateLimit(r.limiter, name, limit, window, PerUser)
+}
+
 // Bearer extracts the token of an "Authorization: Bearer …" header.
 func Bearer(r *http.Request) string {
 	h := r.Header.Get("Authorization")
@@ -109,6 +115,14 @@ func RateLimit(l *ratelimit.Limiter, name string, limit int, window time.Duratio
 
 // PerIP keys by client IP.
 func PerIP(r *http.Request) string { return ClientInfo(r.Context()).IP }
+
+// PerUser keys by the signed-in user ("" when signed out: not limited).
+func PerUser(r *http.Request) string {
+	if c, ok := auth.User(r.Context()); ok {
+		return c.UserID.String()
+	}
+	return ""
+}
 
 // NotFoundHandler renders unmatched routes in the envelope.
 func NotFoundHandler(w http.ResponseWriter, r *http.Request) {

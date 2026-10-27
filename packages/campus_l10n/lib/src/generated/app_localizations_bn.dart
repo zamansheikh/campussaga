@@ -148,7 +148,11 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String errorCodeInvalid(int count) {
-    return 'কোডটি সঠিক নয়। আর $count বার চেষ্টা করা যাবে।';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'কোডটি সঠিক নয়। আর $countString বার চেষ্টা করা যাবে।';
   }
 
   @override
@@ -368,4 +372,267 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get editProfileHint => 'ক্লাস গ্রুপে সহপাঠীরা তোমার নাম দেখবে।';
+
+  @override
+  String get classGroups => 'ক্লাস গ্রুপ';
+
+  @override
+  String get joinWithCode => 'কোড দিয়ে যোগ দাও';
+
+  @override
+  String get createGroup => 'ক্লাস গ্রুপ তৈরি করো';
+
+  @override
+  String get createGroupHint =>
+      'সিআর-দের জন্য: সেকশনের রুটিন একবার লিখে কোডটি শেয়ার করো।';
+
+  @override
+  String get imTheCr => 'আমি সিআর, গ্রুপ তৈরি করব';
+
+  @override
+  String get roleCr => 'সিআর';
+
+  @override
+  String membersCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString জন শিক্ষার্থী';
+  }
+
+  @override
+  String classesCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'সপ্তাহে $countStringটি ক্লাস',
+      zero: 'এখনো কোনো ক্লাস নেই',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get joinTitle => 'তোমার ক্লাস গ্রুপে যোগ দাও';
+
+  @override
+  String get joinSubtitle => 'সিআর-এর দেওয়া ৬ অক্ষরের কোডটি লেখো।';
+
+  @override
+  String get joinCodeLabel => 'যোগদানের কোড';
+
+  @override
+  String get joinAction => 'গ্রুপে যোগ দাও';
+
+  @override
+  String get alreadyMember => 'তুমি এই গ্রুপে আছ';
+
+  @override
+  String get openGroup => 'গ্রুপ খোলো';
+
+  @override
+  String get createSubtitle =>
+      'তুমি হবে সিআর। সহপাঠীরা কোড দিয়ে যোগ দিয়ে তোমার লেখা রুটিন দেখবে।';
+
+  @override
+  String get sectionLabel => 'সেকশন';
+
+  @override
+  String get sectionHint => 'যেমন A';
+
+  @override
+  String get semesterLabel => 'সেমিস্টার';
+
+  @override
+  String get semesterHint => 'যেমন Fall 2026';
+
+  @override
+  String get createAction => 'গ্রুপ তৈরি করো';
+
+  @override
+  String get editGroup => 'গ্রুপের তথ্য সম্পাদনা';
+
+  @override
+  String get inviteTitle => 'সহপাঠীদের আমন্ত্রণ জানাও';
+
+  @override
+  String get inviteHint => 'ক্লাসের মেসেঞ্জার গ্রুপে এই কোডটি শেয়ার করো।';
+
+  @override
+  String get copyInvite => 'আমন্ত্রণ কপি করো';
+
+  @override
+  String get inviteCopied => 'আমন্ত্রণ কপি হয়েছে। ক্লাস গ্রুপে পেস্ট করো।';
+
+  @override
+  String inviteMessage(String group, String app, String code) {
+    return '$app-এ $group গ্রুপে যোগ দাও: অ্যাপ খুলে \"কোড দিয়ে যোগ দাও\" চেপে $code লেখো';
+  }
+
+  @override
+  String get weeklyRoutine => 'সাপ্তাহিক রুটিন';
+
+  @override
+  String get addClass => 'ক্লাস যোগ করো';
+
+  @override
+  String get editClass => 'ক্লাস সম্পাদনা';
+
+  @override
+  String get noClassesYetCr =>
+      'তোমার সেকশনের ক্লাসগুলো যোগ করো। সেমিস্টারে একবার, কয়েক মিনিটের কাজ।';
+
+  @override
+  String get noClassesYetMember => 'তোমার সিআর এখনো ক্লাস যোগ করেনি।';
+
+  @override
+  String get leaveGroup => 'গ্রুপ ছেড়ে দাও';
+
+  @override
+  String get leaveGroupTitle => 'এই গ্রুপ ছেড়ে দেবে?';
+
+  @override
+  String get leaveGroupBody =>
+      'এর ক্লাসগুলো তোমার রুটিন থেকে সরে যাবে। কোড দিয়ে আবার যোগ দিতে পারবে।';
+
+  @override
+  String get deleteGroup => 'গ্রুপ মুছে ফেলো';
+
+  @override
+  String get deleteGroupTitle => 'সবার জন্য গ্রুপটি মুছে ফেলবে?';
+
+  @override
+  String get deleteGroupBody =>
+      'গ্রুপের সব শিক্ষার্থীর কাছ থেকে রুটিনটি মুছে যাবে। এটি আর ফেরানো যাবে না।';
+
+  @override
+  String get courseCodeLabel => 'কোর্স কোড';
+
+  @override
+  String get courseCodeHint => 'যেমন CSE311';
+
+  @override
+  String get courseTitleLabel => 'কোর্সের নাম';
+
+  @override
+  String get teacherLabel => 'শিক্ষক';
+
+  @override
+  String get roomLabel => 'রুম';
+
+  @override
+  String get dayLabel => 'দিন';
+
+  @override
+  String get startsLabel => 'শুরু';
+
+  @override
+  String get endsLabel => 'শেষ';
+
+  @override
+  String get classTheory => 'থিওরি';
+
+  @override
+  String get classLab => 'ল্যাব';
+
+  @override
+  String get saveAndAddAnother => 'সংরক্ষণ করে আরেকটি যোগ করো';
+
+  @override
+  String get classAdded => 'ক্লাস যোগ হয়েছে';
+
+  @override
+  String get deleteClass => 'ক্লাস মুছে ফেলো';
+
+  @override
+  String get errorEndBeforeStart => 'শেষের সময় শুরুর পরে হতে হবে।';
+
+  @override
+  String get nextClass => 'পরের ক্লাস';
+
+  @override
+  String get nowInClass => 'এখন চলছে';
+
+  @override
+  String startsInMinutes(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString মিনিট পর';
+  }
+
+  @override
+  String startsInHours(int hours, int minutes) {
+    final intl.NumberFormat hoursNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String hoursString = hoursNumberFormat.format(hours);
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$hoursString ঘণ্টা $minutesString মিনিট পর';
+  }
+
+  @override
+  String endsInMinutes(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString মিনিট পর শেষ';
+  }
+
+  @override
+  String get todaysClasses => 'আজকের ক্লাস';
+
+  @override
+  String get noClassesToday => 'আজ কোনো ক্লাস নেই';
+
+  @override
+  String get doneForToday => 'আজকের ক্লাস শেষ';
+
+  @override
+  String nextOn(String day) {
+    return 'পরের ক্লাস: $day';
+  }
+
+  @override
+  String get offlineNotice => 'অফলাইন। সংরক্ষিত রুটিন দেখানো হচ্ছে।';
+
+  @override
+  String roomShort(String room) {
+    return 'রুম $room';
+  }
+
+  @override
+  String get routineNoClassesDay => 'এই দিনে কোনো ক্লাস নেই';
+
+  @override
+  String get errorGroupNotFound =>
+      'তোমার বিশ্ববিদ্যালয়ে এই কোডের কোনো ক্লাস গ্রুপ নেই। সিআর-এর কাছ থেকে কোডটি মিলিয়ে নাও।';
+
+  @override
+  String get errorNotCr => 'শুধু সিআর এই গ্রুপ পরিবর্তন করতে পারে।';
+
+  @override
+  String get errorGroupLimit =>
+      'তুমি ইতিমধ্যে ১০টি ক্লাস গ্রুপে আছ। নতুনটিতে যোগ দিতে একটি ছেড়ে দাও।';
+
+  @override
+  String get errorGroupFull => 'এই ক্লাস গ্রুপ পূর্ণ।';
+
+  @override
+  String get errorCrCannotLeave =>
+      'তুমি একমাত্র সিআর, তাই সহপাঠীরা থাকতে গ্রুপ ছাড়তে পারবে না। চাইলে গ্রুপটি মুছে ফেলতে পারো।';
+
+  @override
+  String get errorSlotLimit => 'এই রুটিনে সর্বোচ্চ সংখ্যক ক্লাস আছে।';
+
+  @override
+  String get deleteClassTitle => 'সবার জন্য এই ক্লাসটি মুছে ফেলবে?';
 }
