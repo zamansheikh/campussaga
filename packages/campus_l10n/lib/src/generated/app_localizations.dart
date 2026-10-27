@@ -1004,12 +1004,6 @@ abstract class AppLocalizations {
   /// **'Room'**
   String get roomLabel;
 
-  /// No description provided for @dayLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Day'**
-  String get dayLabel;
-
   /// No description provided for @startsLabel.
   ///
   /// In en, this message translates to:

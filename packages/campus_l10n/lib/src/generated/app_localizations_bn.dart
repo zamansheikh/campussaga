@@ -525,9 +525,6 @@ class AppLocalizationsBn extends AppLocalizations {
   String get roomLabel => 'রুম';
 
   @override
-  String get dayLabel => 'দিন';
-
-  @override
   String get startsLabel => 'শুরু';
 
   @override

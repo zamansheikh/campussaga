@@ -539,9 +539,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roomLabel => 'Room';
 
   @override
-  String get dayLabel => 'Day';
-
-  @override
   String get startsLabel => 'Starts';
 
   @override

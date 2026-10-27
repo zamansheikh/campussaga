@@ -217,6 +217,32 @@ void main() {
       'CSE311',
       'MAT201',
     ]);
+
+    // Editing: pick another day to put the class there too.
+    await scrollAndTap(tester, find.text('MAT201'));
+    await tester.pumpAndSettle();
+    await scrollAndTap(tester, find.text('Thu'));
+    await scrollAndTap(tester, find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(
+      classes.mine.single.slots
+          .where((s) => s.courseCode == 'MAT201')
+          .map((s) => s.weekday),
+      [DateTime.wednesday, DateTime.thursday],
+    );
+
+    // Unpicking its own day moves the class.
+    await scrollAndTap(tester, find.text('CSE311'));
+    await tester.pumpAndSettle();
+    await scrollAndTap(tester, find.text('Tue'));
+    await scrollAndTap(tester, find.text('Sun'));
+    await scrollAndTap(tester, find.text('Save'));
+    await tester.pumpAndSettle();
+    final cse311 = classes.mine.single.slots.where(
+      (s) => s.courseCode == 'CSE311',
+    );
+    expect(cse311.single.weekday, DateTime.sunday);
+    expect(cse311.single.id, 's-311', reason: 'the same class, moved');
   });
 
   testWidgets('Routine shows each day; leaving a group removes it', (

@@ -9,11 +9,14 @@ import '../../../auth/presentation/widgets/notice_banner.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
 
-/// Add or edit a class (CR). Built for speed: a new class can be added on
-/// several days at once (one entry per day, so each can later get its own
-/// room or time), course details already in the routine are suggested, and
-/// "Save and add another" keeps the days and starts the next class when
-/// this one ends. Editing changes that one day only.
+/// Add or edit a class (CR). Built for speed: a class can be put on several
+/// days at once (one entry per day, so each can later get its own room or
+/// time), course details already in the routine are suggested, and "Save
+/// and add another" keeps the days and starts the next class when this one
+/// ends.
+///
+/// Editing changes the class that was opened; days picked besides its own
+/// get a copy, and unpicking its day moves it to the first picked day.
 class SlotEditorPage extends StatefulWidget {
   const SlotEditorPage({super.key, required this.groupId, this.slotId});
 
@@ -40,8 +43,8 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
   late final _room = TextEditingController(text: _slot?.room);
   final _codeFocus = FocusNode();
 
-  /// Editing: exactly the class's day. New: none until the CR picks, so a
-  /// tap never silently adds a second day.
+  /// Editing: the class's own day to start. New: none until the CR picks,
+  /// so a tap never silently adds a day nobody meant.
   late final Set<int> _days = {?_slot?.weekday};
   late int _start = _slot?.startMin ?? 8 * 60 + 30;
   late int _end = _slot?.endMin ?? 10 * 60;
@@ -131,16 +134,19 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
     final cubit = context.read<MyClassesCubit>();
     var added = 0;
     try {
+      final days = weekOrder.where(_days.contains).toList();
       if (_editing) {
-        await cubit.updateSlot(widget.groupId, _slot!.id, _draft(_days.single));
-      } else {
-        // One entry per day, in week order. A day that was saved is taken
-        // off the selection, so "try again" after an error adds no twins.
-        for (final d in weekOrder.where(_days.contains).toList()) {
-          await cubit.addSlot(widget.groupId, _draft(d));
-          added++;
-          if (mounted) setState(() => _days.remove(d));
-        }
+        // The opened class keeps its day if still picked, else moves.
+        final own = days.contains(_slot!.weekday) ? _slot.weekday : days.first;
+        await cubit.updateSlot(widget.groupId, _slot.id, _draft(own));
+        days.remove(own);
+      }
+      // One new entry per other day, in week order. A saved day is taken off
+      // the selection, so "try again" after an error adds no twins.
+      for (final d in days) {
+        await cubit.addSlot(widget.groupId, _draft(d));
+        added++;
+        if (mounted) setState(() => _days.remove(d));
       }
       if (!mounted) return;
       if (!another) {
@@ -284,11 +290,8 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
               ],
             ),
             const SizedBox(height: CsSpace.lg),
-            Text(
-              _editing ? l10n.dayLabel : l10n.daysLabel,
-              style: context.text.labelLarge,
-            ),
-            if (!_editing) Text(l10n.daysHint, style: context.text.bodySmall),
+            Text(l10n.daysLabel, style: context.text.labelLarge),
+            Text(l10n.daysHint, style: context.text.bodySmall),
             const SizedBox(height: CsSpace.sm),
             Wrap(
               spacing: CsSpace.sm,
@@ -303,15 +306,7 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                         ? null
                         : (on) => setState(() {
                             _dayMissing = false;
-                            if (_editing) {
-                              _days
-                                ..clear()
-                                ..add(d);
-                            } else if (on) {
-                              _days.add(d);
-                            } else {
-                              _days.remove(d);
-                            }
+                            on ? _days.add(d) : _days.remove(d);
                           }),
                   ),
               ],
