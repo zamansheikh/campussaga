@@ -40,6 +40,7 @@ abstract final class CsTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: c.background,
       textTheme: text,
+      fontFamilyFallback: CsTypography.fontFamilyFallback,
       extensions: [CsTokens(colors: c)],
       appBarTheme: AppBarTheme(
         backgroundColor: c.background,

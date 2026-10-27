@@ -40,6 +40,8 @@ func TestPublicEndpoints(t *testing.T) {
 	r.into(t, &cfg)
 	assert.JSONEq(t, "1", string(cfg["minSupportedBuild"]))
 	assert.Contains(t, cfg, "features")
+	assert.JSONEq(t, `{"android":"https://play.google.com/store/apps/details?id=com.silifton.campussaga","ios":null}`,
+		string(cfg["storeUrls"]))
 
 	r = h.do("GET", "/nope", "", nil)
 	assert.Equal(t, http.StatusNotFound, r.Status)

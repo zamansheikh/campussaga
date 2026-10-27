@@ -228,4 +228,17 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get cancel => 'বাতিল';
+
+  @override
+  String get updateRequiredTitle => 'আপডেট প্রয়োজন';
+
+  @override
+  String get updateRequiredBody =>
+      'অ্যাপের এই সংস্করণটি আর সমর্থিত নয়। ব্যবহার চালিয়ে যেতে আপডেট করো।';
+
+  @override
+  String get updateNow => 'এখনই আপডেট করো';
+
+  @override
+  String get updateFromStore => 'অ্যাপ স্টোর থেকে অ্যাপটি আপডেট করো।';
 }

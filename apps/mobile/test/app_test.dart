@@ -1,5 +1,6 @@
 import 'package:campus_core/campus_core.dart';
 import 'package:campussaga/app/app.dart';
+import 'package:campussaga/app/settings/settings_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -229,5 +230,42 @@ void main() {
 
     expect(repo.deletes, 1);
     expect(find.text('Continue with Google'), findsOneWidget);
+  });
+
+  testWidgets('an unsupported build sees only the update screen', (
+    tester,
+  ) async {
+    final config = FakeAppConfigRepository()
+      ..config = const AppConfig(
+        minSupportedBuild: 9,
+        storeUrls: {'android': 'https://play.google.com/x'},
+      );
+    final (repo, _) = await registerFakes(config: config, build: 3);
+    repo.savedUser = testUser;
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Update required'), findsOneWidget);
+    expect(find.text('Update now'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+  });
+
+  testWidgets('theme and language come back after a restart', (tester) async {
+    final storage = MemorySettingsStorage();
+    final (repo, _) = await registerFakes(settings: storage);
+    repo.savedUser = testUser;
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('বাংলা'));
+    await tester.pumpAndSettle();
+
+    // "Restart": a fresh app with the same storage.
+    await registerFakes(settings: storage);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+    expect(find.text('Google দিয়ে চালিয়ে যাও'), findsOneWidget);
   });
 }

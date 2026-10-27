@@ -235,4 +235,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredBody =>
+      'This version of the app is no longer supported. Please update to keep using it.';
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get updateFromStore => 'Please update the app from your app store.';
 }

@@ -15,3 +15,19 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
+
+flutter:
+  # Noto Sans Bengali (SIL Open Font License, fonts/NotoSansBengali/OFL.txt),
+  # bundled so Bangla renders the same on every phone. Used as the fallback
+  # font: Latin text keeps the platform font.
+  fonts:
+    - family: NotoSansBengali
+      fonts:
+        - asset: fonts/NotoSansBengali/NotoSansBengali-Regular.ttf
+          weight: 400
+        - asset: fonts/NotoSansBengali/NotoSansBengali-Medium.ttf
+          weight: 500
+        - asset: fonts/NotoSansBengali/NotoSansBengali-SemiBold.ttf
+          weight: 600
+        - asset: fonts/NotoSansBengali/NotoSansBengali-Bold.ttf
+          weight: 700

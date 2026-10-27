@@ -238,13 +238,15 @@ presentation ─▶ application ─▶ campus_core (interfaces, models)
 | Backend calls | `http` (only inside `campus_data`) |
 | Models | `freezed`, `json_serializable` |
 | Secure token storage | `flutter_secure_storage` |
+| Settings (theme, language) | `shared_preferences` (`SharedPreferencesWithCache`, read before the first frame) |
+| App version / store link | `package_info_plus`, `url_launcher`; the minimum build and store links come from `GET /config` |
 | Images | `image_picker`, `flutter_image_compress`, `cached_network_image` |
 | Offline storage (R1) | `drift` (SQLite): routine, changes, announcements |
 | Class reminders | `flutter_local_notifications` + `timezone` |
 | QR join codes | `qr_flutter` (show), `mobile_scanner` (scan) |
 | Push | `firebase_messaging` |
 | Localization | `flutter_localizations` + ARB files |
-| Crash reports | `sentry_flutter` or Firebase Crashlytics |
+| Crash reports | Firebase Crashlytics (release builds only; no user id or profile data attached). Flutter, async and bloc errors are all reported |
 | Component catalog | `widgetbook` |
 
 ---

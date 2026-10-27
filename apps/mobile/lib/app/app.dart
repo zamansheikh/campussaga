@@ -11,6 +11,10 @@ import 'di.dart';
 import 'router.dart';
 import 'settings/bloc/settings_cubit.dart';
 import 'settings/bloc/settings_state.dart';
+import 'settings/settings_storage.dart';
+import 'version/app_version.dart';
+import 'version/update_required_page.dart';
+import 'version/version_gate_cubit.dart';
 
 class CampusApp extends StatefulWidget {
   const CampusApp({super.key});
@@ -25,11 +29,28 @@ class _CampusAppState extends State<CampusApp> {
     google: getIt<GoogleAuth>(),
   )..add(const AuthStarted());
   late final GoRouter _router = buildRouter(_auth);
+  late final VersionGateCubit _versionGate = VersionGateCubit(
+    config: getIt<AppConfigRepository>(),
+    currentBuild: getIt<AppVersion>().build,
+  )..check();
+
+  // Re-check the minimum version when the app comes back to the foreground.
+  late final AppLifecycleListener _lifecycle = AppLifecycleListener(
+    onResume: _versionGate.check,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycle; // start listening
+  }
 
   @override
   void dispose() {
+    _lifecycle.dispose();
     _router.dispose();
     _auth.close();
+    _versionGate.close();
     super.dispose();
   }
 
@@ -38,7 +59,8 @@ class _CampusAppState extends State<CampusApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: _auth),
-        BlocProvider(create: (_) => SettingsCubit()),
+        BlocProvider.value(value: _versionGate),
+        BlocProvider(create: (_) => SettingsCubit(getIt<SettingsStorage>())),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settings) => MaterialApp.router(
@@ -51,6 +73,14 @@ class _CampusAppState extends State<CampusApp> {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: _router,
+          // An unsupported build sees only the update screen.
+          builder: (context, child) =>
+              BlocBuilder<VersionGateCubit, VersionGateState>(
+                builder: (context, gate) =>
+                    gate.status == VersionStatus.updateRequired
+                    ? UpdateRequiredPage(storeUrl: gate.storeUrl)
+                    : child ?? const SizedBox.shrink(),
+              ),
         ),
       ),
     );

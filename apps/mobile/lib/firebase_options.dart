@@ -57,7 +57,6 @@ class DefaultFirebaseOptions {
     databaseURL: 'https://bitlaabuzz.firebaseio.com',
     storageBucket: 'bitlaabuzz.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyB10HkzsSQIhUQRhBxunpQZJ-rCGvTW77o',
     appId: '1:1001688697061:ios:07f2ffb90f5665ec4f2c0c',

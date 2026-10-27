@@ -83,10 +83,10 @@ pair in light and dark mode. Add new pairs there; CI fails if one is too low.
 
 ## 3. Typography
 
-- **Latin:** Inter
+- **Latin:** the platform font (Roboto on Android, SF on iOS). Inter is not bundled, to keep the app small.
 - **Bangla:** Noto Sans Bengali (set as `fontFamilyFallback`, so mixed Bangla/English text renders correctly)
 - Fonts are **bundled in the app**, not downloaded at runtime, so they work offline and send no requests to Google.
-- *Status:* not added yet; the app uses the system font. Add the font files during R0 and set them in `tokens/typography.dart`.
+- *Status:* Noto Sans Bengali 400/500/600/700 (hinted, about 585 KB) is bundled in `packages/campus_ui/fonts/NotoSansBengali/` with its OFL license, and set as the fallback in `tokens/typography.dart` and the theme.
 
 | Token | Size / line height | Weight | Use |
 |---|---|---|---|

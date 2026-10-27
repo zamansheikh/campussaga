@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:campus_core/campus_core.dart';
+import 'package:campussaga/app/crash/crash_reporter.dart';
 import 'package:campussaga/app/di.dart';
+import 'package:campussaga/app/settings/settings_storage.dart';
+import 'package:campussaga/app/version/app_version.dart';
 import 'package:campussaga/features/auth/data/google_auth.dart';
 
 const testUser = UserProfile(
@@ -161,9 +164,25 @@ class FakeProfileRepository implements ProfileRepository {
   }
 }
 
+class FakeAppConfigRepository implements AppConfigRepository {
+  AppConfig config = const AppConfig(minSupportedBuild: 1);
+  Failure? failure;
+  int fetches = 0;
+
+  @override
+  Future<AppConfig> fetch() async {
+    fetches++;
+    if (failure != null) throw failure!;
+    return config;
+  }
+}
+
 /// Registers fakes in get_it for widget tests.
 Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   FakeProfileRepository? profile,
+  FakeAppConfigRepository? config,
+  SettingsStorage? settings,
+  int build = 1,
 }) async {
   await getIt.reset();
   final repo = FakeAuthRepository();
@@ -171,6 +190,12 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   getIt
     ..registerSingleton<AuthRepository>(repo)
     ..registerSingleton<GoogleAuth>(google)
-    ..registerSingleton<ProfileRepository>(profile ?? FakeProfileRepository());
+    ..registerSingleton<ProfileRepository>(profile ?? FakeProfileRepository())
+    ..registerSingleton<AppConfigRepository>(
+      config ?? FakeAppConfigRepository(),
+    )
+    ..registerSingleton<SettingsStorage>(settings ?? MemorySettingsStorage())
+    ..registerSingleton<AppVersion>(AppVersion(version: '0.1.0', build: build))
+    ..registerSingleton<CrashReporter>(MemoryCrashReporter());
   return (repo, google);
 }

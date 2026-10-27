@@ -49,7 +49,7 @@ it saves months later.
 - Auth: sign in with **university Google account** (Firebase, done) or **university email + OTP code**; session handling; log out everywhere
 - Universities list + email domains (seed the launch universities)
 - Profile basics: name, department (with suggestions from classmates), batch; first-time setup after sign-in, edit, delete account (done)
-- App shell: navigation, settings, language switch, theme switch, force-update check, crash reporting
+- App shell: navigation, settings, language switch, theme switch (remembered), force-update check, crash reporting, bundled Bangla font (done)
 - Privacy policy + terms (Bangla + English); **delete my account** works
 
 **Done when:** a student at a launch university can install a test build,

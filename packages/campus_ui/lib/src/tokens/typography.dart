@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 
 /// Type scale. Line heights are generous because Bangla glyphs are taller.
 ///
-/// Fonts: system default for now. Planned: bundled Inter (Latin) with
-/// Noto Sans Bengali as fallback - set [fontFamily] and [fontFamilyFallback]
-/// here once the font files are added.
+/// Fonts: Latin text uses the platform font (Roboto / SF); Bangla falls
+/// back to the bundled Noto Sans Bengali, so it renders the same on every
+/// phone, including ones with poor built-in Bangla fonts.
 abstract final class CsTypography {
   static const String? fontFamily = null;
-  static const List<String>? fontFamilyFallback = null;
+
+  /// Fonts bundled in this package are addressed as `packages/<pkg>/<family>`.
+  static const String banglaFamily = 'packages/campus_ui/NotoSansBengali';
+  static const List<String> fontFamilyFallback = [banglaFamily];
 
   static TextTheme textTheme(Color primary, Color secondary) {
     TextStyle s(double size, double height, FontWeight w, Color c) {
