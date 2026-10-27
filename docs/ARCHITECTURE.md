@@ -123,6 +123,8 @@ rewriting the app.
 | `POST /groups/{id}/announcements` `{body, pinned}` | CR | Post a message (≤1000 chars, line breaks kept); pinning unpins the previous one. 30 a day per CR |
 | `PATCH /groups/{id}/announcements/{a}` `{pinned}` · `DELETE …` | CR | Pin / unpin · delete for everyone |
 
+**Pushes** (`push` module, migration 00430): the app registers its FCM token with `POST /me/devices {token, platform, language}`; the token belongs to that sign-in session, so signing out or a revoked session stops pushes. After a CR posts an announcement or adds/undoes a change, every other member's phone gets a notification in its language (EN/BN, Bengali digits), sent in the background after commit; tokens Firebase reports as gone are deleted. Without `FCM_CREDENTIALS_FILE` the server only logs them. iPhones also need the APNs key (docs/DEPLOYMENT.md).
+
 `GET /groups` includes each group's `changes` from yesterday on, and its `announcements`: the pinned one plus the newest 20 of the last 30 days. The app keeps "seen" times per group on the phone for the "New" badge. Editing a weekly class to another weekday, or deleting it, removes its changes.
 
 Codes are looked up 30 times per hour per student and 120 per IP (24⁶ ≈ 191 million codes). A code of another university, or a group you're not in, answers `GROUP_NOT_FOUND`; a member editing answers `NOT_GROUP_CR`. Limits: 10 groups per student, 300 members per group, 100 classes per routine. The app keeps the last `GET /groups` on the phone (per account) so Today and Routine work offline.
@@ -351,6 +353,8 @@ routine_changes     id, group_id, slot_id NULL (extra), date, kind
                     -- migration 00410; one per (slot_id, date)
 announcements       id, group_id, body, pinned (one per group), created_by,
                     created_at  -- migration 00420
+device_tokens       token, user_id, session_id, platform, language
+                    -- migration 00430 (push)
 -- R1 My Class (planned)
                     co-CR role, CR transfer, semester archive, join code reset
 routine_changes     id, group_id, slot_id NULL, date, type ('cancelled'|

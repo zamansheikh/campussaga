@@ -242,5 +242,7 @@
   "timeMinutesAgo": "{minutes} মিনিট আগে",
   "timeHoursAgo": "{hours} ঘণ্টা আগে",
   "timeYesterday": "গতকাল",
-  "errorAnnouncementGone": "এই ঘোষণাটি আগেই মুছে ফেলা হয়েছে।"
+  "errorAnnouncementGone": "এই ঘোষণাটি আগেই মুছে ফেলা হয়েছে।",
+  "pushChannel": "ক্লাস আপডেট",
+  "pushChannelHint": "সিআর-এর পরিবর্তন ও ঘোষণা"
 }

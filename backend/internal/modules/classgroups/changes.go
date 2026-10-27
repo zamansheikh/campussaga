@@ -141,6 +141,7 @@ func (s *Service) AddChange(ctx context.Context, groupID uuid.UUID, in *ChangeIn
 		if err := s.requireCR(ctx, q, groupID, c.UserID); err != nil {
 			return err
 		}
+		var slotRow *store.RoutineSlot
 		if in.slot != nil {
 			slot, err := q.GetSlot(ctx, store.GetSlotParams{ID: *in.slot, GroupID: groupID})
 			if db.IsNoRows(err) {
@@ -155,6 +156,7 @@ func (s *Service) AddChange(ctx context.Context, groupID uuid.UUID, in *ChangeIn
 			if err := q.DeleteSlotChangeOn(ctx, store.DeleteSlotChangeOnParams{SlotID: in.slot, Date: in.date}); err != nil {
 				return err
 			}
+			slotRow = &slot
 		}
 		n, err := q.CountUpcomingChanges(ctx, store.CountUpcomingChangesParams{GroupID: groupID, FromDate: today})
 		if err != nil {
@@ -174,7 +176,14 @@ func (s *Service) AddChange(ctx context.Context, groupID uuid.UUID, in *ChangeIn
 		}
 		v := changeView(ch)
 		out = &v
-		return q.TouchGroup(ctx, groupID)
+		if err := q.TouchGroup(ctx, groupID); err != nil {
+			return err
+		}
+		g, err := q.GetGroup(ctx, groupID)
+		if err != nil {
+			return err
+		}
+		return s.tellClassmates(ctx, q, groupID, c.UserID, s.changeNotice(g, ch, slotRow, false))
 	})
 	return out, err
 }
@@ -187,14 +196,35 @@ func (s *Service) DeleteChange(ctx context.Context, groupID, changeID uuid.UUID)
 		if err := s.requireCR(ctx, q, groupID, c.UserID); err != nil {
 			return err
 		}
-		n, err := q.DeleteChange(ctx, store.DeleteChangeParams{ID: changeID, GroupID: groupID})
+		ch, err := q.GetChange(ctx, store.GetChangeParams{ID: changeID, GroupID: groupID})
+		if db.IsNoRows(err) {
+			return ErrChangeNotFound
+		}
 		if err != nil {
 			return err
 		}
-		if n == 0 {
-			return ErrChangeNotFound
+		if _, err := q.DeleteChange(ctx, store.DeleteChangeParams{ID: changeID, GroupID: groupID}); err != nil {
+			return err
 		}
-		return q.TouchGroup(ctx, groupID)
+		if err := q.TouchGroup(ctx, groupID); err != nil {
+			return err
+		}
+		if ch.Date.Before(s.today()) {
+			return nil // a past change: nothing to tell
+		}
+		var slot *store.RoutineSlot
+		if ch.SlotID != nil {
+			sl, err := q.GetSlot(ctx, store.GetSlotParams{ID: *ch.SlotID, GroupID: groupID})
+			if err != nil {
+				return err
+			}
+			slot = &sl
+		}
+		g, err := q.GetGroup(ctx, groupID)
+		if err != nil {
+			return err
+		}
+		return s.tellClassmates(ctx, q, groupID, c.UserID, s.changeNotice(g, ch, slot, true))
 	})
 }
 

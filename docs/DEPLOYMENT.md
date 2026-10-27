@@ -97,6 +97,28 @@ Template: [backend/deploy/env.example](../backend/deploy/env.example).
 Changing `JWT_SECRET` signs everyone out. Changing `CODE_HMAC_SECRET` only
 invalidates codes that are waiting to be used.
 
+**Push notifications key** (`FCM_CREDENTIALS_FILE`): a Firebase
+service-account key, a file, not a variable.
+
+1. Firebase console → project `bitlaabuzz` → ⚙ Project settings → Service
+   accounts → **Generate new private key**. A JSON file downloads.
+2. Copy it to the server, never into the repo:
+   `/opt/campussaga/deploy/secrets/fcm-service-account.json`
+3. `chown root:65532` and `chmod 640` (the API container runs as user 65532
+   and mounts `secrets/` read-only at `/run/secrets`).
+4. `.env`: `FCM_CREDENTIALS_FILE=/run/secrets/fcm-service-account.json`.
+
+Without it the API still runs and only logs each notification. To rotate:
+generate a new key, replace the file, restart the API, then delete the old
+key in the Google Cloud console (IAM → Service accounts → Keys).
+
+**iPhone pushes** also need an Apple key: Apple Developer → Keys → new key
+with "Apple Push Notifications service (APNs)" → download the `.p8`, then
+Firebase console → Project settings → Cloud Messaging → Apple app
+configuration → upload it with its Key ID and Team ID. The iOS app then needs
+the "Push Notifications" and "Background Modes → Remote notifications"
+capabilities in Xcode.
+
 ### 3.3 `compose.yaml`
 
 In the repo: [backend/deploy/compose.yaml](../backend/deploy/compose.yaml). Copy it to `/opt/campussaga/deploy/`.

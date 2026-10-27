@@ -137,3 +137,14 @@ RETURNING *;
 
 -- name: DeleteAnnouncement :execrows
 DELETE FROM announcements WHERE id = @id AND group_id = @group_id;
+
+-- ---- notifications -------------------------------------------------------------
+
+-- name: ListMemberIDs :many
+SELECT user_id FROM class_group_members WHERE group_id = @group_id;
+
+-- name: GetGroup :one
+SELECT * FROM class_groups WHERE id = @id;
+
+-- name: GetChange :one
+SELECT * FROM routine_changes WHERE id = @id AND group_id = @group_id;

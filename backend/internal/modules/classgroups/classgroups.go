@@ -60,8 +60,9 @@ const (
 
 // Service is the class groups module.
 type Service struct {
-	d   *db.DB
-	now func() time.Time
+	d      *db.DB
+	now    func() time.Time
+	notify Notifier // nil = no notifications
 }
 
 func NewService(d *db.DB, now func() time.Time) *Service { return &Service{d: d, now: now} }

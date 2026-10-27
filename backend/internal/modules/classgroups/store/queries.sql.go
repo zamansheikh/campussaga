@@ -361,6 +361,61 @@ func (q *Queries) DeleteSlotChanges(ctx context.Context, slotID *uuid.UUID) erro
 	return err
 }
 
+const getChange = `-- name: GetChange :one
+SELECT id, group_id, slot_id, date, kind, course_code, course_title, teacher, class_kind, room, starts_min, ends_min, note, created_by, created_at, updated_at FROM routine_changes WHERE id = $1 AND group_id = $2
+`
+
+type GetChangeParams struct {
+	ID      uuid.UUID
+	GroupID uuid.UUID
+}
+
+func (q *Queries) GetChange(ctx context.Context, arg GetChangeParams) (RoutineChange, error) {
+	row := q.db.QueryRow(ctx, getChange, arg.ID, arg.GroupID)
+	var i RoutineChange
+	err := row.Scan(
+		&i.ID,
+		&i.GroupID,
+		&i.SlotID,
+		&i.Date,
+		&i.Kind,
+		&i.CourseCode,
+		&i.CourseTitle,
+		&i.Teacher,
+		&i.ClassKind,
+		&i.Room,
+		&i.StartsMin,
+		&i.EndsMin,
+		&i.Note,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getGroup = `-- name: GetGroup :one
+SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at FROM class_groups WHERE id = $1
+`
+
+func (q *Queries) GetGroup(ctx context.Context, id uuid.UUID) (ClassGroup, error) {
+	row := q.db.QueryRow(ctx, getGroup, id)
+	var i ClassGroup
+	err := row.Scan(
+		&i.ID,
+		&i.UniversityID,
+		&i.Department,
+		&i.Batch,
+		&i.Section,
+		&i.Semester,
+		&i.JoinCode,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getGroupByCode = `-- name: GetGroupByCode :one
 SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at FROM class_groups WHERE join_code = $1
 `
@@ -537,6 +592,32 @@ func (q *Queries) ListChangesForUser(ctx context.Context, arg ListChangesForUser
 			return nil, err
 		}
 		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listMemberIDs = `-- name: ListMemberIDs :many
+
+SELECT user_id FROM class_group_members WHERE group_id = $1
+`
+
+// ---- notifications -------------------------------------------------------------
+func (q *Queries) ListMemberIDs(ctx context.Context, groupID uuid.UUID) ([]uuid.UUID, error) {
+	rows, err := q.db.Query(ctx, listMemberIDs, groupID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []uuid.UUID{}
+	for rows.Next() {
+		var user_id uuid.UUID
+		if err := rows.Scan(&user_id); err != nil {
+			return nil, err
+		}
+		items = append(items, user_id)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

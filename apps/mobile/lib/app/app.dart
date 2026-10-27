@@ -13,6 +13,8 @@ import '../features/auth/data/google_auth.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/classes/data/routine_cache.dart';
 import '../features/classes/presentation/bloc/my_classes_cubit.dart';
+import '../features/push/push_controller.dart';
+import '../features/push/push_messaging.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/data/reminder_store.dart';
 import '../features/reminders/presentation/bloc/reminders_cubit.dart';
@@ -48,6 +50,13 @@ class _CampusAppState extends State<CampusApp> {
   );
   late final StreamSubscription<List<ClassGroup>> _classesSub;
   late final SeenCubit _seen = SeenCubit(getIt<SeenStore>());
+  late final PushController _push = PushController(
+    getIt<PushMessaging>(),
+    getIt<DeviceRepository>(),
+    onForeground: _onPush,
+    onOpened: _onPushOpened,
+  );
+  String? _pushUser;
   late final SettingsCubit _settings = SettingsCubit(getIt<SettingsStorage>());
   late final GoRouter _router = buildRouter(_auth, _settings);
   late final VersionGateCubit _versionGate = VersionGateCubit(
@@ -74,20 +83,53 @@ class _CampusAppState extends State<CampusApp> {
     // Reminders follow the routine (cleared with it on sign-out).
     unawaited(_reminders.start());
     unawaited(_seen.start());
+    _push.start();
     _classesSub = _classes.stream
         .map((s) => s.groups)
         .distinct()
         .listen((g) => unawaited(_reminders.updateGroups(g)));
   }
 
-  /// The routine follows the signed-in student.
+  /// The routine and pushes follow the signed-in student.
   void _onAuth(AuthState s) {
     final id = s.user?.id;
     if (s.status == AuthStatus.signedIn && id != null) {
       unawaited(_classes.start(id));
+      if (_pushUser != id) {
+        _pushUser = id;
+        unawaited(_push.signedIn());
+      }
     } else if (s.status == AuthStatus.signedOut) {
       unawaited(_classes.clear());
+      _pushUser = null;
+      _push.signedOut();
     }
+  }
+
+  /// A push while the app is open: show it, and fetch what changed.
+  void _onPush(PushNote note) {
+    unawaited(_classes.refresh());
+    final title = note.title;
+    if (title == null) return;
+    unawaited(
+      getIt<ReminderScheduler>().showUpdate(
+        title: title,
+        body: note.body ?? '',
+        payload: note.groupId,
+      ),
+    );
+  }
+
+  /// A push was tapped: fetch what changed and open its group.
+  void _onPushOpened(PushNote note) {
+    unawaited(_classes.refresh());
+    final group = note.groupId;
+    if (group == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_auth.state.status == AuthStatus.signedIn) {
+        unawaited(_router.push(Routes.group(group)));
+      }
+    });
   }
 
   @override
@@ -95,6 +137,7 @@ class _CampusAppState extends State<CampusApp> {
     _lifecycle.dispose();
     unawaited(_authSub.cancel());
     unawaited(_classesSub.cancel());
+    _push.dispose();
     _reminders.close();
     _seen.close();
     _classes.close();
@@ -130,6 +173,7 @@ class _CampusAppState extends State<CampusApp> {
           // An unsupported build sees only the update screen.
           builder: (context, child) => _ReminderLanguage(
             reminders: _reminders,
+            push: _push,
             child: BlocBuilder<VersionGateCubit, VersionGateState>(
               builder: (context, gate) =>
                   gate.status == VersionStatus.updateRequired
@@ -143,11 +187,16 @@ class _CampusAppState extends State<CampusApp> {
   }
 }
 
-/// Tells reminders the app's language, so notifications use it too.
+/// Tells reminders and pushes the app's language, so notifications use it.
 class _ReminderLanguage extends StatefulWidget {
-  const _ReminderLanguage({required this.reminders, required this.child});
+  const _ReminderLanguage({
+    required this.reminders,
+    required this.push,
+    required this.child,
+  });
 
   final RemindersCubit reminders;
+  final PushController push;
   final Widget child;
 
   @override
@@ -158,7 +207,16 @@ class _ReminderLanguageState extends State<_ReminderLanguage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    unawaited(widget.reminders.setLocale(Localizations.localeOf(context)));
+    final locale = Localizations.localeOf(context);
+    unawaited(widget.reminders.setLocale(locale));
+    unawaited(widget.push.setLanguage(locale.languageCode));
+    final l10n = AppLocalizations.of(context);
+    unawaited(
+      getIt<ReminderScheduler>().prepareUpdatesChannel(
+        name: l10n.pushChannel,
+        description: l10n.pushChannelHint,
+      ),
+    );
   }
 
   @override

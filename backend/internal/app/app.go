@@ -15,6 +15,7 @@ import (
 	"github.com/zamansheikh/campussaga/backend/internal/modules/accounts"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/appconfig"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/classgroups"
+	"github.com/zamansheikh/campussaga/backend/internal/modules/push"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/universities"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/config"
@@ -35,6 +36,7 @@ type App struct {
 	Accounts     *accounts.Service
 	Config       *appconfig.Service
 	ClassGroups  *classgroups.Service
+	Push         *push.Service
 
 	handler http.Handler
 }
@@ -44,6 +46,7 @@ type Options struct {
 	Now    func() time.Time        // clock; nil = time.Now
 	Mailer mail.Sender             // nil = SMTP from config
 	Google accounts.GoogleVerifier // nil = Firebase verifier from config (if configured)
+	Push   push.Sender             // nil = FCM from config, or log only
 }
 
 // New assembles the app on an open, migrated database.
@@ -90,8 +93,28 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 	}, now, log)
 	cfgSvc := appconfig.NewService(d)
 	groupSvc := classgroups.NewService(d, now)
+	sender := o.Push
+	if sender == nil {
+		sender = push.LogSender{Log: log}
+		if cfg.FCMCredentialsFile != "" {
+			fcm, err := push.NewFCMFromFile(cfg.FCMCredentialsFile, now)
+			if err != nil {
+				log.Error("push: notifications only logged", "err", err)
+			} else {
+				sender = fcm
+			}
+		}
+	}
+	pushSvc := push.NewService(d, sender, log)
+	groupSvc.SetNotifier(func(userIDs []uuid.UUID, n classgroups.Notice) {
+		texts := make(map[string]push.Text, len(n.Texts))
+		for lang, t := range n.Texts {
+			texts[lang] = push.Text{Title: t.Title, Body: t.Body}
+		}
+		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
+	})
 
-	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc}
+	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc}
 
 	root := chi.NewRouter()
 	root.NotFound(httpx.NotFoundHandler)
@@ -105,6 +128,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		accSvc.Routes(r)
 		cfgSvc.Routes(r)
 		groupSvc.Routes(r)
+		pushSvc.Routes(r)
 	})
 
 	var h http.Handler = root
@@ -169,5 +193,6 @@ func (a *App) Serve(ctx context.Context) error {
 	if err := srv.Shutdown(sctx); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
+	a.Push.Wait() // let notifications already queued go out
 	return nil
 }

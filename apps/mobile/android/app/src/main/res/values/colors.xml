@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- Brand teal for the notification icon tint (CsBrand.primaryLight). -->
+    <color name="notification_color">#0F766E</color>
 </resources>

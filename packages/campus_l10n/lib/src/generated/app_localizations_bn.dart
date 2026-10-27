@@ -869,4 +869,10 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get errorAnnouncementGone => 'এই ঘোষণাটি আগেই মুছে ফেলা হয়েছে।';
+
+  @override
+  String get pushChannel => 'ক্লাস আপডেট';
+
+  @override
+  String get pushChannelHint => 'সিআর-এর পরিবর্তন ও ঘোষণা';
 }

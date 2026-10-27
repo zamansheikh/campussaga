@@ -440,5 +440,7 @@
     }
   },
   "timeYesterday": "yesterday",
-  "errorAnnouncementGone": "This announcement was already deleted."
+  "errorAnnouncementGone": "This announcement was already deleted.",
+  "pushChannel": "Class updates",
+  "pushChannelHint": "Changes and announcements from your CR"
 }

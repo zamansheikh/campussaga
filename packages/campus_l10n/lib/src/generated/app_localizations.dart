@@ -1555,6 +1555,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This announcement was already deleted.'**
   String get errorAnnouncementGone;
+
+  /// No description provided for @pushChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Class updates'**
+  String get pushChannel;
+
+  /// No description provided for @pushChannelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes and announcements from your CR'**
+  String get pushChannelHint;
 }
 
 class _AppLocalizationsDelegate

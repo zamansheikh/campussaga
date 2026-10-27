@@ -60,7 +60,14 @@ func (s *Service) Post(ctx context.Context, groupID uuid.UUID, in *AnnouncementI
 		}
 		v := announcementView(a)
 		out = &v
-		return q.TouchGroup(ctx, groupID)
+		if err := q.TouchGroup(ctx, groupID); err != nil {
+			return err
+		}
+		g, err := q.GetGroup(ctx, groupID)
+		if err != nil {
+			return err
+		}
+		return s.tellClassmates(ctx, q, groupID, c.UserID, announcementNotice(g, body))
 	})
 	return out, err
 }

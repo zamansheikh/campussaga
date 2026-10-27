@@ -893,4 +893,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorAnnouncementGone => 'This announcement was already deleted.';
+
+  @override
+  String get pushChannel => 'Class updates';
+
+  @override
+  String get pushChannelHint => 'Changes and announcements from your CR';
 }

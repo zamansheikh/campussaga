@@ -15,6 +15,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/zamansheikh/campussaga/backend/internal/modules/push"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/config"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase/firebasetest"
@@ -30,6 +31,7 @@ type harness struct {
 	mail   *mail.Memory
 	app    *App
 	google *firebasetest.Signer
+	push   *push.MemorySender
 
 	mu  sync.Mutex
 	now time.Time
@@ -38,7 +40,7 @@ type harness struct {
 func newHarness(t *testing.T) *harness {
 	t.Helper()
 	d := testkit.NewDB(t)
-	h := &harness{t: t, mail: &mail.Memory{}, google: firebasetest.New("campus-test"), now: time.Date(2026, 10, 27, 9, 0, 0, 0, time.UTC)}
+	h := &harness{t: t, mail: &mail.Memory{}, google: firebasetest.New("campus-test"), push: &push.MemorySender{}, now: time.Date(2026, 10, 27, 9, 0, 0, 0, time.UTC)}
 	cfg := &config.Config{
 		Env: "development", APIPrefix: "/api/v1",
 		JWTSecret:  []byte("test-jwt-secret-test-jwt-secret-xx"),
@@ -48,7 +50,7 @@ func newHarness(t *testing.T) *harness {
 		CodeMaxPerHour: 5, CodeMaxAttempts: 5, ShutdownTimeout: time.Second,
 	}
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
-	h.app = New(cfg, log, d, Options{Now: h.Now, Mailer: h.mail, Google: firebase.NewVerifier("campus-test", h.google.Keys(), h.Now)})
+	h.app = New(cfg, log, d, Options{Now: h.Now, Mailer: h.mail, Google: firebase.NewVerifier("campus-test", h.google.Keys(), h.Now), Push: h.push})
 	h.srv = httptest.NewServer(h.app.Handler())
 	t.Cleanup(h.srv.Close)
 

@@ -42,7 +42,25 @@ abstract interface class ReminderScheduler {
     required String channelName,
     required String channelDescription,
   });
+
+  /// Creates (or renames) the Android channel pushes use, so the phone can
+  /// show them in the student's language even when the app is closed.
+  Future<void> prepareUpdatesChannel({
+    required String name,
+    required String description,
+  });
+
+  /// Shows a push that arrived while the app is open.
+  Future<void> showUpdate({
+    required String title,
+    required String body,
+    String? payload,
+  });
 }
+
+/// The Android channel for pushes (changes, announcements); the server
+/// sends this id.
+const updatesChannelId = 'class_updates';
 
 class LocalNotificationScheduler implements ReminderScheduler {
   final _plugin = FlutterLocalNotificationsPlugin();
@@ -150,6 +168,53 @@ class LocalNotificationScheduler implements ReminderScheduler {
       );
     }
   }
+
+  String _updatesName = 'Class updates';
+  String _updatesDescription = '';
+  int _updateId = 100000; // after reminder ids
+
+  @override
+  Future<void> prepareUpdatesChannel({
+    required String name,
+    required String description,
+  }) async {
+    await init();
+    _updatesName = name;
+    _updatesDescription = description;
+    await _android?.createNotificationChannel(
+      AndroidNotificationChannel(
+        updatesChannelId,
+        name,
+        description: description,
+        importance: Importance.high,
+      ),
+    );
+  }
+
+  @override
+  Future<void> showUpdate({
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    await init();
+    await _plugin.show(
+      id: _updateId++,
+      title: title,
+      body: body,
+      payload: payload,
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          updatesChannelId,
+          _updatesName,
+          channelDescription: _updatesDescription,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+    );
+  }
 }
 
 /// Keeps reminders in memory (tests).
@@ -186,4 +251,20 @@ class MemoryReminderScheduler implements ReminderScheduler {
     required String channelName,
     required String channelDescription,
   }) async => pending = List.of(reminders);
+
+  final shown = <(String, String)>[];
+  String? updatesChannel;
+
+  @override
+  Future<void> prepareUpdatesChannel({
+    required String name,
+    required String description,
+  }) async => updatesChannel = name;
+
+  @override
+  Future<void> showUpdate({
+    required String title,
+    required String body,
+    String? payload,
+  }) async => shown.add((title, body));
 }

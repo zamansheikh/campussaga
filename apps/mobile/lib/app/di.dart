@@ -6,6 +6,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../features/announcements/data/seen_store.dart';
 import '../features/auth/data/google_auth.dart';
 import '../features/classes/data/routine_cache.dart';
+import '../features/push/push_messaging.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/data/reminder_store.dart';
 import 'crash/crash_reporter.dart';
@@ -56,6 +57,10 @@ Future<void> configureDependencies({
     ..registerLazySingleton<RoutineCache>(PrefsRoutineCache.new)
     ..registerLazySingleton<ReminderStore>(PrefsReminderStore.new)
     ..registerLazySingleton<SeenStore>(PrefsSeenStore.new)
+    ..registerLazySingleton<DeviceRepository>(
+      () => ApiDeviceRepository(getIt<ApiClient>()),
+    )
+    ..registerLazySingleton<PushMessaging>(FirebasePushMessaging.new)
     ..registerLazySingleton<ReminderScheduler>(LocalNotificationScheduler.new)
     ..registerLazySingleton<GoogleAuth>(FirebaseGoogleAuth.new);
 }

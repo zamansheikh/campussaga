@@ -46,6 +46,11 @@ type Config struct {
 	// must be issued for this Firebase project. Empty = Google sign-in off.
 	FirebaseProjectID string
 
+	// FCMCredentialsFile is a Firebase service-account key (JSON) used to
+	// send push notifications. Empty = pushes are only logged (development).
+	// Never commit the file; keep it outside the repo or in a git-ignored path.
+	FCMCredentialsFile string
+
 	ShutdownTimeout time.Duration
 }
 
@@ -57,26 +62,27 @@ const devSecret = "dev-only-secret-change-me-dev-only-secret"
 func Load() (*Config, error) {
 	env := get("APP_ENV", "development")
 	c := &Config{
-		Env:               env,
-		Addr:              get("ADDR", ":8090"),
-		APIPrefix:         get("API_PREFIX", "/api/v1"),
-		DatabaseURL:       get("DATABASE_URL", "postgres://campus:campus@localhost:55632/campus?sslmode=disable"),
-		DBMaxConns:        int32(getInt("DB_MAX_CONNS", 10)),
-		JWTSecret:         []byte(get("JWT_SECRET", devSecret)),
-		CodeSecret:        []byte(get("CODE_HMAC_SECRET", devSecret+"-codes")),
-		AccessTTL:         getDuration("ACCESS_TTL", 15*time.Minute),
-		RefreshTTL:        getDuration("REFRESH_TTL", 60*24*time.Hour),
-		CodeTTL:           getDuration("CODE_TTL", 10*time.Minute),
-		CodeResendAfter:   getDuration("CODE_RESEND_AFTER", 60*time.Second),
-		CodeMaxPerHour:    getInt("CODE_MAX_PER_HOUR", 5),
-		CodeMaxAttempts:   getInt("CODE_MAX_ATTEMPTS", 5),
-		SMTPHost:          get("SMTP_HOST", "localhost"),
-		SMTPPort:          getInt("SMTP_PORT", 55625),
-		SMTPUsername:      get("SMTP_USERNAME", ""),
-		SMTPPassword:      get("SMTP_PASSWORD", ""),
-		MailFrom:          get("MAIL_FROM", "Campus Saga <no-reply@campussaga.local>"),
-		FirebaseProjectID: get("FIREBASE_PROJECT_ID", ""),
-		ShutdownTimeout:   getDuration("SHUTDOWN_TIMEOUT", 15*time.Second),
+		Env:                env,
+		Addr:               get("ADDR", ":8090"),
+		APIPrefix:          get("API_PREFIX", "/api/v1"),
+		DatabaseURL:        get("DATABASE_URL", "postgres://campus:campus@localhost:55632/campus?sslmode=disable"),
+		DBMaxConns:         int32(getInt("DB_MAX_CONNS", 10)),
+		JWTSecret:          []byte(get("JWT_SECRET", devSecret)),
+		CodeSecret:         []byte(get("CODE_HMAC_SECRET", devSecret+"-codes")),
+		AccessTTL:          getDuration("ACCESS_TTL", 15*time.Minute),
+		RefreshTTL:         getDuration("REFRESH_TTL", 60*24*time.Hour),
+		CodeTTL:            getDuration("CODE_TTL", 10*time.Minute),
+		CodeResendAfter:    getDuration("CODE_RESEND_AFTER", 60*time.Second),
+		CodeMaxPerHour:     getInt("CODE_MAX_PER_HOUR", 5),
+		CodeMaxAttempts:    getInt("CODE_MAX_ATTEMPTS", 5),
+		SMTPHost:           get("SMTP_HOST", "localhost"),
+		SMTPPort:           getInt("SMTP_PORT", 55625),
+		SMTPUsername:       get("SMTP_USERNAME", ""),
+		SMTPPassword:       get("SMTP_PASSWORD", ""),
+		MailFrom:           get("MAIL_FROM", "Campus Saga <no-reply@campussaga.local>"),
+		FirebaseProjectID:  get("FIREBASE_PROJECT_ID", ""),
+		FCMCredentialsFile: get("FCM_CREDENTIALS_FILE", ""),
+		ShutdownTimeout:    getDuration("SHUTDOWN_TIMEOUT", 15*time.Second),
 	}
 	return c, c.validate()
 }
