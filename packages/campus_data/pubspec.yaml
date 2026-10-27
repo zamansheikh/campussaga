@@ -1,5 +1,5 @@
 name: campus_data
-description: Backend implementations of campus_core repositories. The only package that talks to Supabase.
+description: Backend implementations of campus_core repositories. The only package that talks to the Campus Saga API (HTTP).
 publish_to: none
 version: 0.1.0
 
@@ -11,8 +11,7 @@ dependencies:
   campus_core:
   flutter:
     sdk: flutter
-  supabase_flutter: ^2.18.3
-
+  http: ^1.6.0
 dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_test:

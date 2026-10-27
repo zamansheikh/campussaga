@@ -42,10 +42,10 @@ a 1–2 week beta before going public.
 The base every feature stands on. Not visible to students, but done properly
 it saves months later.
 
-- Monorepo: `apps/mobile`, `packages/campus_ui|campus_core|campus_data|campus_l10n`, `supabase/`
+- Monorepo: `apps/mobile`, `packages/campus_ui|campus_core|campus_data|campus_l10n`, `backend/` (Go API)
 - Design system v1: tokens, light/dark theme, Bangla + English fonts, core components, Widgetbook
-- Self-hosted Supabase on the VPS, hardened, HTTPS, backups tested ([DEPLOYMENT.md](DEPLOYMENT.md))
-- CI: format, analyze, tests, RLS tests, APK build
+- Go API + PostgreSQL on the VPS (Docker, behind nginx), HTTPS, backups tested ([DEPLOYMENT.md](DEPLOYMENT.md))
+- CI: format, analyze, Flutter tests, Go tests (`go test -race`, incl. security e2e tests), APK build
 - Auth: sign in with **university email + OTP code**; session handling; log out everywhere
 - Universities list + email domains (seed the launch universities)
 - Profile basics: name, department, batch (private by default)
@@ -121,7 +121,7 @@ for the following semester rather than launching half-done.
 - "How anonymity works" screen
 - Safety reports go privately to moderators/authority, never to the public feed
 
-**Done when:** pgTAP tests prove no role can see anonymous authors; one
+**Done when:** e2e API tests prove no role can see anonymous authors; one
 real authority has replied to and solved at least one issue during beta.
 
 ---
@@ -164,7 +164,7 @@ A feature is finished only when **all** of these are true:
 - [ ] Bangla and English text, checked by a native speaker
 - [ ] Light and dark mode
 - [ ] Loading, empty, error and offline states handled
-- [ ] Database changes as migrations, with RLS policies **and pgTAP tests**
+- [ ] Database changes as new migration files; every endpoint has **e2e tests for who may and may not access it**
 - [ ] Unit tests for logic; widget/golden tests for new components
 - [ ] Screen reader labels; touch targets ≥ 48 dp; works with large text
 - [ ] Tested on a low-end Android phone and a slow network

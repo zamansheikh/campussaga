@@ -1,0 +1,30 @@
+# Production compose file. Copy to /opt/campussaga/deploy/compose.yaml on the
+# VPS (docs/DEPLOYMENT.md). Secrets come from deploy/.env next to it.
+
+name: campussaga
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: campus
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: campus
+    volumes: [pgdata:/var/lib/postgresql]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campus"]
+      interval: 5s
+      retries: 20
+    # no ports: reachable only from the api container
+
+  api:
+    build: ../backend
+    image: campusapi:latest
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      postgres: {condition: service_healthy}
+    ports: ["127.0.0.1:7030:8090"]
+
+volumes:
+  pgdata:

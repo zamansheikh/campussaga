@@ -1,7 +1,7 @@
 /// Backend implementations of the repository interfaces in campus_core.
 ///
-/// This is the only package that imports supabase_flutter. Replacing the
-/// backend later means rewriting this package only.
+/// This is the only package that talks to the Campus Saga API (over HTTP).
+/// Replacing the backend later means rewriting this package only.
 library;
 
-export 'src/backend.dart' show Backend, BackendConfig;
+export 'src/api_client.dart';

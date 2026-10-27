@@ -1,41 +1,39 @@
 # Campus Saga — Architecture
 
-Goal: ship the MVP fast with a small team, without painting ourselves into a
-corner. Every choice below can be replaced later without rewriting the app.
+Goal: ship each release properly with a small team, without painting
+ourselves into a corner. Every choice below can be replaced later without
+rewriting the app.
 
 ---
 
-## 1. Database decision
+## 1. Database and backend decision
 
-**Decision: PostgreSQL, using Supabase self-hosted on our own VPS.**
+**Decision: PostgreSQL + our own Go API, running on our own VPS.**
 (Setup and hardening: [DEPLOYMENT.md](DEPLOYMENT.md).)
 
-| Hosting option | Verdict |
-|---|---|
-| **Self-hosted Supabase on our VPS** | ✅ Chosen: no monthly bill, data stays on our server, same features and code as Supabase Cloud |
-| Supabase Cloud | Backup plan: same code, just change the URL and keys. Use it if running the server becomes too much work |
-| Plain Postgres + own API (Serverpod / NestJS) | Later, only if we outgrow Supabase; the repository layer makes this a swap of `campus_data` |
-
-| Option | Verdict | Why |
+| Database | Verdict | Why |
 |---|---|---|
-| **PostgreSQL (Supabase)** | ✅ Chosen | Relational data (users → universities → issues → votes → comments), strong access rules (Row Level Security), SQL for rankings and scorecards, open source and portable |
-| Firebase Firestore | ❌ | NoSQL makes counts, rankings and "issues solved per university per month" painful and costly; security rules can't hide one field (author) on a document; full vendor lock-in |
+| **PostgreSQL** | ✅ Chosen | Relational data (users → universities → issues → votes → comments), SQL for rankings and scorecards, open source, runs anywhere |
+| Firebase Firestore | ❌ | NoSQL makes counts, rankings and "issues solved per university per month" painful and costly; full vendor lock-in |
 | MongoDB | ❌ | No real benefit for this data; weaker for joins and reporting |
-| MySQL | ⚠️ Possible | Fine, but no RLS, weaker JSON, no pgvector/PostGIS ecosystem |
-| Own server + Postgres (NestJS) | ⏳ Later | Maximum control, but months of extra work now. Our design keeps this door open |
+| MySQL | ⚠️ Possible | Fine, but weaker JSON and no pgvector/PostGIS ecosystem |
+
+| Backend | Verdict | Why |
+|---|---|---|
+| **Own Go API** | ✅ Chosen | The team already builds Go backends (same conventions as `gamebackend`); the logic is normal, testable Go code; one small binary (~50–100 MB RAM), light on our shared VPS |
+| Supabase (self-hosted) | Considered | Fast start, but logic lives in SQL policies and functions, and the stack needs ~4 GB RAM |
+| NestJS | Considered | Fine, but heavier at runtime, and Go is the team's current backend stack |
 
 **Why this is future-proof**
 
-- Postgres is the industry standard. Any host (Supabase, AWS RDS, Neon, your own server) runs it.
-- Supabase is open source; we self-host it on our VPS and can move to Supabase Cloud (or another server) by restoring the **same database dump**.
-- Everything is in **SQL migration files in git**, not clicked together in a dashboard.
-- The app never talks to Supabase from screens. It goes through a **repository layer** (section 4), so swapping Supabase for our own API later means rewriting one folder, not the whole app.
+- Postgres is the industry standard. Any host (our VPS, AWS RDS, Neon, a dedicated server) runs it.
+- Every schema change is a **numbered SQL migration file in git**, applied by the API binary (`campusapi migrate`).
+- The app never talks to the backend from screens. It goes through a **repository layer** (section 4), so the backend can change without rewriting the app.
+- The API is a plain HTTP + JSON contract with stable error codes. A web dashboard or another client can use the same endpoints.
 - Postgres grows with us:
   - `pg_trgm` → "similar issues" duplicate check and search (works with Bangla text)
   - `pgvector` → smarter duplicate detection and recommendations later
   - `PostGIS` → campus map / issue location later
-  - `pg_cron` → nightly scorecard calculation
-  - `pgmq` (Supabase Queues) → background jobs like notifications
 
 ---
 
@@ -43,86 +41,143 @@ corner. Every choice below can be replaced later without rewriting the app.
 
 ```
 ┌────────────────────┐   ┌──────────────────────┐
-│  Flutter mobile    │   │ Authority web (v1.5) │
+│  Flutter mobile    │   │ Authority web (R4)   │
 │  (Android, iOS)    │   │ Flutter Web          │
 └─────────┬──────────┘   └──────────┬───────────┘
-          │  HTTPS + JWT            │
+          │  HTTPS + JWT (Bearer)   │
           ▼                         ▼
 ┌─────────────────────────────────────────────────┐
-│                    Supabase                     │
+│  nginx on the VPS (TLS, api.<domain>)           │
+└───────────────┬─────────────────────────────────┘
+                ▼  127.0.0.1
+┌─────────────────────────────────────────────────┐
+│  campusapi (Go)               /api/v1           │
 │                                                 │
-│  Auth (email OTP, Google)                       │
-│  REST (PostgREST) ── reads: public views only   │
-│  RPC (SQL functions) ── all writes / commands   │
-│  Edge Functions (TypeScript) ── side effects:   │
-│    image cleaning, moderation, push, emails     │
-│  Storage ── quarantine bucket → public bucket   │
-│  Realtime ── live status / comment updates      │
-│                                                 │
-│  PostgreSQL                                     │
-│   ├─ schema public   (exposed: views, RPCs)     │
-│   └─ schema private  (NOT exposed: identities,  │
-│                       authorship, audit log)    │
+│  platform: config · db · httpx · apperr ·       │
+│            auth (JWT, sessions) · ratelimit ·   │
+│            mail (SMTP)                          │
+│  modules:  universities · accounts · appconfig  │
+│            (R1+: classgroups, routine, issues…) │
+│  workers:  goroutines for push, moderation,     │
+│            nightly scorecards                   │
 └───────────────┬─────────────────────────────────┘
                 ▼
-      FCM (push) · Moderation API · Email provider
+          PostgreSQL 18
+                │
+      FCM (push) · Cloudflare R2 (images, S3 API) · SMTP (Resend)
 ```
 
-### Three rules for talking to the backend
+### Rules for talking to the backend
 
-1. **Reads** go through views in the `public` schema. Views never contain identity columns.
-2. **Writes** go through RPC functions (`create_issue`, `vote_issue`, `change_status` …). Clients never `insert` into tables directly. Validation, rate limits and permission checks live in one place: the database function.
-3. **Side effects** (send push, clean image, call moderation API) go through Edge Functions, triggered by queues or database webhooks, never from the app.
+1. **Every request goes through the Go API.** The database is never reachable from the internet; only the API connects to it.
+2. **Handlers return response DTOs, never database rows.** A field that isn't in a response struct can't leak, even if a query selects it.
+3. **Commands in, DTOs out.** Writes are explicit endpoints (`POST /issues`, `POST /issues/{id}/vote`, …). Validation, rate limits and permission checks happen in the handler/service, not in the app.
+4. **No endpoint takes another user's id** for private data. "Me" endpoints (`/me`, `/me/issues`) read the user from the token.
+5. **Side effects** (send push, clean image, call moderation API) run in the Go process after the database transaction commits, never from the app.
 
-This "commands in, views out" design is what lets us replace Supabase later.
-An own API would expose the same commands and the same view shapes.
+### API conventions
+
+- Prefix `/api/v1`. JSON in and out.
+- Response envelope (same shape as `gamebackend`):
+
+  ```json
+  {"success": true,  "data": {...}, "error": null, "meta": {"timestamp": "..."}}
+  {"success": false, "data": null,  "error": {"code": "CODE_INVALID", "message": "...", "details": {"remainingAttempts": 4}}, "meta": {...}}
+  ```
+
+- Error `code` values are the **wire contract**: the app maps them to `campus_core` `Failure` types (`NetworkFailure`, `RateLimitedFailure`, `ValidationFailure` …). Never rename a shipped code.
+- Every response carries an `X-Trace-Id` header for support and logs.
+
+### R0 endpoints
+
+| Method + path | Access | What |
+|---|---|---|
+| `GET /health` | public | Liveness + database check |
+| `GET /universities` | public | Active universities with their email domains (the app checks an email before sending a code) |
+| `GET /config` | public | `minSupportedBuild`, `features` (feature flags) |
+| `POST /auth/code` `{email}` | public | 202 and sends a 6-digit code. 403 `UNIVERSITY_EMAIL_REQUIRED` for non-university email; 429 when resent within 60 s or more than 5 per hour |
+| `POST /auth/verify` `{email, code}` | public | Access + refresh tokens and the profile. Codes expire in 10 minutes, max 5 wrong attempts |
+| `POST /auth/refresh` | public (refresh token) | New token pair; the old refresh token stops working |
+| `POST /auth/logout` | student | Ends this session |
+| `POST /auth/logout-all` | student | Ends every session (all devices) |
+| `GET /me` | student | Own profile + university |
+| `PATCH /me` | student | `displayName`, `department`, `batch` only (empty string clears); unknown fields such as `role` are rejected with 400 |
+| `DELETE /me` | student | Deletes the account and everything it owns |
+
+### Authentication
+
+- **Sign-in = university email + 6-digit code.** Codes are stored only as an HMAC hash (`CODE_HMAC_SECRET`), never in plain text.
+- **Accounts are created only after a correct code**, so every account is a verified student of a known university.
+- **University matching:** by email domain, including subdomains (`cse.du.ac.bd` → `du.ac.bd`); the longest matching domain wins. Domains live in a `university_domains` table (each domain unique).
+- **Access token:** JWT (HS256, `JWT_SECRET`), valid 15 minutes. Claims: `sub` (user id), `sid` (session id), `uni` (university id), `role`.
+- **Refresh token:** 32 random bytes, stored hashed in the `sessions` table, valid 60 days, **rotated on every use**. Reusing an old refresh token is treated as theft and revokes the whole session.
+- Tokens are kept on the phone in secure storage (Keychain / Android Keystore).
+- **Every signed-in request checks the session is still active**, so sign out, sign out everywhere and account deletion take effect immediately, not when the access token expires.
+- The app must send **one refresh at a time**: replaying an already-rotated refresh token ends the session.
+
+### Error codes (wire contract)
+
+| HTTP | Code | When | App does |
+|---|---|---|---|
+| 400 | `VALIDATION_FAILED` | A field is invalid (`details.fields`) | Show the field error |
+| 400 | `BAD_REQUEST` | Bad JSON or unknown field | Bug: report |
+| 403 | `UNIVERSITY_EMAIL_REQUIRED` | Email is not from a supported university | Ask for the university email |
+| 429 | `CODE_RESEND_TOO_SOON` | New code asked within 60 s (`details.retryAfterSeconds`) | Show countdown |
+| 429 | `CODE_LIMIT_REACHED` | More than 5 codes in an hour | Show "try later" |
+| 502 | `EMAIL_SEND_FAILED` | Email provider failed | "Try again" (no wait needed) |
+| 400 | `CODE_INVALID` | Wrong code (`details.remainingAttempts`) | Show attempts left |
+| 400 | `CODE_EXPIRED` | Code expired, used, or never sent | Offer a new code |
+| 429 | `CODE_TOO_MANY_ATTEMPTS` | 5 wrong codes | Offer a new code |
+| 401 | `UNAUTHORIZED` / `TOKEN_INVALID` | No or bad access token | Sign in |
+| 401 | `TOKEN_EXPIRED` | Access token expired | Refresh, then retry |
+| 401 | `REFRESH_INVALID` / `SESSION_ENDED` | Signed out, deleted, or session revoked | Sign in |
+| 429 | `TOO_MANY_REQUESTS` | Per-IP limit on sign-in endpoints | Show countdown |
+| 500 | `INTERNAL_ERROR` | Bug (details only in server logs, by `X-Trace-Id`) | Generic error |
+
+In the app, `campus_data`'s `ApiClient` turns these into `campus_core` failures: 401 → `UnauthenticatedFailure`, 429 → `RateLimitedFailure`, `VALIDATION_FAILED` → `ValidationFailure`, other business codes → `RejectedFailure`. Each failure carries `code`.
 
 ---
 
-## 3. Anonymity built into the database
+## 3. Anonymity built into the design
 
-Identity is **physically separated** from content. Hiding a column in the UI is not enough.
+Identity is **physically separated** from content. Hiding a field in the UI is not enough.
 
 ```
-private.issue_authors   (issue_id, user_id)      ← never exposed via API
-public.issues           (id, …, public_author_id NULL when anonymous)
-public.issues_feed      VIEW: issues + author name only when not anonymous
+issues          (id, university_id, public_author_id NULL when anonymous, …)
+issue_authors   (issue_id, user_id)   ← no endpoint ever returns this table
 ```
 
-- The `private` schema is not exposed through the REST API at all.
-- `create_issue()` (security definer function) writes the content to `public.issues` and the real author to `private.issue_authors` in one transaction.
-- "My posts" works through `my_issues()`, which looks up `auth.uid()` in the private table and returns only the caller's own posts.
-- Same pattern for comments (`private.comment_authors`) and votes (a user can only read their own vote rows; counts are kept in `issues.me_too_count` by a trigger).
-- Moderators ban through `ban_author_of(issue_id)`, which acts on the hidden user **without returning who they are**. Revealing identity is a separate, logged, two-admin procedure.
-- Automated tests (pgTAP) prove that a normal user, an authority and a moderator **cannot** read `private.*`. These tests run in CI on every change.
+- `POST /issues` writes the content to `issues` and the real author to `issue_authors` in one transaction.
+- Response DTOs for issues have **no author id field** for anonymous posts. The only "who" information is `public_author_id` / display name, and only when the author chose to post with their name.
+- "My posts" (`GET /me/issues`) looks up the caller's own rows in `issue_authors` from the token, and returns only their posts.
+- Same pattern for comments (`comment_authors`) and reports (`report_authors`). Votes: a user only ever sees whether *they* voted; counts are kept in `issues.me_too_count`.
+- Moderators ban through `POST /moderation/issues/{id}/ban-author`, which acts on the hidden user **without returning who they are**. Revealing identity is a separate, logged, two-admin procedure.
+- Every moderator/admin action is written to an `audit_log` table that no endpoint exposes.
+- **End-to-end tests** (`internal/app`) call the real HTTP API as a student, an authority and a moderator and prove that none of them can learn who wrote an anonymous post. These tests run in CI on every change.
 
 ---
 
 ## 4. Flutter app architecture
 
-### Monorepo layout (Dart pub workspaces)
+### Monorepo layout (Dart pub workspace + Go backend)
 
 ```
 campussaga/
 ├─ apps/
 │  ├─ mobile/                 # the student app
-│  └─ admin_web/              # authority + moderator dashboard (v1.5)
+│  └─ admin_web/              # authority + moderator dashboard (R4)
 ├─ packages/
 │  ├─ campus_ui/              # design system: tokens, theme, components
 │  ├─ campus_core/            # domain models, repository interfaces, errors
-│  ├─ campus_data/            # Supabase implementations of the repositories
+│  ├─ campus_data/            # HTTP implementations of the repositories (talks to the Go API)
 │  └─ campus_l10n/            # Bangla + English strings
-├─ supabase/
-│  ├─ migrations/             # every schema change, in order
-│  ├─ functions/              # Edge Functions (TypeScript)
-│  ├─ tests/                  # pgTAP tests for RLS + RPCs
-│  └─ seed.sql                # test universities, users, issues
+├─ backend/                   # Go API (see section 5)
 ├─ docs/
-└─ pubspec.yaml               # workspace root
+└─ pubspec.yaml               # Dart workspace root
 ```
 
 Why packages: the mobile app and the web dashboard share the same design
-system, models and data layer. Replacing the backend means replacing only
+system, models and data layer. Changing the backend means changing only
 `campus_data`.
 
 ### Layers inside each feature
@@ -155,9 +210,9 @@ presentation ─▶ application ─▶ campus_core (interfaces, models)
                     campus_data ─────┘ (implements interfaces)
 ```
 
-- Screens never import `supabase_flutter`. A lint rule (`import_lint` or a custom check in CI) enforces this.
+- Screens never make HTTP calls. Only `campus_data` imports `package:http`.
 - Models are immutable (`freezed`) with JSON mapping (`json_serializable`).
-- Errors are typed (`Failure.network`, `Failure.rateLimited`, `Failure.forbidden` …) so the UI can show friendly messages.
+- Errors are typed (`NetworkFailure`, `RateLimitedFailure`, `ForbiddenFailure` …), mapped from the API's error codes, so the UI can show friendly messages.
 
 ### Core packages
 
@@ -165,7 +220,7 @@ presentation ─▶ application ─▶ campus_core (interfaces, models)
 |---|---|
 | State + DI | `flutter_riverpod` (+ `riverpod_generator`) |
 | Routing / deep links | `go_router` |
-| Backend | `supabase_flutter` (only inside `campus_data`) |
+| Backend calls | `http` (only inside `campus_data`) |
 | Models | `freezed`, `json_serializable` |
 | Secure token storage | `flutter_secure_storage` |
 | Images | `image_picker`, `flutter_image_compress`, `cached_network_image` |
@@ -179,18 +234,69 @@ presentation ─▶ application ─▶ campus_core (interfaces, models)
 
 ---
 
-## 5. Data model
+## 5. Go backend structure
+
+Same conventions as our `gamebackend` service.
+
+```
+backend/                          module github.com/zamansheikh/campussaga/backend
+├─ cmd/campusapi/                 main: `campusapi serve` | `campusapi migrate`
+├─ internal/
+│  ├─ platform/
+│  │  ├─ config/                  env → Config (dev defaults; secrets required in production)
+│  │  ├─ db/                      pgx/v5 pool, InTx (tx travels in ctx), AfterCommit hooks
+│  │  ├─ httpx/                   envelope, typed handlers, binding + validation, middleware
+│  │  ├─ apperr/                  the one client-facing error type (status, code, message)
+│  │  ├─ auth/                    JWT access tokens, session/refresh tokens, guards
+│  │  ├─ ratelimit/               in-process fixed-window limiter
+│  │  └─ mail/                    SMTP sender (logs the code in development without SMTP)
+│  ├─ modules/
+│  │  ├─ universities/            handler · service · store/ (sqlc) · queries.sql
+│  │  ├─ accounts/                sign-in codes, sessions, profile, delete account
+│  │  └─ appconfig/               min build, feature flags
+│  ├─ app/                        wiring (router + modules) and end-to-end tests
+│  └─ testkit/                    fresh Postgres DB per test, cloned from a migrated template
+├─ migrations/                    goose SQL files, embedded in the binary
+├─ Makefile · docker-compose.yml · Dockerfile
+```
+
+| Concern | Library |
+|---|---|
+| Router | `go-chi/chi/v5` |
+| Database | `jackc/pgx/v5` (pool) + `sqlc` (typed queries per module) |
+| Migrations | `pressly/goose/v3` (embedded) |
+| Validation | `go-playground/validator/v10` |
+| Tokens | `golang-jwt/jwt/v5` |
+| Logging | `log/slog` (JSON in production) |
+| Tests | `stretchr/testify`, `go test -race` |
+
+**Rules**
+
+- Modules never import each other. `internal/app` wires them together.
+- Each module's queries live in `store/queries.sql`; `make sqlc` regenerates the Go code.
+- Migrations are numbered by area: `00001_platform`, `00100_universities`, `00200_accounts`, `00300_app_config`; later areas take the next hundred. **Never edit a migration that has shipped; add a new one.**
+- Every test gets its own fresh database (`testkit`), so tests run in parallel and never share state.
+
+---
+
+## 6. Data model
+
+Exact columns are in `backend/migrations/`. Overview:
 
 ```sql
 -- R0 Foundation
-universities        id, slug, name, name_bn, email_domains text[], logo_url, city,
-                    timezone (default 'Asia/Dhaka')
-profiles            id (= auth.users.id), university_id, display_name, role,
-                    department, batch, reputation, created_at
-student_verifications id, user_id, method ('email'|'id_card'|'sso'),
-                    university_id, status, verified_at
-app_config          key, value jsonb   -- min app version, feature flags
-device_tokens       user_id, token, platform, updated_at
+universities        id, slug, name, name_bn, city, timezone (default 'Asia/Dhaka'),
+                    week_start, is_active
+university_domains  domain (unique), university_id
+users               id, email (unique), university_id, role, display_name,
+                    department, batch, verified_at, created_at
+sign_in_codes       email, university_id, code_hash (HMAC), attempts, sends, window_start,
+                    last_sent_at, expires_at
+sessions            id, user_id, refresh_hash, expires_at, revoked_at,
+                    user_agent, created_at, last_used_at
+app_config          key, value jsonb   -- min_supported_build, feature flags
+audit_log           id, actor_id, action, target_type, target_id, meta, created_at
+device_tokens       user_id, token, platform, updated_at   -- R1 (push)
 
 -- R1 My Class
 class_groups        id, university_id, department, program, batch, section,
@@ -206,13 +312,13 @@ routine_changes     id, group_id, slot_id NULL, date, type ('cancelled'|
 announcements       id, group_id, body, pinned, created_by, created_at
 member_course_prefs user_id, course_id, hidden, reminder_minutes, muted
 personal_slots      id, user_id, title, weekday, start_time, end_time, place
-                    -- RLS: only the owner, ever
+                    -- only the owner, ever
 
 -- R2 Campus Voice
 issues              id, university_id, public_author_id NULL, title, body,
                     category, status, location_label, me_too_count,
                     comment_count, created_at, updated_at, removed_at
-issue_images        id, issue_id, storage_path, width, height
+issue_images        id, issue_id, storage_key (R2), width, height
 issue_votes         issue_id, user_id, created_at   PK(issue_id, user_id)
 comments            id, issue_id, anon_handle, public_author_id NULL, body,
                     is_official, created_at, removed_at
@@ -221,44 +327,39 @@ reports             id, target_type, target_id, reason, state, created_at
 authorities         id, university_id, user_id, title, verified_at
 notifications       id, user_id, type, payload jsonb, read_at, created_at
 
--- private schema (never exposed)
-private.issue_authors     issue_id, user_id
-private.comment_authors   comment_id, user_id
-private.report_authors    report_id, user_id
-private.audit_log         id, actor_id, action, target_type, target_id, meta, created_at
-private.rate_limits       user_id, action, window_start, count
+-- Authorship (no endpoint ever returns these tables)
+issue_authors       issue_id, user_id
+comment_authors     comment_id, user_id
+report_authors      report_id, user_id
 ```
 
 **Future-proof choices in the schema**
 
-- `university_id` on every row → multi-university from day one; RLS scopes by it.
-- `student_verifications` is separate from login → we can add ID card review, university SSO or alumni status later without touching auth.
-- Status, category and role are Postgres enums or lookup tables, and the app treats unknown values gracefully (shows "Other"), so the backend can add a value without breaking old app versions.
+- `university_id` on every row → multi-university from day one; queries are always scoped by the caller's university from the token.
+- Verification is separate from login → we can add ID card review, university SSO or alumni status later without touching sign-in.
+- Status, category and role are enums or lookup tables, and the app treats unknown values gracefully (shows "Other"), so the backend can add a value without breaking old app versions.
 - Soft delete (`removed_at`) instead of hard delete → moderation history and appeals.
 - UUID primary keys everywhere (no guessable IDs like `/issues/42`).
 - Keyset (cursor) pagination: `created_at < $cursor`, never `OFFSET`.
 
----
-
-### Class group rules (RLS)
+### Class group rules
 
 - Only verified students of the same university can join a group (by invite code).
-- Members read the group's courses, slots, changes and announcements. **Only CR/co-CR write** them, through RPCs (`cancel_class`, `change_room`, `post_announcement` …).
-- Member lists are readable only by CRs; members see a count.
-- Group membership is **never joined with issue data** in any view, so an anonymous issue can't be narrowed down to a section.
+- Members read the group's courses, slots, changes and announcements. **Only CR/co-CR write** them, through explicit endpoints (`POST /groups/{id}/changes`, `POST /groups/{id}/announcements` …). The service checks the caller's role in that group on every write.
+- Member lists are returned only to CRs; members see a count.
+- Group membership is **never joined with issue data** in any response, so an anonymous issue can't be narrowed down to a section.
 - Rate limits on announcements and joins (stops spam and code guessing). Invite codes can be reset by the CR.
 
 ---
 
-## 6. Routine and reminders design
+## 7. Routine and reminders design
 
 **Offline first.** The phone keeps a copy of the student's groups, slots,
 changes and announcements in SQLite (`drift`). The Today screen reads only the
 local copy, so it opens instantly without internet.
 
 **Sync.** On app open and on push notification: fetch rows changed since
-`last_synced_at` (every table has `updated_at`). Realtime updates only while
-a group screen is open.
+`last_synced_at` (every table has `updated_at`).
 
 **Effective routine for a date** = weekly slots valid on that date
 − hidden courses − cancelled changes ± rescheduled/room changes + extra
@@ -276,13 +377,14 @@ needed, and they work offline.
 - Some brands (Xiaomi, Realme, Oppo, Vivo) kill background apps: show a one-time guide to turn off battery optimization.
 - All times stored as local wall-clock time + the university's timezone (`Asia/Dhaka`), never converted to UTC for weekly slots.
 
-**Change alerts.** When a CR cancels or moves a class, an RPC writes
-`routine_changes` → a queue job sends FCM push to members → the app syncs and
-re-schedules reminders. If the push is missed, the next app open fixes it.
+**Change alerts.** When a CR cancels or moves a class, the API writes
+`routine_changes` → after the transaction commits, a worker sends an FCM push
+to members → the app syncs and re-schedules reminders. If the push is missed,
+the next app open fixes it.
 
 ---
 
-## 7. Issue lifecycle (R2)
+## 8. Issue lifecycle (R2)
 
 ```
           ┌─────────┐ authority ┌──────────────┐ authority ┌─────────────┐
@@ -298,62 +400,67 @@ re-schedules reminders. If the push is missed, the next app open fixes it.
                                                              back to OPEN
 ```
 
-Every transition is one RPC (`change_issue_status`) that checks the role,
-writes `status_updates`, and enqueues notifications for all voters.
+Every transition is one endpoint (`POST /issues/{id}/status`) whose service
+checks the role, writes `status_updates`, and queues notifications for all
+voters after commit.
 
 ---
 
-## 8. Background jobs
+## 9. Background jobs
+
+Background work runs as goroutine workers inside the Go process, started by
+`campusapi serve`. If jobs ever need to survive restarts or retries at scale,
+add a `jobs` table (Postgres `FOR UPDATE SKIP LOCKED`) — no extra service.
 
 | Trigger | Job |
 |---|---|
-| Image uploaded to `quarantine/` | Edge Function: strip EXIF, resize, NSFW check → move to `public-images/` |
-| CR changes a class or posts an announcement | Queue → FCM push to group members → app syncs and re-schedules reminders |
-| New issue or comment | Queue → text moderation (slurs, phone numbers, names) → auto-approve or hold |
-| Status change / official reply | Queue → push to voters and followers (FCM) |
-| Nightly (`pg_cron`) | Recalculate university scorecards into a `university_stats` table |
-| Daily | Delete ID card photos older than 7 days; clean expired rate-limit rows |
+| Image uploaded | Strip EXIF, resize, NSFW check → store in Cloudflare R2 (S3 API) |
+| CR changes a class or posts an announcement | After commit → FCM push to group members → app syncs and re-schedules reminders |
+| New issue or comment | Text moderation (slurs, phone numbers, names) → auto-approve or hold |
+| Status change / official reply | After commit → push to voters and followers (FCM) |
+| Nightly ticker | Recalculate university scorecards into a `university_stats` table |
+| Daily ticker | Delete expired sign-in codes and sessions; delete ID card photos older than 7 days |
 
 ---
 
-## 9. Environments and delivery
+## 10. Environments and delivery
 
 | Environment | What |
 |---|---|
-| **local** | `supabase start` (Docker on the Mac) + Flutter with `--dart-define-from-file=env/local.json` |
-| **staging** | Second Docker Compose stack on the VPS (if it has ≥ 8 GB RAM) at `staging-api.<domain>`, or a small second VPS; internal testers via Play Console internal track |
-| **production** | Self-hosted Supabase on the VPS at `api.<domain>`; Play Store |
+| **local** | `make deps-up` (Postgres + Mailpit in Docker) + `make run` (API on :8090) + Flutter with `--dart-define-from-file=env/local.json` |
+| **staging** | Second compose project on the VPS at `staging-api.<domain>` with its own database; internal testers via Play Console internal track |
+| **production** | Go API + Postgres in Docker on the VPS at `api.<domain>`, behind nginx; Play Store |
 
-- Env config only through `--dart-define-from-file`; no secrets in the app. The Supabase anon key is public by design. The **service role key never leaves the server**.
+- App config only through `--dart-define-from-file` (`API_BASE_URL`); no secrets in the app.
+- Server secrets (`JWT_SECRET`, `CODE_HMAC_SECRET`, SMTP password, database password) live only in the server's `.env` file.
 - CI (GitHub Actions) on every pull request:
-  1. `dart format --set-exit-if-changed` + `flutter analyze`
-  2. unit + widget + golden tests
-  3. `supabase db reset` + `supabase test db` (RLS / pgTAP tests)
-  4. build APK
-- Database changes only through migrations (`supabase migration new <name>`), reviewed in the pull request, applied to staging first.
-- **Forced update**: the app reads `app_config.min_supported_version` on start, so we can retire old app versions when the API changes.
+  1. Flutter: `dart format --set-exit-if-changed`, `flutter analyze`, unit + widget + golden tests, build APK
+  2. Go: `gofmt`, `go vet`, `go test -race` against a Postgres service container (includes the security e2e tests)
+- Database changes only through new migration files, reviewed in the pull request, applied to staging first (`campusapi migrate`).
+- **Forced update**: the app reads `min_supported_build` from `GET /config` on start, so we can retire old app versions when the API changes.
 - **Feature flags** in `app_config` to turn features on per university.
 
 ---
 
-## 10. Scaling path (do nothing until the numbers say so)
+## 11. Scaling path (do nothing until the numbers say so)
 
 | Stage | Users | Action |
 |---|---|---|
-| Launch | < 10k | One VPS (4–8 GB RAM), images on Cloudflare R2, off-site backups |
-| Growing | 10k+ | Bigger VPS, or move Postgres to its own server; Cloudflare in front for caching and DDoS protection |
-| Growth | 10k–200k | Add indexes from slow-query log, Realtime only on detail screens, CDN for images |
-| Large | 200k+ | Read replica, move heavy search to Typesense/Meilisearch, consider own API service in front of the same Postgres |
-| Exit plan | any | Move to Supabase Cloud (restore the same dump) or own API + Postgres; app changes only `campus_data` |
+| Launch | < 10k | One API container + Postgres on the shared VPS, images on Cloudflare R2, off-site backups |
+| Growing | 10k–200k | Indexes from the slow-query log; Cloudflare in front for caching and DDoS protection; move Postgres to its own server or a managed Postgres |
+| Large | 200k+ | Several API instances behind nginx (move rate limits to Redis), read replica, heavy search in Typesense/Meilisearch |
+| Exit plan | any | Restore the same Postgres dump anywhere; the API is one container; the app changes only its `API_BASE_URL` |
 
 ---
 
-## 11. Setup checklist
+## 12. Setup checklist
 
 ```bash
-brew install supabase/tap/supabase          # Supabase CLI
-supabase start                              # local stack in Docker (OrbStack)
-supabase db reset                           # re-apply migrations + seed.sql
-supabase test db                            # security tests in supabase/tests/
-flutter pub get && ./tool/test_all.sh       # app + packages
+cd backend
+make deps-up        # Postgres 18 (:55632) + Mailpit (SMTP :55625, UI http://localhost:58025)
+make run            # API on :8090, applies migrations first in development
+make seed           # dev universities: demo.ac.bd, sit.edu.bd
+make test           # go test -race, fresh database per test
+
+cd .. && flutter pub get && ./tool/test_all.sh   # app + packages
 ```

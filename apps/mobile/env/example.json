@@ -1,5 +1,4 @@
 {
   "APP_ENV": "local",
-  "SUPABASE_URL": "http://127.0.0.1:54321",
-  "SUPABASE_PUBLISHABLE_KEY": "paste-the-local-anon-key-here"
+  "API_BASE_URL": "http://10.0.2.2:8090/api/v1"
 }

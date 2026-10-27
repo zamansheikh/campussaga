@@ -20,7 +20,7 @@ morning, and a safe, anonymous voice to get campus problems fixed.
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Releases R0–R5, scope, definition of done |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Database, system design, data model, app structure |
 | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Colors, type, components, rebranding checklist |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Self-hosting Supabase on our VPS |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Running the Go API + Postgres on our VPS |
 
 ## Project layout
 
@@ -28,9 +28,9 @@ morning, and a safe, anonymous voice to get campus problems fixed.
 apps/mobile/            Flutter app (Android, iOS)  · com.silifton.campussaga
 packages/campus_core/   Domain models, repository interfaces (pure Dart)
 packages/campus_ui/     Design system: tokens, theme, components
-packages/campus_data/   Backend (Supabase) implementations
+packages/campus_data/   HTTP implementations of the repositories (talks to the Go API)
 packages/campus_l10n/   English + Bangla strings
-supabase/               Backend: migrations, security tests, email templates, config
+backend/                Go API: cmd/campusapi, internal/ (platform, modules), migrations/
 tool/                   Scripts (test_all.sh)
 ```
 
@@ -52,19 +52,20 @@ real values.
 
 ## Backend (local)
 
-Needs Docker (OrbStack) and the Supabase CLI (`brew install supabase/tap/supabase`).
+Needs Go 1.26+ and Docker (OrbStack).
 
 ```bash
-supabase start            # local backend: database, auth, API, test mailbox
-supabase db reset         # rebuild from migrations + seed.sql
-supabase test db          # security tests (supabase/tests/)
-supabase status           # URLs and local keys
+cd backend
+make deps-up      # Postgres 18 (:55632) + Mailpit (SMTP :55625, UI http://localhost:58025)
+make run          # API on http://localhost:8090/api/v1 (applies migrations first)
+make seed         # dev universities: demo.ac.bd, sit.edu.bd
+make test         # go test -race, fresh database per test
 ```
 
 Sign in locally with any address at `demo.ac.bd`; the 6-digit code arrives
-in Mailpit at http://127.0.0.1:54324. Put the local publishable key from
-`supabase status` in `apps/mobile/env/local.json` (the Android emulator
-reaches your Mac at `10.0.2.2`).
+in Mailpit at http://localhost:58025 (without SMTP configured, the server
+logs it). Set `API_BASE_URL` in `apps/mobile/env/local.json`: the Android
+emulator reaches your Mac at `http://10.0.2.2:8090/api/v1`.
 
 ## Everyday commands
 

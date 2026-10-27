@@ -59,15 +59,44 @@ jobs:
         working-directory: apps/mobile
         run: flutter build apk --debug
 
-  database:
+  backend:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: campus
+          POSTGRES_PASSWORD: campus
+          POSTGRES_DB: campus
+        ports: ["55632:5432"]
+        options: >-
+          --health-cmd "pg_isready -U campus"
+          --health-interval 2s
+          --health-retries 30
     steps:
       - uses: actions/checkout@v4
-      - uses: supabase/setup-cli@v1
+      - uses: actions/setup-go@v5
         with:
-          version: 2.122.0
-      - name: Start database with all migrations and seed
-        run: supabase db start
-      - name: Security tests (pgTAP)
-        run: supabase test db
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - uses: sqlc-dev/setup-sqlc@v4
+        with:
+          sqlc-version: '1.31.1'
+      - name: Generated code is up to date
+        run: |
+          make sqlc
+          git diff --exit-code -- internal
+      - name: gofmt
+        run: test -z "$(gofmt -l cmd internal migrations)"
+      - name: vet
+        run: go vet ./...
+      - name: Tests (race, fresh database per test)
+        env:
+          TEST_DATABASE_URL: postgres://campus:campus@localhost:55632/campus?sslmode=disable
+        run: go test -race -count=1 ./...
+      - name: Docker image builds
+        run: docker build -t campusapi:ci .

@@ -1,7 +1,7 @@
 # Campus Saga — Running on Our VPS
 
-We self-host Supabase (official Docker Compose setup) on our own VPS.
-Same features as Supabase Cloud: Postgres, Auth, REST, Realtime, Storage, Edge Functions, Studio.
+Campus Saga runs as two Docker containers on our own VPS: the Go API
+(`campusapi`) and its PostgreSQL 18 database. nginx on the host handles HTTPS.
 
 **Self-hosting means we own security, backups and uptime.** A leak of who
 posted what would destroy student trust, so the checklists here are not
@@ -9,159 +9,190 @@ optional.
 
 ---
 
-## 1. Server requirements
+## 1. The server
 
-| | Minimum | Comfortable (prod + staging on one box) |
-|---|---|---|
-| RAM | 4 GB | 8 GB+ |
-| CPU | 2 vCPU | 4 vCPU |
-| Disk | 40 GB SSD | 80 GB+ NVMe |
-| OS | Ubuntu 24.04 LTS | same |
-| Location | Close to students (Singapore / Mumbai, or a Bangladesh provider) for low latency | |
+We use our existing shared VPS (Ubuntu 24.04). It already runs other
+products, so Campus Saga must fit its conventions and **never interrupt
+other services**:
+
+| Convention on the box | What it means for us |
+|---|---|
+| nginx on the host fronts every site | We add one vhost for `api.<domain>`; no own reverse proxy container |
+| Containers bind to `127.0.0.1` only | Our API listens on `127.0.0.1:7030` (**check the port is free first**: `ss -ltnp \| grep 7030`) |
+| Apps live under `/opt/<name>` | Everything in `/opt/campussaga` |
+| vhosts: `/etc/nginx/sites-available/fx-<domain>.conf`, symlinked into `sites-enabled` | Same for ours |
+| Certificates via `certbot --webroot -w /var/www/html` | Same for ours |
+| `ufw` allows 22, 80, 443 only | Postgres and the API are never exposed publicly |
+
+**Footprint:** the Go API uses about 50–100 MB of RAM, Postgres a few hundred
+MB. That matters on a shared box.
 
 Also needed:
-- a domain (e.g. `campussaga.app`), managed in **Cloudflare DNS**
-- an email sending service for OTP codes: **Resend, Amazon SES or Brevo**. Mail sent straight from a VPS lands in spam.
-- object storage for images and backups: **Cloudflare R2** (free egress) or Backblaze B2
+- a domain with DNS in **Cloudflare**, and an `api.<domain>` record pointing to the VPS
+- **Resend** for sign-in code emails (SMTP). The sender domain must be verified in Resend; mail sent straight from a VPS lands in spam
+- object storage for images (R1+) and backups: **Cloudflare R2** (free egress) or Backblaze B2
 
 ---
 
-## 2. Layout on the server
+## 2. Layout
 
 ```
 Internet
-   │  443 only
+   │  443
    ▼
-Cloudflare (DNS, DDoS protection, caching for images)
+Cloudflare (DNS, optional proxy / DDoS protection)
    │
    ▼
 ┌──────────────────────── VPS ────────────────────────┐
-│  Caddy (TLS, reverse proxy)                         │
-│    api.<domain>  ─▶ 127.0.0.1:8000 (Kong)           │
-│      allowed: /auth/v1 /rest/v1 /storage/v1         │
-│               /realtime/v1 /functions/v1            │
-│      everything else (Studio) ─▶ blocked            │
+│  nginx (TLS)   api.<domain> ─▶ 127.0.0.1:7030       │
 │                                                     │
-│  Supabase stack (Docker Compose, /opt/supabase)     │
-│    kong · auth · rest · realtime · storage ·        │
-│    edge-runtime · imgproxy · meta · studio ·        │
-│    supavisor · db (Postgres) · analytics            │
-│    → all ports bound to 127.0.0.1 only              │
+│  /opt/campussaga/deploy  (docker compose project    │
+│                           "campussaga")             │
+│    api       campusapi serve   127.0.0.1:7030       │
+│    postgres  postgres:18       internal network only│
 │                                                     │
-│  backup job (cron) ──▶ encrypted dump ──▶ R2/B2     │
+│  backup job (cron) ──▶ encrypted dump ──▶ R2 / B2   │
 └─────────────────────────────────────────────────────┘
-        ▲
-        │ Tailscale / SSH tunnel (admins only)
-     Studio + direct Postgres access
 ```
 
-**Studio (the admin dashboard) is never public.** Reach it through Tailscale or
-`ssh -L 8000:127.0.0.1:8000 vps`, then open `http://localhost:8000`.
+```
+/opt/campussaga/
+├─ backend/              # copy of the repo's backend/ (rsync)
+└─ deploy/
+   ├─ compose.yaml       # api + postgres
+   ├─ .env               # secrets, chmod 600, never in git
+   └─ backups/           # local copy of the latest dumps
+```
 
 ---
 
 ## 3. Setup steps
 
-### 3.1 Harden the server (day 1, before anything else)
+### 3.1 First-time setup
 
-- [ ] Create a non-root user with sudo; SSH **key only**; `PermitRootLogin no`, `PasswordAuthentication no`
-- [ ] `ufw`: allow 22 (or Tailscale only), 80, 443; deny everything else
-- [ ] Also set the same rules in the **VPS provider's firewall** (see the Docker note below)
-- [ ] `fail2ban` for SSH
-- [ ] `unattended-upgrades` for security patches
-- [ ] Install Tailscale; once it works, close port 22 to the public internet
-- [ ] Set timezone to UTC and enable NTP
+- [ ] Confirm `127.0.0.1:7030` is free and pick another port if not
+- [ ] `mkdir -p /opt/campussaga/deploy && chmod 700 /opt/campussaga/deploy`
+- [ ] Copy the backend: `rsync -a --delete --exclude .git backend/ <vps>:/opt/campussaga/backend/`
+- [ ] Create `deploy/.env` (section 3.2) and `deploy/compose.yaml` (section 3.3)
 
-> ⚠️ **Docker bypasses `ufw`.** A container port published as `8000:8000`
-> is open to the whole internet even if `ufw` blocks it. Every port in our
-> compose override is bound to `127.0.0.1:` (see 3.3), and the provider
-> firewall is the second safety net.
+### 3.2 Secrets: `/opt/campussaga/deploy/.env`
 
-### 3.2 Install Supabase
+Template: [backend/deploy/env.example](../backend/deploy/env.example).
 
-```bash
-# Docker Engine + compose plugin (official Docker apt repo)
-git clone --depth 1 https://github.com/supabase/supabase /tmp/supabase
-sudo mkdir -p /opt/supabase && sudo cp -r /tmp/supabase/docker/* /opt/supabase/
-cd /opt/supabase && cp .env.example .env
-```
+`chmod 600`, owned by root. One copy in the password manager. Never in git.
 
-### 3.3 Configure `.env` and the compose override
-
-Replace **every** default secret. Follow the official self-hosting guide to
-generate the JWT secret and the `ANON_KEY` / `SERVICE_ROLE_KEY` signed with it.
-
-| Setting | Value |
+| Variable | Value |
 |---|---|
-| `POSTGRES_PASSWORD` | long random (`openssl rand -base64 48`) |
-| `JWT_SECRET` + `ANON_KEY` + `SERVICE_ROLE_KEY` | new, generated together |
-| `DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD` | not the defaults |
-| `SECRET_KEY_BASE`, `VAULT_ENC_KEY`, `LOGFLARE_*` tokens | new random values |
-| `SITE_URL`, `API_EXTERNAL_URL`, `SUPABASE_PUBLIC_URL` | `https://api.<domain>` |
-| `SMTP_*` | Resend/SES/Brevo credentials, sender `no-reply@<domain>` |
-| `ENABLE_EMAIL_AUTOCONFIRM` | `false` |
-| `GOTRUE_HOOK_BEFORE_USER_CREATED_ENABLED` / `_URI` | `true` / `pg-functions://postgres/private/hook_before_user_created` (only university emails can sign up; add to the auth service env in the compose file) |
-| `GOTRUE_MAILER_OTP_EXP` | `600` (codes expire after 10 minutes) |
-| `DISABLE_SIGNUP` | `false` (sign-up is limited to university domains by the hook above) |
-| Storage backend | S3-compatible → Cloudflare R2 bucket, so images don't fill the VPS disk |
+| `APP_ENV` | `production` |
+| `POSTGRES_PASSWORD` | long random (`openssl rand -base64 36`) |
+| `DATABASE_URL` | `postgres://campus:<POSTGRES_PASSWORD>@postgres:5432/campus?sslmode=disable` |
+| `JWT_SECRET` | 64 random bytes (`openssl rand -base64 64`); signs access tokens |
+| `CODE_HMAC_SECRET` | 64 random bytes; hashes sign-in codes |
+| `SMTP_HOST` / `SMTP_PORT` | `smtp.resend.com` / `587` |
+| `SMTP_USERNAME` | `resend` |
+| `SMTP_PASSWORD` | the Resend API key |
+| `MAIL_FROM` | e.g. `Campus Saga <no-reply@<domain>>` (domain verified in Resend) |
 
-`docker-compose.override.yml`: bind published ports to localhost only:
+Changing `JWT_SECRET` signs everyone out. Changing `CODE_HMAC_SECRET` only
+invalidates codes that are waiting to be used.
+
+### 3.3 `compose.yaml`
+
+In the repo: [backend/deploy/compose.yaml](../backend/deploy/compose.yaml). Copy it to `/opt/campussaga/deploy/`.
 
 ```yaml
+name: campussaga
 services:
-  kong:
-    ports: !override
-      - "127.0.0.1:8000:8000"
-  supavisor:
-    ports: !override
-      - "127.0.0.1:5432:5432"
-      - "127.0.0.1:6543:6543"
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: campus
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: campus
+    volumes: [pgdata:/var/lib/postgresql]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campus"]
+      interval: 5s
+      retries: 20
+    # no ports: reachable only from the api container
+
+  api:
+    build: ../backend
+    image: campusapi:latest
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      postgres: {condition: service_healthy}
+    ports: ["127.0.0.1:7030:8090"]
+
+volumes:
+  pgdata:
 ```
 
-**Where the secrets live:** only in `/opt/supabase/.env` on the server
-(`chmod 600`, owned by root), plus one copy in a password manager.
-Never in git, never in the Flutter app. The app only gets the **anon key**,
-which is public by design. Access is protected by RLS.
+### 3.4 nginx + HTTPS
 
-### 3.4 Caddy (HTTPS + only public API paths)
+`/etc/nginx/sites-available/fx-api.<domain>.conf`, symlinked into
+`sites-enabled` (template: [backend/deploy/nginx.conf.example](../backend/deploy/nginx.conf.example)):
 
-```caddy
-api.{$DOMAIN} {
-    @api path /auth/v1/* /rest/v1/* /storage/v1/* /realtime/v1/* /functions/v1/*
-    handle @api {
-        reverse_proxy 127.0.0.1:8000
-    }
-    handle {
-        respond 404
-    }
-    header {
-        Strict-Transport-Security "max-age=31536000; includeSubDomains"
-        X-Content-Type-Options nosniff
-        Referrer-Policy no-referrer
+```nginx
+server {
+    listen 80;
+    server_name api.<domain>;
+    location /.well-known/acme-challenge/ { root /var/www/html; }
+    location / { return 301 https://$host$request_uri; }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name api.<domain>;
+
+    ssl_certificate     /etc/letsencrypt/live/api.<domain>/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.<domain>/privkey.pem;
+
+    client_max_body_size 10m;
+
+    location / {
+        proxy_pass http://127.0.0.1:7030;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 ```
 
-With Cloudflare in front, use **Full (strict)** SSL mode and, ideally, let only
-Cloudflare IP ranges reach port 443.
+```bash
+certbot certonly --webroot -w /var/www/html -d api.<domain>
+nginx -t && systemctl reload nginx
+```
+
+Run `nginx -t` before every reload: a broken config would take down every
+site on the box.
 
 ### 3.5 Email deliverability
 
-- [ ] SPF, DKIM and DMARC records for `<domain>` (the email provider shows them)
-- [ ] Send a test OTP to Gmail, Outlook and a university address; check it isn't in spam
-- [ ] Customize the OTP email templates (Bangla + English)
+- [ ] Sender domain verified in Resend (SPF/DKIM records added in Cloudflare)
+- [ ] Send a test code to Gmail, Outlook and a university address; check it isn't in spam
+- [ ] The code email is bilingual (Bangla + English) and says never to share the code
 
-### 3.6 Apply our database
-
-From the Mac, through Tailscale or an SSH tunnel to `127.0.0.1:5432`:
+### 3.6 Deploy (first time and every update)
 
 ```bash
-supabase db push --db-url "postgresql://postgres:<password>@localhost:5432/postgres"
-supabase functions deploy ...   # or copy to /opt/supabase/volumes/functions and restart edge-runtime
+# from the Mac
+rsync -a --delete --exclude .git backend/ <vps>:/opt/campussaga/backend/
+
+# on the VPS
+cd /opt/campussaga/deploy
+docker compose build api
+docker compose run --rm api migrate        # apply new migrations first
+docker compose up -d api                   # start the new version
+curl -fsS http://127.0.0.1:7030/api/v1/health
 ```
 
-The same migrations run locally, in CI, on staging, then on production. Never
-change the production schema by hand in Studio.
+- Take a manual backup (section 4) before any release with a migration.
+- Tag the previous image before building (`docker tag campusapi:latest campusapi:rollback`) so a rollback is one `docker compose up -d` away.
+- Never change the production schema by hand. Every change is a migration in git.
 
 ---
 
@@ -169,32 +200,39 @@ change the production schema by hand in Studio.
 
 | What | How | Keep |
 |---|---|---|
-| Database | Nightly `pg_dump -Fc` + roles (`pg_dumpall --roles-only`) from the `db` container, encrypted with `age`, uploaded with `rclone` | 7 daily, 4 weekly, 6 monthly |
-| Images | Already on R2 (enable bucket versioning) | — |
-| Config | `.env` + override + Caddyfile, encrypted, uploaded | latest 10 |
-| Point-in-time recovery | Later: WAL-G streaming WAL to R2/B2 | 7 days |
+| Database | Nightly `pg_dump -Fc` from the `postgres` container, encrypted with `age`, uploaded with `rclone` | 7 daily, 4 weekly, 6 monthly |
+| Images (R1+) | Already on R2 (enable bucket versioning) | — |
+| Config | `deploy/.env` + `compose.yaml` + nginx vhost, encrypted, uploaded | latest 10 |
+| Point-in-time recovery | Later: WAL archiving (e.g. WAL-G) to R2/B2 | 7 days |
+
+```bash
+docker compose exec -T postgres pg_dump -U campus -Fc campus \
+  | age -r <public-key> > backups/campus-$(date +%F).dump.age
+rclone copy backups/ r2:campussaga-backups/
+```
 
 Rules:
-- Backups go to a **different provider/account** than the VPS. If the VPS account is lost, backups survive.
-- The backup encryption key is in the password manager, not only on the server.
-- **Monthly restore test**: restore last night's dump into local Docker, run the pgTAP tests, check row counts. An untested backup is not a backup.
-- Before every Supabase upgrade or risky migration: take a manual backup.
+- Backups go to a **different provider/account** than the VPS. If the VPS is lost, backups survive.
+- The `age` private key is in the password manager, not on the server.
+- **Monthly restore test**: restore last night's dump into a local Postgres, run `campusapi migrate` and the e2e tests against it, check row counts. An untested backup is not a backup.
+- Before every release with a migration: take a manual backup.
 
 ---
 
 ## 5. Updates
 
-- OS security patches: automatic (`unattended-upgrades`); reboot monthly.
-- Supabase: pin image versions in compose. Once a month, pull the new compose file, try it on staging, read the changelog, then upgrade production at a low-traffic time (late night BD time).
+- OS security patches are handled for the whole box; coordinate reboots with the other services on it.
+- Postgres minor updates: pull the new `postgres:18-alpine` image and restart, after a backup.
 - Postgres major versions: only with a tested backup and a restore rehearsal.
+- Go and dependency updates go through the normal release flow (CI, staging, then production).
 
 ---
 
 ## 6. Monitoring and alerts
 
-- [ ] **Uptime Kuma** (ideally on a different machine, or a free external checker) → checks `https://api.<domain>/auth/v1/health` every minute → Telegram alert
+- [ ] Uptime check (Uptime Kuma or similar, ideally off the VPS) on `https://api.<domain>/api/v1/health` every minute → Telegram alert
 - [ ] Disk usage alert at 80% (Postgres stops when the disk is full)
-- [ ] RAM/CPU: Netdata or `docker stats`; add swap (2–4 GB) as a safety net
+- [ ] Logs: `docker compose logs -f api` (JSON lines with `traceId`; the app shows the trace id in error reports)
 - [ ] Backup job sends a "backup OK" ping (e.g. healthchecks.io); alert if it misses a night
 - [ ] App errors: Sentry/Crashlytics on the Flutter side
 
@@ -202,25 +240,25 @@ Rules:
 
 ## 7. Security checklist before launch
 
-- [ ] All default secrets replaced; `.env` is `chmod 600`
-- [ ] `nmap` the server from outside: only 80/443 open (22 closed if Tailscale)
-- [ ] Studio and Postgres not reachable from the internet
-- [ ] `https://api.<domain>/` returns 404; only API paths work
-- [ ] pgTAP tests pass on production: no role can read `private.*`
-- [ ] Logged in as a normal student in the app: cannot read another user's email, votes, or anonymous authorship
-- [ ] Rate limits work (spam 50 posts → blocked)
+- [ ] `.env` is `chmod 600`; all secrets random and unique to this app
+- [ ] From outside: only 22/80/443 open; port 7030 and Postgres not reachable
+- [ ] `docker compose ps`: Postgres publishes no port; the API publishes only on `127.0.0.1`
+- [ ] HTTPS works and HTTP redirects to HTTPS
+- [ ] `go test -race ./...` green on the release commit, including the security e2e tests (no student can read another student's data or an anonymous author)
+- [ ] Rate limits work: requesting codes repeatedly returns 429
+- [ ] A non-university email gets 403 `UNIVERSITY_EMAIL_REQUIRED`
 - [ ] Backup restored successfully at least once
-- [ ] Service role key exists only on the server and in the password manager
+- [ ] No secret in git: `git grep -i -e secret -e password` shows only placeholders
 
 ---
 
 ## 8. If the server dies (runbook)
 
-1. Create a new VPS (or a Supabase Cloud project if speed matters most).
-2. Run sections 3.1–3.4 (keep this doc up to date so it takes < 1 hour).
-3. Restore the latest encrypted dump; restore `.env` with the **same JWT secret**, so existing app logins and keys keep working.
-4. Point `api.<domain>` DNS to the new server (Cloudflare: change is instant).
-5. Check health, run the pgTAP tests, post a status update to students.
+1. Create a new VPS (Ubuntu 24.04, Docker, nginx, certbot).
+2. Restore `/opt/campussaga/deploy` (`.env`, `compose.yaml`) and the nginx vhost from the encrypted config backup. Keep the **same `JWT_SECRET`** so existing app logins keep working.
+3. Copy the backend, `docker compose up -d postgres`, restore the latest dump with `pg_restore`, then `docker compose up -d api`.
+4. Issue the certificate, point the `api.<domain>` DNS record to the new server (Cloudflare: change is instant).
+5. Check `/api/v1/health`, sign in from the app, post a status update to students.
 
 Target: back online within 2 hours, losing at most 24 hours of data
-(at most minutes once WAL-G is added).
+(at most minutes once WAL archiving is added).

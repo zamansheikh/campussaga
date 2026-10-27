@@ -9,7 +9,7 @@
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Releases R0–R5, feature scope, definition of done, release rhythm |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Database choice, system design, data model, app structure |
 | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Colors, fonts, spacing, components, UX patterns |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Self-hosting Supabase on our VPS: security, backups, monitoring |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Running the Go API + Postgres on our VPS: security, backups, monitoring |
 
 ---
 
@@ -107,4 +107,4 @@ Per-release targets are in [ROADMAP.md §6](docs/ROADMAP.md).
 1. Commit the cleanup and the docs (tag the old version first: `git tag v1-archive ac7e422`).
 2. Talk to 5 CRs and 10 students: how is the routine shared today, how do they learn about changes, what do they miss?
 3. Pick the launch university and recruit the first CRs for beta.
-4. Start **R0 Foundation**: monorepo, design system, Supabase on the VPS, sign-in.
+4. Start **R0 Foundation**: monorepo, design system, Go API + Postgres on the VPS, sign-in.
