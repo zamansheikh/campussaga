@@ -25,7 +25,11 @@ var FS embed.FS
 func Up(ctx context.Context, pool *pgxpool.Pool, log *slog.Logger) error {
 	sqlDB := stdlib.OpenDBFromPool(pool)
 	defer sqlDB.Close()
-	provider, err := goose.NewProvider(goose.DialectPostgres, sqlDB, FS)
+	// Out-of-order is allowed because each area owns a version range
+	// (a new 00110 file may arrive after 00300 was applied).
+	provider, err := goose.NewProvider(goose.DialectPostgres, sqlDB, FS,
+		goose.WithAllowOutofOrder(true),
+	)
 	if err != nil {
 		return fmt.Errorf("migrations: provider: %w", err)
 	}

@@ -62,3 +62,13 @@ func TestGoogleSignInRejections(t *testing.T) {
 
 	assert.Equal(t, "VALIDATION_FAILED", h.do("POST", "/auth/google", "", map[string]string{}).code())
 }
+
+func TestLaunchUniversityGoogleAccount(t *testing.T) {
+	h := newHarness(t)
+	r := h.do("POST", "/auth/google", "", map[string]string{"idToken": h.googleToken("student@diu.edu.bd", true)})
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	var s signedIn
+	r.into(t, &s)
+	assert.Equal(t, "diu", s.User.University.Slug)
+	assert.Equal(t, "Daffodil International University", s.User.University.Name)
+}

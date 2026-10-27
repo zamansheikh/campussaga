@@ -26,9 +26,12 @@ func TestPublicEndpoints(t *testing.T) {
 		} `json:"universities"`
 	}
 	r.into(t, &list)
-	require.Len(t, list.Universities, 1)
-	assert.Equal(t, "test-uni", list.Universities[0].Slug)
-	assert.Equal(t, []string{"test.ac.bd"}, list.Universities[0].Domains)
+	domains := map[string][]string{}
+	for _, u := range list.Universities {
+		domains[u.Slug] = u.Domains
+	}
+	assert.Equal(t, []string{"test.ac.bd"}, domains["test-uni"])
+	assert.Equal(t, []string{"diu.edu.bd"}, domains["diu"], "launch universities ship with the migrations")
 
 	r = h.do("GET", "/config", "", nil)
 	require.Equal(t, http.StatusOK, r.Status, r.Raw)
