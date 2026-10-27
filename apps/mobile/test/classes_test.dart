@@ -62,6 +62,27 @@ void main() {
     expect(find.text('MAT201'), findsOneWidget);
   });
 
+  testWidgets('Today: a CR reaches the routine from any class or the group', (
+    tester,
+  ) async {
+    appNow = () => DateTime(2026, 10, 27, 14, 0); // done for today
+    await signedIn(tester, mine: [sampleGroup(role: GroupRole.cr)]);
+    expect(find.text('CLASS GROUPS'), findsOneWidget);
+    expect(find.text('CR'), findsOneWidget);
+
+    // The "next class" card opens the group, where the CR can edit.
+    await scrollAndTap(tester, find.text('MAT201'));
+    await tester.pumpAndSettle();
+    expect(find.text('Invite classmates'), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await scrollAndTap(tester, find.text('CSE 61 · A'));
+    await tester.pumpAndSettle();
+    expect(find.text('Invite classmates'), findsOneWidget);
+  });
+
   testWidgets('a classmate joins with the code', (tester) async {
     final classes = await signedIn(tester, others: {'ABCDEF': sampleGroup()});
     expect(find.text('No classes yet'), findsOneWidget);

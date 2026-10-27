@@ -157,6 +157,8 @@ class _TodayPageState extends State<TodayPage> {
           ],
         ),
       ],
+      const SizedBox(height: CsSpace.lg),
+      _MyGroups(groups: groups),
     ];
   }
 
@@ -169,6 +171,36 @@ class _TodayPageState extends State<TodayPage> {
     return m < 60
         ? l10n.startsInMinutes(m)
         : l10n.startsInHours(m ~/ 60, m % 60);
+  }
+}
+
+/// The student's groups, one tap away (the CR edits the routine there).
+class _MyGroups extends StatelessWidget {
+  const _MyGroups({required this.groups});
+
+  final List<ClassGroup> groups;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return CsSection(
+      title: l10n.classGroups,
+      children: [
+        for (final g in groups)
+          CsRow(
+            icon: Icons.groups_rounded,
+            title: g.title,
+            subtitle: [
+              g.semester,
+              l10n.classesCount(g.slots.length),
+            ].join(' · '),
+            trailing: g.isCr
+                ? CsBadge(label: l10n.roleCr, tone: CsBadgeTone.success)
+                : null,
+            onTap: () => context.push(Routes.group(g.id)),
+          ),
+      ],
+    );
   }
 }
 
@@ -423,6 +455,7 @@ class _NothingLeft extends StatelessWidget {
                   ClassTile(
                     slot: next.slot,
                     groupTitle: groups.length > 1 ? next.group.title : null,
+                    onTap: () => context.push(Routes.group(next!.group.id)),
                   ),
                 ],
               ),
