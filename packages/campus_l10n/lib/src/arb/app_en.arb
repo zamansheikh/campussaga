@@ -404,5 +404,41 @@
     }
   },
   "changeSaved": "Saved. Classmates see it when they open the app.",
-  "openGroupAction": "Open class group"
+  "openGroupAction": "Open class group",
+  "announcements": "Announcements",
+  "postAction": "Post",
+  "newAnnouncement": "New announcement",
+  "announcementHint": "Write to your class, e.g. Bring a calculator tomorrow",
+  "pinToTop": "Pin to top",
+  "pinToTopHint": "Stays first until you unpin it. Only one can be pinned.",
+  "pinAction": "Pin",
+  "unpinAction": "Unpin",
+  "pinnedLabel": "Pinned",
+  "deleteAction": "Delete",
+  "deleteAnnouncementTitle": "Delete this announcement for everyone?",
+  "noAnnouncements": "No announcements yet.",
+  "noAnnouncementsCr": "Post updates for your class here: quizzes, things to bring, room news.",
+  "announcementPosted": "Posted. Classmates see it when they open the app.",
+  "newBadge": "New",
+  "timeJustNow": "just now",
+  "timeMinutesAgo": "{minutes} min ago",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "timeHoursAgo": "{hours} h ago",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "timeYesterday": "yesterday",
+  "errorAnnouncementGone": "This announcement was already deleted."
 }

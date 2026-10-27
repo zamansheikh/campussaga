@@ -100,6 +100,7 @@ class ClassGroup {
     required this.memberCount,
     this.slots = const [],
     this.changes = const [],
+    this.announcements = const [],
   });
 
   factory ClassGroup.fromJson(Map<String, Object?> json) => ClassGroup(
@@ -119,6 +120,10 @@ class ClassGroup {
       for (final c in json['changes'] as List<Object?>? ?? const [])
         ClassChange.fromJson(c! as Map<String, Object?>),
     ],
+    announcements: [
+      for (final a in json['announcements'] as List<Object?>? ?? const [])
+        Announcement.fromJson(a! as Map<String, Object?>),
+    ],
   );
 
   final String id;
@@ -133,6 +138,9 @@ class ClassGroup {
 
   /// One-date changes from yesterday on, earliest first.
   final List<ClassChange> changes;
+
+  /// The pinned one first, then the last 30 days' newest first.
+  final List<Announcement> announcements;
 
   bool get isCr => role == GroupRole.cr;
 
@@ -150,11 +158,14 @@ class ClassGroup {
     'role': role.name,
     'memberCount': memberCount,
     'slots': [for (final s in slots) s.toJson()],
+    'changes': [for (final c in changes) c.toJson()],
+    'announcements': [for (final a in announcements) a.toJson()],
   };
 
   ClassGroup copyWith({
     List<ClassSlot>? slots,
     List<ClassChange>? changes,
+    List<Announcement>? announcements,
     int? memberCount,
   }) => ClassGroup(
     id: id,
@@ -167,8 +178,52 @@ class ClassGroup {
     memberCount: memberCount ?? this.memberCount,
     slots: slots ?? this.slots,
     changes: changes ?? this.changes,
+    announcements: announcements ?? this.announcements,
   );
 }
+
+/// A message from the CR to the group.
+class Announcement {
+  const Announcement({
+    required this.id,
+    required this.body,
+    this.pinned = false,
+    required this.createdAt,
+  });
+
+  factory Announcement.fromJson(Map<String, Object?> json) => Announcement(
+    id: json['id']! as String,
+    body: json['body']! as String,
+    pinned: json['pinned'] as bool? ?? false,
+    createdAt: DateTime.parse(json['createdAt']! as String).toLocal(),
+  );
+
+  final String id;
+  final String body;
+  final bool pinned;
+  final DateTime createdAt;
+
+  Announcement copyWith({bool? pinned}) => Announcement(
+    id: id,
+    body: body,
+    pinned: pinned ?? this.pinned,
+    createdAt: createdAt,
+  );
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'body': body,
+    'pinned': pinned,
+    'createdAt': createdAt.toUtc().toIso8601String(),
+  };
+}
+
+/// Pinned first, then newest first (the order the server sends).
+List<Announcement> sortAnnouncements(Iterable<Announcement> list) =>
+    list.toList()..sort((a, b) {
+      if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
+      return b.createdAt.compareTo(a.createdAt);
+    });
 
 /// What a join code leads to, shown before joining.
 class GroupPreview {

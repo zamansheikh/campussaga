@@ -36,6 +36,21 @@ String classErrorText(AppLocalizations l10n, Failure f) => switch (f.code) {
   'GROUP_FULL' => l10n.errorGroupFull,
   'CR_CANNOT_LEAVE' => l10n.errorCrCannotLeave,
   'SLOT_LIMIT_REACHED' => l10n.errorSlotLimit,
+  'ANNOUNCEMENT_NOT_FOUND' => l10n.errorAnnouncementGone,
   _ when f is RateLimitedFailure => l10n.errorTooManyRequests,
   _ => authErrorText(l10n, f),
 };
+
+/// "just now", "5 min ago", "3 h ago", "yesterday", or the date.
+String agoText(BuildContext context, DateTime t, DateTime now) {
+  final l10n = AppLocalizations.of(context);
+  final d = now.difference(t);
+  if (d.inMinutes < 1) return l10n.timeJustNow;
+  if (d.inMinutes < 60) return l10n.timeMinutesAgo(d.inMinutes);
+  final today = DateTime(now.year, now.month, now.day);
+  if (!t.isBefore(today)) return l10n.timeHoursAgo(d.inHours);
+  if (!t.isBefore(today.subtract(const Duration(days: 1)))) {
+    return l10n.timeYesterday;
+  }
+  return DateFormat.MMMd(_locale(context)).format(t);
+}

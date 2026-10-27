@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:campus_core/campus_core.dart';
+import 'package:campussaga/app/clock.dart';
 import 'package:campussaga/app/crash/crash_reporter.dart';
 import 'package:campussaga/app/di.dart';
 import 'package:campussaga/app/settings/bloc/settings_state.dart';
 import 'package:campussaga/app/settings/settings_storage.dart';
 import 'package:campussaga/app/version/app_version.dart';
+import 'package:campussaga/features/announcements/data/seen_store.dart';
 import 'package:campussaga/features/auth/data/google_auth.dart';
 import 'package:campussaga/features/classes/data/routine_cache.dart';
 import 'package:campussaga/features/reminders/data/reminder_scheduler.dart';
@@ -192,6 +194,7 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   RoutineCache? routineCache,
   ReminderStore? reminderStore,
   ReminderScheduler? reminderScheduler,
+  SeenStore? seenStore,
   int build = 1,
 }) async {
   await getIt.reset();
@@ -218,7 +221,8 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
     ..registerSingleton<ReminderStore>(reminderStore ?? MemoryReminderStore())
     ..registerSingleton<ReminderScheduler>(
       reminderScheduler ?? MemoryReminderScheduler(),
-    );
+    )
+    ..registerSingleton<SeenStore>(seenStore ?? MemorySeenStore());
   return (repo, google);
 }
 
@@ -422,6 +426,61 @@ class FakeClassGroupRepository implements ClassGroupRepository {
       ),
     );
     return c;
+  }
+
+  @override
+  Future<Announcement> postAnnouncement(
+    String groupId,
+    String body, {
+    bool pinned = false,
+  }) async {
+    _check();
+    final g = _mine(groupId);
+    final a = Announcement(
+      id: _id('a'),
+      body: body.trim(),
+      pinned: pinned,
+      createdAt: appNow(),
+    );
+    _put(
+      g.copyWith(
+        announcements: sortAnnouncements([
+          for (final x in g.announcements)
+            pinned ? x.copyWith(pinned: false) : x,
+          a,
+        ]),
+      ),
+    );
+    return a;
+  }
+
+  @override
+  Future<Announcement> setAnnouncementPinned(
+    String groupId,
+    String id, {
+    required bool pinned,
+  }) async {
+    _check();
+    final g = _mine(groupId);
+    final list = [
+      for (final x in g.announcements)
+        x.id == id
+            ? x.copyWith(pinned: pinned)
+            : (pinned ? x.copyWith(pinned: false) : x),
+    ];
+    _put(g.copyWith(announcements: sortAnnouncements(list)));
+    return list.firstWhere((x) => x.id == id);
+  }
+
+  @override
+  Future<void> deleteAnnouncement(String groupId, String id) async {
+    _check();
+    final g = _mine(groupId);
+    _put(
+      g.copyWith(
+        announcements: g.announcements.where((x) => x.id != id).toList(),
+      ),
+    );
   }
 
   @override

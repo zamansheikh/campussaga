@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/announcements/data/seen_store.dart';
+import '../features/announcements/presentation/seen_cubit.dart';
 import '../features/auth/data/google_auth.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/classes/data/routine_cache.dart';
@@ -45,6 +47,7 @@ class _CampusAppState extends State<CampusApp> {
     getIt<ReminderScheduler>(),
   );
   late final StreamSubscription<List<ClassGroup>> _classesSub;
+  late final SeenCubit _seen = SeenCubit(getIt<SeenStore>());
   late final SettingsCubit _settings = SettingsCubit(getIt<SettingsStorage>());
   late final GoRouter _router = buildRouter(_auth, _settings);
   late final VersionGateCubit _versionGate = VersionGateCubit(
@@ -70,6 +73,7 @@ class _CampusAppState extends State<CampusApp> {
     _authSub = _auth.stream.listen(_onAuth);
     // Reminders follow the routine (cleared with it on sign-out).
     unawaited(_reminders.start());
+    unawaited(_seen.start());
     _classesSub = _classes.stream
         .map((s) => s.groups)
         .distinct()
@@ -92,6 +96,7 @@ class _CampusAppState extends State<CampusApp> {
     unawaited(_authSub.cancel());
     unawaited(_classesSub.cancel());
     _reminders.close();
+    _seen.close();
     _classes.close();
     _router.dispose();
     _auth.close();
@@ -109,6 +114,7 @@ class _CampusAppState extends State<CampusApp> {
         BlocProvider.value(value: _settings),
         BlocProvider.value(value: _classes),
         BlocProvider.value(value: _reminders),
+        BlocProvider.value(value: _seen),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settings) => MaterialApp.router(

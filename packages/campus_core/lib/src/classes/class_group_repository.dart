@@ -32,4 +32,19 @@ abstract interface class ClassGroupRepository {
 
   /// Undoes a change (CR).
   Future<void> deleteChange(String groupId, String changeId);
+
+  /// Posts a message to the group (CR); pinning unpins the previous one.
+  Future<Announcement> postAnnouncement(
+    String groupId,
+    String body, {
+    bool pinned = false,
+  });
+
+  Future<Announcement> setAnnouncementPinned(
+    String groupId,
+    String announcementId, {
+    required bool pinned,
+  });
+
+  Future<void> deleteAnnouncement(String groupId, String announcementId);
 }

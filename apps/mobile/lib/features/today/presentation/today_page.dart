@@ -10,6 +10,8 @@ import 'package:intl/intl.dart';
 
 import '../../../app/clock.dart';
 import '../../../app/router.dart';
+import '../../announcements/presentation/announcement_widgets.dart';
+import '../../announcements/presentation/seen_cubit.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../classes/presentation/bloc/my_classes_cubit.dart';
 import '../../classes/presentation/class_format.dart';
@@ -140,6 +142,7 @@ class _TodayPageState extends State<TodayPage> {
     return [
       hero,
       if (ask) ...[const SizedBox(height: CsSpace.md), const ReminderPrompt()],
+      _RecentAnnouncements(groups: groups, now: now),
       if (today.isNotEmpty) ...[
         const SizedBox(height: CsSpace.lg),
         CsSection(
@@ -173,6 +176,62 @@ class _TodayPageState extends State<TodayPage> {
     return m < 60
         ? l10n.startsInMinutes(m)
         : l10n.startsInHours(m ~/ 60, m % 60);
+  }
+}
+
+/// Pinned and last-3-days announcements from all groups, newest first.
+class _RecentAnnouncements extends StatelessWidget {
+  const _RecentAnnouncements({required this.groups, required this.now});
+
+  final List<ClassGroup> groups;
+  final DateTime now;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final seen = context.watch<SeenCubit>();
+    final recent = [
+      for (final g in groups)
+        for (final a in g.announcements)
+          if (a.pinned || now.difference(a.createdAt).inDays < 3) (g, a),
+    ]..sort((x, y) => y.$2.createdAt.compareTo(x.$2.createdAt));
+    if (recent.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: CsSpace.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              CsSpace.xs,
+              0,
+              CsSpace.xs,
+              CsSpace.sm,
+            ),
+            child: Text(
+              l10n.announcements.toUpperCase(),
+              style: context.text.labelMedium?.copyWith(
+                letterSpacing: 0.8,
+                color: context.cs.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          for (final (g, a) in recent.take(3))
+            Padding(
+              padding: const EdgeInsets.only(bottom: CsSpace.sm),
+              child: AnnouncementCard(
+                group: g,
+                announcement: a,
+                showGroup: true,
+                isNew: seen.isNew(g, a),
+                maxLines: 3,
+                onTap: () => context.push(Routes.group(g.id)),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 

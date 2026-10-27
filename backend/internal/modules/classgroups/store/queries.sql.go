@@ -90,6 +90,39 @@ func (q *Queries) CountUserGroups(ctx context.Context, userID uuid.UUID) (int64,
 	return count, err
 }
 
+const createAnnouncement = `-- name: CreateAnnouncement :one
+INSERT INTO announcements (group_id, body, pinned, created_by)
+VALUES ($1, $2, $3, $4)
+RETURNING id, group_id, body, pinned, created_by, created_at, updated_at
+`
+
+type CreateAnnouncementParams struct {
+	GroupID   uuid.UUID
+	Body      string
+	Pinned    bool
+	CreatedBy *uuid.UUID
+}
+
+func (q *Queries) CreateAnnouncement(ctx context.Context, arg CreateAnnouncementParams) (Announcement, error) {
+	row := q.db.QueryRow(ctx, createAnnouncement,
+		arg.GroupID,
+		arg.Body,
+		arg.Pinned,
+		arg.CreatedBy,
+	)
+	var i Announcement
+	err := row.Scan(
+		&i.ID,
+		&i.GroupID,
+		&i.Body,
+		&i.Pinned,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const createChange = `-- name: CreateChange :one
 INSERT INTO routine_changes (group_id, slot_id, date, kind, course_code, course_title, teacher,
                              class_kind, room, starts_min, ends_min, note, created_by)
@@ -242,6 +275,23 @@ func (q *Queries) CreateSlot(ctx context.Context, arg CreateSlotParams) (Routine
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const deleteAnnouncement = `-- name: DeleteAnnouncement :execrows
+DELETE FROM announcements WHERE id = $1 AND group_id = $2
+`
+
+type DeleteAnnouncementParams struct {
+	ID      uuid.UUID
+	GroupID uuid.UUID
+}
+
+func (q *Queries) DeleteAnnouncement(ctx context.Context, arg DeleteAnnouncementParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteAnnouncement, arg.ID, arg.GroupID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
 const deleteChange = `-- name: DeleteChange :execrows
@@ -398,6 +448,49 @@ func (q *Queries) GetSlot(ctx context.Context, arg GetSlotParams) (RoutineSlot, 
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const listAnnouncementsForUser = `-- name: ListAnnouncementsForUser :many
+
+SELECT a.id, a.group_id, a.body, a.pinned, a.created_by, a.created_at, a.updated_at FROM announcements a
+JOIN class_group_members m ON m.group_id = a.group_id
+WHERE m.user_id = $1 AND (a.pinned OR a.created_at >= $2)
+ORDER BY a.group_id, a.pinned DESC, a.created_at DESC, a.id
+`
+
+type ListAnnouncementsForUserParams struct {
+	UserID uuid.UUID
+	Since  time.Time
+}
+
+// ---- announcements -----------------------------------------------------------
+// The pinned one and recent ones, per group newest first.
+func (q *Queries) ListAnnouncementsForUser(ctx context.Context, arg ListAnnouncementsForUserParams) ([]Announcement, error) {
+	rows, err := q.db.Query(ctx, listAnnouncementsForUser, arg.UserID, arg.Since)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Announcement{}
+	for rows.Next() {
+		var i Announcement
+		if err := rows.Scan(
+			&i.ID,
+			&i.GroupID,
+			&i.Body,
+			&i.Pinned,
+			&i.CreatedBy,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listChangesForUser = `-- name: ListChangesForUser :many
@@ -593,6 +686,32 @@ func (q *Queries) RemoveMember(ctx context.Context, arg RemoveMemberParams) erro
 	return err
 }
 
+const setAnnouncementPinned = `-- name: SetAnnouncementPinned :one
+UPDATE announcements SET pinned = $1 WHERE id = $2 AND group_id = $3
+RETURNING id, group_id, body, pinned, created_by, created_at, updated_at
+`
+
+type SetAnnouncementPinnedParams struct {
+	Pinned  bool
+	ID      uuid.UUID
+	GroupID uuid.UUID
+}
+
+func (q *Queries) SetAnnouncementPinned(ctx context.Context, arg SetAnnouncementPinnedParams) (Announcement, error) {
+	row := q.db.QueryRow(ctx, setAnnouncementPinned, arg.Pinned, arg.ID, arg.GroupID)
+	var i Announcement
+	err := row.Scan(
+		&i.ID,
+		&i.GroupID,
+		&i.Body,
+		&i.Pinned,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const touchGroup = `-- name: TouchGroup :exec
 UPDATE class_groups SET updated_at = now() WHERE id = $1
 `
@@ -600,6 +719,15 @@ UPDATE class_groups SET updated_at = now() WHERE id = $1
 // Marks the group changed (routine edits), so apps know to refresh.
 func (q *Queries) TouchGroup(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, touchGroup, id)
+	return err
+}
+
+const unpinAnnouncements = `-- name: UnpinAnnouncements :exec
+UPDATE announcements SET pinned = false WHERE group_id = $1 AND pinned
+`
+
+func (q *Queries) UnpinAnnouncements(ctx context.Context, groupID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, unpinAnnouncements, groupID)
 	return err
 }
 

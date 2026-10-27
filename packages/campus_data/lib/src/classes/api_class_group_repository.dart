@@ -85,6 +85,38 @@ class ApiClassGroupRepository implements ClassGroupRepository {
   Future<void> deleteChange(String groupId, String changeId) =>
       _api.delete('/groups/${_id(groupId)}/changes/${_id(changeId)}');
 
+  @override
+  Future<Announcement> postAnnouncement(
+    String groupId,
+    String body, {
+    bool pinned = false,
+  }) async => Announcement.fromJson(
+    _map(
+      await _api.post('/groups/${_id(groupId)}/announcements', {
+        'body': body,
+        'pinned': pinned,
+      }),
+    ),
+  );
+
+  @override
+  Future<Announcement> setAnnouncementPinned(
+    String groupId,
+    String announcementId, {
+    required bool pinned,
+  }) async => Announcement.fromJson(
+    _map(
+      await _api.patch(
+        '/groups/${_id(groupId)}/announcements/${_id(announcementId)}',
+        {'pinned': pinned},
+      ),
+    ),
+  );
+
+  @override
+  Future<void> deleteAnnouncement(String groupId, String announcementId) => _api
+      .delete('/groups/${_id(groupId)}/announcements/${_id(announcementId)}');
+
   static String _code(String code) => code.trim().toUpperCase();
 
   // Ids go into the URL path: never let one carry a slash or query.

@@ -9,6 +9,8 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/clock.dart';
 import '../../../../app/router.dart';
+import '../../../announcements/presentation/announcement_widgets.dart';
+import '../../../announcements/presentation/seen_cubit.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
 import '../widgets/class_sheet.dart';
@@ -64,6 +66,10 @@ class GroupPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final g = context.select((MyClassesCubit c) => c.state.group(groupId));
     if (g == null) return const Scaffold(body: SizedBox.shrink());
+    // Opening the group shows its announcements: they're no longer new.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) context.read<SeenCubit>().markSeen(g);
+    });
 
     final days = [
       for (final d in weekOrder)
@@ -118,6 +124,8 @@ class GroupPage extends StatelessWidget {
             _Header(group: g),
             const SizedBox(height: CsSpace.md),
             _InviteCard(group: g),
+            const SizedBox(height: CsSpace.lg),
+            AnnouncementsSection(group: g),
             const SizedBox(height: CsSpace.lg),
             ..._upcomingChanges(context, g),
             if (days.isEmpty)

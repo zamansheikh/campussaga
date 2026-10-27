@@ -1435,6 +1435,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open class group'**
   String get openGroupAction;
+
+  /// No description provided for @announcements.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcements'**
+  String get announcements;
+
+  /// No description provided for @postAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get postAction;
+
+  /// No description provided for @newAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'New announcement'**
+  String get newAnnouncement;
+
+  /// No description provided for @announcementHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write to your class, e.g. Bring a calculator tomorrow'**
+  String get announcementHint;
+
+  /// No description provided for @pinToTop.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin to top'**
+  String get pinToTop;
+
+  /// No description provided for @pinToTopHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Stays first until you unpin it. Only one can be pinned.'**
+  String get pinToTopHint;
+
+  /// No description provided for @pinAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin'**
+  String get pinAction;
+
+  /// No description provided for @unpinAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin'**
+  String get unpinAction;
+
+  /// No description provided for @pinnedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned'**
+  String get pinnedLabel;
+
+  /// No description provided for @deleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteAction;
+
+  /// No description provided for @deleteAnnouncementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this announcement for everyone?'**
+  String get deleteAnnouncementTitle;
+
+  /// No description provided for @noAnnouncements.
+  ///
+  /// In en, this message translates to:
+  /// **'No announcements yet.'**
+  String get noAnnouncements;
+
+  /// No description provided for @noAnnouncementsCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Post updates for your class here: quizzes, things to bring, room news.'**
+  String get noAnnouncementsCr;
+
+  /// No description provided for @announcementPosted.
+  ///
+  /// In en, this message translates to:
+  /// **'Posted. Classmates see it when they open the app.'**
+  String get announcementPosted;
+
+  /// No description provided for @newBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get newBadge;
+
+  /// No description provided for @timeJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get timeJustNow;
+
+  /// No description provided for @timeMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min ago'**
+  String timeMinutesAgo(int minutes);
+
+  /// No description provided for @timeHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h ago'**
+  String timeHoursAgo(int hours);
+
+  /// No description provided for @timeYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'yesterday'**
+  String get timeYesterday;
+
+  /// No description provided for @errorAnnouncementGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This announcement was already deleted.'**
+  String get errorAnnouncementGone;
 }
 
 class _AppLocalizationsDelegate

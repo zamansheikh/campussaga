@@ -136,6 +136,57 @@ class MyClassesCubit extends Cubit<MyClassesState> {
     }
   }
 
+  Future<void> postAnnouncement(
+    String groupId,
+    String body, {
+    bool pinned = false,
+  }) async {
+    final a = await _repo.postAnnouncement(groupId, body, pinned: pinned);
+    final g = state.group(groupId);
+    if (g == null) return;
+    _replace(
+      g.copyWith(
+        announcements: sortAnnouncements([
+          for (final x in g.announcements)
+            pinned ? x.copyWith(pinned: false) : x,
+          a,
+        ]),
+      ),
+    );
+  }
+
+  Future<void> setAnnouncementPinned(
+    String groupId,
+    String id, {
+    required bool pinned,
+  }) async {
+    await _repo.setAnnouncementPinned(groupId, id, pinned: pinned);
+    final g = state.group(groupId);
+    if (g == null) return;
+    _replace(
+      g.copyWith(
+        announcements: sortAnnouncements([
+          for (final x in g.announcements)
+            x.id == id
+                ? x.copyWith(pinned: pinned)
+                : (pinned ? x.copyWith(pinned: false) : x),
+        ]),
+      ),
+    );
+  }
+
+  Future<void> deleteAnnouncement(String groupId, String id) async {
+    await _repo.deleteAnnouncement(groupId, id);
+    final g = state.group(groupId);
+    if (g != null) {
+      _replace(
+        g.copyWith(
+          announcements: g.announcements.where((x) => x.id != id).toList(),
+        ),
+      );
+    }
+  }
+
   void _replace(ClassGroup g) =>
       _set([for (final x in state.groups) x.id == g.id ? g : x]);
 

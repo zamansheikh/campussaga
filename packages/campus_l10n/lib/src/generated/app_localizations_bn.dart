@@ -795,4 +795,78 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get openGroupAction => 'ক্লাস গ্রুপ খোলো';
+
+  @override
+  String get announcements => 'ঘোষণা';
+
+  @override
+  String get postAction => 'পোস্ট করো';
+
+  @override
+  String get newAnnouncement => 'নতুন ঘোষণা';
+
+  @override
+  String get announcementHint => 'ক্লাসকে লেখো, যেমন: কাল ক্যালকুলেটর আনবে';
+
+  @override
+  String get pinToTop => 'উপরে পিন করো';
+
+  @override
+  String get pinToTopHint =>
+      'আনপিন না করা পর্যন্ত সবার উপরে থাকবে। একটিই পিন করা যায়।';
+
+  @override
+  String get pinAction => 'পিন করো';
+
+  @override
+  String get unpinAction => 'আনপিন করো';
+
+  @override
+  String get pinnedLabel => 'পিন করা';
+
+  @override
+  String get deleteAction => 'মুছে ফেলো';
+
+  @override
+  String get deleteAnnouncementTitle => 'সবার জন্য এই ঘোষণা মুছে ফেলবে?';
+
+  @override
+  String get noAnnouncements => 'এখনো কোনো ঘোষণা নেই।';
+
+  @override
+  String get noAnnouncementsCr =>
+      'ক্লাসের আপডেট এখানে পোস্ট করো: কুইজ, কী আনতে হবে, রুমের খবর।';
+
+  @override
+  String get announcementPosted => 'পোস্ট হয়েছে। সহপাঠীরা অ্যাপ খুললেই দেখবে।';
+
+  @override
+  String get newBadge => 'নতুন';
+
+  @override
+  String get timeJustNow => 'এইমাত্র';
+
+  @override
+  String timeMinutesAgo(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString মিনিট আগে';
+  }
+
+  @override
+  String timeHoursAgo(int hours) {
+    final intl.NumberFormat hoursNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String hoursString = hoursNumberFormat.format(hours);
+
+    return '$hoursString ঘণ্টা আগে';
+  }
+
+  @override
+  String get timeYesterday => 'গতকাল';
+
+  @override
+  String get errorAnnouncementGone => 'এই ঘোষণাটি আগেই মুছে ফেলা হয়েছে।';
 }

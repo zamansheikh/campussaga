@@ -364,6 +364,46 @@ void main() {
       await capture(tester, 'changes-${look.name}');
     });
 
+    shot('news ${look.name}', (tester) async {
+      final g = _group(GroupRole.cr).copyWith(
+        announcements: [
+          Announcement(
+            id: 'a1',
+            body: 'Mid-term exam on 5 November, Room 504.\nSyllabus: chapters 1-5.',
+            pinned: true,
+            createdAt: DateTime(2026, 10, 20, 18),
+          ),
+          Announcement(
+            id: 'a2',
+            body: 'Bring a scientific calculator to the Database Lab tomorrow.',
+            createdAt: DateTime(2026, 10, 27, 7, 20),
+          ),
+          Announcement(
+            id: 'a3',
+            body: 'Assignment 2 deadline moved to Sunday.',
+            createdAt: DateTime(2026, 10, 26, 21),
+          ),
+        ],
+      );
+      final router = await start(tester, look, user: _student, groups: [g]);
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -420));
+      await tester.pumpAndSettle();
+      await capture(tester, 'news-${look.name}');
+      unawaited(router.push(Routes.group('g1')));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(Scrollable).last, const Offset(0, -260));
+      await tester.pumpAndSettle();
+      await capture(tester, 'news-${look.name}');
+      await tester.tap(find.byIcon(Icons.campaign_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byType(TextField).last,
+        'Class is in Room 805 today.',
+      );
+      await tester.pumpAndSettle();
+      await capture(tester, 'news-${look.name}');
+    });
+
     shot('join ${look.name}', (tester) async {
       final router = await start(
         tester,

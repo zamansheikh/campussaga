@@ -816,4 +816,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openGroupAction => 'Open class group';
+
+  @override
+  String get announcements => 'Announcements';
+
+  @override
+  String get postAction => 'Post';
+
+  @override
+  String get newAnnouncement => 'New announcement';
+
+  @override
+  String get announcementHint =>
+      'Write to your class, e.g. Bring a calculator tomorrow';
+
+  @override
+  String get pinToTop => 'Pin to top';
+
+  @override
+  String get pinToTopHint =>
+      'Stays first until you unpin it. Only one can be pinned.';
+
+  @override
+  String get pinAction => 'Pin';
+
+  @override
+  String get unpinAction => 'Unpin';
+
+  @override
+  String get pinnedLabel => 'Pinned';
+
+  @override
+  String get deleteAction => 'Delete';
+
+  @override
+  String get deleteAnnouncementTitle =>
+      'Delete this announcement for everyone?';
+
+  @override
+  String get noAnnouncements => 'No announcements yet.';
+
+  @override
+  String get noAnnouncementsCr =>
+      'Post updates for your class here: quizzes, things to bring, room news.';
+
+  @override
+  String get announcementPosted =>
+      'Posted. Classmates see it when they open the app.';
+
+  @override
+  String get newBadge => 'New';
+
+  @override
+  String get timeJustNow => 'just now';
+
+  @override
+  String timeMinutesAgo(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString min ago';
+  }
+
+  @override
+  String timeHoursAgo(int hours) {
+    final intl.NumberFormat hoursNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String hoursString = hoursNumberFormat.format(hours);
+
+    return '$hoursString h ago';
+  }
+
+  @override
+  String get timeYesterday => 'yesterday';
+
+  @override
+  String get errorAnnouncementGone => 'This announcement was already deleted.';
 }

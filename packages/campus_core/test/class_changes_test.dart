@@ -106,13 +106,39 @@ void main() {
     ]);
   });
 
+  test('announcements: JSON and order', () {
+    final old = Announcement(
+      id: 'a',
+      body: 'old',
+      createdAt: DateTime(2026, 10, 1),
+    );
+    final newer = Announcement(
+      id: 'b',
+      body: 'new',
+      createdAt: DateTime(2026, 10, 2),
+    );
+    final pinned = old.copyWith(pinned: true);
+    expect(sortAnnouncements([old, newer]).map((a) => a.id), ['b', 'a']);
+    expect(sortAnnouncements([newer, pinned]).map((a) => a.id), ['a', 'b']);
+    final g = group(const []).copyWith(announcements: [newer]);
+    final back = ClassGroup.fromJson(g.toJson());
+    expect(back.announcements.single.body, 'new');
+    expect(back.announcements.single.createdAt, newer.createdAt);
+    expect(back.copyWith(slots: const []).announcements, hasLength(1));
+  });
+
   test('copyWith keeps the changes', () {
     expect(group(changes).copyWith(slots: const []).changes, hasLength(3));
   });
 
   test('JSON round trip and drafts', () {
     final g = group(changes);
-    expect(ClassGroup.fromJson(g.toJson()).toJson(), g.toJson());
+    final back = ClassGroup.fromJson(g.toJson());
+    expect(back.toJson(), g.toJson());
+    // Saved offline: changes must survive the round trip.
+    expect(back.changes.map((c) => (c.kind, c.date, c.room, c.startMin)), [
+      for (final c in changes) (c.kind, c.date, c.room, c.startMin),
+    ]);
     expect(
       ChangeDraft.cancel(slotId: 's311', date: wed, note: 'sick').toJson(),
       containsPair('date', '2026-10-28'),

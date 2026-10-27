@@ -14,6 +14,9 @@
 //   - POST   /groups/{id}/changes       cancel / move a class, or add an
 //     extra class, on one date (CR)
 //   - DELETE /groups/{id}/changes/{c}   undo a change (CR)
+//   - POST   /groups/{id}/announcements post a message (CR)
+//   - PATCH  /groups/{id}/announcements/{a}  pin / unpin (CR)
+//   - DELETE /groups/{id}/announcements/{a}  delete (CR)
 //
 // Security notes:
 //   - A group is visible only to its members. Codes only work for students
@@ -75,8 +78,10 @@ type Group struct {
 	MemberCount int64     `json:"memberCount"`
 	Slots       []Slot    `json:"slots"`
 	// Changes from yesterday on (Bangladesh dates), earliest first.
-	Changes   []Change  `json:"changes"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	Changes []Change `json:"changes"`
+	// The pinned one first, then the last 30 days' newest first.
+	Announcements []Announcement `json:"announcements"`
+	UpdatedAt     time.Time      `json:"updatedAt"`
 }
 
 // Slot is one weekly class. Weekday is ISO (1 = Monday ... 7 = Sunday);
@@ -171,11 +176,18 @@ func (s *Service) MyGroups(ctx context.Context) ([]Group, error) {
 	for _, ch := range changes {
 		changesByGroup[ch.GroupID] = append(changesByGroup[ch.GroupID], changeView(ch))
 	}
+	news, err := s.announcementsByGroup(ctx, q, c.UserID)
+	if err != nil {
+		return nil, err
+	}
 	out := make([]Group, 0, len(rows))
 	for _, r := range rows {
 		g := groupView(r.ClassGroup, r.Role, r.MemberCount, byGroup[r.ClassGroup.ID])
 		if cs := changesByGroup[r.ClassGroup.ID]; cs != nil {
 			g.Changes = cs
+		}
+		if as := news[r.ClassGroup.ID]; as != nil {
+			g.Announcements = as
 		}
 		out = append(out, g)
 	}
@@ -529,7 +541,7 @@ func groupView(g store.ClassGroup, role string, members int64, slots []Slot) Gro
 	return Group{
 		ID: g.ID, Department: g.Department, Batch: g.Batch, Section: g.Section, Semester: g.Semester,
 		JoinCode: g.JoinCode, Role: role, MemberCount: members, Slots: slots, Changes: []Change{},
-		UpdatedAt: g.UpdatedAt,
+		Announcements: []Announcement{}, UpdatedAt: g.UpdatedAt,
 	}
 }
 

@@ -113,3 +113,27 @@ RETURNING *;
 
 -- name: DeleteChange :execrows
 DELETE FROM routine_changes WHERE id = @id AND group_id = @group_id;
+
+-- ---- announcements -----------------------------------------------------------
+
+-- The pinned one and recent ones, per group newest first.
+-- name: ListAnnouncementsForUser :many
+SELECT a.* FROM announcements a
+JOIN class_group_members m ON m.group_id = a.group_id
+WHERE m.user_id = @user_id AND (a.pinned OR a.created_at >= @since)
+ORDER BY a.group_id, a.pinned DESC, a.created_at DESC, a.id;
+
+-- name: CreateAnnouncement :one
+INSERT INTO announcements (group_id, body, pinned, created_by)
+VALUES (@group_id, @body, @pinned, @created_by)
+RETURNING *;
+
+-- name: UnpinAnnouncements :exec
+UPDATE announcements SET pinned = false WHERE group_id = @group_id AND pinned;
+
+-- name: SetAnnouncementPinned :one
+UPDATE announcements SET pinned = @pinned WHERE id = @id AND group_id = @group_id
+RETURNING *;
+
+-- name: DeleteAnnouncement :execrows
+DELETE FROM announcements WHERE id = @id AND group_id = @group_id;

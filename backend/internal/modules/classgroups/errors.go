@@ -24,6 +24,8 @@ var (
 		"This class was not found")
 	ErrChangeNotFound = apperr.New(http.StatusNotFound, "CHANGE_NOT_FOUND",
 		"This change was not found")
+	ErrAnnouncementNotFound = apperr.New(http.StatusNotFound, "ANNOUNCEMENT_NOT_FOUND",
+		"This announcement was not found")
 	ErrChangeLimit = apperr.New(http.StatusConflict, "CHANGE_LIMIT_REACHED",
 		"This routine already has the most upcoming changes allowed")
 )

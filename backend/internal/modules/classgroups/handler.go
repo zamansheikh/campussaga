@@ -30,6 +30,10 @@ func (s *Service) Routes(r *httpx.Router) {
 	r.Student().Delete("/groups/{id}/slots/{slot}", httpx.Handle(s.handleDeleteSlot, httpx.NoContent()))
 	r.Student().Post("/groups/{id}/changes", httpx.Handle(s.handleAddChange, httpx.Status(http.StatusCreated)))
 	r.Student().Delete("/groups/{id}/changes/{change}", httpx.Handle(s.handleDeleteChange, httpx.NoContent()))
+	r.Student().With(r.LimitUser("announce", 30, 24*time.Hour)).
+		Post("/groups/{id}/announcements", httpx.Handle(s.handlePost, httpx.Status(http.StatusCreated)))
+	r.Student().Patch("/groups/{id}/announcements/{a}", httpx.Handle(s.handlePin))
+	r.Student().Delete("/groups/{id}/announcements/{a}", httpx.Handle(s.handleDeleteAnnouncement, httpx.NoContent()))
 }
 
 type groupsRes struct {
@@ -128,4 +132,31 @@ type changePath struct {
 
 func (s *Service) handleDeleteChange(ctx context.Context, in *changePath) (*httpx.Empty, error) {
 	return nil, s.DeleteChange(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.Change))
+}
+
+type postReq struct {
+	groupPath
+	AnnouncementInput
+}
+
+func (s *Service) handlePost(ctx context.Context, in *postReq) (*Announcement, error) {
+	return s.Post(ctx, uuid.MustParse(in.ID), &in.AnnouncementInput)
+}
+
+type announcementPath struct {
+	ID string `json:"-" path:"id" validate:"required,uuid"`
+	A  string `json:"-" path:"a" validate:"required,uuid"`
+}
+
+type pinReq struct {
+	announcementPath
+	Pinned *bool `json:"pinned" validate:"required"`
+}
+
+func (s *Service) handlePin(ctx context.Context, in *pinReq) (*Announcement, error) {
+	return s.SetPinned(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.A), *in.Pinned)
+}
+
+func (s *Service) handleDeleteAnnouncement(ctx context.Context, in *announcementPath) (*httpx.Empty, error) {
+	return nil, s.DeleteAnnouncement(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.A))
 }

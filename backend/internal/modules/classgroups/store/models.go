@@ -10,6 +10,16 @@ import (
 	"github.com/google/uuid"
 )
 
+type Announcement struct {
+	ID        uuid.UUID
+	GroupID   uuid.UUID
+	Body      string
+	Pinned    bool
+	CreatedBy *uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 type ClassGroup struct {
 	ID           uuid.UUID
 	UniversityID uuid.UUID

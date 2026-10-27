@@ -3,6 +3,7 @@ import 'package:campus_data/campus_data.dart';
 import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../features/announcements/data/seen_store.dart';
 import '../features/auth/data/google_auth.dart';
 import '../features/classes/data/routine_cache.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
@@ -54,6 +55,7 @@ Future<void> configureDependencies({
     )
     ..registerLazySingleton<RoutineCache>(PrefsRoutineCache.new)
     ..registerLazySingleton<ReminderStore>(PrefsReminderStore.new)
+    ..registerLazySingleton<SeenStore>(PrefsSeenStore.new)
     ..registerLazySingleton<ReminderScheduler>(LocalNotificationScheduler.new)
     ..registerLazySingleton<GoogleAuth>(FirebaseGoogleAuth.new);
 }
