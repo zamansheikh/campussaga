@@ -33,7 +33,7 @@ export function UniversityDialog({ university }: { university?: AdminUniversity 
   const [error, setError] = useState<string>();
   const [kind, setKind] = useState<string>(university?.kind ?? NONE);
   const [active, setActive] = useState(university?.active ?? true);
-  const [domains, setDomainList] = useState<string[]>([]);
+  const [domains, setDomainList] = useState<string[]>(university?.domains ?? []);
 
   function submit(form: FormData) {
     const get = (k: string) => String(form.get(k) ?? "");
@@ -46,15 +46,24 @@ export function UniversityDialog({ university }: { university?: AdminUniversity 
     };
     setError(undefined);
     startTransition(async () => {
-      const res = university
-        ? await updateUniversity(university.id, changes(university, { ...common, active }))
-        : await createUniversity({ ...common, slug: get("slug"), domains });
-      if (res.ok) {
-        toast.success(university ? "University saved" : "University added");
-        setOpen(false);
-      } else {
-        setError(res.error);
+      if (!university) {
+        const res = await createUniversity({ ...common, slug: get("slug"), domains });
+        if (!res.ok) return setError(res.error);
+        toast.success("University added");
+        return setOpen(false);
       }
+      // Details and domains are saved separately; only what changed.
+      const patch = changes(university, { ...common, active });
+      if (Object.keys(patch).length > 0) {
+        const res = await updateUniversity(university.id, patch);
+        if (!res.ok) return setError(res.error);
+      }
+      if (domains.join(",") !== university.domains.join(",")) {
+        const res = await setDomains(university.id, domains);
+        if (!res.ok) return setError(res.error);
+      }
+      toast.success("University saved");
+      setOpen(false);
     });
   }
 
@@ -67,7 +76,7 @@ export function UniversityDialog({ university }: { university?: AdminUniversity 
           setError(undefined);
           setKind(university?.kind ?? NONE);
           setActive(university?.active ?? true);
-          setDomainList([]);
+          setDomainList(university?.domains ?? []);
         }
       }}
     >
@@ -123,6 +132,13 @@ export function UniversityDialog({ university }: { university?: AdminUniversity 
           <Field label="Website" htmlFor="website" hint="Domain only, e.g. diu.edu.bd">
             <Input id="website" name="website" defaultValue={university?.website ?? ""} autoComplete="off" />
           </Field>
+          <Field
+            label={`Student email domains${domains.length > 0 ? ` (${domains.length})` : ""}`}
+            htmlFor="domain-input"
+            hint="Students with these emails are verified. The website above is separate."
+          >
+            <DomainInput value={domains} onChange={setDomainList} />
+          </Field>
           {editing ? (
             <div className="flex items-center justify-between rounded-lg border px-3 py-2.5">
               <div>
@@ -131,11 +147,7 @@ export function UniversityDialog({ university }: { university?: AdminUniversity 
               </div>
               <Switch id="active" checked={active} onCheckedChange={setActive} />
             </div>
-          ) : (
-            <Field label="Student email domains" htmlFor="domain-input" hint="Students with these emails are verified.">
-              <DomainInput value={domains} onChange={setDomainList} />
-            </Field>
-          )}
+          ) : null}
           {error ? (
             <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {error}

@@ -35,7 +35,7 @@ const createSchema = fields.extend({
     .trim()
     .toLowerCase()
     .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Slug: lowercase letters, numbers and dashes"),
-  domains: z.array(domain).max(20),
+  domains: z.array(domain).max(50),
 });
 
 function issues(e: z.ZodError) {
@@ -107,7 +107,7 @@ export async function setActive(id: string, active: boolean): Promise<ActionResu
 
 export async function setDomains(id: string, domains: string[]): Promise<ActionResult<AdminUniversity>> {
   const parsedId = z.uuid().safeParse(id);
-  const parsed = z.array(domain).max(20).safeParse(domains);
+  const parsed = z.array(domain).max(50).safeParse(domains);
   if (!parsedId.success) return { ok: false, error: "That university isn't valid." };
   if (!parsed.success) return { ok: false, error: issues(parsed.error) };
   try {

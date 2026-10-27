@@ -74,7 +74,7 @@ type createUniversityReq struct {
 	City    string   `json:"city" validate:"max=60"`
 	Kind    string   `json:"kind" validate:"omitempty,oneof=public private"`
 	Website string   `json:"website" validate:"max=100"`
-	Domains []string `json:"domains" validate:"max=20,dive,max=100"`
+	Domains []string `json:"domains" validate:"max=50,dive,max=100"`
 }
 
 func (s *Service) handleCreateUniversity(ctx context.Context, in *createUniversityReq) (*University, error) {
@@ -172,7 +172,7 @@ func (s *Service) handlePatchUniversity(ctx context.Context, in *patchUniversity
 
 type domainsReq struct {
 	ID      string   `json:"-" path:"id" validate:"required,uuid"`
-	Domains []string `json:"domains" validate:"max=20,dive,max=100"`
+	Domains []string `json:"domains" validate:"max=50,dive,max=100"`
 }
 
 func (s *Service) handleSetDomains(ctx context.Context, in *domainsReq) (*University, error) {
