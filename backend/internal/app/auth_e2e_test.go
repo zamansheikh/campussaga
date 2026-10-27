@@ -31,7 +31,8 @@ func TestPublicEndpoints(t *testing.T) {
 		domains[u.Slug] = u.Domains
 	}
 	assert.Equal(t, []string{"test.ac.bd"}, domains["test-uni"])
-	assert.Equal(t, []string{"diu.edu.bd"}, domains["diu"], "launch universities ship with the migrations")
+	assert.Contains(t, domains["diu"], "diu.edu.bd", "universities ship with the migrations")
+	assert.Greater(t, len(list.Universities), 150, "all Bangladeshi universities are seeded")
 
 	r = h.do("GET", "/config", "", nil)
 	require.Equal(t, http.StatusOK, r.Status, r.Raw)

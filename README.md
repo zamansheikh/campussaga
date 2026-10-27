@@ -20,6 +20,7 @@ morning, and a safe, anonymous voice to get campus problems fixed.
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Releases R0–R5, scope, definition of done |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Database, system design, data model, app structure |
 | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Colors, type, components, rebranding checklist |
+| [docs/UNIVERSITIES.md](docs/UNIVERSITIES.md) | All 169 Bangladeshi universities and their student email domains, with patterns |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Running the Go API + Postgres on our VPS |
 
 ## Project layout

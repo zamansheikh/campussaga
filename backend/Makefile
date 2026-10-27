@@ -7,7 +7,7 @@ DEVDB := postgres://campus:campus@localhost:55632/campus?sslmode=disable
 -include .env
 export
 
-.PHONY: help deps-up deps-down run migrate seed build test test-short sqlc fmt vet lint check clean-testdbs
+.PHONY: help deps-up deps-down run migrate seed universities build test test-short sqlc fmt vet lint check clean-testdbs
 
 help: ## list targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-14s %s\n",$$1,$$2}'
@@ -29,6 +29,9 @@ migrate: ## apply migrations to DATABASE_URL (default: local dev db)
 
 seed: migrate ## load development universities (demo.ac.bd, sit.edu.bd)
 	psql "$(DEVDB)" -v ON_ERROR_STOP=1 -q -f seed/dev.sql
+
+universities: ## regenerate docs/UNIVERSITIES.md (add MIGRATION=00130_name for a new seed migration)
+	python3 tools/universities/generate.py $(if $(MIGRATION),--migration $(MIGRATION))
 
 sqlc: ## regenerate every module's store/ from its sqlc.yaml
 	@for f in $$(find internal -name sqlc.yaml); do echo "sqlc $$f"; (cd $$(dirname $$f) && sqlc generate) || exit 1; done

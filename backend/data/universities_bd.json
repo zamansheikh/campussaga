@@ -1,0 +1,3697 @@
+{
+  "about": "Bangladeshi universities (UGC-approved, public + private) and the email domains their students sign in with. Source of truth for backend/migrations universities seed: edit here, then run backend/tools/universities/generate.py.",
+  "researched_on": "2026-10-27",
+  "sources": [
+    "https://www.ugc.gov.bd/ (public university pages)",
+    "http://www.ugc-universities.gov.bd/private-universities",
+    "each university's official website"
+  ],
+  "rules": [
+    "sign_in_domains = website + student_email_domains + alias_domains; every subdomain of these also matches (longest match wins).",
+    "Cross-domain student domains are accepted only when they clearly belong to the same institution; unverified ones go to held_domains.",
+    "Never a shared suffix (ac.bd, edu.bd) or free mail provider: the database refuses them (migration 00105)."
+  ],
+  "universities": [
+    {
+      "slug": "amust",
+      "name": "Ahsania Mission University of Science and Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Rajshahi",
+      "website": "amust.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "amust.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.amust.ac.bd/"
+      ],
+      "notes": "Live site https://www.amust.ac.bd/ (matches UGC). Only info-type contacts seen; no student email evidence; amust.ac.bd has no MX record. Bangla name on site appears only inflected (…বিশ্ববিদ্যালয়ের), so name_bn null."
+    },
+    {
+      "slug": "aust",
+      "name": "Ahsanullah University of Science and Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "aust.edu",
+      "student_email_domains": [
+        "aust.edu"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "aust.edu"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.aust.edu/",
+        "https://ieomsociety.org/?p=3086"
+      ],
+      "notes": "Students use <studentID>@aust.edu (e.g. 160207002@aust.edu, 170107030@aust.edu) listed for AUST IEOM student chapter officers (secondary source); aust.edu MX = Google Workspace. Live site matches UGC. Bangla name only inflected on site."
+    },
+    {
+      "slug": "aiub",
+      "name": "American International University-Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "aiub.edu",
+      "student_email_domains": [
+        "student.aiub.edu"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "aiub.edu",
+        "student.aiub.edu"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.aiub.edu/",
+        "https://www.aiub.edu/notice---newly-enrolled-freshman-students-of-spring-2021-22-first-day-of-class-and-other-instructions"
+      ],
+      "notes": "UGC lists aiub.ac.bd; live site is aiub.edu. Official AIUB notice: Teams username 'universityID@student.aiub.edu' is also the AIUB student email (Microsoft 365, login at mail.aiub.edu). student.aiub.edu MX -> Outlook. Subdomain of aiub.edu."
+    },
+    {
+      "slug": "akmu",
+      "name": "Anwer Khan Modern University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "akmu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "akmu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://akmu.edu.bd/",
+        "https://iems.akmu.edu.bd/"
+      ],
+      "notes": "www.akmu.edu.bd redirects to akmu.edu.bd. Google Workspace MX (web-mail link points to gmail.com) but no evidence students get accounts; student portal iems uses User ID login."
+    },
+    {
+      "slug": "asaub",
+      "name": "ASA University Bangladesh",
+      "name_bn": "আশা ইউনিভার্সিটি বাংলাদেশ",
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "asaub.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "asaub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.asaub.edu.bd/",
+        "https://www.asaub.edu.bd/"
+      ],
+      "notes": "Live site matches UGC; mail.asaub.edu.bd + Microsoft 365 MX, but no evidence of student accounts found."
+    },
+    {
+      "slug": "aub",
+      "name": "Asian University of Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "aub.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "aub.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://aub.ac.bd/",
+        "https://aub.ac.bd/notice-details/109"
+      ],
+      "notes": "Live site https://aub.ac.bd/ (www.aub.ac.bd over plain http served an nginx test page; aub.edu.bd redirects to aub.ac.bd). Site banner: 'www.aub.ac.bd is our only website'. Google MX; student portal myasian.aub.ac.bd logs in by Student ID; no student email evidence."
+    },
+    {
+      "slug": "adust",
+      "name": "Atish Dipankar University of Science & Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "adust.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "adust.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.adust.edu.bd/"
+      ],
+      "notes": "Live site https://www.adust.edu.bd/ (React SPA, matches UGC). Google MX; no student email evidence."
+    },
+    {
+      "slug": "bubban",
+      "name": "Bandarban University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Bandarban",
+      "website": "bubban.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bubban.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.bubban.ac.bd/"
+      ],
+      "notes": "Live site https://www.bubban.ac.bd/ (SPA; staff emails @bubban.ac.bd). Caveat: its international-affairs page lists addresses @bu.edu.bd, but bu.edu.bd is Bangladesh University's site - do NOT map bu.edu.bd to Bandarban. No student email evidence."
+    },
+    {
+      "slug": "baiust",
+      "name": "Bangladesh Army International University of Science & Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Cumilla",
+      "website": "baiust.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "baiust.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://baiust.ac.bd/"
+      ],
+      "notes": "www.baiust.ac.bd redirects to https://baiust.ac.bd/. Google MX; student portal iumss.baiust.ac.bd; no student email evidence. RePEc lists an old dba.baiust.edu.bd host (unverified)."
+    },
+    {
+      "slug": "bauet",
+      "name": "Bangladesh Army University of Engineering & Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Natore",
+      "website": "bauet.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bauet.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://bauet.ac.bd/"
+      ],
+      "notes": "www.bauet.ac.bd redirects to https://bauet.ac.bd/. Google MX + webmail link; no evidence students get accounts (registrar even uses a gmail address)."
+    },
+    {
+      "slug": "baust",
+      "name": "Bangladesh Army University of Science and Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Saidpur",
+      "website": "baust.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "baust.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://baust.edu.bd/",
+        "https://ieomsociety.org/baust/"
+      ],
+      "notes": "www.baust.edu.bd redirects to https://baust.edu.bd/. student.baust.edu.bd is the student portal (no MX), not an email domain. Faculty use name.dept@baust.edu.bd; IEOM student chapter officers listed with personal Gmail. No student email evidence."
+    },
+    {
+      "slug": "baustkhulna",
+      "name": "Bangladesh Army University of Science and Technology, Khulna",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Khulna",
+      "website": "baustkhulna.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "baustkhulna.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://baustkhulna.ac.bd/"
+      ],
+      "notes": "www.baustkhulna.ac.bd redirects to baustkhulna.ac.bd. Only staff/role addresses (info@, vc@, student_suggestions@ is a feedback inbox). Hostinger mail; no student email evidence."
+    },
+    {
+      "slug": "biu",
+      "name": "Bangladesh Islami University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "biu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "biu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/39",
+        "https://biu.ac.bd/"
+      ],
+      "notes": "www.biu.ac.bd redirects to https://biu.ac.bd/. Only info@/registrar@biu.ac.bd seen; student portal (studentportal/authorise/login) gives no email hint. No student email evidence."
+    },
+    {
+      "slug": "bu",
+      "name": "Bangladesh University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "bu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/40",
+        "https://www.bu.edu.bd/"
+      ],
+      "notes": "Staff use @bu.edu.bd (vc@, controller@, it@). Student portal hosted at busmsportal.azurewebsites.net. No student email evidence."
+    },
+    {
+      "slug": "bubt",
+      "name": "Bangladesh University of Business & Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "bubt.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bubt.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/41",
+        "https://www.bubt.edu.bd/",
+        "https://www.bubt.edu.bd/page/it-services"
+      ],
+      "notes": "Staff on @bubt.edu.bd and dept subdomains (e.g. hod@management.bubt.edu.bd, cse.bubt.edu.bd); many faculty list gmail. No student email evidence found."
+    },
+    {
+      "slug": "buhs",
+      "name": "Bangladesh University of Health Sciences",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "buhs.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "buhs.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/48",
+        "https://buhs.ac.bd/"
+      ],
+      "notes": "www redirects to https://buhs.ac.bd/ (Next.js site). UGC lists info@buhs.ac.bd; WHO directory shows older buhs-edu.org. Mirpur, Dhaka. No student email evidence."
+    },
+    {
+      "slug": "bgctub",
+      "name": "BGC Trust University Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Chattogram",
+      "website": "bgctub.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bgctub.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/54",
+        "https://bgctub.ac.bd/"
+      ],
+      "notes": "www.bgctub.ac.bd (UGC-listed) did not connect; bare bgctub.ac.bd works. Site lists info@bgctub.ac.bd and infobgctub@gmail.com. No student email evidence."
+    },
+    {
+      "slug": "buft",
+      "name": "BGMEA University of Fashion & Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "buft.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "buft.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/58",
+        "https://www.buft.edu.bd/"
+      ],
+      "notes": "Site Login menu links 'Email' to mail.google.com/a/buft.edu.bd (Google Workspace on buft.edu.bd) beside UCAM student portal, but nothing confirms students get accounts; buft.edu.bd is a plausible candidate. AIMS portal is on buft.ac.bd (second domain owned)."
+    },
+    {
+      "slug": "bracu",
+      "name": "BRAC University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "bracu.ac.bd",
+      "student_email_domains": [
+        "g.bracu.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bracu.ac.bd",
+        "g.bracu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/59",
+        "https://www.bracu.ac.bd/",
+        "https://www.bracu.ac.bd/node/21097",
+        "https://www.bracu.ac.bd/sites/default/files/admission/results/Spring-2020/CSE%20Postgraduate%20Admission%20Test%20Result_With%20EAP%20Notice.pdf"
+      ],
+      "notes": "Official BRACU notice requires a G Suite student email ID for registration/advising; official admission PDF lists a student address @g.bracu.ac.bd. Site behind Cloudflare challenge (403 to curl/WebFetch); verified via search index of official pages. Staff use bracu.ac.bd."
+    },
+    {
+      "slug": "briu",
+      "name": "Brahmaputra International University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Jamalpur",
+      "website": "briu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "briu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/96",
+        "https://briu.ac.bd/"
+      ],
+      "notes": "http://www.briu.ac.bd shows a hosting 'website has been stopped' page; https://briu.ac.bd/ is live. Portal at portal.briu.ac.bd. UGC also lists briuniversitybd@gmail.com. No student email evidence."
+    },
+    {
+      "slug": "britannia",
+      "name": "Britannia University",
+      "name_bn": "ব্রিটানিয়া বিশ্ববিদ্যালয়",
+      "kind": "private",
+      "city": "Cumilla",
+      "website": "britannia.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "britannia.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/65",
+        "https://www.britannia.edu.bd/"
+      ],
+      "notes": "Bangla name from own homepage: 'Britannia University (BU) (Bengali: ব্রিটানিয়া বিশ্ববিদ্যালয়)'. ERP at erp.britannia.edu.bd. No student email evidence."
+    },
+    {
+      "slug": "cub",
+      "name": "Canadian University of Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "cub.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/165",
+        "https://www.cub.edu.bd/",
+        "https://cub.edu.bd/officer_list.php"
+      ],
+      "notes": "Staff use firstname.lastname@cub.edu.bd; UMS at ums.cub.edu.bd; also uses cub.ac.bd (gallery.cub.ac.bd). Bangla name only seen inflected in headlines. No student email evidence."
+    },
+    {
+      "slug": "ccnust",
+      "name": "CCN University of Science & Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Cumilla",
+      "website": "ccnust.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ccnust.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/66",
+        "https://ccnust.ac.bd/"
+      ],
+      "notes": "www redirects to https://ccnust.ac.bd/. Official contacts are ccnust@gmail.com / ccncomilla@yahoo.com; no institutional email seen at all. Bangla 'সিসিএন বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়' appears only inside a news headline, not as standalone name."
+    },
+    {
+      "slug": "cust",
+      "name": "Central University of Science and Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "cust.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cust.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/170",
+        "https://cust.ac.bd/",
+        "https://cust.ac.bd/page/ict-department"
+      ],
+      "notes": "www redirects to https://cust.ac.bd/ (Mirpur, Dhaka). Only enquiries@cust.ac.bd seen; student login asks for 'Email ID' without domain. No student email evidence."
+    },
+    {
+      "slug": "cwu",
+      "name": "Central Women's University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "cwu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cwu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.cwu.edu.bd/"
+      ],
+      "notes": "Site live at www.cwu.edu.bd (no redirect). Only info@cwu.edu.bd seen; MX points to mail.kazifarms.com. No student email evidence. Bangla name appears only inside news sentences (mostly inflected), not as a standalone header, so left null."
+    },
+    {
+      "slug": "cbuft",
+      "name": "Chattogram BGMEA University of Fashion and Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Chattogram",
+      "website": "cbuft.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cbuft.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.cbuft.edu.bd/"
+      ],
+      "notes": "Site live, no redirect. info@cbuft.edu.bd only; domain on Google Workspace (MX). No student email evidence. Do not confuse with BUFT Dhaka (buft.edu.bd)."
+    },
+    {
+      "slug": "ciu",
+      "name": "Chittagong Independent University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Chattogram",
+      "website": "ciu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ciu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.ciu.edu.bd/",
+        "https://ciu.ac.bd/"
+      ],
+      "notes": "Two live sites: www.ciu.edu.bd (UGC-listed, 'CIU-Home') and ciu.ac.bd (newer WordPress site with 2026 notices); both link 'E-mail' to mail.google.com/a/ciu.edu.bd and list office addresses @ciu.edu.bd. ciu.ac.bd also has Google MX. No direct evidence students get @ciu.edu.bd mailboxes."
+    },
+    {
+      "slug": "cityuniversity",
+      "name": "City University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "cityuniversity.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cityuniversity.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.cityuniversity.ac.bd/"
+      ],
+      "notes": "Site live, no redirect. Header 'Webmail' links to outlook.office.com; domain MX is Microsoft 365. No evidence of who (students vs staff) gets mailboxes."
+    },
+    {
+      "slug": "cbiu",
+      "name": "Cox's Bazar International University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Cox's Bazar",
+      "website": "cbiu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cbiu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.cbiu.ac.bd/",
+        "https://portal.cbiu.ac.bd/"
+      ],
+      "notes": "Site live, no redirect; student portal at portal.cbiu.ac.bd (ID login). MX mixes Microsoft 365/Google/maileroo. No student email evidence."
+    },
+    {
+      "slug": "diu",
+      "name": "Daffodil International University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "daffodilvarsity.edu.bd",
+      "student_email_domains": [
+        "diu.edu.bd"
+      ],
+      "alias_domains": [
+        "diu.edu.bd"
+      ],
+      "sign_in_domains": [
+        "daffodilvarsity.edu.bd",
+        "diu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.daffodilvarsity.edu.bd/",
+        "https://diu.edu.bd/",
+        "https://it.daffodilvarsity.edu.bd/?p=70",
+        "https://forum.daffodilvarsity.edu.bd/index.php/topic,4364.0.html",
+        "https://studentportal.diu.edu.bd/"
+      ],
+      "notes": "www.diu.edu.bd redirects to daffodilvarsity.edu.bd. Official IT page: students get a Google (G Suite) email tied to student ID; official forum thread titled 'Our Email address (@diu.edu.bd)'; search snippets of official alumni pages show <id>@diu.edu.bd; student portal is studentportal.diu.edu.bd. diu.edu.bd and s.diu.edu.bd both have Google MX (s.diu.edu.bd possibly a newer student subdomain, covered by subdomain match). daffodilvarsity.edu.bd is used for office/staff addresses (info@, admission@, itsupport@, iceoffice@); a class routine shows faculty on both domains; no evidence students get @daffodilvarsity.edu.bd."
+    },
+    {
+      "slug": "diu-ac",
+      "name": "Dhaka International University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "diu.ac",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "diu.ac"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.diu.ac/",
+        "https://students.diu.ac/"
+      ],
+      "notes": "NOT Daffodil. Site www.diu.ac (title 'DIU | Dhaka International University'); UGC contacts use diu.net.bd (MX Microsoft 365). Student portal students.diu.ac logs in by email, and students.diu.ac itself has a Microsoft 365 MX record, which hints at @students.diu.ac student mailboxes, but no published address confirms it. If you add diu.ac, subdomain matching would cover it. Never map diu.edu.bd here."
+    },
+    {
+      "slug": "must",
+      "name": "Dr. Momtaz Begum University of Science and Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Bhairab, Kishoreganj",
+      "website": "must.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "must.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://must.ac.bd/"
+      ],
+      "notes": "www.must.ac.bd redirects to must.ac.bd. Header shows info@must.ac.bd (mailto actually info.shust@gmail.com) and Webmail at mail.must.ac.bd (self-hosted MX). No student email evidence. Bangla name only seen inflected in a news blurb."
+    },
+    {
+      "slug": "eastdelta",
+      "name": "East Delta University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Chattogram",
+      "website": "eastdelta.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "eastdelta.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.eastdelta.edu.bd/"
+      ],
+      "notes": "Site live, no redirect. The homepage's 'Important Links' include a 'Google Workspace Account' link (mail.eastdelta.edu.bd, which goes to the Google login for eastdelta.edu.bd) next to student links (ePayment, EDU Blackbox), but it is not labelled as student email. Google MX. No explicit student-address evidence."
+    },
+    {
+      "slug": "ewubd",
+      "name": "East West University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "ewubd.edu",
+      "student_email_domains": [
+        "std.ewubd.edu"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ewubd.edu",
+        "std.ewubd.edu"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.ewubd.edu/",
+        "https://ewubd.edu/storage/app/uploads/public/5f7/f45/da8/5f7f45da81234667750750.pdf",
+        "https://www.ewubd.edu/notice-details/notice-applicable-newly-admitted-students-activating-g-suite-email-account"
+      ],
+      "notes": "Confirmed by an official EWU notice PDF: 'G Suite email account ... xxxx-x-xx-xxx@std.ewubd.edu where xxxx-x-xx-xxx is your Student ID'. std.ewubd.edu has Google MX. Staff use @ewubd.edu."
+    },
+    {
+      "slug": "easternuni",
+      "name": "Eastern University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "easternuni.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "easternuni.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.easternuni.edu.bd/",
+        "https://webportal.easternuni.edu.bd/"
+      ],
+      "notes": "Site live, no redirect. Header links to both 'Microsoft 365' and 'Webmail' (Google login for easternuni.edu.bd); MX is Google. Portal at webportal.easternuni.edu.bd. No evidence of student addresses. Bangla name only seen inflected ('ইস্টার্ন ইউনিভার্সিটিতে')."
+    },
+    {
+      "slug": "eco-university-of-science-and-technology",
+      "name": "Eco University of Science and Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Thakurgaon",
+      "website": null,
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [],
+      "held_domains": [],
+      "confidence": "medium",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://en.prothomalo.com/youth/education/ranx0h6ndd",
+        "https://esdo.net.bd/?p=18512"
+      ],
+      "notes": "No official site found. eust.edu.bd and eust.ac.bd do not resolve. News only on sponsor ESDO's site (esdo.net.bd), which is not the university's domain. Newly approved (provisional), East Nargun, Thakurgaon Sadar."
+    },
+    {
+      "slug": "eub",
+      "name": "European University of Bangladesh",
+      "name_bn": "ইউরোপিয়ান ইউনিভার্সিটি অব বাংলাদেশ",
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "eub.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "eub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.eub.edu.bd/"
+      ],
+      "notes": "UGC page lists no website; www.eub.edu.bd is live, titled 'European University of Bangladesh' (no redirect); Google MX. The only institutional address seen is azme@eub.edu.bd (others on the page are personal gmail). No student email evidence."
+    },
+    {
+      "slug": "ebaub",
+      "name": "Exim Bank Agricultural University, Bangladesh",
+      "name_bn": "এক্সিম ব্যাংক কৃষি বিশ্ববিদ্যালয় বাংলাদেশ",
+      "kind": "private",
+      "city": "Chapainawabganj",
+      "website": "ebaub.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ebaub.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://ebaub.ac.bd/",
+        "https://en.wikipedia.org/wiki/Exim_Bank_Agricultural_University_Bangladesh"
+      ],
+      "notes": "UGC lists ebaub.edu.bd, which does not resolve (NXDOMAIN via curl and WebFetch). The live site is ebaub.ac.bd (title 'EBAUB | Home Page', info@ebaub.ac.bd, webmail at mail.ebaub.ac.bd). No student email evidence. name_bn appears uninflected on own site, as 'এক্সিম ব্যাংক কৃষি বিশ্ববিদ্যালয় বাংলাদেশ-এ ...' in news cards."
+    },
+    {
+      "slug": "fiu",
+      "name": "Fareast International University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "fiu.edu.bd",
+      "student_email_domains": [
+        "student.fiu.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "fiu.edu.bd",
+        "student.fiu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://fiu.edu.bd/",
+        "https://student.fiu.edu.bd/"
+      ],
+      "notes": "www.fiu.edu.bd redirects to https://fiu.edu.bd/. student.fiu.edu.bd has its own Microsoft 365 MX (student-fiu-edu-bd.mail.protection.outlook.com) and hosts the 'Student Information Portal | FIU' linked from the homepage. fiu.edu.bd itself uses Google Workspace MX (staff webmail mail.google.com/a/fiu.edu.bd). No published student address found, so the student domain rests on DNS evidence."
+    },
+    {
+      "slug": "feniuniversity",
+      "name": "Feni University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Feni",
+      "website": "feniuniversity.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "feniuniversity.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.feniuniversity.ac.bd/"
+      ],
+      "notes": "Live at https://www.feniuniversity.ac.bd/ (registrar@feniuniversity.ac.bd). The domain uses Google Workspace MX. No student email evidence. Bangla name appears only inflected in headlines (ফেনী ইউনিভার্সিটির / ফেনী বিশ্ববিদ্যালয়ের), so it is left null."
+    },
+    {
+      "slug": "fcub",
+      "name": "First Capital University of Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Chuadanga",
+      "website": "fcub.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "fcub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://fcub.edu.bd/"
+      ],
+      "notes": "www.fcub.edu.bd redirects to https://fcub.edu.bd/ (info@fcub.edu.bd, hosted mail MX). No student email evidence. No Bangla name on homepage."
+    },
+    {
+      "slug": "gub",
+      "name": "German University Bangladesh",
+      "name_bn": "জার্মান ইউনিভার্সিটি বাংলাদেশ",
+      "kind": "private",
+      "city": "Gazipur",
+      "website": "gub.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "gub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://gub.edu.bd/"
+      ],
+      "notes": "curl gets 406 (bot filter), WebFetch works. Footer: 38 T&T Road, Joydebpur, Gazipur. info@gub.edu.bd; webmail links go to mail.google.com/a/gub.edu.bd and gub.edu.bd:2096 (cPanel). Student portal is on third-party gub.pipilikasoft.com. No student email evidence. name_bn from own headline 'জার্মান ইউনিভার্সিটি বাংলাদেশ-এর ...' (hyphen-separated, uninflected)."
+    },
+    {
+      "slug": "globaluniversity",
+      "name": "Global University Bangladesh",
+      "name_bn": "গ্লোবাল ইউনিভার্সিটি বাংলাদেশ",
+      "kind": "private",
+      "city": "Barishal",
+      "website": "globaluniversity.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "globaluniversity.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://globaluniversity.edu.bd/"
+      ],
+      "notes": "curl gets 406 (bot filter), WebFetch works. Footer: Mallick Tower, Natullahbad, Barisal. info@globaluniversity.edu.bd; UCAM portal on bare IP. No student email evidence. name_bn from own notice 'গ্লোবাল ইউনিভার্সিটি বাংলাদেশ, বরিশাল ...'."
+    },
+    {
+      "slug": "gonouniversity",
+      "name": "Gono Bishwabidyalay",
+      "name_bn": "গণ বিশ্ববিদ্যালয়",
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "gonouniversity.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "gonouniversity.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://gonouniversity.edu.bd/"
+      ],
+      "notes": "www redirects to https://gonouniversity.edu.bd/ (admin@gonouniversity.edu.bd, cPanel webmail.gonouniversity.edu.bd). No student email evidence. name_bn appears uninflected on own site in 'গণ বিশ্ববিদ্যালয় বোর্ড অব ট্রাস্টিজের ৫৮তম সভা অনুষ্ঠিত' (news headline) and matches the transliterated English name."
+    },
+    {
+      "slug": "grameenu",
+      "name": "Grameen University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "grameenu.ac",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "grameenu.ac"
+      ],
+      "held_domains": [],
+      "confidence": "medium",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://grameenu.ac/",
+        "https://en.wikipedia.org/wiki/Grameen_University"
+      ],
+      "notes": "UGC lists no website. https://grameenu.ac/ is live (title 'Grameen University - Dedicated to creating the world of three zeros', info@grameenu.ac, Microsoft 365 MX). Wikipedia and Chronicle job ads (career@grameenu.ac) corroborate it. Note .ac is the Ascension Island TLD, not .ac.bd. Address is South Diabari, Turag. Academic activity may not have started, and there is no student email evidence."
+    },
+    {
+      "slug": "green",
+      "name": "Green University of Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Narayanganj",
+      "website": "green.edu.bd",
+      "student_email_domains": [
+        "student.green.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "green.edu.bd"
+      ],
+      "held_domains": [
+        "student.green.ac.bd"
+      ],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "https://www.green.edu.bd/",
+        "https://eee.green.edu.bd/storage/files/eee/regular-supervisor-allocation-of-thesisproject-summer-2026-semester-1783481846.pdf",
+        "https://eee.green.edu.bd/storage/files/eee/weekend-supervisor-allocation-of-thesisproject-summer-2026-semester-1783481860.pdf",
+        "https://archive-site.green.edu.bd/?p=7743"
+      ],
+      "notes": "Homepage footer gives only the permanent campus: Purbachal American City, Kanchan, Rupganj, Narayanganj-1461. Search snippets of two official EEE-dept Summer 2026 thesis lists show student addresses like <studentID>@student.green.ac.bd, a DIFFERENT registrable domain (green.ac.bd). I could not fetch the PDFs myself (eee.green.edu.bd does not resolve from here) and green.ac.bd returned no DNS records here, though .bd DNS is unreliable from this network. Staff use @green.edu.bd. An archived 'Email Activation' page says students look up their address at email.green.edu.bd and log in through Google. Recommend also allowing green.edu.bd. student.green.ac.bd seen only in search results (thesis PDFs); green.ac.bd ownership unverified, so held back."
+    },
+    {
+      "slug": "hamdarduniversity",
+      "name": "Hamdard University Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Munshiganj",
+      "website": "hamdarduniversity.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "hamdarduniversity.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.hamdarduniversity.edu.bd/"
+      ],
+      "notes": "Live over http at www.hamdarduniversity.edu.bd. Address: Hamdard City of Science, Education & Culture, Gazaria, Munshiganj-1510. The domain uses Google Workspace MX and an ICT office exists (ict@hamdarduniversity.edu.bd), but no student-address evidence was found."
+    },
+    {
+      "slug": "iub",
+      "name": "Independent University, Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "iub.ac.bd",
+      "student_email_domains": [
+        "iub.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "iub.ac.bd",
+        "iub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/95",
+        "https://iub.ac.bd/",
+        "http://www.iub.edu.bd/files/notice/notice14052020.pdf",
+        "http://www.iub.edu.bd/cits/office365"
+      ],
+      "notes": "UGC lists www.iub.edu.bd, which 301s to iub.ac.bd (live site). Official IUB notice (2020 PDF): student email = 7-digit ID@iub.edu.bd via Gmail (e.g. 2030100@iub.edu.bd). iub.edu.bd MX = Google; iub.ac.bd has NO MX record, so it cannot receive mail; site contact is still info@iub.edu.bd. Many IUB student GitHub projects whitelist @iub.edu.bd."
+    },
+    {
+      "slug": "iiustb",
+      "name": "International Islami University of Science and Technology Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "iiustb.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "iiustb.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/228",
+        "https://www.iiustb.ac.bd/"
+      ],
+      "notes": "Live at https://www.iiustb.ac.bd/ (returns 406 to plain curl UA; fine with browser headers). Contact info@iiustb.ac.bd; student portal at /student/login. MX is self-hosted (iiustb.ac.bd). No student-email evidence found. Not to be confused with IIUC."
+    },
+    {
+      "slug": "iiuc",
+      "name": "International Islamic University Chittagong",
+      "name_bn": "আন্তর্জাতিক ইসলামী বিশ্ববিদ্যালয় চট্টগ্রাম",
+      "kind": "private",
+      "city": "Chattogram",
+      "website": "iiuc.ac.bd",
+      "student_email_domains": [
+        "ugrad.iiuc.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "iiuc.ac.bd",
+        "ugrad.iiuc.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/100",
+        "https://www.iiuc.ac.bd/",
+        "https://github.com/shahriar7ahmed/knowledgeTrace-Client/blob/9bc01911081e58119c459fa3bd9fffb0937b2f5b/src/pages/Register.jsx",
+        "https://github.com/Abdullah572001/App-for-all/blob/e835ea325e61004104c05243e6b44395e8ecb775/app/src/main/java/com/example/ui/PdfViewModel.kt"
+      ],
+      "notes": "Website domain confirmed (UGC + live). Student domain is secondary evidence: IIUC student GitHub projects validate students as @ugrad.iiuc.ac.bd (e.g. q251064@ugrad.iiuc.ac.bd) and staff as @iiuc.ac.bd; ugrad.iiuc.ac.bd has Google MX. student.iiuc.ac.bd also has an MX (Outlook) but no usage evidence. name_bn from news text on iiuc.ac.bd ('আন্তর্জাতিক ইসলামী বিশ্ববিদ্যালয় চট্টগ্রাম (আইআইইউসি)-তে'), not header/logo text."
+    },
+    {
+      "slug": "isu",
+      "name": "International Standard University",
+      "name_bn": "ইন্টারন্যাশনাল স্ট্যান্ডার্ড ইউনিভার্সিটি",
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "isu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "isu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/196",
+        "https://www.isu.ac.bd/"
+      ],
+      "notes": "Live https://www.isu.ac.bd/; Google MX on isu.ac.bd. No student-email evidence found (new-student intro page and searches silent). name_bn from an uninflected news title on isu.ac.bd ('...চ্যাম্পিয়ন ইন্টারন্যাশনাল স্ট্যান্ডার্ড ইউনিভার্সিটি'), not header; drop if strict."
+    },
+    {
+      "slug": "iubat",
+      "name": "International University of Business Agriculture & Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "iubat.edu",
+      "student_email_domains": [
+        "iubat.edu"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "iubat.edu"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/101",
+        "https://iubat.edu/",
+        "https://iubat.edu/notice-for-freshmen-of-summer-2023/"
+      ],
+      "notes": "Official freshman notice (Summer 2023): 'go to Gmail.com. Enter your StudentID@iubat.edu as email address'. iubat.edu MX = Google. Not IUB."
+    },
+    {
+      "slug": "ishakha",
+      "name": "Ishakha International University, Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Kishoreganj",
+      "website": "ishakha.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ishakha.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/102",
+        "https://www.ishakha.edu.bd/en/"
+      ],
+      "notes": "www.ishakha.edu.bd redirects to /en/. Site contact info@ishakha.edu.bd; UGC lists a gmail contact. MX self-hosted. No student-email evidence."
+    },
+    {
+      "slug": "kkbau",
+      "name": "Khulna Khan Bahadur Ahsanullah University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Khulna",
+      "website": "kkbau.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "kkbau.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/184",
+        "https://www.kkbau.ac.bd/",
+        "https://www.kkbau.ac.bd/administration/ict-cell/"
+      ],
+      "notes": "Live https://www.kkbau.ac.bd/ (406 to plain curl UA). Contact registrar@kkbau.ac.bd; UGC also lists gmail contacts. Student portal is on a bare IP. No student-email evidence."
+    },
+    {
+      "slug": "kyau",
+      "name": "Khwaja Yunus Ali University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Sirajganj",
+      "website": "kyau.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "kyau.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/103",
+        "http://www.kyau.edu.bd/"
+      ],
+      "notes": "Live at http://www.kyau.edu.bd/. kyau.edu.bd MX = Google, and student.kyau.edu.bd has its own Google MX (suggests student accounts there, but no usage evidence found, so left empty; a subdomain match would cover it anyway). Distinct from KYAMC (kyamc.edu.bd)."
+    },
+    {
+      "slug": "lusa",
+      "name": "Lalon University of Science and Arts",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Kushtia",
+      "website": "lusa.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "lusa.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/231",
+        "http://lusa.ac.bd/"
+      ],
+      "notes": "Live http://lusa.ac.bd/ (no www needed). Contact info@lusa.ac.bd. Bangla name only seen inflected ('লালন বিজ্ঞান ও কলা বিশ্ববিদ্যালয়ে'), so null. No student-email evidence. Not Leading University (lus.ac.bd)."
+    },
+    {
+      "slug": "lus",
+      "name": "Leading University",
+      "name_bn": "লিডিং ইউনিভার্সিটি",
+      "kind": "private",
+      "city": "Sylhet",
+      "website": "lus.ac.bd",
+      "student_email_domains": [
+        "lus.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "lus.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/104",
+        "https://lus.ac.bd/",
+        "https://github.com/Sajid-ikram/LU-CSE-Community-/blob/b33a2a3b53b03e09b8759097776876e6dcf229d9/lib/view/sign_in_sign_up/widgets/custom_text_field.dart",
+        "https://github.com/Sajid-ikram/LU-Bus-Tracker/blob/643705f5957287ce004c806062d1ccd279412e59/lib/view/auth/widgets/text_field.dart"
+      ],
+      "notes": "Website confirmed (UGC + live, www redirects to lus.ac.bd). Student domain is secondary evidence: LU student apps require '@lus.ac.bd' ('You have to use LU G Suite...'); lus.ac.bd MX = Google. name_bn from uninflected news text on lus.ac.bd ('লিডিং ইউনিভার্সিটি ও শাহজালাল...'), not header."
+    },
+    {
+      "slug": "manarat",
+      "name": "Manarat International University",
+      "name_bn": "মানারাত ইন্টারন্যাশনাল ইউনিভার্সিটি",
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "manarat.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "manarat.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/105",
+        "https://manarat.ac.bd/"
+      ],
+      "notes": "Live https://manarat.ac.bd/; Google MX; student portal miuportal.manarat.ac.bd. No student-email evidence. name_bn from a notice on manarat.ac.bd ('...মানারাত ইন্টারন্যাশনাল ইউনিভার্সিটি'র চ্যান্সেলর'), apostrophe-suffixed, not header; drop if strict."
+    },
+    {
+      "slug": "metrouni",
+      "name": "Metropolitan University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Sylhet",
+      "website": "metrouni.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "metrouni.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/106",
+        "https://metrouni.edu.bd/"
+      ],
+      "notes": "www redirects to metrouni.edu.bd; site 'Webmail' link goes to Gmail (Google MX). student.metrouni.edu.bd has an MX record (self-hosted) but no usage evidence found, so left empty."
+    },
+    {
+      "slug": "npiub",
+      "name": "N.P.I University of Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Manikganj",
+      "website": "npiub.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "npiub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/166",
+        "https://npiub.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "nbiu",
+      "name": "North Bengal International University",
+      "name_bn": "নর্থ বেঙ্গল ইন্টারন্যাশনাল ইউনিভার্সিটি",
+      "kind": "private",
+      "city": "Rajshahi",
+      "website": "nbiu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "nbiu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/107",
+        "https://nbiu.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "neub",
+      "name": "North East University Bangladesh",
+      "name_bn": "নর্থ ইস্ট ইউনিভার্সিটি বাংলাদেশ",
+      "kind": "private",
+      "city": "Sylhet",
+      "website": "neub.edu.bd",
+      "student_email_domains": [
+        "neub.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "neub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/108",
+        "https://neub.edu.bd/",
+        "https://github.com/tajwone17/romanized-sylheti-hate-speech"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "northsouth",
+      "name": "North South University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "northsouth.edu",
+      "student_email_domains": [
+        "northsouth.edu"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "northsouth.edu"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/14",
+        "https://docs.google.com/document/d/1Zi2xIsr8VxtDLsw--AwqgLqfD6vgIuJX"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "nwu",
+      "name": "North Western University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Khulna",
+      "website": "nwu.ac.bd",
+      "student_email_domains": [
+        "nwu.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "nwu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/109",
+        "https://nwu.ac.bd/",
+        "https://github.com/AsifFoisal/CV-For-University"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "nub",
+      "name": "Northern University Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "nub.ac.bd",
+      "student_email_domains": [
+        "nub.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "nub.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/110",
+        "https://nub.ac.bd/",
+        "https://github.com/NazmusSakib2036/Portfolio_2026"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "nubtkhulna",
+      "name": "Northern University of Business & Technology, Khulna",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Khulna",
+      "website": "nubtkhulna.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "nubtkhulna.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/167",
+        "https://nubtkhulna.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "ndub",
+      "name": "Notre Dame University Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "ndub.edu.bd",
+      "student_email_domains": [
+        "student.ndub.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ndub.edu.bd",
+        "student.ndub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/111",
+        "https://ndub.edu.bd/",
+        "https://github.com/mhtafhim/Messy-Stuffs/tree/main/IUPC/IUPC%202025"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "portcity",
+      "name": "Port City International University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Chattogram",
+      "website": "portcity.edu.bd",
+      "student_email_domains": [
+        "portcity.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "portcity.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/112",
+        "https://portcity.edu.bd/",
+        "https://github.com/Diba-Dev/Diba-Dev"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "puc",
+      "name": "Premier University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Chattogram",
+      "website": "puc.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "puc.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/60",
+        "https://puc.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "pu",
+      "name": "Presidency University",
+      "name_bn": "প্রেসিডেন্সি ইউনিভার্সিটি",
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "pu.edu.bd",
+      "student_email_domains": [
+        "student.presidency.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "pu.edu.bd",
+        "student.presidency.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/84",
+        "https://pu.edu.bd/",
+        "https://web.archive.org/web/20250522130154/https://pu.edu.bd/facilities/webmail/"
+      ],
+      "notes": "Website pu.edu.bd; students on student.presidency.edu.bd (official evidence)."
+    },
+    {
+      "slug": "primeuniversity",
+      "name": "Prime University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "primeuniversity.ac.bd",
+      "student_email_domains": [
+        "primeuniversity.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "primeuniversity.ac.bd",
+        "primeuniversity.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/86",
+        "https://primeuniversity.ac.bd/",
+        "https://github.com/mhtafhim/Messy-Stuffs/tree/main/IUPC/IUPC%202025"
+      ],
+      "notes": "Website primeuniversity.ac.bd; primeuniversity.edu.bd rests on one student address."
+    },
+    {
+      "slug": "primeasia",
+      "name": "Primeasia University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "primeasia.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "primeasia.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/87",
+        "https://primeasia.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "pundrauniversity",
+      "name": "Pundra University of Science & Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Bogura",
+      "website": "pundrauniversity.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [
+        "pundrauniversity.edu.bd"
+      ],
+      "sign_in_domains": [
+        "pundrauniversity.ac.bd",
+        "pundrauniversity.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/163",
+        "https://pundrauniversity.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "rpsu",
+      "name": "R. P. Shaha University",
+      "name_bn": "আর. পি. সাহা বিশ্ববিদ্যালয়",
+      "kind": "private",
+      "city": "Narayanganj",
+      "website": "rpsu.ac.bd",
+      "student_email_domains": [
+        "rpsu.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "rpsu.ac.bd",
+        "rpsu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/91",
+        "https://rpsu.ac.bd/",
+        "https://github.com/mhtafhim/Messy-Stuffs/tree/main/IUPC/IUPC%202025",
+        "https://github.com/Mufassir-Chowdhury/cse-carnival"
+      ],
+      "notes": "Website rpsu.ac.bd; students on rpsu.edu.bd."
+    },
+    {
+      "slug": "rtm-aktu",
+      "name": "R.T.M Al-Kabir Technical University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Sylhet",
+      "website": "rtm-aktu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [
+        "rtm-aktu.edu.bd"
+      ],
+      "sign_in_domains": [
+        "rtm-aktu.ac.bd",
+        "rtm-aktu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/216",
+        "http://rtm-aktu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "rmu",
+      "name": "Rabindra Maitree University",
+      "name_bn": "রবীন্দ্র মৈত্রী বিশ্ববিদ্যালয়",
+      "kind": "private",
+      "city": "Kushtia",
+      "website": "rmu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "rmu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/168",
+        "https://rmu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "rstu",
+      "name": "Rajshahi Science & Technology University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Natore",
+      "website": "rstu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "rstu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/89",
+        "https://web.archive.org/web/20260123221748/https://www.rstu.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "royal",
+      "name": "Royal University of Dhaka",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "royal.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "royal.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/92",
+        "https://www.royal.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "smuct",
+      "name": "Shanto-Mariam University of Creative Technology",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "smuct.ac.bd",
+      "student_email_domains": [
+        "smuct.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "smuct.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/94",
+        "https://smuct.ac.bd/",
+        "https://github.com/anik071/portfolio"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "su",
+      "name": "Sonargaon University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "su.edu.bd",
+      "student_email_domains": [
+        "su.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "su.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/97",
+        "https://su.edu.bd/",
+        "https://name.su.edu.bd/assets/service-charter-name-d90b6d00.pdf"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "seu",
+      "name": "Southeast University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "seu.edu.bd",
+      "student_email_domains": [
+        "seu.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "seu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/98",
+        "https://seu.edu.bd/",
+        "https://github.com/git-mahmud/seu.ratemyfaculty"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "southern",
+      "name": "Southern University Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Chattogram",
+      "website": "southern.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "southern.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/99",
+        "https://southern.ac.bd/",
+        "https://southern.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "stamforduniversity",
+      "name": "Stamford University Bangladesh",
+      "name_bn": "স্টামফোর্ড ইউনিভার্সিটি বাংলাদেশ",
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "stamforduniversity.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [
+        "stamford.university"
+      ],
+      "sign_in_domains": [
+        "stamforduniversity.edu.bd",
+        "stamford.university"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/113",
+        "https://www.stamforduniversity.edu.bd/index.php/stamford/university_mail"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "sub",
+      "name": "State University of Bangladesh",
+      "name_bn": "স্টেট ইউনিভার্সিটি অব বাংলাদেশ",
+      "kind": "private",
+      "city": "Narayanganj",
+      "website": "sub.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [
+        "sub.edu.bd"
+      ],
+      "sign_in_domains": [
+        "sub.ac.bd",
+        "sub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/114",
+        "https://sub.ac.bd/administration/it-department"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "siu",
+      "name": "Sylhet International University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Sylhet",
+      "website": "siu.edu.bd",
+      "student_email_domains": [
+        "siu.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "siu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/115",
+        "https://github.com/Nuhel/SIU/blob/be169db26abafd18946a0e9c491c70929ab62964/resources/views/pages/g_suite.blade.php"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "tuca",
+      "name": "Tagore University of Creative Arts",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "tuca.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "tuca.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/176",
+        "https://tuca.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "teestauniversity",
+      "name": "Teesta University, Rangpur",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Rangpur",
+      "website": "teestauniversity.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "teestauniversity.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/226",
+        "https://teestauniversity.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "themillenniumuniversity",
+      "name": "The Millennium University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "themillenniumuniversity.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "themillenniumuniversity.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/private-universities",
+        "http://www.ugc-universities.gov.bd/university-detail/116"
+      ],
+      "notes": "Domain only from UGC (detail page also gives info@themillenniumuniversity.edu.bd). Site currently unreachable: no NS/A records, SERVFAIL via 1.1.1.1, WebFetch ENOTFOUND (likely lapsed registration). No alternative domain found. No student-email evidence."
+    },
+    {
+      "slug": "pub",
+      "name": "The People's University of Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "pub.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "pub.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/117",
+        "https://www.pub.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "timesuniversitybd",
+      "name": "Times University, Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Faridpur",
+      "website": "timesuniversitybd.com",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "timesuniversitybd.com"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/136",
+        "https://timesuniversitybd.com/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "trustuniversity",
+      "name": "Trust University, Barishal",
+      "name_bn": "ট্রাস্ট ইউনিভার্সিটি, বরিশাল",
+      "kind": "private",
+      "city": "Barishal",
+      "website": "trustuniversity.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "trustuniversity.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/193",
+        "https://trustuniversity.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "uiu",
+      "name": "United International University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "uiu.ac.bd",
+      "student_email_domains": [
+        "bscse.uiu.ac.bd",
+        "bsds.uiu.ac.bd",
+        "bseee.uiu.ac.bd",
+        "bsce.uiu.ac.bd",
+        "bba.uiu.ac.bd",
+        "bba-ais.uiu.ac.bd",
+        "bseco.uiu.ac.bd",
+        "bsseds.uiu.ac.bd",
+        "bssmsj.uiu.ac.bd",
+        "baeng.uiu.ac.bd",
+        "bpharm.uiu.ac.bd",
+        "bsbge.uiu.ac.bd",
+        "mscse.uiu.ac.bd",
+        "mba.uiu.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "uiu.ac.bd",
+        "bscse.uiu.ac.bd",
+        "bsds.uiu.ac.bd",
+        "bseee.uiu.ac.bd",
+        "bsce.uiu.ac.bd",
+        "bba.uiu.ac.bd",
+        "bba-ais.uiu.ac.bd",
+        "bseco.uiu.ac.bd",
+        "bsseds.uiu.ac.bd",
+        "bssmsj.uiu.ac.bd",
+        "baeng.uiu.ac.bd",
+        "bpharm.uiu.ac.bd",
+        "bsbge.uiu.ac.bd",
+        "mscse.uiu.ac.bd",
+        "mba.uiu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/119",
+        "https://cse.uiu.ac.bd/facilities/it-services/",
+        "https://ce.uiu.ac.bd/facilities/it-service/",
+        "https://datascience.uiu.ac.bd/facilities/itservice/",
+        "https://www.uiu.ac.bd/offices/center-for-it-services/"
+      ],
+      "notes": "Students on per-programme subdomains (bscse, bseee, bba, ...); bare uiu.ac.bd is staff."
+    },
+    {
+      "slug": "uap-bd",
+      "name": "University of Asia Pacific",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "uap-bd.edu",
+      "student_email_domains": [
+        "uap-bd.edu"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "uap-bd.edu"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/118",
+        "https://uap-bd.edu/",
+        "https://github.com/Siratul804/Reportify"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "uob",
+      "name": "University of Brahmanbaria",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Brahmanbaria",
+      "website": "uob.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "uob.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/211",
+        "https://uob.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "uctc",
+      "name": "University of Creative Technology, Chittagong",
+      "name_bn": "ইউনিভার্সিটি অব ক্রিয়েটিভ টেকনোলজি চিটাগাং",
+      "kind": "private",
+      "city": "Chattogram",
+      "website": "uctc.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [
+        "uctc.edu.bd"
+      ],
+      "sign_in_domains": [
+        "uctc.ac.bd",
+        "uctc.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/169",
+        "https://www.uctc.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "uoda",
+      "name": "University of Development Alternative",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "uoda.edu.bd",
+      "student_email_domains": [
+        "student.uoda.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "uoda.edu.bd",
+        "student.uoda.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/120",
+        "https://uoda.edu.bd/mail/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "ugv",
+      "name": "University of Global Village",
+      "name_bn": "ইউনিভার্সিটি অব গ্লোবাল ভিলেজ",
+      "kind": "private",
+      "city": "Barishal",
+      "website": "ugv.edu.bd",
+      "student_email_domains": [
+        "ugv.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ugv.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/172",
+        "https://ugv.edu.bd/",
+        "https://github.com/nknahidkhan/Nahidkhan"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "uits",
+      "name": "University of Information Technology & Sciences",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "uits.ac.bd",
+      "student_email_domains": [
+        "uits.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "uits.ac.bd",
+        "uits.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/121",
+        "https://uits.ac.bd/",
+        "https://github.com/khalidshanto/Simulation-Modeling-Lab-CSE-413"
+      ],
+      "notes": "Website uits.ac.bd; students on uits.edu.bd."
+    },
+    {
+      "slug": "ulab",
+      "name": "University of Liberal Arts Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "ulab.edu.bd",
+      "student_email_domains": [
+        "ulab.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ulab.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/122",
+        "https://ito.ulab.edu.bd/node/1678",
+        "https://admissions.ulab.edu.bd/node/2641"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "ius",
+      "name": "University of Scholars",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "ius.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ius.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/164",
+        "https://ius.edu.bd/student-support"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "ustc",
+      "name": "University of Science & Technology Chittagong",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Chattogram",
+      "website": "ustc.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ustc.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/123",
+        "https://ustc.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "southasiauni",
+      "name": "University of South Asia",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "southasiauni.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "southasiauni.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/124",
+        "https://southasiauni.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "uttara",
+      "name": "Uttara University",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "uttara.ac.bd",
+      "student_email_domains": [
+        "uttara.ac.bd",
+        "uttarauniversity.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "uttara.ac.bd",
+        "uttarauniversity.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/125",
+        "https://www.uttara.ac.bd/",
+        "https://forum.cursor.com/t/edu-email-not-available-in-bangladesh-can-i-use-my-university-issued-email-instead/87948",
+        "https://github.com/Cyber-Security-Club-Uttara-University/CyberCon25-fullstack"
+      ],
+      "notes": "Website uttara.ac.bd; students on uttara.ac.bd and uttarauniversity.edu.bd."
+    },
+    {
+      "slug": "vu",
+      "name": "Varendra University",
+      "name_bn": "বরেন্দ্র বিশ্ববিদ্যালয়",
+      "kind": "private",
+      "city": "Rajshahi",
+      "website": "vu.edu.bd",
+      "student_email_domains": [
+        "vu.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "vu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/126",
+        "https://vu.edu.bd/the-university/why-vu"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "vub",
+      "name": "Victoria University of Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "vub.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "vub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/127",
+        "https://vub.edu.bd/contact-us/"
+      ],
+      "notes": "UGC flags an unapproved campus; website showed injected spam links on 2026-10-27."
+    },
+    {
+      "slug": "wub",
+      "name": "World University of Bangladesh",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "wub.edu.bd",
+      "student_email_domains": [
+        "student.wub.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "wub.edu.bd",
+        "student.wub.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/128",
+        "https://student.wub.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "zhsust",
+      "name": "Z.H Sikder University of Science & Technology",
+      "name_bn": "জেড. এইচ. সিকদার বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়",
+      "kind": "private",
+      "city": "Shariatpur",
+      "website": "zhsust.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [
+        "zhsust.edu.bd"
+      ],
+      "sign_in_domains": [
+        "zhsust.ac.bd",
+        "zhsust.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/132",
+        "https://zhsust.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "zums",
+      "name": "ZNRF University of Management Sciences",
+      "name_bn": null,
+      "kind": "private",
+      "city": "Dhaka",
+      "website": "zums.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "zums.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "http://www.ugc-universities.gov.bd/university-detail/180",
+        "https://zums.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "aaub",
+      "name": "Aviation and Aerospace University, Bangladesh",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Lalmonirhat",
+      "website": "aaub.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [
+        "bsmraau.edu.bd"
+      ],
+      "sign_in_domains": [
+        "aaub.edu.bd",
+        "bsmraau.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/aviation-and-aerospace-university-bangladesh",
+        "https://aaub.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "bau",
+      "name": "Bangladesh Agricultural University",
+      "name_bn": "বাংলাদেশ কৃষি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Mymensingh",
+      "website": "bau.edu.bd",
+      "student_email_domains": [
+        "student.bau.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bau.edu.bd",
+        "student.bau.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/bangladesh-agricultural-university",
+        "https://bau.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "bmu",
+      "name": "Bangladesh Maritime University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Chattogram",
+      "website": "bmu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bmu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/bangladesh-maritime-university",
+        "https://bmu.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "bmu-ac",
+      "name": "Bangladesh Medical University",
+      "name_bn": "বাংলাদেশ মেডিক্যাল বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Dhaka",
+      "website": "bmu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [
+        "bsmmu.edu.bd",
+        "bsmmu.ac.bd"
+      ],
+      "sign_in_domains": [
+        "bmu.ac.bd",
+        "bsmmu.edu.bd",
+        "bsmmu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/bangladesh-medical-university",
+        "https://www.bmu.ac.bd/"
+      ],
+      "notes": "Renamed from BSMMU; old bsmmu.edu.bd / bsmmu.ac.bd redirect and still receive mail, accepted as aliases. Not bmu.edu.bd (that is Bangladesh Maritime University)."
+    },
+    {
+      "slug": "bou",
+      "name": "Bangladesh Open University",
+      "name_bn": "বাংলাদেশ উন্মুক্ত বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Gazipur",
+      "website": "bou.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bou.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/bangladesh-open-university",
+        "https://www.bou.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "buet",
+      "name": "Bangladesh University of Engineering & Technology",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Dhaka",
+      "website": "buet.ac.bd",
+      "student_email_domains": [
+        "ugrad.cse.buet.ac.bd",
+        "grad.cse.buet.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "buet.ac.bd",
+        "ugrad.cse.buet.ac.bd",
+        "grad.cse.buet.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/bangladesh-university-of-engineering-technology",
+        "https://www.buet.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "bup",
+      "name": "Bangladesh University of Professionals",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Dhaka",
+      "website": "bup.edu.bd",
+      "student_email_domains": [
+        "student.bup.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bup.edu.bd",
+        "student.bup.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/bangladesh-university-of-professionals",
+        "https://bup.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "butex",
+      "name": "Bangladesh University of Textiles",
+      "name_bn": "বাংলাদেশ টেক্সটাইল বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Dhaka",
+      "website": "butex.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "butex.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/bangladesh-university-of-textiles",
+        "https://www.butex.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "brur",
+      "name": "Begum Rokeya University, Rangpur",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Rangpur",
+      "website": "brur.ac.bd",
+      "student_email_domains": [
+        "student.brur.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "brur.ac.bd",
+        "student.brur.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/begum-rokeya-university-rangpur",
+        "https://brur.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "cstu",
+      "name": "Chandpur Science and Technology University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Chandpur",
+      "website": "cstu.ac.bd",
+      "student_email_domains": [
+        "student.cstu.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cstu.ac.bd",
+        "student.cstu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/chandpur-science-and-technology-university",
+        "https://cstu.ac.bd/",
+        "https://www.ictcell.cstu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "cmu",
+      "name": "Chittagong Medical University",
+      "name_bn": "চট্টগ্রাম মেডিকেল বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Chattogram",
+      "website": "cmu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cmu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/chittagong-medical-university",
+        "https://cmu.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "cuet",
+      "name": "Chittagong University of Engineering & Technology",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Chattogram",
+      "website": "cuet.ac.bd",
+      "student_email_domains": [
+        "student.cuet.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cuet.ac.bd",
+        "student.cuet.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/chittagong-university-of-engineering-technology-cuet",
+        "https://cuet.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "cvasu",
+      "name": "Chittagong Veterinary and Animal Sciences University",
+      "name_bn": "চট্টগ্রাম ভেটেরিনারি ও এনিম্যাল সাইন্সেস বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Chattogram",
+      "website": "cvasu.ac.bd",
+      "student_email_domains": [
+        "student.cvasu.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cvasu.ac.bd",
+        "student.cvasu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/chittagong-veterinary-and-animal-sciences-university",
+        "https://cvasu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "cou",
+      "name": "Comilla University",
+      "name_bn": "কুমিল্লা বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Cumilla",
+      "website": "cou.ac.bd",
+      "student_email_domains": [
+        "stud.cou.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cou.ac.bd",
+        "stud.cou.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/comilla-university",
+        "https://cou.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "dcu",
+      "name": "Dhaka Central University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Dhaka",
+      "website": "dcu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "dcu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/dhaka-central-university",
+        "https://dcu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "duet",
+      "name": "Dhaka University of Engineering & Technology",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Gazipur",
+      "website": "duet.ac.bd",
+      "student_email_domains": [
+        "student.duet.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "duet.ac.bd",
+        "student.duet.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/dhaka-university-of-engineering-technology-duet",
+        "https://duet.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "gau",
+      "name": "Gazipur Agricultural University",
+      "name_bn": "গাজীপুর কৃষি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Gazipur",
+      "website": "gau.edu.bd",
+      "student_email_domains": [
+        "stu.gau.edu.bd",
+        "stu.bsmrau.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "gau.edu.bd",
+        "stu.gau.edu.bd",
+        "stu.bsmrau.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/gazipur-agricultural-university",
+        "https://gau.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "gstu",
+      "name": "Gopalganj Science & Technology University",
+      "name_bn": "গোপালগঞ্জ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Gopalganj",
+      "website": "gstu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "gstu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/gopalganj-science-technology-university",
+        "https://gstu.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "hau",
+      "name": "Habiganj Agricultural University",
+      "name_bn": "হবিগঞ্জ কৃষি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Habiganj",
+      "website": "hau.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "hau.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/hobiganj-agricultural-university",
+        "https://hau.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "hstu",
+      "name": "Hajee Mohammad Danesh Science & Technology University",
+      "name_bn": "হাজী মোহাম্মদ দানেশ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Dinajpur",
+      "website": "hstu.ac.bd",
+      "student_email_domains": [
+        "std.hstu.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "hstu.ac.bd",
+        "std.hstu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/hajee-mohammad-danesh-science-technology-university",
+        "https://hstu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "iau",
+      "name": "Islamic Arabic University",
+      "name_bn": "ইসলামি আরবি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Dhaka",
+      "website": "iau.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "iau.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/islamic-arabic-university",
+        "https://iau.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "iu",
+      "name": "Islamic University, Bangladesh",
+      "name_bn": "ইসলামী বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Kushtia",
+      "website": "iu.ac.bd",
+      "student_email_domains": [
+        "std.iu.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "iu.ac.bd",
+        "std.iu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/islamic-university-bangladesh",
+        "https://iu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "jnu",
+      "name": "Jagannath University",
+      "name_bn": "জগন্নাথ বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Dhaka",
+      "website": "jnu.ac.bd",
+      "student_email_domains": [
+        "student.jnu.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "jnu.ac.bd",
+        "student.jnu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/jagannath-university",
+        "https://jnu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "juniv",
+      "name": "Jahangirnagar University",
+      "name_bn": "জাহাঙ্গীরনগর বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Dhaka",
+      "website": "juniv.edu",
+      "student_email_domains": [
+        "juniv.edu"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "juniv.edu"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/jahangirnagar-university",
+        "https://juniv.edu/",
+        "https://juniv.edu/student-email/apply"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "jstu",
+      "name": "Jamalpur Science and Technology University",
+      "name_bn": "জামালপুর বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Jamalpur",
+      "website": "jstu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "jstu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/jamalpur-science-and-technology-university",
+        "https://jstu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "jkkniu",
+      "name": "Jatiya Kabi Kazi Nazrul Islam University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Mymensingh",
+      "website": "jkkniu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "jkkniu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/jatiya-kabi-kazi-nazrul-islam-university",
+        "https://jkkniu.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "just",
+      "name": "Jessore University of Science & Technology",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Jashore",
+      "website": "just.edu.bd",
+      "student_email_domains": [
+        "student.just.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "just.edu.bd",
+        "student.just.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/jessore-university-of-science-technology",
+        "https://just.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "kau",
+      "name": "Khulna Agricultural University",
+      "name_bn": "খুলনা কৃষি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Khulna",
+      "website": "kau.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "kau.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/khulna-agricultural-university",
+        "https://kau.ac.bd/"
+      ],
+      "notes": "Live domain kau.ac.bd, not kau.edu.bd."
+    },
+    {
+      "slug": "kmu",
+      "name": "Khulna Medical University",
+      "name_bn": "খুলনা মেডিক্যাল বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Khulna",
+      "website": "kmu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "kmu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/khulna-medical-university-khulna",
+        "https://kmu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "ku",
+      "name": "Khulna University",
+      "name_bn": "খুলনা বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Khulna",
+      "website": "ku.ac.bd",
+      "student_email_domains": [
+        "ku.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ku.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/khulna-university",
+        "https://ku.ac.bd/",
+        "https://ku.ac.bd/uploads/form/1771228213New%20web%20mail%20request%20.pdf"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "kuet",
+      "name": "Khulna University of Engineering & Technology",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Khulna",
+      "website": "kuet.ac.bd",
+      "student_email_domains": [
+        "stud.kuet.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "kuet.ac.bd",
+        "stud.kuet.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/khulna-university-of-engineering-technology-kuet",
+        "https://kuet.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "kiu",
+      "name": "Kishoreganj University",
+      "name_bn": "কিশোরগঞ্জ বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Kishoreganj",
+      "website": "kiu.ac.bd",
+      "student_email_domains": [
+        "std.kiu.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "kiu.ac.bd",
+        "std.kiu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/kishoreganj-university",
+        "https://kiu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "kuriau",
+      "name": "Kurigram Agricultural University",
+      "name_bn": "কুড়িগ্রাম কৃষি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Kurigram",
+      "website": "kuriau.edu.bd",
+      "student_email_domains": [
+        "stu.kuriau.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "kuriau.edu.bd",
+        "stu.kuriau.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/kurigram-agricultural-university",
+        "https://kuriau.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "lakshmipur-science-technology-university",
+      "name": "Lakshmipur Science & Technology University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Lakshmipur",
+      "website": null,
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [],
+      "held_domains": [],
+      "confidence": "none",
+      "sources": [
+        "https://www.ugc.gov.bd/university/lakshmipur-science-technology-university"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "mbstu",
+      "name": "Mawlana Bhashani Science & Technology University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Tangail",
+      "website": "mbstu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "mbstu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/mawlana-bhashani-science-technology-university",
+        "https://mbstu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "meherpur-university",
+      "name": "Meherpur University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Meherpur",
+      "website": null,
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [],
+      "held_domains": [],
+      "confidence": "none",
+      "sources": [
+        "https://www.ugc.gov.bd/university/meherpur-university"
+      ],
+      "notes": "Wikipedia lists mum.ac.bd (old name Mujibnagar University) but it does not resolve; no domain yet."
+    },
+    {
+      "slug": "nau",
+      "name": "Naogaon University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Naogaon",
+      "website": "nau.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "nau.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/naogaon-university",
+        "https://nau.ac.bd/",
+        "https://en.wikipedia.org/wiki/Naogaon_University"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "narayanganj-science-and-technology-university",
+      "name": "Narayanganj Science and Technology University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Narayanganj",
+      "website": null,
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [],
+      "held_domains": [],
+      "confidence": "none",
+      "sources": [
+        "https://www.ugc.gov.bd/university/narayanganj-science-and-technology-university"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "nu",
+      "name": "National University",
+      "name_bn": "জাতীয় বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Gazipur",
+      "website": "nu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [
+        "nu.edu.bd"
+      ],
+      "sign_in_domains": [
+        "nu.ac.bd",
+        "nu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/national-university",
+        "https://www.nu.ac.bd/"
+      ],
+      "notes": "UGC lists nu.edu.bd (still has a mail server); live site nu.ac.bd. Both accepted."
+    },
+    {
+      "slug": "neu",
+      "name": "Netrokona University",
+      "name_bn": "নেত্রকোণা বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Netrokona",
+      "website": "neu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "neu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/netrokona-university",
+        "https://neu.ac.bd/"
+      ],
+      "notes": "Old shu.edu.bd is dead; live site neu.ac.bd."
+    },
+    {
+      "slug": "nstu",
+      "name": "Noakhali Science & Technology University",
+      "name_bn": "নোয়াখালী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Noakhali",
+      "website": "nstu.edu.bd",
+      "student_email_domains": [
+        "student.nstu.edu.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "nstu.edu.bd",
+        "student.nstu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/noakhali-science-technology-university",
+        "https://nstu.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "pust",
+      "name": "Pabna University of Science and Technology",
+      "name_bn": "পাবনা বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Pabna",
+      "website": "pust.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "pust.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/pabna-university-of-science-and-technology",
+        "https://pust.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "pstu",
+      "name": "Patuakhali Science And Technology University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Patuakhali",
+      "website": "pstu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "pstu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/patuakhali-science-and-technology-university",
+        "https://pstu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "prstu",
+      "name": "Pirojpur Science & Technology University",
+      "name_bn": "পিরোজপুর বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Pirojpur",
+      "website": "prstu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "prstu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/pirojpur-science-technology-university",
+        "https://prstu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "rub",
+      "name": "Rabindra University, Bangladesh",
+      "name_bn": "রবীন্দ্র বিশ্ববিদ্যালয়, বাংলাদেশ",
+      "kind": "public",
+      "city": "Sirajganj",
+      "website": "rub.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "rub.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/rabindra-university-bangladesh",
+        "https://rub.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "rmu-edu",
+      "name": "Rajshahi Medical University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Rajshahi",
+      "website": "rmu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "rmu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/rajshahi-medical-university",
+        "https://rmu.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "ruet",
+      "name": "Rajshahi University of Engineering & Technology",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Rajshahi",
+      "website": "ruet.ac.bd",
+      "student_email_domains": [
+        "student.ruet.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ruet.ac.bd",
+        "student.ruet.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/rajshahi-university-of-engineering-technology-ruet",
+        "https://ruet.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "rmstu",
+      "name": "Rangamati Science and Technology University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Rangamati",
+      "website": "rmstu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "rmstu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/rangamati-science-and-technology-university",
+        "https://rmstu.ac.bd/"
+      ],
+      "notes": "UGC lists rmstu.edu.bd (dead); live site rmstu.ac.bd."
+    },
+    {
+      "slug": "sust",
+      "name": "Shahjalal University of Science & Technology",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Sylhet",
+      "website": "sust.edu",
+      "student_email_domains": [
+        "student.sust.edu"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "sust.edu",
+        "student.sust.edu"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/shahjalal-university-of-science-technology"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "shariatpur-agricultural-university",
+      "name": "Shariatpur Agricultural University",
+      "name_bn": "শরিয়তপুর কৃষি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Shariatpur",
+      "website": null,
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [],
+      "held_domains": [],
+      "confidence": "none",
+      "sources": [
+        "https://www.ugc.gov.bd/university/shariatpur-agricultural-university"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "sau",
+      "name": "Sher-e-Bangla Agricultural University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Dhaka",
+      "website": "sau.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "sau.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/sher-e-bangla-agricultural-university"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "sstu",
+      "name": "Sunamganj Science and Technology University",
+      "name_bn": "সুনামগঞ্জ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Sunamganj",
+      "website": "sstu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "sstu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/sunamganj-science-and-technology-university",
+        "https://sstu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "sau-ac",
+      "name": "Sylhet Agricultural University",
+      "name_bn": "সিলেট কৃষি বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Sylhet",
+      "website": "sau.ac.bd",
+      "student_email_domains": [
+        "student.sau.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "sau.ac.bd",
+        "student.sau.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/sylhet-agricultural-university",
+        "https://www.sau.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "smu",
+      "name": "Sylhet Medical University",
+      "name_bn": "সিলেট মেডিকেল বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Sylhet",
+      "website": "smu.edu.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "smu.edu.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/sylhet-medical-university-sylhet",
+        "https://smu.edu.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "thakurgaon-university",
+      "name": "Thakurgaon University",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Thakurgaon",
+      "website": null,
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [],
+      "held_domains": [],
+      "confidence": "none",
+      "sources": [
+        "https://www.ugc.gov.bd/university/thakurgaon-university"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "bu-ac",
+      "name": "University of Barishal",
+      "name_bn": "বরিশাল বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Barishal",
+      "website": "bu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/university-of-barishal",
+        "https://bu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "bstu",
+      "name": "University of Bogura",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Bogura",
+      "website": "bstu.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "bstu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/bogra-science-and-technology-university",
+        "https://bstu.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "cu",
+      "name": "University of Chittagong",
+      "name_bn": "চট্টগ্রাম বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Chattogram",
+      "website": "cu.ac.bd",
+      "student_email_domains": [
+        "std.cu.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "cu.ac.bd",
+        "std.cu.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/university-of-chittagong",
+        "https://cu.ac.bd/",
+        "https://ictcell.cu.ac.bd/aliasemail"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "du",
+      "name": "University of Dhaka",
+      "name_bn": "ঢাকা বিশ্ববিদ্যালয়",
+      "kind": "public",
+      "city": "Dhaka",
+      "website": "du.ac.bd",
+      "student_email_domains": [
+        "cs.du.ac.bd",
+        "it.du.ac.bd",
+        "eee.du.ac.bd",
+        "phy.du.ac.bd",
+        "stat.du.ac.bd",
+        "ib.du.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "du.ac.bd",
+        "cs.du.ac.bd",
+        "it.du.ac.bd",
+        "eee.du.ac.bd",
+        "phy.du.ac.bd",
+        "stat.du.ac.bd",
+        "ib.du.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/university-of-dhaka",
+        "https://www.du.ac.bd/",
+        "https://www.du.ac.bd/body/contact/CSE"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "uftb",
+      "name": "University of Frontier Technology, Bangladesh",
+      "name_bn": "ইউনিভার্সিটি অব ফ্রন্টিয়ার টেকনোলজি, বাংলাদেশ",
+      "kind": "public",
+      "city": "Gazipur",
+      "website": "uftb.ac.bd",
+      "student_email_domains": [],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "uftb.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/university-of-frontier-technology-bangladesh",
+        "https://uftb.ac.bd/"
+      ],
+      "notes": null
+    },
+    {
+      "slug": "ru",
+      "name": "University of Rajshahi",
+      "name_bn": null,
+      "kind": "public",
+      "city": "Rajshahi",
+      "website": "ru.ac.bd",
+      "student_email_domains": [
+        "ru.ac.bd"
+      ],
+      "alias_domains": [],
+      "sign_in_domains": [
+        "ru.ac.bd"
+      ],
+      "held_domains": [],
+      "confidence": "high",
+      "sources": [
+        "https://www.ugc.gov.bd/university/university-of-rajshahi",
+        "https://www.ru.ac.bd/",
+        "http://emailapp.ru.ac.bd"
+      ],
+      "notes": null
+    }
+  ]
+}
