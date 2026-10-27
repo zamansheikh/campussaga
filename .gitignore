@@ -13,6 +13,11 @@ coverage/
 **/doc/api/
 
 # Secrets and local config (never commit)
+# Service-account / admin keys (Firebase Admin SDK, Google Cloud)
+*-firebase-adminsdk-*.json
+*service-account*.json
+*serviceAccount*.json
+*credentials*.json
 .env
 *.env
 **/env/*.json

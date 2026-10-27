@@ -6,6 +6,7 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - "**/generated/**"
+    - "build/**"
     - "**/build/**"
   language:
     strict-casts: true

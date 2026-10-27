@@ -3,7 +3,6 @@ import 'package:campus_data/campus_data.dart';
 import 'package:get_it/get_it.dart';
 
 import '../features/auth/data/google_auth.dart';
-import '../firebase_options.dart';
 import 'env.dart';
 
 /// Service locator for long-lived services (API client, repositories).
@@ -24,9 +23,5 @@ void configureDependencies() {
     ..registerLazySingleton<AuthRepository>(
       () => ApiAuthRepository(getIt<ApiClient>(), getIt<TokenStore>()),
     )
-    ..registerLazySingleton<GoogleAuth>(
-      () => FirebaseGoogleAuth(
-        iosClientId: DefaultFirebaseOptions.currentPlatform.iosClientId,
-      ),
-    );
+    ..registerLazySingleton<GoogleAuth>(FirebaseGoogleAuth.new);
 }
