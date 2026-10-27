@@ -30,4 +30,33 @@ class ApiProfileRepository implements ProfileRepository {
             as Map<String, Object?>;
     return (data['departments']! as List<Object?>).cast<String>();
   }
+
+  @override
+  Future<List<University>> universities() async {
+    final data = (await _api.get('/universities'))! as Map<String, Object?>;
+    return [
+      for (final u in data['universities']! as List<Object?>)
+        University.fromJson(u! as Map<String, Object?>),
+    ];
+  }
+
+  @override
+  Future<UserProfile> setUniversity(String universityId) async =>
+      UserProfile.fromJson(
+        (await _api.put('/me/university', {'universityId': universityId}))!
+            as Map<String, Object?>,
+      );
+
+  @override
+  Future<CodeSent> requestVerifyCode(String email) async => CodeSent.fromJson(
+    (await _api.post('/me/verify/code', {'email': email.trim()}))!
+        as Map<String, Object?>,
+  );
+
+  @override
+  Future<UserProfile> verifyUniversityEmail(String email, String code) async =>
+      UserProfile.fromJson(
+        (await _api.post('/me/verify', {'email': email.trim(), 'code': code}))!
+            as Map<String, Object?>,
+      );
 }

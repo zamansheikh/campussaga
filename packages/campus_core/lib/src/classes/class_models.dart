@@ -29,6 +29,7 @@ class GroupMember {
     required this.name,
     required this.role,
     this.isMe = false,
+    this.verified = true,
   });
 
   factory GroupMember.fromJson(Map<String, Object?> json) => GroupMember(
@@ -36,12 +37,16 @@ class GroupMember {
     name: json['name'] as String? ?? '',
     role: GroupRole.parse(json['role'] as String?),
     isMe: json['isMe'] as bool? ?? false,
+    verified: json['verified'] as bool? ?? true,
   );
 
   final String userId;
   final String name;
   final GroupRole role;
   final bool isMe;
+
+  /// Signed in with a university email (others used Gmail).
+  final bool verified;
 }
 
 /// Minutes after midnight <-> "HH:MM".

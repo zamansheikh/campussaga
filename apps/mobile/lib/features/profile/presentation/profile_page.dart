@@ -13,6 +13,7 @@ import '../../../app/version/app_version.dart';
 import '../../auth/presentation/auth_error_text.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../reminders/presentation/bloc/reminders_cubit.dart';
+import 'widgets/university_picker.dart';
 
 /// Who you are, your preferences, and account actions.
 class ProfilePage extends StatelessWidget {
@@ -80,6 +81,14 @@ class ProfilePage extends StatelessWidget {
             CsSection(
               title: l10n.account,
               children: [
+                if (!(context.select((AuthBloc b) => b.state.user?.verified) ??
+                    true))
+                  CsRow(
+                    icon: Icons.verified_outlined,
+                    title: l10n.verifyWithUniEmail,
+                    subtitle: l10n.verifyHint,
+                    onTap: () => context.push(Routes.verifyEmail),
+                  ),
                 CsRow(
                   icon: Icons.edit_outlined,
                   title: l10n.editProfile,
@@ -253,11 +262,18 @@ class _ProfileHeader extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: CsSpace.sm),
-                      CsBadge(
-                        label: l10n.verifiedStudent,
-                        icon: Icons.verified_rounded,
-                        tone: CsBadgeTone.success,
-                      ),
+                      if (user.verified)
+                        CsBadge(
+                          label: l10n.verifiedStudent,
+                          icon: Icons.verified_rounded,
+                          tone: CsBadgeTone.success,
+                        )
+                      else
+                        CsBadge(
+                          label: l10n.notVerified,
+                          icon: Icons.help_outline_rounded,
+                          tone: CsBadgeTone.accent,
+                        ),
                     ],
                   ),
                 ),
@@ -266,10 +282,13 @@ class _ProfileHeader extends StatelessWidget {
             const SizedBox(height: CsSpace.md),
             const Divider(),
             const SizedBox(height: CsSpace.md),
-            _InfoLine(
-              icon: Icons.account_balance_outlined,
-              text: user.university.localName(lang),
-            ),
+            if (user.verified)
+              _InfoLine(
+                icon: Icons.account_balance_outlined,
+                text: user.university?.localName(lang) ?? '',
+              )
+            else
+              const UniversityField(),
             const SizedBox(height: CsSpace.sm),
             if (classLine.isNotEmpty)
               _InfoLine(icon: Icons.school_outlined, text: classLine)

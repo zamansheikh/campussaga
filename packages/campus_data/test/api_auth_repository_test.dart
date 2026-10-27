@@ -66,7 +66,7 @@ void main() {
 
     final result = await repo.signInWithGoogle('fb-token');
     expect(result.isNewUser, isTrue);
-    expect(result.user.university.name, 'Demo University');
+    expect(result.user.university!.name, 'Demo University');
     expect(store.tokens?.refreshToken, 'refresh-1');
 
     expect(await repo.restoreSession(), isNotNull);

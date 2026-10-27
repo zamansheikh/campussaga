@@ -39,9 +39,13 @@ var (
 type Claims struct {
 	UserID       uuid.UUID
 	SessionID    uuid.UUID
-	UniversityID uuid.UUID
+	UniversityID uuid.UUID // uuid.Nil: not chosen yet (not verified student)
 	Role         string
 	ExpiresAt    time.Time
+
+	// Verified: proved a university email. Not in the token: the session
+	// check fills it (and refreshes UniversityID) from the database.
+	Verified bool
 }
 
 type jwtClaims struct {

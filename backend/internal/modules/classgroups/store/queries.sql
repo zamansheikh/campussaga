@@ -153,7 +153,8 @@ SELECT * FROM routine_changes WHERE id = @id AND group_id = @group_id;
 
 -- Names only (no emails): what a CR needs to manage the group.
 -- name: ListMembers :many
-SELECT m.user_id, m.role, m.joined_at, u.display_name
+SELECT m.user_id, m.role, m.joined_at, u.display_name,
+       (u.verified_at IS NOT NULL)::bool AS verified
 FROM class_group_members m
 JOIN users u ON u.id = m.user_id
 WHERE m.group_id = @group_id

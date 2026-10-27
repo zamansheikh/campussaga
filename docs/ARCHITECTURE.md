@@ -131,6 +131,22 @@ rewriting the app.
 
 Codes are looked up 30 times per hour per student and 120 per IP (24⁶ ≈ 191 million codes). A code of another university, or a group you're not in, answers `GROUP_NOT_FOUND`; a member editing answers `NOT_GROUP_CR`. Limits: 10 groups per student, 300 members per group, 100 classes per routine. The app keeps the last `GET /groups` on the phone (per account) so Today and Routine work offline.
 
+### Verified and not-verified students (migration 00460)
+
+Some universities give students no email. Signing in with **any Google
+account** that isn't a university address creates a **not verified**
+student: no university yet (`PUT /me/university` picks one from the list;
+only while not verified), shown as "Not verified" on their profile and in
+the CR's member list. They can verify later: `POST /me/verify/code {email}`
+sends a code to a university email (same limits as sign-in codes), and
+`POST /me/verify {email, code}` stores it as `university_email`, sets
+`verified_at` and the university. Whoever controls that university email
+gets the same account when signing in with it. Email-code sign-in still
+needs a university email. The session check reads the student's current
+university and verified flag from the database on every request, so a
+choice or verification applies at once. Groups need a university
+(`UNIVERSITY_REQUIRED`). Campus Voice (R2) will require verified students.
+
 ### Authentication
 
 - **Sign-in = university email + 6-digit code.** Codes are stored only as an HMAC hash (`CODE_HMAC_SECRET`), never in plain text.

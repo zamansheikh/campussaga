@@ -14,6 +14,8 @@ String emailErrorText(AppLocalizations l10n, Failure failure) {
         (details?['remainingAttempts'] as num?)?.toInt() ?? 1,
       ),
     RejectedFailure(code: 'CODE_EXPIRED') => l10n.errorCodeExpired,
+    RejectedFailure(code: 'EMAIL_IN_USE') => l10n.errorEmailInUse,
+    RejectedFailure(code: 'ALREADY_VERIFIED') => l10n.errorAlreadyVerified,
     RejectedFailure(code: 'EMAIL_SEND_FAILED') => l10n.errorEmailSendFailed,
     RateLimitedFailure(code: 'CODE_TOO_MANY_ATTEMPTS') =>
       l10n.errorCodeTooManyAttempts,

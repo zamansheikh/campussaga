@@ -770,7 +770,8 @@ func (q *Queries) ListMemberIDs(ctx context.Context, groupID uuid.UUID) ([]uuid.
 
 const listMembers = `-- name: ListMembers :many
 
-SELECT m.user_id, m.role, m.joined_at, u.display_name
+SELECT m.user_id, m.role, m.joined_at, u.display_name,
+       (u.verified_at IS NOT NULL)::bool AS verified
 FROM class_group_members m
 JOIN users u ON u.id = m.user_id
 WHERE m.group_id = $1
@@ -782,6 +783,7 @@ type ListMembersRow struct {
 	Role        string
 	JoinedAt    time.Time
 	DisplayName *string
+	Verified    bool
 }
 
 // ---- members (CR) ----------------------------------------------------------
@@ -800,6 +802,7 @@ func (q *Queries) ListMembers(ctx context.Context, groupID uuid.UUID) ([]ListMem
 			&i.Role,
 			&i.JoinedAt,
 			&i.DisplayName,
+			&i.Verified,
 		); err != nil {
 			return nil, err
 		}

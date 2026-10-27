@@ -31,6 +31,7 @@ String rangeText(BuildContext context, ClassSlot s) =>
 /// The student-facing message for a class group failure.
 String classErrorText(AppLocalizations l10n, Failure f) => switch (f.code) {
   'GROUP_NOT_FOUND' => l10n.errorGroupNotFound,
+  'UNIVERSITY_REQUIRED' => l10n.errorUniversityRequired,
   'NOT_GROUP_CR' => l10n.errorNotCr,
   'GROUP_LIMIT_REACHED' => l10n.errorGroupLimit,
   'GROUP_FULL' => l10n.errorGroupFull,

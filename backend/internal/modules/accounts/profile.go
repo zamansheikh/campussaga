@@ -15,26 +15,34 @@ import (
 // Me is the signed-in student's own profile. It is the only place an
 // email address is ever returned, and only to its owner.
 type Me struct {
-	ID          uuid.UUID   `json:"id"`
-	Email       string      `json:"email"`
+	ID    uuid.UUID `json:"id"`
+	Email string    `json:"email"`
+	// University: null until a not-verified student picks one.
 	University  *University `json:"university"`
 	DisplayName *string     `json:"displayName"`
 	Department  *string     `json:"department"`
 	Batch       *string     `json:"batch"`
 	Role        string      `json:"role"`
-	VerifiedAt  time.Time   `json:"verifiedAt"`
-	CreatedAt   time.Time   `json:"createdAt"`
+	// Verified: proved a university email (signing in with one, or later).
+	Verified        bool       `json:"verified"`
+	UniversityEmail *string    `json:"universityEmail"`
+	VerifiedAt      *time.Time `json:"verifiedAt"`
+	CreatedAt       time.Time  `json:"createdAt"`
 }
 
 func (s *Service) meView(ctx context.Context, u store.User) (*Me, error) {
-	uni, err := s.unis.Get(ctx, u.UniversityID)
-	if err != nil {
-		return nil, err
+	var uni *University
+	if u.UniversityID != nil {
+		var err error
+		if uni, err = s.unis.Get(ctx, *u.UniversityID); err != nil {
+			return nil, err
+		}
 	}
 	return &Me{
 		ID: u.ID, Email: u.Email, University: uni,
 		DisplayName: u.DisplayName, Department: u.Department, Batch: u.Batch,
-		Role: string(u.Role), VerifiedAt: u.VerifiedAt, CreatedAt: u.CreatedAt,
+		Role: string(u.Role), Verified: u.VerifiedAt != nil, UniversityEmail: u.UniversityEmail,
+		VerifiedAt: u.VerifiedAt, CreatedAt: u.CreatedAt,
 	}, nil
 }
 
@@ -103,9 +111,12 @@ func apply(current, patch *string) *string {
 // Only department names are returned, never who entered them.
 func (s *Service) DepartmentSuggestions(ctx context.Context, q string) ([]string, error) {
 	c := auth.MustUser(ctx)
+	if c.UniversityID == uuid.Nil {
+		return []string{}, nil
+	}
 	q = strings.Join(strings.Fields(q), " ")
 	out, err := store.New(s.d.Q(ctx)).DepartmentSuggestions(ctx, store.DepartmentSuggestionsParams{
-		UniversityID: c.UniversityID, Q: q, MaxResults: 10,
+		UniversityID: &c.UniversityID, Q: q, MaxResults: 10,
 	})
 	if err != nil {
 		return nil, err

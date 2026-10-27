@@ -30,6 +30,8 @@ const testUser = UserProfile(
   displayName: 'Rafi',
   department: 'CSE',
   batch: '61',
+  verified: true,
+  universityEmail: 'rafi@cse.demo.ac.bd',
 );
 
 /// Signed in for the first time: department and batch still missing.
@@ -43,6 +45,18 @@ const newUser = UserProfile(
   ),
   role: 'student',
   displayName: 'Mim',
+  verified: true,
+  universityEmail: 'mim@diu.edu.bd',
+);
+
+/// Signed in with Gmail (the university gives no email): not verified,
+/// no university chosen yet.
+const gmailUser = UserProfile(
+  id: 'u3',
+  email: 'tanvir.student@gmail.com',
+  university: null,
+  role: 'student',
+  displayName: 'Tanvir Ahmed',
 );
 
 class FakeAuthRepository implements AuthRepository {
@@ -103,7 +117,7 @@ class FakeAuthRepository implements AuthRepository {
     if (requestFailure != null) throw requestFailure!;
     return CodeSent(
       email: email,
-      university: testUser.university,
+      university: testUser.university!,
       expiresIn: const Duration(minutes: 10),
       resendAfter: const Duration(seconds: 60),
     );
@@ -154,14 +168,90 @@ class FakeProfileRepository implements ProfileRepository {
   }) async {
     updates.add((displayName, department, batch));
     if (failure != null) throw failure!;
-    return UserProfile(
-      id: newUser.id,
-      email: newUser.email,
-      university: newUser.university,
-      role: newUser.role,
+    final base = edited ?? newUser;
+    final saved = UserProfile(
+      id: base.id,
+      email: base.email,
+      university: base.university,
+      role: base.role,
       displayName: displayName,
       department: department,
       batch: batch,
+      verified: base.verified,
+      universityEmail: base.universityEmail,
+    );
+    if (edited != null) me = edited = saved;
+    return saved;
+  }
+
+  /// The student setUniversity / verify edit (a Gmail student by default);
+  /// once edited, updateProfile builds on it instead of [newUser].
+  UserProfile me = gmailUser;
+  UserProfile? edited;
+  final verifyCodes = <String>[];
+
+  @override
+  Future<List<University>> universities() async {
+    if (failure != null) throw failure!;
+    return const [
+      University(
+        id: 'uni-buet',
+        slug: 'buet',
+        name: 'Bangladesh University of Engineering and Technology',
+        nameBn: 'বাংলাদেশ প্রকৌশল বিশ্ববিদ্যালয়',
+      ),
+      University(id: 'uni1', slug: 'demo-university', name: 'Demo University'),
+    ];
+  }
+
+  @override
+  Future<UserProfile> setUniversity(String universityId) async {
+    if (failure != null) throw failure!;
+    final uni = (await universities()).firstWhere((u) => u.id == universityId);
+    return me = edited = UserProfile(
+      id: me.id,
+      email: me.email,
+      university: uni,
+      role: me.role,
+      displayName: me.displayName,
+      department: me.department,
+      batch: me.batch,
+    );
+  }
+
+  @override
+  Future<CodeSent> requestVerifyCode(String email) async {
+    if (failure != null) throw failure!;
+    verifyCodes.add(email);
+    if (!email.endsWith('.ac.bd')) {
+      throw const RejectedFailure(code: 'UNIVERSITY_EMAIL_REQUIRED');
+    }
+    return CodeSent(
+      email: email,
+      university: testUser.university!,
+      expiresIn: const Duration(minutes: 10),
+      resendAfter: const Duration(seconds: 60),
+    );
+  }
+
+  @override
+  Future<UserProfile> verifyUniversityEmail(String email, String code) async {
+    if (code != '123456') {
+      throw const RejectedFailure(
+        code: 'CODE_INVALID',
+        details: {'remainingAttempts': 4},
+      );
+    }
+    return me = edited = UserProfile(
+      id: me.id,
+      email: me.email,
+      university: testUser.university,
+      role: me.role,
+      displayName: me.displayName,
+      department: me.department,
+      batch: me.batch,
+      verified: true,
+      universityEmail: email,
     );
   }
 

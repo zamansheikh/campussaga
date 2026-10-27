@@ -113,8 +113,22 @@ func (s *Service) RequestCode(ctx context.Context, rawEmail string) (*CodeSent, 
 	if uni == nil {
 		return nil, ErrUniversityEmailRequired
 	}
+	if err := s.sendCode(ctx, email, uni); err != nil {
+		return nil, err
+	}
+	return &CodeSent{
+		Email: email, University: uni,
+		ExpiresInSeconds:   int(s.cfg.CodeTTL.Seconds()),
+		ResendAfterSeconds: int(s.cfg.ResendAfter.Seconds()),
+	}, nil
+}
+
+// sendCode emails a fresh 6-digit code to a university address, with the
+// resend and hourly limits. Used by sign-in and by verifying a university
+// email later.
+func (s *Service) sendCode(ctx context.Context, email string, uni *University) error {
 	now := s.now()
-	err = s.d.InTx(ctx, func(ctx context.Context) error {
+	return s.d.InTx(ctx, func(ctx context.Context) error {
 		q := store.New(s.d.Q(ctx))
 		if err := q.LockEmail(ctx, email); err != nil {
 			return err
@@ -162,14 +176,6 @@ func (s *Service) RequestCode(ctx context.Context, rawEmail string) (*CodeSent, 
 		}
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return &CodeSent{
-		Email: email, University: uni,
-		ExpiresInSeconds:   int(s.cfg.CodeTTL.Seconds()),
-		ResendAfterSeconds: int(s.cfg.ResendAfter.Seconds()),
-	}, nil
 }
 
 // SignedIn answers POST /auth/verify.
@@ -204,41 +210,22 @@ func (s *Service) VerifyCode(ctx context.Context, rawEmail, code string) (*Signe
 		if err := q.LockEmail(ctx, email); err != nil {
 			return err
 		}
-		row, err := q.LockSignInCode(ctx, email)
-		if db.IsNoRows(err) {
-			return ErrCodeExpired
-		}
+		row, bad, err := s.consumeCode(ctx, q, email, code, now)
 		if err != nil {
 			return err
 		}
-		if !now.Before(row.ExpiresAt) {
-			return ErrCodeExpired
-		}
-		if int(row.Attempts) >= s.cfg.MaxAttempts {
-			return ErrCodeTooManyAttempts
-		}
-		if !hmac.Equal(s.codeHash(email, code), row.CodeHash) {
-			attempts, err := q.CountFailedAttempt(ctx, email)
-			if err != nil {
-				return err
-			}
-			left := s.cfg.MaxAttempts - int(attempts)
-			if left <= 0 {
-				failure = ErrCodeTooManyAttempts
-			} else {
-				failure = ErrCodeInvalid.WithDetails(map[string]int{"remainingAttempts": left})
-			}
+		if bad != nil {
+			failure = bad
 			return nil // commit the attempt count
-		}
-		if err := q.DeleteSignInCode(ctx, email); err != nil {
-			return err
 		}
 
 		user, err := q.GetUserByEmail(ctx, email)
 		isNew := false
 		if db.IsNoRows(err) {
 			isNew = true
-			user, err = q.InsertUser(ctx, store.InsertUserParams{Email: email, UniversityID: row.UniversityID, VerifiedAt: now})
+			user, err = q.InsertUser(ctx, store.InsertUserParams{
+				Email: email, UniversityID: &row.UniversityID, UniversityEmail: &email, VerifiedAt: &now,
+			})
 		}
 		if err != nil {
 			return err
@@ -263,12 +250,50 @@ func (s *Service) VerifyCode(ctx context.Context, rawEmail, code string) (*Signe
 	return out, nil
 }
 
+// consumeCode checks a code for email inside the caller's transaction:
+// bad (wrong code; the caller commits the attempt count) or the code row,
+// deleted so it can't be used twice.
+func (s *Service) consumeCode(ctx context.Context, q *store.Queries, email, code string, now time.Time) (row store.SignInCode, bad error, err error) {
+	row, err = q.LockSignInCode(ctx, email)
+	if db.IsNoRows(err) {
+		return row, nil, ErrCodeExpired
+	}
+	if err != nil {
+		return row, nil, err
+	}
+	if !now.Before(row.ExpiresAt) {
+		return row, nil, ErrCodeExpired
+	}
+	if int(row.Attempts) >= s.cfg.MaxAttempts {
+		return row, nil, ErrCodeTooManyAttempts
+	}
+	if !hmac.Equal(s.codeHash(email, code), row.CodeHash) {
+		attempts, err := q.CountFailedAttempt(ctx, email)
+		if err != nil {
+			return row, nil, err
+		}
+		left := s.cfg.MaxAttempts - int(attempts)
+		if left <= 0 {
+			bad = ErrCodeTooManyAttempts
+		} else {
+			bad = ErrCodeInvalid.WithDetails(map[string]int{"remainingAttempts": left})
+		}
+		return row, bad, nil // the caller commits the attempt count
+	}
+	if err := q.DeleteSignInCode(ctx, email); err != nil {
+		return row, nil, err
+	}
+	return row, nil, nil
+}
+
 // ---- Google -----------------------------------------------------------------
 
 // SignInWithGoogle signs a student in with a Firebase ID token from Google
-// sign-in. Only verified university Google accounts are accepted (most
-// universities give students a Google Workspace address); a personal Gmail
-// gets UNIVERSITY_EMAIL_REQUIRED and the app offers the email code instead.
+// sign-in. A university Google account (most universities give students a
+// Google Workspace address) is a verified student of that university. Any
+// other Google account (Gmail; some universities give no email) becomes a
+// NOT verified student who picks their university and can verify later
+// with a university email.
 // The same email always maps to the same account, whichever way they sign in.
 func (s *Service) SignInWithGoogle(ctx context.Context, idToken string) (*SignedIn, error) {
 	if s.google == nil {
@@ -290,10 +315,11 @@ func (s *Service) SignInWithGoogle(ctx context.Context, idToken string) (*Signed
 	if err != nil {
 		return nil, err
 	}
-	if uni == nil {
-		return nil, ErrUniversityEmailRequired
-	}
 	now := s.now()
+	params := store.InsertUserParams{Email: email} // not verified
+	if uni != nil {
+		params = store.InsertUserParams{Email: email, UniversityID: &uni.ID, UniversityEmail: &email, VerifiedAt: &now}
+	}
 	var out *SignedIn
 	err = s.d.InTx(ctx, func(ctx context.Context) error {
 		q := store.New(s.d.Q(ctx))
@@ -304,7 +330,7 @@ func (s *Service) SignInWithGoogle(ctx context.Context, idToken string) (*Signed
 		isNew := false
 		if db.IsNoRows(err) {
 			isNew = true
-			user, err = q.InsertUser(ctx, store.InsertUserParams{Email: email, UniversityID: uni.ID, VerifiedAt: now})
+			user, err = q.InsertUser(ctx, params)
 		}
 		if err != nil {
 			return err
@@ -348,7 +374,7 @@ func (s *Service) startSession(ctx context.Context, q *store.Queries, u store.Us
 
 func (s *Service) issue(u store.User, sessionID uuid.UUID, refresh string, refreshExp time.Time) (*Tokens, error) {
 	access, exp, err := s.tokens.Issue(auth.Claims{
-		UserID: u.ID, SessionID: sessionID, UniversityID: u.UniversityID, Role: string(u.Role),
+		UserID: u.ID, SessionID: sessionID, UniversityID: deref(u.UniversityID), Role: string(u.Role),
 	})
 	if err != nil {
 		return nil, err
@@ -416,14 +442,24 @@ func (s *Service) Refresh(ctx context.Context, refresh string) (*Tokens, error) 
 // everywhere and deleting the account take effect immediately instead of
 // when the access token expires.
 func (s *Service) CheckSession(ctx context.Context, c *auth.Claims) error {
-	ok, err := store.New(s.d.Q(ctx)).SessionActive(ctx, store.SessionActiveParams{ID: c.SessionID, UserID: c.UserID, Now: s.now()})
+	u, err := store.New(s.d.Q(ctx)).SessionUser(ctx, store.SessionUserParams{ID: c.SessionID, UserID: c.UserID, Now: s.now()})
+	if db.IsNoRows(err) {
+		return ErrSessionEnded
+	}
 	if err != nil {
 		return err
 	}
-	if !ok {
-		return ErrSessionEnded
-	}
+	// Fresh from the database, not the token: picking a university or
+	// verifying applies to the very next request.
+	c.UniversityID, c.Verified = deref(u.UniversityID), u.Verified
 	return nil
+}
+
+func deref(id *uuid.UUID) uuid.UUID {
+	if id == nil {
+		return uuid.Nil
+	}
+	return *id
 }
 
 // Logout ends the current session.

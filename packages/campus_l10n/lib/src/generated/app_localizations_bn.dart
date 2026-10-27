@@ -57,12 +57,11 @@ class AppLocalizationsBn extends AppLocalizations {
   String get comingSoon => 'শীঘ্রই আসছে';
 
   @override
-  String get welcomeTitle =>
-      'তোমার বিশ্ববিদ্যালয়ের অ্যাকাউন্ট দিয়ে সাইন ইন করো';
+  String get welcomeTitle => 'শুরু করতে সাইন ইন করো';
 
   @override
   String get welcomeSubtitle =>
-      'শুধু যাচাই করা শিক্ষার্থীরাই যোগ দিতে পারে। বিশ্ববিদ্যালয়ের ইমেইলই দেখায় তুমি শিক্ষার্থী।';
+      'যাচাই করা শিক্ষার্থী হিসেবে যোগ দিতে বিশ্ববিদ্যালয়ের ইমেইল ব্যবহার করো। বিশ্ববিদ্যালয়ের ইমেইল নেই? যেকোনো Google অ্যাকাউন্ট দিয়ে চালিয়ে যাও।';
 
   @override
   String get continueWithGoogle => 'Google দিয়ে চালিয়ে যাও';
@@ -144,7 +143,7 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get errorNotUniversityEmail =>
-      'এই ইমেইলটি কোনো যুক্ত বিশ্ববিদ্যালয়ের নয়। তোমার বিশ্ববিদ্যালয়ের দেওয়া ইমেইল ব্যবহার করো।';
+      'এই ইমেইল কোনো সমর্থিত বিশ্ববিদ্যালয়ের নয়। বিশ্ববিদ্যালয়ের ইমেইল নেই? ফিরে গিয়ে Google দিয়ে চালিয়ে যাও।';
 
   @override
   String errorCodeInvalid(int count) {
@@ -1008,4 +1007,58 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get sendFeedbackHint =>
       'কোনো সমস্যা পেলে বা কোনো আইডিয়া থাকলে জানাও।';
+
+  @override
+  String get notVerified => 'যাচাই করা হয়নি';
+
+  @override
+  String get verifyWithUniEmail => 'বিশ্ববিদ্যালয়ের ইমেইল দিয়ে যাচাই করো';
+
+  @override
+  String get verifyHint =>
+      'বিশ্ববিদ্যালয়ের ইমেইলে পাঠানো কোড দিয়ে যাচাই ব্যাজ পাও।';
+
+  @override
+  String get chooseUniversity => 'তোমার বিশ্ববিদ্যালয় বেছে নাও';
+
+  @override
+  String get chooseUniversityHint =>
+      'তুমি বিশ্ববিদ্যালয়ের ইমেইল ছাড়া সাইন ইন করেছ, তাই বিশ্ববিদ্যালয় বেছে নাও। বিশ্ববিদ্যালয়ের ইমেইল দিয়ে যাচাই না করা পর্যন্ত তুমি যাচাই করা হয়নি হিসেবে দেখাবে।';
+
+  @override
+  String get searchUniversity => 'বিশ্ববিদ্যালয় খোঁজো';
+
+  @override
+  String get universityLabel => 'বিশ্ববিদ্যালয়';
+
+  @override
+  String get changeAction => 'বদলাও';
+
+  @override
+  String get verifiedNow => 'তুমি এখন যাচাই করা শিক্ষার্থী';
+
+  @override
+  String get verifyTitle => 'শিক্ষার্থী পরিচয় যাচাই করো';
+
+  @override
+  String get verifySubtitle =>
+      'তোমার বিশ্ববিদ্যালয়ের দেওয়া ইমেইল লেখো। সেখানে একটি ৬ অঙ্কের কোড পাঠাব।';
+
+  @override
+  String get errorEmailInUse =>
+      'এই ইমেইলের আলাদা অ্যাকাউন্ট আছে। সাইন আউট করে সেটি দিয়ে সাইন ইন করো।';
+
+  @override
+  String get errorAlreadyVerified => 'তুমি ইতিমধ্যে যাচাই করা।';
+
+  @override
+  String get errorUniversityRequired =>
+      'আগে প্রোফাইলে তোমার বিশ্ববিদ্যালয় বেছে নাও।';
+
+  @override
+  String get errorChooseUniversity => 'চালিয়ে যেতে বিশ্ববিদ্যালয় বেছে নাও।';
+
+  @override
+  String get errorNotUniversityEmailVerify =>
+      'এই ইমেইল কোনো সমর্থিত বিশ্ববিদ্যালয়ের নয়। বিশ্ববিদ্যালয়ের দেওয়া ইমেইল ব্যবহার করো।';
 }

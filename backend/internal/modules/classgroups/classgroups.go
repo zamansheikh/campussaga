@@ -216,6 +216,9 @@ func (s *Service) MyGroups(ctx context.Context) ([]Group, error) {
 
 // Create makes a new group with the caller as its CR.
 func (s *Service) Create(ctx context.Context, in *GroupInput) (*Group, error) {
+	if auth.MustUser(ctx).UniversityID == uuid.Nil {
+		return nil, ErrUniversityRequired
+	}
 	if err := in.clean(); err != nil {
 		return nil, err
 	}
@@ -517,6 +520,9 @@ func (s *Service) DeleteSlot(ctx context.Context, groupID, slotID uuid.UUID) err
 
 // groupForCode finds a group of the caller's university by code.
 func (s *Service) groupForCode(ctx context.Context, q *store.Queries, c *auth.Claims, code string) (store.ClassGroup, error) {
+	if c.UniversityID == uuid.Nil {
+		return store.ClassGroup{}, ErrUniversityRequired
+	}
 	code = strings.ToUpper(strings.TrimSpace(code))
 	g, err := q.GetGroupByCode(ctx, code)
 	if db.IsNoRows(err) || (err == nil && g.UniversityID != c.UniversityID) {

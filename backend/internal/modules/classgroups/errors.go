@@ -10,6 +10,8 @@ import (
 var (
 	ErrGroupNotFound = apperr.New(http.StatusNotFound, "GROUP_NOT_FOUND",
 		"No class group with this code at your university")
+	ErrUniversityRequired = apperr.New(http.StatusConflict, "UNIVERSITY_REQUIRED",
+		"Choose your university first")
 	ErrNotCR = apperr.New(http.StatusForbidden, "NOT_GROUP_CR",
 		"Only the CR can change this class group")
 	ErrGroupLimit = apperr.New(http.StatusConflict, "GROUP_LIMIT_REACHED",

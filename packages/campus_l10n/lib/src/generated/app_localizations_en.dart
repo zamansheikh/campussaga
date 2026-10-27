@@ -57,11 +57,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comingSoon => 'Coming soon';
 
   @override
-  String get welcomeTitle => 'Sign in with your university account';
+  String get welcomeTitle => 'Sign in to get started';
 
   @override
   String get welcomeSubtitle =>
-      'Only verified students can join. Your university email shows you\'re a student.';
+      'Use your university email to join as a verified student. No university email? Continue with Google using any account.';
 
   @override
   String get continueWithGoogle => 'Continue with Google';
@@ -144,7 +144,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorNotUniversityEmail =>
-      'This email isn\'t from a supported university. Use the email your university gave you.';
+      'This email isn\'t from a supported university. No university email? Go back and continue with Google.';
 
   @override
   String errorCodeInvalid(int count) {
@@ -1032,4 +1032,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sendFeedbackHint => 'Found a bug or have an idea? Tell us.';
+
+  @override
+  String get notVerified => 'Not verified';
+
+  @override
+  String get verifyWithUniEmail => 'Verify with university email';
+
+  @override
+  String get verifyHint =>
+      'Get the Verified badge with a code sent to your university email.';
+
+  @override
+  String get chooseUniversity => 'Choose your university';
+
+  @override
+  String get chooseUniversityHint =>
+      'You signed in without a university email, so choose your university. You show as not verified until you verify with a university email.';
+
+  @override
+  String get searchUniversity => 'Search universities';
+
+  @override
+  String get universityLabel => 'University';
+
+  @override
+  String get changeAction => 'Change';
+
+  @override
+  String get verifiedNow => 'You\'re now a verified student';
+
+  @override
+  String get verifyTitle => 'Verify you\'re a student';
+
+  @override
+  String get verifySubtitle =>
+      'Enter the email your university gave you. We\'ll send a 6-digit code to it.';
+
+  @override
+  String get errorEmailInUse =>
+      'This email already has its own account. Sign out and sign in with it instead.';
+
+  @override
+  String get errorAlreadyVerified => 'You\'re already verified.';
+
+  @override
+  String get errorUniversityRequired =>
+      'Choose your university first in your profile.';
+
+  @override
+  String get errorChooseUniversity => 'Choose your university to continue.';
+
+  @override
+  String get errorNotUniversityEmailVerify =>
+      'This email isn\'t from a supported university. Use the email your university gave you.';
 }

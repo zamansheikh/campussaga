@@ -165,6 +165,8 @@ class _MemberRow extends StatelessWidget {
                   CsBadge(label: l10n.roleCr, tone: CsBadgeTone.success),
                 if (member.isMe)
                   CsBadge(label: l10n.youLabel, tone: CsBadgeTone.neutral),
+                if (!member.verified)
+                  CsBadge(label: l10n.notVerified, tone: CsBadgeTone.accent),
               ],
             ),
           ),

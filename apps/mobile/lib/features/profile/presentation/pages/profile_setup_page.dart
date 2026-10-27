@@ -8,9 +8,11 @@ import '../../../../app/di.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../bloc/profile_form_cubit.dart';
 import '../widgets/profile_form.dart';
+import '../widgets/university_picker.dart';
 
-/// Shown after sign-in while name, department or batch is missing. Saving
-/// (or "Later") lets the router open the app.
+/// Shown after sign-in while name, department or batch is missing, or (a
+/// student who signed in with Gmail) the university. Saving (or "Later",
+/// once a university is chosen) lets the router open the app.
 class ProfileSetupPage extends StatelessWidget {
   const ProfileSetupPage({super.key});
 
@@ -18,7 +20,7 @@ class ProfileSetupPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthBloc>();
-    final user = auth.state.user;
+    final user = context.select((AuthBloc b) => b.state.user);
     if (user == null) return const SizedBox.shrink();
     final lang = Localizations.localeOf(context).languageCode;
     return BlocProvider(
@@ -53,22 +55,32 @@ class ProfileSetupPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: CsSpace.md),
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: CsBadge(
-                  label: user.university.localName(lang),
-                  icon: Icons.account_balance_outlined,
-                  tone: CsBadgeTone.neutral,
-                ),
-              ),
+              if (user.verified && user.university != null)
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: CsBadge(
+                    label: user.university!.localName(lang),
+                    icon: Icons.verified_rounded,
+                    tone: CsBadgeTone.success,
+                  ),
+                )
+              else ...[
+                Text(l10n.chooseUniversityHint, style: context.text.bodySmall),
+                const SizedBox(height: CsSpace.sm),
+                const UniversityField(),
+              ],
               const SizedBox(height: CsSpace.lg),
               ProfileForm(
                 initial: user,
                 onSaved: (u) => auth.add(AuthProfileUpdated(u)),
-                secondary: TextButton(
-                  onPressed: () => auth.add(const AuthProfileSetupSkipped()),
-                  child: Text(l10n.setupLater),
-                ),
+                // The university can't wait: groups need it.
+                secondary: user.university == null
+                    ? null
+                    : TextButton(
+                        onPressed: () =>
+                            auth.add(const AuthProfileSetupSkipped()),
+                        child: Text(l10n.setupLater),
+                      ),
               ),
             ],
           ),

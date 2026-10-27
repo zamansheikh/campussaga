@@ -80,14 +80,15 @@ type SignInCode struct {
 }
 
 type User struct {
-	ID           uuid.UUID
-	Email        string
-	UniversityID uuid.UUID
-	DisplayName  *string
-	Department   *string
-	Batch        *string
-	Role         UserRole
-	VerifiedAt   time.Time
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID              uuid.UUID
+	Email           string
+	UniversityID    *uuid.UUID
+	DisplayName     *string
+	Department      *string
+	Batch           *string
+	Role            UserRole
+	VerifiedAt      *time.Time
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	UniversityEmail *string
 }

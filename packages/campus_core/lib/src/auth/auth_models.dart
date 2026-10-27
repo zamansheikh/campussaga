@@ -34,23 +34,38 @@ class UserProfile {
     this.displayName,
     this.department,
     this.batch,
+    this.verified = false,
+    this.universityEmail,
   });
 
   factory UserProfile.fromJson(Map<String, Object?> json) => UserProfile(
     id: json['id']! as String,
     email: json['email']! as String,
-    university: University.fromJson(
-      json['university']! as Map<String, Object?>,
-    ),
+    university: json['university'] == null
+        ? null
+        : University.fromJson(json['university']! as Map<String, Object?>),
     role: json['role']! as String,
     displayName: json['displayName'] as String?,
     department: json['department'] as String?,
     batch: json['batch'] as String?,
+    // Older servers didn't send it: everyone was verified then.
+    verified: json['verified'] as bool? ?? true,
+    universityEmail: json['universityEmail'] as String?,
   );
 
   final String id;
+
+  /// The sign-in email (a university email, or a personal Google account).
   final String email;
-  final University university;
+
+  /// Null until a not-verified student picks their university.
+  final University? university;
+
+  /// Proved a university email (signing in with one, or verifying later).
+  /// Students of universities without email sign in with Gmail and are
+  /// not verified.
+  final bool verified;
+  final String? universityEmail;
   final String role;
   final String? displayName;
   final String? department;

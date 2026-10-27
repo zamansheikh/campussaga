@@ -191,13 +191,13 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Sign in with your university account'**
+  /// **'Sign in to get started'**
   String get welcomeTitle;
 
   /// No description provided for @welcomeSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Only verified students can join. Your university email shows you\'re a student.'**
+  /// **'Use your university email to join as a verified student. No university email? Continue with Google using any account.'**
   String get welcomeSubtitle;
 
   /// No description provided for @continueWithGoogle.
@@ -347,7 +347,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorNotUniversityEmail.
   ///
   /// In en, this message translates to:
-  /// **'This email isn\'t from a supported university. Use the email your university gave you.'**
+  /// **'This email isn\'t from a supported university. No university email? Go back and continue with Google.'**
   String get errorNotUniversityEmail;
 
   /// No description provided for @errorCodeInvalid.
@@ -1795,6 +1795,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Found a bug or have an idea? Tell us.'**
   String get sendFeedbackHint;
+
+  /// No description provided for @notVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Not verified'**
+  String get notVerified;
+
+  /// No description provided for @verifyWithUniEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify with university email'**
+  String get verifyWithUniEmail;
+
+  /// No description provided for @verifyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Get the Verified badge with a code sent to your university email.'**
+  String get verifyHint;
+
+  /// No description provided for @chooseUniversity.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your university'**
+  String get chooseUniversity;
+
+  /// No description provided for @chooseUniversityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You signed in without a university email, so choose your university. You show as not verified until you verify with a university email.'**
+  String get chooseUniversityHint;
+
+  /// No description provided for @searchUniversity.
+  ///
+  /// In en, this message translates to:
+  /// **'Search universities'**
+  String get searchUniversity;
+
+  /// No description provided for @universityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'University'**
+  String get universityLabel;
+
+  /// No description provided for @changeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get changeAction;
+
+  /// No description provided for @verifiedNow.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re now a verified student'**
+  String get verifiedNow;
+
+  /// No description provided for @verifyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify you\'re a student'**
+  String get verifyTitle;
+
+  /// No description provided for @verifySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email your university gave you. We\'ll send a 6-digit code to it.'**
+  String get verifySubtitle;
+
+  /// No description provided for @errorEmailInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'This email already has its own account. Sign out and sign in with it instead.'**
+  String get errorEmailInUse;
+
+  /// No description provided for @errorAlreadyVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re already verified.'**
+  String get errorAlreadyVerified;
+
+  /// No description provided for @errorUniversityRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your university first in your profile.'**
+  String get errorUniversityRequired;
+
+  /// No description provided for @errorChooseUniversity.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your university to continue.'**
+  String get errorChooseUniversity;
+
+  /// No description provided for @errorNotUniversityEmailVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'This email isn\'t from a supported university. Use the email your university gave you.'**
+  String get errorNotUniversityEmailVerify;
 }
 
 class _AppLocalizationsDelegate

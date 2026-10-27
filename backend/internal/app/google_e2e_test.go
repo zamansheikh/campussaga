@@ -40,10 +40,6 @@ func TestGoogleSignInRejections(t *testing.T) {
 		return h.do("POST", "/auth/google", "", map[string]string{"idToken": tok})
 	}
 
-	r := post(h.googleToken("someone@gmail.com", true))
-	assert.Equal(t, http.StatusForbidden, r.Status)
-	assert.Equal(t, "UNIVERSITY_EMAIL_REQUIRED", r.code(), "personal Gmail is not enough")
-
 	assert.Equal(t, "GOOGLE_TOKEN_INVALID", post(h.googleToken("x@test.ac.bd", false)).code(), "unverified email")
 	assert.Equal(t, "GOOGLE_TOKEN_INVALID", post("garbage").code())
 

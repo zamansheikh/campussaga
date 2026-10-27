@@ -32,15 +32,33 @@ DELETE FROM sign_in_codes WHERE expires_at < @before AND window_start < @before;
 
 -- ---- users --------------------------------------------------------------
 
+-- The account for an email: its sign-in email, or the university email a
+-- Gmail student proved (whoever controls that address owns the account).
 -- name: GetUserByEmail :one
-SELECT * FROM users WHERE email = @email;
+SELECT * FROM users WHERE email = @email OR university_email = @email
+ORDER BY (email = @email) DESC LIMIT 1;
+
+-- name: EmailInUse :one
+SELECT EXISTS (
+    SELECT 1 FROM users WHERE (email = @email OR university_email = @email) AND id <> @id
+);
+
+-- name: SetUniversity :one
+UPDATE users SET university_id = @university_id WHERE id = @id AND verified_at IS NULL
+RETURNING *;
+
+-- name: VerifyUser :one
+UPDATE users SET university_email = @university_email, university_id = @university_id,
+    verified_at = @verified_at
+WHERE id = @id
+RETURNING *;
 
 -- name: GetUser :one
 SELECT * FROM users WHERE id = @id;
 
 -- name: InsertUser :one
-INSERT INTO users (email, university_id, verified_at)
-VALUES (@email, @university_id, @verified_at)
+INSERT INTO users (email, university_id, university_email, verified_at)
+VALUES (@email, sqlc.narg(university_id), sqlc.narg(university_email), sqlc.narg(verified_at))
 RETURNING *;
 
 -- name: UpdateProfile :one
@@ -92,11 +110,13 @@ WHERE id = @id AND user_id = @user_id AND revoked_at IS NULL;
 -- name: RevokeUserSessions :execrows
 UPDATE sessions SET revoked_at = @now::timestamptz WHERE user_id = @user_id AND revoked_at IS NULL;
 
--- name: SessionActive :one
-SELECT EXISTS (
-    SELECT 1 FROM sessions
-    WHERE id = @id AND user_id = @user_id AND revoked_at IS NULL AND expires_at > @now
-);
+-- The live session's student: their current university and whether they
+-- are verified (read on every request, so changes apply at once). No row =
+-- session ended.
+-- name: SessionUser :one
+SELECT u.university_id, (u.verified_at IS NOT NULL)::bool AS verified
+FROM sessions s JOIN users u ON u.id = s.user_id
+WHERE s.id = @id AND s.user_id = @user_id AND s.revoked_at IS NULL AND s.expires_at > @now;
 
 -- name: PurgeSessions :execrows
 DELETE FROM sessions WHERE expires_at < @before OR revoked_at < @before;

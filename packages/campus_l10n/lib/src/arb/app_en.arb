@@ -18,8 +18,8 @@
   "themeDark": "Dark",
   "language": "Language",
   "comingSoon": "Coming soon",
-  "welcomeTitle": "Sign in with your university account",
-  "welcomeSubtitle": "Only verified students can join. Your university email shows you're a student.",
+  "welcomeTitle": "Sign in to get started",
+  "welcomeSubtitle": "Use your university email to join as a verified student. No university email? Continue with Google using any account.",
   "continueWithGoogle": "Continue with Google",
   "useUniversityEmail": "Use university email instead",
   "errorUniversityEmailRequired": "This isn't a university account. Choose your university Google account, or sign in with your university email.",
@@ -58,7 +58,7 @@
   "useDifferentEmail": "Use a different email",
   "codeSpamHint": "Can't find it? Check your spam folder.",
   "errorEmailInvalid": "Enter a valid email address.",
-  "errorNotUniversityEmail": "This email isn't from a supported university. Use the email your university gave you.",
+  "errorNotUniversityEmail": "This email isn't from a supported university. No university email? Go back and continue with Google.",
   "errorCodeInvalid": "That code isn't right. {count, plural, =1{1 try left.} other{{count} tries left.}}",
   "@errorCodeInvalid": {
     "placeholders": {
@@ -509,5 +509,21 @@
   },
   "openSettings": "Open settings",
   "sendFeedback": "Send feedback",
-  "sendFeedbackHint": "Found a bug or have an idea? Tell us."
+  "sendFeedbackHint": "Found a bug or have an idea? Tell us.",
+  "notVerified": "Not verified",
+  "verifyWithUniEmail": "Verify with university email",
+  "verifyHint": "Get the Verified badge with a code sent to your university email.",
+  "chooseUniversity": "Choose your university",
+  "chooseUniversityHint": "You signed in without a university email, so choose your university. You show as not verified until you verify with a university email.",
+  "searchUniversity": "Search universities",
+  "universityLabel": "University",
+  "changeAction": "Change",
+  "verifiedNow": "You're now a verified student",
+  "verifyTitle": "Verify you're a student",
+  "verifySubtitle": "Enter the email your university gave you. We'll send a 6-digit code to it.",
+  "errorEmailInUse": "This email already has its own account. Sign out and sign in with it instead.",
+  "errorAlreadyVerified": "You're already verified.",
+  "errorUniversityRequired": "Choose your university first in your profile.",
+  "errorChooseUniversity": "Choose your university to continue.",
+  "errorNotUniversityEmailVerify": "This email isn't from a supported university. Use the email your university gave you."
 }

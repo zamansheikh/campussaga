@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
 )
 
@@ -27,6 +29,11 @@ func (s *Service) Routes(r *httpx.Router) {
 	r.Student().Patch("/me", httpx.Handle(s.handleUpdateMe))
 	r.Student().Get("/me/department-suggestions", httpx.Handle(s.handleDepartmentSuggestions))
 	r.Student().Delete("/me", httpx.Handle(s.handleDeleteMe, httpx.NoContent()))
+	r.Student().Put("/me/university", httpx.Handle(s.handleSetUniversity))
+	r.Student().With(r.Limit("verify-code", 10, 10*time.Minute)).
+		Post("/me/verify/code", httpx.Handle(s.handleVerifyCode, httpx.Status(http.StatusAccepted)))
+	r.Student().With(r.Limit("verify", 30, 10*time.Minute)).
+		Post("/me/verify", httpx.Handle(s.handleVerify2))
 }
 
 type requestCodeReq struct {
@@ -96,4 +103,20 @@ func (s *Service) handleDepartmentSuggestions(ctx context.Context, in *suggestio
 
 func (s *Service) handleDeleteMe(ctx context.Context, _ *httpx.Empty) (*httpx.Empty, error) {
 	return nil, s.DeleteMe(ctx)
+}
+
+type universityReq struct {
+	UniversityID string `json:"universityId" validate:"required,uuid"`
+}
+
+func (s *Service) handleSetUniversity(ctx context.Context, in *universityReq) (*Me, error) {
+	return s.SetUniversity(ctx, uuid.MustParse(in.UniversityID))
+}
+
+func (s *Service) handleVerifyCode(ctx context.Context, in *requestCodeReq) (*CodeSent, error) {
+	return s.RequestVerifyCode(ctx, in.Email)
+}
+
+func (s *Service) handleVerify2(ctx context.Context, in *verifyReq) (*Me, error) {
+	return s.VerifyUniversityEmail(ctx, in.Email, in.Code)
 }

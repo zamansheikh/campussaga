@@ -29,6 +29,13 @@ var (
 	ErrGoogleTokenInvalid = apperr.New(http.StatusUnauthorized, "GOOGLE_TOKEN_INVALID",
 		"Google sign-in failed. Please try again")
 
+	ErrAlreadyVerified = apperr.New(http.StatusConflict, "ALREADY_VERIFIED",
+		"You are already a verified student")
+	ErrEmailInUse = apperr.New(http.StatusConflict, "EMAIL_IN_USE",
+		"This email already belongs to another account. Sign in with it instead")
+	ErrUniversityNotFound = apperr.New(http.StatusNotFound, "UNIVERSITY_NOT_FOUND",
+		"This university was not found")
+
 	// ErrRefreshInvalid tells the app to sign the student out.
 	ErrRefreshInvalid = apperr.New(http.StatusUnauthorized, "REFRESH_INVALID",
 		"Please sign in again")

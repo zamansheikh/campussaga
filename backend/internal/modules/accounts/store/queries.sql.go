@@ -56,7 +56,7 @@ LIMIT $3
 `
 
 type DepartmentSuggestionsParams struct {
-	UniversityID uuid.UUID
+	UniversityID *uuid.UUID
 	Q            string
 	MaxResults   int32
 }
@@ -83,6 +83,24 @@ func (q *Queries) DepartmentSuggestions(ctx context.Context, arg DepartmentSugge
 	return items, nil
 }
 
+const emailInUse = `-- name: EmailInUse :one
+SELECT EXISTS (
+    SELECT 1 FROM users WHERE (email = $1 OR university_email = $1) AND id <> $2
+)
+`
+
+type EmailInUseParams struct {
+	Email string
+	ID    uuid.UUID
+}
+
+func (q *Queries) EmailInUse(ctx context.Context, arg EmailInUseParams) (bool, error) {
+	row := q.db.QueryRow(ctx, emailInUse, arg.Email, arg.ID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const findSessionByPrevious = `-- name: FindSessionByPrevious :one
 SELECT id, user_id, refresh_hash, previous_hash, user_agent, created_at, last_used_at, expires_at, revoked_at FROM sessions WHERE previous_hash = $1 ORDER BY last_used_at DESC LIMIT 1
 `
@@ -105,7 +123,7 @@ func (q *Queries) FindSessionByPrevious(ctx context.Context, previousHash []byte
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at FROM users WHERE id = $1
+SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
@@ -122,16 +140,20 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.VerifiedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UniversityEmail,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
 
-SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at FROM users WHERE email = $1
+SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email FROM users WHERE email = $1 OR university_email = $1
+ORDER BY (email = $1) DESC LIMIT 1
 `
 
 // ---- users --------------------------------------------------------------
+// The account for an email: its sign-in email, or the university email a
+// Gmail student proved (whoever controls that address owns the account).
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
 	row := q.db.QueryRow(ctx, getUserByEmail, email)
 	var i User
@@ -146,6 +168,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.VerifiedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UniversityEmail,
 	)
 	return i, err
 }
@@ -190,19 +213,25 @@ func (q *Queries) InsertSession(ctx context.Context, arg InsertSessionParams) (S
 }
 
 const insertUser = `-- name: InsertUser :one
-INSERT INTO users (email, university_id, verified_at)
-VALUES ($1, $2, $3)
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at
+INSERT INTO users (email, university_id, university_email, verified_at)
+VALUES ($1, $2, $3, $4)
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email
 `
 
 type InsertUserParams struct {
-	Email        string
-	UniversityID uuid.UUID
-	VerifiedAt   time.Time
+	Email           string
+	UniversityID    *uuid.UUID
+	UniversityEmail *string
+	VerifiedAt      *time.Time
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, insertUser, arg.Email, arg.UniversityID, arg.VerifiedAt)
+	row := q.db.QueryRow(ctx, insertUser,
+		arg.Email,
+		arg.UniversityID,
+		arg.UniversityEmail,
+		arg.VerifiedAt,
+	)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -215,6 +244,7 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, e
 		&i.VerifiedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UniversityEmail,
 	)
 	return i, err
 }
@@ -358,24 +388,60 @@ func (q *Queries) RotateSession(ctx context.Context, arg RotateSessionParams) er
 	return err
 }
 
-const sessionActive = `-- name: SessionActive :one
-SELECT EXISTS (
-    SELECT 1 FROM sessions
-    WHERE id = $1 AND user_id = $2 AND revoked_at IS NULL AND expires_at > $3
-)
+const sessionUser = `-- name: SessionUser :one
+SELECT u.university_id, (u.verified_at IS NOT NULL)::bool AS verified
+FROM sessions s JOIN users u ON u.id = s.user_id
+WHERE s.id = $1 AND s.user_id = $2 AND s.revoked_at IS NULL AND s.expires_at > $3
 `
 
-type SessionActiveParams struct {
+type SessionUserParams struct {
 	ID     uuid.UUID
 	UserID uuid.UUID
 	Now    time.Time
 }
 
-func (q *Queries) SessionActive(ctx context.Context, arg SessionActiveParams) (bool, error) {
-	row := q.db.QueryRow(ctx, sessionActive, arg.ID, arg.UserID, arg.Now)
-	var exists bool
-	err := row.Scan(&exists)
-	return exists, err
+type SessionUserRow struct {
+	UniversityID *uuid.UUID
+	Verified     bool
+}
+
+// The live session's student: their current university and whether they
+// are verified (read on every request, so changes apply at once). No row =
+// session ended.
+func (q *Queries) SessionUser(ctx context.Context, arg SessionUserParams) (SessionUserRow, error) {
+	row := q.db.QueryRow(ctx, sessionUser, arg.ID, arg.UserID, arg.Now)
+	var i SessionUserRow
+	err := row.Scan(&i.UniversityID, &i.Verified)
+	return i, err
+}
+
+const setUniversity = `-- name: SetUniversity :one
+UPDATE users SET university_id = $1 WHERE id = $2 AND verified_at IS NULL
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email
+`
+
+type SetUniversityParams struct {
+	UniversityID *uuid.UUID
+	ID           uuid.UUID
+}
+
+func (q *Queries) SetUniversity(ctx context.Context, arg SetUniversityParams) (User, error) {
+	row := q.db.QueryRow(ctx, setUniversity, arg.UniversityID, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.UniversityID,
+		&i.DisplayName,
+		&i.Department,
+		&i.Batch,
+		&i.Role,
+		&i.VerifiedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UniversityEmail,
+	)
+	return i, err
 }
 
 const updateProfile = `-- name: UpdateProfile :one
@@ -384,7 +450,7 @@ UPDATE users SET
     department   = $2,
     batch        = $3
 WHERE id = $4
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email
 `
 
 type UpdateProfileParams struct {
@@ -413,6 +479,7 @@ func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) (U
 		&i.VerifiedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UniversityEmail,
 	)
 	return i, err
 }
@@ -451,4 +518,42 @@ func (q *Queries) UpsertSignInCode(ctx context.Context, arg UpsertSignInCodePara
 		arg.ExpiresAt,
 	)
 	return err
+}
+
+const verifyUser = `-- name: VerifyUser :one
+UPDATE users SET university_email = $1, university_id = $2,
+    verified_at = $3
+WHERE id = $4
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email
+`
+
+type VerifyUserParams struct {
+	UniversityEmail *string
+	UniversityID    *uuid.UUID
+	VerifiedAt      *time.Time
+	ID              uuid.UUID
+}
+
+func (q *Queries) VerifyUser(ctx context.Context, arg VerifyUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, verifyUser,
+		arg.UniversityEmail,
+		arg.UniversityID,
+		arg.VerifiedAt,
+		arg.ID,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.UniversityID,
+		&i.DisplayName,
+		&i.Department,
+		&i.Batch,
+		&i.Role,
+		&i.VerifiedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UniversityEmail,
+	)
+	return i, err
 }

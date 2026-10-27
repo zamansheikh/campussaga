@@ -91,7 +91,12 @@ void main() {
     classes.membersOf['g-cse'] = const [
       GroupMember(userId: 'u1', name: 'Rafi', role: GroupRole.cr, isMe: true),
       GroupMember(userId: 'u2', name: 'Nabila Rahman', role: GroupRole.member),
-      GroupMember(userId: 'u3', name: '', role: GroupRole.member),
+      GroupMember(
+        userId: 'u3',
+        name: '',
+        role: GroupRole.member,
+        verified: false,
+      ),
     ];
     await scrollAndTap(tester, find.text('CSE 61 · A'));
     await tester.pumpAndSettle();
@@ -100,6 +105,7 @@ void main() {
     expect(find.text('Nabila Rahman'), findsOneWidget);
     expect(find.text('Student'), findsOneWidget, reason: 'no name set');
     expect(find.text('You'), findsOneWidget);
+    expect(find.text('Not verified'), findsOneWidget, reason: 'Gmail student');
 
     // Menus in order: Nabila, then Student (the only CR, you, has none).
     await tester.tap(find.byIcon(Icons.more_vert).at(0));

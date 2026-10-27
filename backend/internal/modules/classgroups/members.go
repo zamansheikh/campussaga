@@ -24,6 +24,8 @@ type Member struct {
 	Role     string    `json:"role"`
 	JoinedAt time.Time `json:"joinedAt"`
 	IsMe     bool      `json:"isMe"`
+	// Verified: proved a university email (others signed in with Gmail).
+	Verified bool `json:"verified"`
 }
 
 // Members lists the group's students (CR only).
@@ -43,7 +45,10 @@ func (s *Service) Members(ctx context.Context, groupID uuid.UUID) ([]Member, err
 		if r.DisplayName != nil {
 			name = *r.DisplayName
 		}
-		out = append(out, Member{UserID: r.UserID, Name: name, Role: r.Role, JoinedAt: r.JoinedAt, IsMe: r.UserID == c.UserID})
+		out = append(out, Member{
+			UserID: r.UserID, Name: name, Role: r.Role, JoinedAt: r.JoinedAt,
+			IsMe: r.UserID == c.UserID, Verified: r.Verified,
+		})
 	}
 	return out, nil
 }
