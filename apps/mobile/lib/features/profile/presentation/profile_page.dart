@@ -1,19 +1,19 @@
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../app/app_settings.dart';
+import '../../../app/settings/bloc/settings_cubit.dart';
 
 /// Profile and settings. R0 adds sign-in, profile details and delete account.
-class ProfilePage extends ConsumerWidget {
+class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final settings = ref.watch(appSettingsProvider);
-    final controller = ref.read(appSettingsProvider.notifier);
+    final settings = context.watch<SettingsCubit>().state;
+    final controller = context.read<SettingsCubit>();
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navProfile)),

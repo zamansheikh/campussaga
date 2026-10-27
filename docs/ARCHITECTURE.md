@@ -184,10 +184,13 @@ system, models and data layer. Changing the backend means changing only
 
 ```
 apps/mobile/lib/
-  app/                 # bootstrap, router, DI (providers), env config
+  app/                 # bootstrap, router, DI (get_it), env config, settings cubit
   features/
     auth/
-      presentation/    # screens, widgets, controllers (Riverpod Notifiers)
+      presentation/
+        bloc/          # auth_bloc.dart, auth_event.dart, auth_state.dart
+        pages/         # screens
+        widgets/       # feature-only widgets
       application/     # use-cases that combine repositories (optional)
     today/             # R1: home screen, next class
     class_groups/      # R1: create / join / manage, announcements
@@ -211,6 +214,12 @@ presentation ─▶ application ─▶ campus_core (interfaces, models)
 ```
 
 - Screens never make HTTP calls. Only `campus_data` imports `package:http`.
+- **State management: Bloc** (`flutter_bloc`), the same as our other Flutter apps.
+  - **Bloc** (events → states) for flows with several steps: sign-in (request code → enter code → resend timer → locked), routine sync, posting an issue.
+  - **Cubit** for simple state changed by direct calls: settings, filters, toggles.
+  - States extend `Equatable`; every bloc has `bloc_test` tests.
+  - Blocs get repositories through their constructor; `get_it` (`app/di.dart`) holds long-lived services such as `ApiClient` and the repositories. Blocs themselves are created by `BlocProvider` where a screen needs them.
+  - A `BlocObserver` logs every transition in debug builds (added with the first real bloc).
 - Models are immutable (`freezed`) with JSON mapping (`json_serializable`).
 - Errors are typed (`NetworkFailure`, `RateLimitedFailure`, `ForbiddenFailure` …), mapped from the API's error codes, so the UI can show friendly messages.
 
@@ -218,7 +227,8 @@ presentation ─▶ application ─▶ campus_core (interfaces, models)
 
 | Need | Package |
 |---|---|
-| State + DI | `flutter_riverpod` (+ `riverpod_generator`) |
+| State | `flutter_bloc`, `equatable`; tests with `bloc_test` |
+| Dependency injection | `get_it` |
 | Routing / deep links | `go_router` |
 | Backend calls | `http` (only inside `campus_data`) |
 | Models | `freezed`, `json_serializable` |
