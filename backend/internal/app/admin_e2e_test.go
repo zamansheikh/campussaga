@@ -187,10 +187,18 @@ func TestAdminUniversities(t *testing.T) {
 	r.into(t, &uni)
 	assert.Equal(t, []string{"cse.new.edu.bd", "new.edu.bd"}, uni.Domains)
 
-	r = h.do("PATCH", "/admin/universities/"+uni.ID, admin, map[string]any{"active": false, "city": ""})
+	assert.Equal(t, "VALIDATION_FAILED", h.do("PATCH", "/admin/universities/"+uni.ID, admin, map[string]any{"kind": "other"}).code())
+	r = h.do("PATCH", "/admin/universities/"+uni.ID, admin, map[string]any{"active": false, "city": "", "kind": ""})
 	require.Equal(t, http.StatusOK, r.Status, r.Raw)
-	r.into(t, &uni)
-	assert.False(t, uni.Active)
+	var cleared struct {
+		Active bool    `json:"active"`
+		City   *string `json:"city"`
+		Kind   *string `json:"kind"`
+	}
+	r.into(t, &cleared)
+	assert.False(t, cleared.Active)
+	assert.Nil(t, cleared.City)
+	assert.Nil(t, cleared.Kind)
 
 	var list struct {
 		Items []struct {

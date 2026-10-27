@@ -121,17 +121,21 @@ func (s *Service) handleCreateUniversity(ctx context.Context, in *createUniversi
 }
 
 type patchUniversityReq struct {
-	ID      string  `json:"-" path:"id" validate:"required,uuid"`
-	Name    *string `json:"name" validate:"omitempty,min=2,max=120"`
-	NameBn  *string `json:"nameBn" validate:"omitempty,max=120"`
-	City    *string `json:"city" validate:"omitempty,max=60"`
-	Kind    *string `json:"kind" validate:"omitempty,oneof=public private"`
+	ID     string  `json:"-" path:"id" validate:"required,uuid"`
+	Name   *string `json:"name" validate:"omitempty,min=2,max=120"`
+	NameBn *string `json:"nameBn" validate:"omitempty,max=120"`
+	City   *string `json:"city" validate:"omitempty,max=60"`
+	// Kind: public, private, or "" to clear it.
+	Kind    *string `json:"kind" validate:"omitempty,max=10"`
 	Website *string `json:"website" validate:"omitempty,max=100"`
 	Active  *bool   `json:"active"`
 }
 
 func (s *Service) handlePatchUniversity(ctx context.Context, in *patchUniversityReq) (*University, error) {
 	id := uuid.MustParse(in.ID)
+	if in.Kind != nil && *in.Kind != "" && *in.Kind != "public" && *in.Kind != "private" {
+		return nil, apperr.Validation(map[string]string{"kind": "must be public, private or empty"})
+	}
 	if in.Website != nil {
 		w := normalizeHost(*in.Website)
 		if w != "" && !domainRe.MatchString(w) {
