@@ -1034,7 +1034,39 @@ class AppLocalizationsBn extends AppLocalizations {
       'তুমি বিশ্ববিদ্যালয়ের ইমেইল ছাড়া সাইন ইন করেছ, তাই বিশ্ববিদ্যালয় বেছে নাও। বিশ্ববিদ্যালয়ের ইমেইল দিয়ে যাচাই না করা পর্যন্ত তুমি যাচাই করা হয়নি হিসেবে দেখাবে।';
 
   @override
-  String get searchUniversity => 'বিশ্ববিদ্যালয় খোঁজো';
+  String get searchUniversity => 'নাম, সংক্ষিপ্ত নাম বা শহর';
+
+  @override
+  String get universityPickerHint =>
+      'নাম, DIU-এর মতো সংক্ষিপ্ত নাম বা শহর দিয়ে খোঁজো।';
+
+  @override
+  String get currentUniversity => 'বর্তমান';
+
+  @override
+  String get allUniversities => 'সব বিশ্ববিদ্যালয়';
+
+  @override
+  String universityMatches(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countStringটি মিলেছে';
+  }
+
+  @override
+  String get noUniversityFound => 'কোনো বিশ্ববিদ্যালয় পাওয়া যায়নি';
+
+  @override
+  String get noUniversityFoundHint =>
+      'বানান দেখে নাও, অথবা DIU-এর মতো সংক্ষিপ্ত নাম বা ইমেইল ডোমেইন দিয়ে খোঁজো।';
+
+  @override
+  String get askToAddUniversity => 'যোগ করতে বলো';
+
+  @override
+  String get addUniversitySubject => 'আমার বিশ্ববিদ্যালয় যোগ করুন';
 
   @override
   String get universityLabel => 'বিশ্ববিদ্যালয়';

@@ -12,14 +12,18 @@ import (
 )
 
 const getUniversity = `-- name: GetUniversity :one
-SELECT id, slug, name, name_bn FROM universities WHERE id = $1
+SELECT u.id, u.slug, u.name, u.name_bn, u.city,
+       coalesce((SELECT array_agg(d.domain ORDER BY d.domain) FROM university_domains d WHERE d.university_id = u.id), '{}')::text[] AS domains
+FROM universities u WHERE u.id = $1
 `
 
 type GetUniversityRow struct {
-	ID     uuid.UUID
-	Slug   string
-	Name   string
-	NameBn *string
+	ID      uuid.UUID
+	Slug    string
+	Name    string
+	NameBn  *string
+	City    *string
+	Domains []string
 }
 
 func (q *Queries) GetUniversity(ctx context.Context, id uuid.UUID) (GetUniversityRow, error) {
@@ -30,6 +34,8 @@ func (q *Queries) GetUniversity(ctx context.Context, id uuid.UUID) (GetUniversit
 		&i.Slug,
 		&i.Name,
 		&i.NameBn,
+		&i.City,
+		&i.Domains,
 	)
 	return i, err
 }

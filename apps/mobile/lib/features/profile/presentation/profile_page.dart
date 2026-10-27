@@ -355,7 +355,10 @@ Future<void> _changeUniversity(BuildContext context) async {
     await context.push(Routes.verifyEmail);
     return;
   }
-  final uni = await showUniversityPicker(context);
+  final uni = await showUniversityPicker(
+    context,
+    currentId: context.read<AuthBloc>().state.user?.university?.id,
+  );
   if (uni == null || !context.mounted) return;
   final lang = Localizations.localeOf(context).languageCode;
   final ok = await showDialog<bool>(

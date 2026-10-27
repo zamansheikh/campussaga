@@ -38,12 +38,15 @@ type View struct {
 	Domains   []string  `json:"domains"`
 }
 
-// Summary is the short form embedded in other responses.
+// Summary is the short form embedded in other responses. City and Domains
+// are filled by Get only (the student's own university in /me).
 type Summary struct {
-	ID     uuid.UUID `json:"id"`
-	Slug   string    `json:"slug"`
-	Name   string    `json:"name"`
-	NameBn *string   `json:"nameBn"`
+	ID      uuid.UUID `json:"id"`
+	Slug    string    `json:"slug"`
+	Name    string    `json:"name"`
+	NameBn  *string   `json:"nameBn"`
+	City    *string   `json:"city,omitempty"`
+	Domains []string  `json:"domains,omitempty"`
 }
 
 type listRes struct {
@@ -89,7 +92,7 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Summary, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Summary{ID: r.ID, Slug: r.Slug, Name: r.Name, NameBn: r.NameBn}, nil
+	return &Summary{ID: r.ID, Slug: r.Slug, Name: r.Name, NameBn: r.NameBn, City: r.City, Domains: r.Domains}, nil
 }
 
 // DomainCandidates returns the email's host and each parent domain with at

@@ -18,4 +18,6 @@ ORDER BY length(d.domain) DESC
 LIMIT 1;
 
 -- name: GetUniversity :one
-SELECT id, slug, name, name_bn FROM universities WHERE id = @id;
+SELECT u.id, u.slug, u.name, u.name_bn, u.city,
+       coalesce((SELECT array_agg(d.domain ORDER BY d.domain) FROM university_domains d WHERE d.university_id = u.id), '{}')::text[] AS domains
+FROM universities u WHERE u.id = @id;

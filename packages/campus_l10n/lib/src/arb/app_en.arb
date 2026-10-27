@@ -518,7 +518,23 @@
   "verifyHint": "Get the Verified badge with a code sent to your university email.",
   "chooseUniversity": "Choose your university",
   "chooseUniversityHint": "You signed in without a university email, so choose your university. You show as not verified until you verify with a university email.",
-  "searchUniversity": "Search universities",
+  "searchUniversity": "Name, short name or city",
+  "universityPickerHint": "Search by name, a short name like DIU, or city.",
+  "currentUniversity": "Current",
+  "allUniversities": "All universities",
+  "universityMatches": "{count, plural, =1{1 match} other{{count} matches}}",
+  "@universityMatches": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "noUniversityFound": "No university found",
+  "noUniversityFoundHint": "Check the spelling, or try a short name like DIU or the email domain.",
+  "askToAddUniversity": "Ask us to add it",
+  "addUniversitySubject": "Please add my university",
   "universityLabel": "University",
   "changeAction": "Change",
   "verifiedNow": "You're now a verified student",

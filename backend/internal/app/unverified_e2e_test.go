@@ -15,8 +15,9 @@ type meJSON struct {
 	Verified        bool    `json:"verified"`
 	UniversityEmail *string `json:"universityEmail"`
 	University      *struct {
-		ID   string `json:"id"`
-		Slug string `json:"slug"`
+		ID      string   `json:"id"`
+		Slug    string   `json:"slug"`
+		Domains []string `json:"domains"`
 	} `json:"university"`
 }
 
@@ -138,6 +139,7 @@ func TestMovingUniversity(t *testing.T) {
 	m := h.me(tok)
 	assert.True(t, m.Verified)
 	assert.Equal(t, "other-uni", m.University.Slug)
+	assert.NotEmpty(t, m.University.Domains, "/me carries the domains for the badge")
 	assert.Equal(t, "msc@other.ac.bd", *m.UniversityEmail)
 	assert.Equal(t, "bsc@test.ac.bd", m.Email, "still signs in with the old address")
 

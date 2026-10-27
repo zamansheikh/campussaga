@@ -1059,7 +1059,45 @@ class AppLocalizationsEn extends AppLocalizations {
       'You signed in without a university email, so choose your university. You show as not verified until you verify with a university email.';
 
   @override
-  String get searchUniversity => 'Search universities';
+  String get searchUniversity => 'Name, short name or city';
+
+  @override
+  String get universityPickerHint =>
+      'Search by name, a short name like DIU, or city.';
+
+  @override
+  String get currentUniversity => 'Current';
+
+  @override
+  String get allUniversities => 'All universities';
+
+  @override
+  String universityMatches(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString matches',
+      one: '1 match',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get noUniversityFound => 'No university found';
+
+  @override
+  String get noUniversityFoundHint =>
+      'Check the spelling, or try a short name like DIU or the email domain.';
+
+  @override
+  String get askToAddUniversity => 'Ask us to add it';
+
+  @override
+  String get addUniversitySubject => 'Please add my university';
 
   @override
   String get universityLabel => 'University';

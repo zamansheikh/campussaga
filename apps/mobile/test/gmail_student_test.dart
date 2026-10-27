@@ -1,4 +1,5 @@
 import 'package:campussaga/app/app.dart';
+import 'package:campussaga/features/profile/presentation/widgets/university_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -23,6 +24,17 @@ void main() {
     // Pick it from the list (search works on English and Bangla names).
     await tester.tap(find.text('Choose your university'));
     await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, 'BUET');
+    await tester.pumpAndSettle();
+    expect(find.text('1 match'.toUpperCase()), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(UniversityBadge),
+        matching: find.text('BUET'),
+      ),
+      findsOneWidget,
+      reason: 'short-name badge',
+    );
     await tester.enterText(find.byType(TextField).last, 'engineering');
     await tester.pumpAndSettle();
     expect(find.text('Demo University'), findsNothing);

@@ -42,10 +42,12 @@ import (
 
 // University is what accounts needs to know about a university.
 type University struct {
-	ID     uuid.UUID `json:"id"`
-	Slug   string    `json:"slug"`
-	Name   string    `json:"name"`
-	NameBn *string   `json:"nameBn"`
+	ID      uuid.UUID `json:"id"`
+	Slug    string    `json:"slug"`
+	Name    string    `json:"name"`
+	NameBn  *string   `json:"nameBn"`
+	City    *string   `json:"city,omitempty"`
+	Domains []string  `json:"domains,omitempty"`
 }
 
 // Universities is the port to the universities module (wired in app).

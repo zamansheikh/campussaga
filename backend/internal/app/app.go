@@ -75,7 +75,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		if u == nil {
 			return nil
 		}
-		return &accounts.University{ID: u.ID, Slug: u.Slug, Name: u.Name, NameBn: u.NameBn}
+		return &accounts.University{ID: u.ID, Slug: u.Slug, Name: u.Name, NameBn: u.NameBn, City: u.City, Domains: u.Domains}
 	}
 	accSvc := accounts.NewService(d, tokens, mailer, accounts.Universities{
 		ForEmail: func(ctx context.Context, email string) (*accounts.University, error) {

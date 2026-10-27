@@ -1841,8 +1841,56 @@ abstract class AppLocalizations {
   /// No description provided for @searchUniversity.
   ///
   /// In en, this message translates to:
-  /// **'Search universities'**
+  /// **'Name, short name or city'**
   String get searchUniversity;
+
+  /// No description provided for @universityPickerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name, a short name like DIU, or city.'**
+  String get universityPickerHint;
+
+  /// No description provided for @currentUniversity.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get currentUniversity;
+
+  /// No description provided for @allUniversities.
+  ///
+  /// In en, this message translates to:
+  /// **'All universities'**
+  String get allUniversities;
+
+  /// No description provided for @universityMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 match} other{{count} matches}}'**
+  String universityMatches(int count);
+
+  /// No description provided for @noUniversityFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No university found'**
+  String get noUniversityFound;
+
+  /// No description provided for @noUniversityFoundHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the spelling, or try a short name like DIU or the email domain.'**
+  String get noUniversityFoundHint;
+
+  /// No description provided for @askToAddUniversity.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask us to add it'**
+  String get askToAddUniversity;
+
+  /// No description provided for @addUniversitySubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add my university'**
+  String get addUniversitySubject;
 
   /// No description provided for @universityLabel.
   ///

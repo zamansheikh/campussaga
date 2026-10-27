@@ -3,8 +3,10 @@ import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app/di.dart';
+import '../../../../app/env.dart';
 import '../../../auth/presentation/auth_error_text.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 
@@ -23,7 +25,10 @@ class _UniversityFieldState extends State<UniversityField> {
 
   Future<void> _pick() async {
     final auth = context.read<AuthBloc>();
-    final picked = await showUniversityPicker(context);
+    final picked = await showUniversityPicker(
+      context,
+      currentId: auth.state.user?.university?.id,
+    );
     if (picked == null || !mounted) return;
     setState(() {
       _busy = true;
@@ -61,7 +66,10 @@ class _UniversityFieldState extends State<UniversityField> {
               padding: const EdgeInsets.all(14),
               child: Row(
                 children: [
-                  Icon(Icons.account_balance_outlined, color: cs.primary),
+                  if (uni == null)
+                    Icon(Icons.account_balance_outlined, color: cs.primary)
+                  else
+                    UniversityBadge(university: uni, size: 40),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -77,6 +85,13 @@ class _UniversityFieldState extends State<UniversityField> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+                        if (uni != null && universityMeta(uni).isNotEmpty)
+                          Text(
+                            universityMeta(uni),
+                            style: context.text.bodySmall?.copyWith(
+                              color: cs.textSecondary,
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -112,18 +127,27 @@ class _UniversityFieldState extends State<UniversityField> {
   }
 }
 
-/// A full-height sheet: search and pick a university.
-Future<University?> showUniversityPicker(BuildContext context) =>
-    showModalBottomSheet<University>(
-      context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (_) => const _UniversityPicker(),
-    );
+/// A tall sheet: search and pick a university. [currentId] is marked and
+/// shown first.
+Future<University?> showUniversityPicker(
+  BuildContext context, {
+  String? currentId,
+}) {
+  // Close the keyboard of the form behind: the list needs the room.
+  FocusManager.instance.primaryFocus?.unfocus();
+  return showModalBottomSheet<University>(
+    context: context,
+    useRootNavigator: true,
+    isScrollControlled: true,
+    useSafeArea: true,
+    builder: (_) => _UniversityPicker(currentId: currentId),
+  );
+}
 
 class _UniversityPicker extends StatefulWidget {
-  const _UniversityPicker();
+  const _UniversityPicker({this.currentId});
+
+  final String? currentId;
 
   @override
   State<_UniversityPicker> createState() => _UniversityPickerState();
@@ -132,22 +156,57 @@ class _UniversityPicker extends StatefulWidget {
 class _UniversityPickerState extends State<_UniversityPicker> {
   late final Future<List<University>> _all = getIt<ProfileRepository>()
       .universities();
-  String _q = '';
+  final _search = TextEditingController();
 
-  bool _matches(University u) {
-    final q = _q.trim().toLowerCase();
-    if (q.isEmpty) return true;
-    return u.name.toLowerCase().contains(q) ||
-        (u.nameBn?.contains(_q.trim()) ?? false) ||
-        u.slug.contains(q);
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
   }
+
+  /// Section titles (String) and universities, in display order.
+  List<Object> _entries(List<University> all, AppLocalizations l10n) {
+    final q = _search.text.trim();
+    if (q.isNotEmpty) {
+      final scored =
+          [
+            for (final u in all)
+              if (u.searchScore(q) case final s when s > 0) (u, s),
+          ]..sort((a, b) {
+            final byScore = b.$2.compareTo(a.$2);
+            return byScore != 0 ? byScore : a.$1.name.compareTo(b.$1.name);
+          });
+      if (scored.isEmpty) return const [];
+      return [
+        l10n.universityMatches(scored.length),
+        for (final e in scored) e.$1,
+      ];
+    }
+    final sorted = [...all]..sort((a, b) => a.name.compareTo(b.name));
+    final current = sorted.where((u) => u.id == widget.currentId).firstOrNull;
+    return [
+      if (current != null) ...[l10n.currentUniversity, current],
+      l10n.allUniversities,
+      ...sorted,
+    ];
+  }
+
+  Future<void> _askToAdd(AppLocalizations l10n) => launchUrl(
+    Uri(
+      scheme: 'mailto',
+      path: Env.supportEmail,
+      query:
+          'subject=${Uri.encodeComponent(l10n.addUniversitySubject)}'
+          '&body=${Uri.encodeComponent('${_search.text.trim()}\n')}',
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final lang = Localizations.localeOf(context).languageCode;
+    final cs = context.cs;
     return SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.85,
+      height: MediaQuery.sizeOf(context).height * 0.9,
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.viewInsetsOf(context).bottom,
@@ -156,57 +215,264 @@ class _UniversityPickerState extends State<_UniversityPicker> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(
-                CsSpace.md,
-                0,
-                CsSpace.md,
-                CsSpace.sm,
+              padding: const EdgeInsets.fromLTRB(CsSpace.lg, 0, CsSpace.sm, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.chooseUniversity,
+                      style: context.text.titleLarge,
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: l10n.cancel,
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
               ),
-              child: TextField(
-                autofocus: true,
-                onChanged: (v) => setState(() => _q = v),
-                decoration: InputDecoration(
-                  hintText: l10n.searchUniversity,
-                  prefixIcon: const Icon(Icons.search_rounded),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                CsSpace.lg,
+                0,
+                CsSpace.lg,
+                CsSpace.md,
+              ),
+              child: Text(
+                l10n.universityPickerHint,
+                style: context.text.bodyMedium?.copyWith(
+                  color: cs.textSecondary,
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: CsSpace.md),
+              child: ValueListenableBuilder(
+                valueListenable: _search,
+                builder: (context, value, _) => TextField(
+                  controller: _search,
+                  textInputAction: TextInputAction.search,
+                  onChanged: (_) => setState(() {}),
+                  decoration: InputDecoration(
+                    hintText: l10n.searchUniversity,
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: value.text.isEmpty
+                        ? null
+                        : IconButton(
+                            tooltip: l10n.cancel,
+                            onPressed: () => setState(_search.clear),
+                            icon: const Icon(Icons.cancel_rounded),
+                          ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: CsSpace.sm),
             Expanded(
               child: FutureBuilder<List<University>>(
                 future: _all,
                 builder: (context, snap) {
                   if (snap.hasError) {
                     final e = snap.error;
-                    return Center(
-                      child: Text(
-                        e is Failure
-                            ? authErrorText(l10n, e)
-                            : l10n.errorGeneric,
-                      ),
+                    return CsEmptyState(
+                      icon: Icons.cloud_off_rounded,
+                      title: e is Failure
+                          ? authErrorText(l10n, e)
+                          : l10n.errorGeneric,
                     );
                   }
                   final list = snap.data;
                   if (list == null) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  final shown = list.where(_matches).toList()
-                    ..sort((a, b) => a.name.compareTo(b.name));
+                  final entries = _entries(list, l10n);
+                  if (entries.isEmpty) {
+                    return SingleChildScrollView(
+                      child: CsEmptyState(
+                        icon: Icons.search_off_rounded,
+                        title: l10n.noUniversityFound,
+                        message: l10n.noUniversityFoundHint,
+                        actionLabel: l10n.askToAddUniversity,
+                        onAction: () => _askToAdd(l10n),
+                      ),
+                    );
+                  }
                   return ListView.builder(
-                    itemCount: shown.length,
-                    itemBuilder: (context, i) {
-                      final u = shown[i];
-                      final local = u.localName(lang);
-                      return ListTile(
-                        title: Text(local),
-                        subtitle: local == u.name ? null : Text(u.name),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: const EdgeInsets.fromLTRB(
+                      CsSpace.sm,
+                      0,
+                      CsSpace.sm,
+                      CsSpace.lg,
+                    ),
+                    itemCount: entries.length,
+                    itemBuilder: (context, i) => switch (entries[i]) {
+                      final String title => _SectionTitle(title),
+                      final University u => _UniversityRow(
+                        university: u,
+                        selected: u.id == widget.currentId,
                         onTap: () => Navigator.of(context).pop(u),
-                      );
+                      ),
+                      _ => const SizedBox.shrink(),
                     },
                   );
                 },
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(
+      CsSpace.md,
+      CsSpace.md,
+      CsSpace.md,
+      CsSpace.xs,
+    ),
+    child: Text(
+      text.toUpperCase(),
+      style: context.text.labelMedium?.copyWith(
+        letterSpacing: 0.8,
+        fontWeight: FontWeight.w600,
+        color: context.cs.textSecondary,
+      ),
+    ),
+  );
+}
+
+class _UniversityRow extends StatelessWidget {
+  const _UniversityRow({
+    required this.university,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final University university;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = context.cs;
+    final lang = Localizations.localeOf(context).languageCode;
+    final u = university;
+    final local = u.localName(lang);
+    final meta = universityMeta(u);
+    return Material(
+      color: selected ? cs.primaryContainer : Colors.transparent,
+      borderRadius: BorderRadius.circular(CsRadius.md),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: CsSpace.sm,
+            vertical: 10,
+          ),
+          child: Row(
+            children: [
+              UniversityBadge(university: u, strong: selected),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      local,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.text.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: selected ? cs.onPrimaryContainer : null,
+                      ),
+                    ),
+                    if (local != u.name)
+                      Text(
+                        u.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.text.bodySmall,
+                      ),
+                    if (meta.isNotEmpty)
+                      Text(
+                        meta,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.text.bodySmall?.copyWith(
+                          color: cs.textSecondary,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (selected) ...[
+                const SizedBox(width: CsSpace.sm),
+                Icon(Icons.check_circle_rounded, color: cs.primary),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "Dhaka · diu.edu.bd": where it is and its student email.
+String universityMeta(University u) => [
+  if ((u.city ?? '').isNotEmpty) u.city!,
+  ?u.mainDomain,
+].join(' · ');
+
+/// A rounded square with the university's short name (DIU, BUET, ...).
+class UniversityBadge extends StatelessWidget {
+  const UniversityBadge({
+    super.key,
+    required this.university,
+    this.size = 44,
+    this.strong = false,
+  });
+
+  final University university;
+  final double size;
+
+  /// Filled with the primary color (the chosen university).
+  final bool strong;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = context.cs;
+    return Container(
+      width: size,
+      height: size,
+      padding: const EdgeInsets.all(6),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: strong ? cs.primary : cs.surfaceVariant,
+        borderRadius: BorderRadius.circular(CsRadius.sm + 2),
+        border: strong ? null : Border.all(color: cs.border),
+      ),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          university.badge,
+          maxLines: 1,
+          style: context.text.labelMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.3,
+            color: strong ? cs.onPrimary : cs.textPrimary,
+          ),
         ),
       ),
     );
