@@ -24,6 +24,11 @@ class CgpaPage extends StatelessWidget {
     final book = state.book;
     return Scaffold(
       appBar: AppBar(
+        // The CGPA pages share their state through a ShellRoute, so this
+        // first page sits alone on its own navigator: show Back ourselves.
+        leading: GoRouter.of(context).canPop()
+            ? BackButton(onPressed: () => context.pop())
+            : null,
         title: Text(l10n.cgpaTitle),
         actions: [
           IconButton(

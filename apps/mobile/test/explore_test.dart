@@ -1,4 +1,7 @@
 import 'package:campussaga/app/app.dart';
+import 'package:campussaga/app/di.dart';
+import 'package:campussaga/features/cgpa/data/cgpa_store.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'helpers/fakes.dart';
@@ -35,5 +38,25 @@ void main() {
     await tester.tap(find.text('Class reminders'));
     await tester.pumpAndSettle();
     expect(find.text('Remind me before each class'), findsOneWidget);
+  });
+
+  testWidgets('the CGPA calculator opens from Explore and goes back', (
+    tester,
+  ) async {
+    usePhoneScreen(tester);
+    final (auth, _) = await registerFakes();
+    getIt.registerSingleton<CgpaStore>(MemoryCgpaStore());
+    auth.savedUser = testUser;
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Explore'));
+    await tester.pumpAndSettle();
+    await scrollAndTap(tester, find.text('CGPA calculator'));
+    await tester.pumpAndSettle();
+    expect(find.byType(BackButton), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.byType(BackButton), findsNothing, reason: 'back on Explore');
+    expect(find.text('CGPA calculator'), findsOneWidget);
   });
 }
