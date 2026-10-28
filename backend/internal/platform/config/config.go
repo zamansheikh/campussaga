@@ -94,7 +94,7 @@ func Load() (*Config, error) {
 		SMTPPort:           getInt("SMTP_PORT", 55625),
 		SMTPUsername:       get("SMTP_USERNAME", ""),
 		SMTPPassword:       get("SMTP_PASSWORD", ""),
-		MailFrom:           get("MAIL_FROM", "Campus Saga <no-reply@campussaga.local>"),
+		MailFrom:           get("MAIL_FROM", "VarsityKotha <no-reply@campussaga.local>"),
 		FirebaseProjectID:  get("FIREBASE_PROJECT_ID", ""),
 		FCMCredentialsFile: get("FCM_CREDENTIALS_FILE", ""),
 		VoiceHMACSecret:    []byte(get("VOICE_HMAC_SECRET", devSecret+"-voice")),

@@ -1,4 +1,4 @@
-// Command campusapi runs the Campus Saga API.
+// Command campusapi runs the VarsityKotha API.
 //
 //	campusapi            serve (development: applies migrations first)
 //	campusapi serve      same

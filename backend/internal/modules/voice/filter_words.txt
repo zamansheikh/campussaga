@@ -1,7 +1,7 @@
 # Campus Voice language check. A post or comment containing one of these is
 # HELD for a moderator (hold reason "language"); nothing is deleted, and a
 # moderator approves false alarms. English, Bangla (Bangla script) and
-# Banglish (romanized Bangla). Maintained by the Campus Saga team.
+# Banglish (romanized Bangla). Maintained by the VarsityKotha team.
 #
 # Matching (filter.go): text is NFC-normalized, lower-cased, zero-width
 # characters removed, then split into words. Each line is one of:

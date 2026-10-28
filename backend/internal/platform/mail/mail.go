@@ -193,8 +193,8 @@ func LoginCode(to, code string, ttl time.Duration) (Message, error) {
 	if err := loginCodeHTML.Execute(&html, map[string]any{"Code": code, "Minutes": minutes}); err != nil {
 		return Message{}, err
 	}
-	text := fmt.Sprintf("Your sign-in code is %s\nIt expires in %d minutes. Never share this code with anyone.\n\n"+
+	text := fmt.Sprintf("VarsityKotha\n\nYour sign-in code is %s\nIt expires in %d minutes. Never share this code with anyone.\n\n"+
 		"তোমার সাইন-ইন কোড %s\nকোডটি %d মিনিট পর বাতিল হবে। কাউকে এই কোড দিও না।\n\n"+
 		"If you didn't try to sign in, you can ignore this email.\n", code, minutes, code, minutes)
-	return Message{To: to, Subject: "Your sign-in code: " + code, Text: text, HTML: html.String()}, nil
+	return Message{To: to, Subject: "Your VarsityKotha sign-in code: " + code, Text: text, HTML: html.String()}, nil
 }
