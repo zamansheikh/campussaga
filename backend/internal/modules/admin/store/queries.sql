@@ -181,7 +181,7 @@ INSERT INTO university_domains (domain, university_id) VALUES (@domain, @univers
 -- ---- class groups -----------------------------------------------------------------
 
 -- name: ListGroups :many
-SELECT g.id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_at,
+SELECT g.id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_at, g.keep_when_empty,
        un.id AS university_id, un.slug AS university_slug, un.name AS university_name,
        (SELECT count(*) FROM class_group_members m WHERE m.group_id = g.id)::int AS members,
        (SELECT count(*) FROM routine_slots s WHERE s.group_id = g.id)::int AS slots
@@ -201,7 +201,7 @@ WHERE (@q::text = '' OR g.department ILIKE @q_like OR g.batch ILIKE @q_like OR g
   AND (sqlc.narg(university_id)::uuid IS NULL OR g.university_id = sqlc.narg(university_id));
 
 -- name: GetGroup :one
-SELECT g.id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_at,
+SELECT g.id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_at, g.keep_when_empty,
        un.id AS university_id, un.slug AS university_slug, un.name AS university_name,
        (SELECT count(*) FROM class_group_members m WHERE m.group_id = g.id)::int AS members,
        (SELECT count(*) FROM routine_slots s WHERE s.group_id = g.id)::int AS slots
@@ -231,6 +231,15 @@ UPDATE class_group_members SET role = @role WHERE group_id = @group_id AND user_
 
 -- name: RemoveMember :execrows
 DELETE FROM class_group_members WHERE group_id = @group_id AND user_id = @user_id;
+
+-- name: SetGroupCode :exec
+UPDATE class_groups SET join_code = @join_code WHERE id = @id;
+
+-- name: JoinCodeTaken :one
+SELECT EXISTS (SELECT 1 FROM class_groups WHERE join_code = @join_code AND id <> @id);
+
+-- name: SetGroupKeep :exec
+UPDATE class_groups SET keep_when_empty = @keep WHERE id = @id;
 
 -- name: DeleteGroup :execrows
 DELETE FROM class_groups WHERE id = @id;

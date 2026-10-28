@@ -148,7 +148,7 @@ func (q *Queries) DeleteUserDevices(ctx context.Context, userID uuid.UUID) error
 }
 
 const getGroup = `-- name: GetGroup :one
-SELECT g.id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_at,
+SELECT g.id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_at, g.keep_when_empty,
        un.id AS university_id, un.slug AS university_slug, un.name AS university_name,
        (SELECT count(*) FROM class_group_members m WHERE m.group_id = g.id)::int AS members,
        (SELECT count(*) FROM routine_slots s WHERE s.group_id = g.id)::int AS slots
@@ -165,6 +165,7 @@ type GetGroupRow struct {
 	Semester       string
 	JoinCode       string
 	CreatedAt      time.Time
+	KeepWhenEmpty  bool
 	UniversityID   uuid.UUID
 	UniversitySlug string
 	UniversityName string
@@ -183,6 +184,7 @@ func (q *Queries) GetGroup(ctx context.Context, id uuid.UUID) (GetGroupRow, erro
 		&i.Semester,
 		&i.JoinCode,
 		&i.CreatedAt,
+		&i.KeepWhenEmpty,
 		&i.UniversityID,
 		&i.UniversitySlug,
 		&i.UniversityName,
@@ -483,6 +485,22 @@ func (q *Queries) InsertUniversityDomain(ctx context.Context, arg InsertUniversi
 	return err
 }
 
+const joinCodeTaken = `-- name: JoinCodeTaken :one
+SELECT EXISTS (SELECT 1 FROM class_groups WHERE join_code = $1 AND id <> $2)
+`
+
+type JoinCodeTakenParams struct {
+	JoinCode string
+	ID       uuid.UUID
+}
+
+func (q *Queries) JoinCodeTaken(ctx context.Context, arg JoinCodeTakenParams) (bool, error) {
+	row := q.db.QueryRow(ctx, joinCodeTaken, arg.JoinCode, arg.ID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const listAudit = `-- name: ListAudit :many
 SELECT a.id, a.actor_id, u.email AS actor_email, u.display_name AS actor_name,
        a.action, a.target_type, a.target_id, a.meta, a.created_at
@@ -567,7 +585,7 @@ func (q *Queries) ListConfig(ctx context.Context) ([]AppConfig, error) {
 
 const listGroups = `-- name: ListGroups :many
 
-SELECT g.id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_at,
+SELECT g.id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_at, g.keep_when_empty,
        un.id AS university_id, un.slug AS university_slug, un.name AS university_name,
        (SELECT count(*) FROM class_group_members m WHERE m.group_id = g.id)::int AS members,
        (SELECT count(*) FROM routine_slots s WHERE s.group_id = g.id)::int AS slots
@@ -596,6 +614,7 @@ type ListGroupsRow struct {
 	Semester       string
 	JoinCode       string
 	CreatedAt      time.Time
+	KeepWhenEmpty  bool
 	UniversityID   uuid.UUID
 	UniversitySlug string
 	UniversityName string
@@ -627,6 +646,7 @@ func (q *Queries) ListGroups(ctx context.Context, arg ListGroupsParams) ([]ListG
 			&i.Semester,
 			&i.JoinCode,
 			&i.CreatedAt,
+			&i.KeepWhenEmpty,
 			&i.UniversityID,
 			&i.UniversitySlug,
 			&i.UniversityName,
@@ -1044,6 +1064,34 @@ type RevokeUserSessionsParams struct {
 
 func (q *Queries) RevokeUserSessions(ctx context.Context, arg RevokeUserSessionsParams) error {
 	_, err := q.db.Exec(ctx, revokeUserSessions, arg.Now, arg.UserID)
+	return err
+}
+
+const setGroupCode = `-- name: SetGroupCode :exec
+UPDATE class_groups SET join_code = $1 WHERE id = $2
+`
+
+type SetGroupCodeParams struct {
+	JoinCode string
+	ID       uuid.UUID
+}
+
+func (q *Queries) SetGroupCode(ctx context.Context, arg SetGroupCodeParams) error {
+	_, err := q.db.Exec(ctx, setGroupCode, arg.JoinCode, arg.ID)
+	return err
+}
+
+const setGroupKeep = `-- name: SetGroupKeep :exec
+UPDATE class_groups SET keep_when_empty = $1 WHERE id = $2
+`
+
+type SetGroupKeepParams struct {
+	Keep bool
+	ID   uuid.UUID
+}
+
+func (q *Queries) SetGroupKeep(ctx context.Context, arg SetGroupKeepParams) error {
+	_, err := q.db.Exec(ctx, setGroupKeep, arg.Keep, arg.ID)
 	return err
 }
 

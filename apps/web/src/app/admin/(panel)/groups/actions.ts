@@ -46,3 +46,28 @@ export async function deleteGroup(groupId: string): Promise<ActionResult> {
     return failure(e);
   }
 }
+
+const codeRe = /^[A-HJ-NP-Z]{6}$/;
+
+/** Sets a group's join code (6 letters, no I or O) and/or whether it stays when empty. */
+export async function updateGroup(
+  groupId: string,
+  change: { joinCode?: string; keepWhenEmpty?: boolean },
+): Promise<ActionResult> {
+  if (!ids(groupId)) return { ok: false, error: "That group isn't valid." };
+  const body: { joinCode?: string; keepWhenEmpty?: boolean } = {};
+  if (change.joinCode !== undefined) {
+    const code = change.joinCode.trim().toUpperCase();
+    if (!codeRe.test(code)) return { ok: false, error: "A join code is 6 letters, without I or O." };
+    body.joinCode = code;
+  }
+  if (change.keepWhenEmpty !== undefined) body.keepWhenEmpty = change.keepWhenEmpty;
+  try {
+    await api(`/admin/groups/${groupId}`, { method: "PATCH", body });
+    revalidatePath(`/admin/groups/${groupId}`);
+    revalidatePath("/admin/groups");
+    return { ok: true };
+  } catch (e) {
+    return failure(e);
+  }
+}

@@ -321,3 +321,30 @@ func TestAdminSettingsPushStats(t *testing.T) {
 	assert.Equal(t, "2026-10-27", stats.SignupsByDay[29].Date)
 	assert.Equal(t, 2, stats.SignupsByDay[29].Count)
 }
+
+// An admin sets a group's join code (6 letters, no I or O, not taken) and
+// keeps a published routine when its last member leaves.
+func TestAdminGroupCodeAndKeep(t *testing.T) {
+	h := newHarness(t)
+	admin := h.makeAdmin("admin@test.ac.bd")
+	cr := h.signIn("cr@test.ac.bd").Tokens.AccessToken
+	g := h.createGroup(cr)
+	other := h.createGroup(h.signIn("cr2@test.ac.bd").Tokens.AccessToken)
+	path := "/admin/groups/" + g.ID
+
+	var out struct {
+		JoinCode      string `json:"joinCode"`
+		KeepWhenEmpty bool   `json:"keepWhenEmpty"`
+	}
+	r := h.do("PATCH", path, admin, map[string]any{"joinCode": " pmsxyz ", "keepWhenEmpty": true})
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	r.into(t, &out)
+	assert.Equal(t, "PMSXYZ", out.JoinCode)
+	assert.True(t, out.KeepWhenEmpty)
+	assert.Equal(t, http.StatusOK, h.do("POST", "/groups/join", h.signIn("s@test.ac.bd").Tokens.AccessToken, map[string]string{"code": "PMSXYZ"}).Status)
+
+	assert.Equal(t, "VALIDATION_FAILED", h.do("PATCH", path, admin, map[string]any{"joinCode": "PMSCIO"}).code(), "no I or O")
+	assert.Equal(t, "VALIDATION_FAILED", h.do("PATCH", path, admin, map[string]any{"joinCode": "ABC"}).code())
+	assert.Equal(t, "JOIN_CODE_TAKEN", h.do("PATCH", path, admin, map[string]any{"joinCode": other.JoinCode}).code())
+	assert.Equal(t, "NOT_ADMIN", h.do("PATCH", path, cr, map[string]any{"joinCode": "QQQQQQ"}).code())
+}

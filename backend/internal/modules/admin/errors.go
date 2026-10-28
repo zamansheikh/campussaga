@@ -19,6 +19,7 @@ var (
 	ErrDomainNotAllowed   = apperr.New(http.StatusUnprocessableEntity, "DOMAIN_NOT_ALLOWED",
 		"Free email providers and shared suffixes (like ac.bd) can't be university domains")
 	ErrGroupNotFound  = apperr.New(http.StatusNotFound, "GROUP_NOT_FOUND", "No such class group")
+	ErrJoinCodeTaken  = apperr.New(http.StatusConflict, "JOIN_CODE_TAKEN", "Another group already uses this code")
 	ErrMemberNotFound = apperr.New(http.StatusNotFound, "MEMBER_NOT_FOUND", "This student is not in the group")
 	ErrLastCR         = apperr.New(http.StatusConflict, "LAST_CR", "A group always keeps one CR. Make someone else CR first")
 	ErrCRLimit        = apperr.New(http.StatusConflict, "CR_LIMIT_REACHED", "A group can have at most 3 CRs")

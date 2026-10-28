@@ -78,6 +78,7 @@ func (s *Service) Routes(r *httpx.Router) {
 	a.Get("/admin/groups/{id}", httpx.Handle(s.handleGetGroup))
 	a.Put("/admin/groups/{id}/members/{user}", httpx.Handle(s.handleSetMemberRole, httpx.NoContent()))
 	a.Delete("/admin/groups/{id}/members/{user}", httpx.Handle(s.handleRemoveMember, httpx.NoContent()))
+	a.Patch("/admin/groups/{id}", httpx.Handle(s.handlePatchGroup))
 	a.Delete("/admin/groups/{id}", httpx.Handle(s.handleDeleteGroup, httpx.NoContent()))
 
 	a.Get("/admin/config", httpx.Handle(s.handleListConfig))

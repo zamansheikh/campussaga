@@ -12,6 +12,7 @@ import { api, requireAdmin } from "@/lib/admin/session";
 import type { AdminGroupDetail } from "@/lib/admin/types";
 import { formatDate, formatDateTime, formatNumber } from "@/lib/format";
 
+import { JoinCodeEditor, KeepWhenEmpty } from "./group-settings";
 import { DeleteGroup, MemberActions } from "./member-actions";
 
 export const metadata: Metadata = { title: "Class group" };
@@ -42,7 +43,7 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Info label="Join code">
-              <span className="font-mono text-lg tracking-widest">{g.joinCode}</span>
+              <JoinCodeEditor key={g.joinCode} groupId={g.id} joinCode={g.joinCode} />
             </Info>
             <Info label="Semester">{g.semester}</Info>
             <Info label="Members">
@@ -50,6 +51,8 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
             </Info>
             <Info label="Weekly classes">{formatNumber(g.slots)}</Info>
           </div>
+
+          <KeepWhenEmpty groupId={g.id} keep={g.keepWhenEmpty} />
 
           <Card>
             <CardHeader>

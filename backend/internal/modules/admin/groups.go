@@ -2,12 +2,14 @@ package admin
 
 import (
 	"context"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/admin/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
 	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
 	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
 )
@@ -28,7 +30,9 @@ type Group struct {
 	Members    int           `json:"members"`
 	CRs        []Person      `json:"crs"`
 	Slots      int           `json:"slots"`
-	CreatedAt  time.Time     `json:"createdAt"`
+	// KeepWhenEmpty: a published routine that stays when its last member leaves.
+	KeepWhenEmpty bool      `json:"keepWhenEmpty"`
+	CreatedAt     time.Time `json:"createdAt"`
 }
 
 type Person struct {
@@ -57,6 +61,7 @@ func groupView(r store.GetGroupRow) Group {
 		Batch: r.Batch, Section: r.Section, Semester: r.Semester, JoinCode: r.JoinCode,
 		University: UniversityRef{ID: r.UniversityID, Slug: r.UniversitySlug, Name: r.UniversityName},
 		Members:    int(r.Members), CRs: []Person{}, Slots: int(r.Slots), CreatedAt: r.CreatedAt,
+		KeepWhenEmpty: r.KeepWhenEmpty,
 	}
 }
 
@@ -207,6 +212,62 @@ func (s *Service) handleRemoveMember(ctx context.Context, in *memberReq) (*httpx
 		return s.audit(ctx, q, "group.member.remove", "group", groupID.String(), map[string]string{"userId": userID.String()})
 	})
 	return nil, err
+}
+
+type patchGroupReq struct {
+	groupReq
+	// JoinCode: 6 letters, no I or O (any case); must be free.
+	JoinCode      *string `json:"joinCode" validate:"omitempty"`
+	KeepWhenEmpty *bool   `json:"keepWhenEmpty"`
+}
+
+var joinCodeRe = regexp.MustCompile(`^[A-HJ-NP-Z]{6}$`)
+
+// handlePatchGroup sets a group's join code and whether it stays when empty.
+func (s *Service) handlePatchGroup(ctx context.Context, in *patchGroupReq) (*GroupDetail, error) {
+	id := uuid.MustParse(in.ID)
+	var code string
+	if in.JoinCode != nil {
+		code = strings.ToUpper(strings.TrimSpace(*in.JoinCode))
+		if !joinCodeRe.MatchString(code) {
+			return nil, apperr.Validation(map[string]string{"joinCode": "must be 6 letters, without I or O"})
+		}
+	}
+	err := s.d.InTx(ctx, func(ctx context.Context) error {
+		q := store.New(s.d.Q(ctx))
+		g, err := q.GetGroup(ctx, id)
+		if db.IsNoRows(err) {
+			return ErrGroupNotFound
+		}
+		if err != nil {
+			return err
+		}
+		meta := map[string]any{"title": groupTitle(g.Department, g.Batch, g.Section)}
+		if in.JoinCode != nil && code != g.JoinCode {
+			taken, err := q.JoinCodeTaken(ctx, store.JoinCodeTakenParams{JoinCode: code, ID: id})
+			if err != nil {
+				return err
+			}
+			if taken {
+				return ErrJoinCodeTaken
+			}
+			if err := q.SetGroupCode(ctx, store.SetGroupCodeParams{JoinCode: code, ID: id}); err != nil {
+				return err
+			}
+			meta["joinCode"] = map[string]string{"from": g.JoinCode, "to": code}
+		}
+		if in.KeepWhenEmpty != nil && *in.KeepWhenEmpty != g.KeepWhenEmpty {
+			if err := q.SetGroupKeep(ctx, store.SetGroupKeepParams{Keep: *in.KeepWhenEmpty, ID: id}); err != nil {
+				return err
+			}
+			meta["keepWhenEmpty"] = *in.KeepWhenEmpty
+		}
+		return s.audit(ctx, q, "group.update", "group", id.String(), meta)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return s.handleGetGroup(ctx, &in.groupReq)
 }
 
 func (s *Service) handleDeleteGroup(ctx context.Context, in *groupReq) (*httpx.Empty, error) {

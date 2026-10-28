@@ -100,6 +100,8 @@ export type AdminGroup = {
   members: number;
   crs: { id: string; name: string | null; email: string }[];
   slots: number;
+  /** A published routine that stays when its last member leaves. */
+  keepWhenEmpty: boolean;
   createdAt: string;
 };
 
