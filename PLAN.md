@@ -1,4 +1,4 @@
-# Campus Saga — Project Plan
+# VarsityKotha — Project Plan
 
 > The daily app for university students: your class routine and reminders
 > every morning, and a safe, anonymous voice to get campus problems fixed.
@@ -23,7 +23,7 @@ or miss it. Nobody reminds you that class starts in 10 minutes.
 food, harassment. Students don't complain openly out of fear, complaints get
 buried in Facebook groups, and nobody knows if anything was fixed.
 
-**Campus Saga solves both:**
+**VarsityKotha solves both:**
 - **My Class** → routine, reminders and instant change alerts from the CR. *Reason to open the app every day.*
 - **Campus Voice** → verified-but-anonymous issues, "me too" votes, tracked until solved. *Reason the app exists.*
 
@@ -36,7 +36,7 @@ buried in Facebook groups, and nobody knows if anything was fixed.
 | **Student** | Verified student (university email) | See routine, get reminders, join class groups, raise and vote on issues |
 | **CR** (class representative) | Student who runs a class group | Create the routine, post changes and announcements, manage members |
 | **Authority** | Verified university official | Reply officially to issues, change status, post notices. **Never sees student identities** |
-| **Moderator** | Campus Saga team | Handle reports, remove abuse, verify authorities |
+| **Moderator** | VarsityKotha team | Handle reports, remove abuse, verify authorities |
 | **Super admin** | Owner | Everything, all actions logged |
 
 ---

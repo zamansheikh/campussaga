@@ -1,4 +1,4 @@
-# Campus Saga — admin panel and web (campus.silifton.com)
+# VarsityKotha — admin panel and web (campus.silifton.com)
 
 One Next.js app (`apps/web`) serves the whole domain:
 

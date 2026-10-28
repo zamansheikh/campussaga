@@ -1,4 +1,4 @@
-# Campus Saga — Roadmap
+# VarsityKotha — Roadmap
 
 We build in **releases**. Each release has a small, fixed set of features that
 we finish completely: designed, translated, tested, secure, and polished.
@@ -19,7 +19,7 @@ backlog (section 4).
 | **Campus Life** | Notices, scorecards, lost & found, events, clubs | Regularly |
 
 **Strategy:** *daily utility brings students in; Campus Voice is why we exist.*
-A student who opens Campus Saga every morning for their routine is already
+A student who opens VarsityKotha every morning for their routine is already
 there when they want to raise an issue. Then Campus Voice launches to a real
 audience, not an empty feed.
 
@@ -60,13 +60,13 @@ account, all on a cheap Android phone.
 
 ### R1 — My Class (≈ 8 weeks) ⭐ first public release
 
-**Goal:** every student checks Campus Saga every morning.
+**Goal:** every student checks VarsityKotha every morning.
 
 #### How the routine gets into the app
 
 In Bangladeshi universities every section already has a **CR (class
 representative)** who shares the routine and announces changes in Messenger
-groups. Campus Saga gives the CR a better tool:
+groups. VarsityKotha gives the CR a better tool:
 
 1. CR creates a **class group** (university → department → batch → section → semester).
 2. CR enters the weekly routine once: course, teacher, room, day, time, theory/lab.

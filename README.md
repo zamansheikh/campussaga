@@ -1,13 +1,17 @@
 <div align="center">
 
-<img src="assets/icon/Campus_Saga_Icon.png" width="120" height="120" alt="Campus Saga icon (placeholder)">
+<img src="assets/icon/Campus_Saga_Icon.png" width="120" height="120" alt="VarsityKotha icon (placeholder)">
 
-# Campus Saga
+# VarsityKotha
 
 **The daily app for university students:** class routine and reminders every
 morning, and a safe, anonymous voice to get campus problems fixed.
 
 </div>
+
+> Renamed from "Campus Saga" to VarsityKotha (ভার্সিটি কথা) on 2026-10-28.
+> Internal names (the `campussaga` Dart package, the repo, server paths) are
+> unchanged.
 
 > v2 is a fresh start. The old v1 app is kept at the git tag `v1-archive`.
 > The name and logo are placeholders and will change.

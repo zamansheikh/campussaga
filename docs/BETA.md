@@ -1,4 +1,4 @@
-# Campus Saga — Beta checklist (R1 "My Class")
+# VarsityKotha — Beta checklist (R1 "My Class")
 
 Goal from the roadmap: **5+ class groups (200+ students) for 2 weeks with no
 critical bugs**, Android first. iPhones follow once the Apple push key is set.

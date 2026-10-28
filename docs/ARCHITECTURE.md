@@ -1,4 +1,9 @@
-# Campus Saga — Architecture
+# VarsityKotha — Architecture
+
+> The product was renamed from "Campus Saga" to VarsityKotha (ভার্সিটি কথা) on
+> 2026-10-28. Internal identifiers keep the old name: the Dart package
+> `campussaga`, the Go module, the repo, `/opt/campussaga`, the compose
+> project and database names.
 
 Goal: ship each release properly with a small team, without painting
 ourselves into a corner. Every choice below can be replaced later without

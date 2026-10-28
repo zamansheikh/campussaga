@@ -1,6 +1,6 @@
-# Campus Saga — Running on Our VPS
+# VarsityKotha — Running on Our VPS
 
-Campus Saga runs as two Docker containers on our own VPS: the Go API
+VarsityKotha runs as two Docker containers on our own VPS: the Go API
 (`campusapi`) and its PostgreSQL 18 database. nginx on the host handles HTTPS.
 
 **Self-hosting means we own security, backups and uptime.** A leak of who
@@ -12,7 +12,7 @@ optional.
 ## 1. The server
 
 We use our existing shared VPS (Ubuntu 24.04). It already runs other
-products, so Campus Saga must fit its conventions and **never interrupt
+products, so VarsityKotha must fit its conventions and **never interrupt
 other services**:
 
 | Convention on the box | What it means for us |
@@ -92,7 +92,7 @@ Template: [backend/deploy/env.example](../backend/deploy/env.example).
 | `SMTP_HOST` / `SMTP_PORT` | `smtp.resend.com` / `587` |
 | `SMTP_USERNAME` | `resend` |
 | `SMTP_PASSWORD` | the Resend API key |
-| `MAIL_FROM` | `Campus Saga <no-reply@silifton.com>`. `silifton.com` is already verified in Resend (DKIM on the root domain; its DMARC is strict, so mail must be DKIM-signed for `silifton.com`, which Resend does). Switch to the product domain once it is chosen and verified |
+| `MAIL_FROM` | `VarsityKotha <no-reply@silifton.com>`. `silifton.com` is already verified in Resend (DKIM on the root domain; its DMARC is strict, so mail must be DKIM-signed for `silifton.com`, which Resend does). Switch to the product domain once it is chosen and verified |
 
 Changing `JWT_SECRET` signs everyone out. Changing `CODE_HMAC_SECRET` only
 invalidates codes that are waiting to be used.

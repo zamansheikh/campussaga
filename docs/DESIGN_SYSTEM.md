@@ -1,4 +1,4 @@
-# Campus Saga — Design System
+# VarsityKotha — Design System
 
 Lives in `packages/campus_ui`. Every screen in every app uses it; no screen
 writes its own colors, sizes or fonts.
