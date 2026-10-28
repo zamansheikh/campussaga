@@ -137,7 +137,9 @@ class RaiseIssueCubit extends Cubit<RaiseState> {
         body: d.body,
         place: d.place,
         anonymous: d.anonymous,
-        step: d.category == null ? 0 : 1,
+        // Always from the first step, the category already picked: the
+        // student continues with Next (and can change it).
+        step: 0,
         restored: true,
       ),
     );

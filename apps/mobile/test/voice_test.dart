@@ -447,4 +447,43 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('a saved draft reopens at step 1 with its category picked', (
+    tester,
+  ) async {
+    cache
+      ..draftUser = testUser.id
+      ..savedDraft = const VoiceDraft(
+        category: IssueCategory.hostel,
+        body: 'No water on the 3rd floor',
+      );
+    await start(tester);
+    await openCampus(tester);
+    await tester.tap(find.text('Raise issue'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Step 1 of 3'),
+      findsOneWidget,
+      reason: 'never jumps ahead',
+    );
+    expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Step 2 of 3'), findsOneWidget);
+    expect(find.text('No water on the 3rd floor'), findsOneWidget);
+  });
+
+  testWidgets('a category picked but nothing typed is not restored', (
+    tester,
+  ) async {
+    cache
+      ..draftUser = testUser.id
+      ..savedDraft = const VoiceDraft(category: IssueCategory.hostel);
+    await start(tester);
+    await openCampus(tester);
+    await tester.tap(find.text('Raise issue'));
+    await tester.pumpAndSettle();
+    expect(find.text('Step 1 of 3'), findsOneWidget);
+    expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+  });
 }

@@ -30,8 +30,8 @@ class VoiceDraft {
   final String place;
   final bool anonymous;
 
-  bool get isEmpty =>
-      category == null && title.isEmpty && body.isEmpty && place.isEmpty;
+  /// Nothing typed yet (a picked category alone isn't worth restoring).
+  bool get isEmpty => title.isEmpty && body.isEmpty && place.isEmpty;
 
   Map<String, Object?> toJson() => {
     'category': category?.wire,
