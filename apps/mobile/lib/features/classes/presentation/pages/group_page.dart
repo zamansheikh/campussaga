@@ -19,7 +19,9 @@ import '../widgets/class_tile.dart';
 
 enum _Action { edit, semester, leave, delete }
 
-/// One group: invite code and the weekly routine. The CR edits it here.
+/// One group: its next seven days of classes first (tap a class for its
+/// actions on that day), then tests, announcements and later changes; the
+/// invite code is a compact bar, courses and members at the end.
 class GroupPage extends StatelessWidget {
   const GroupPage({super.key, required this.groupId});
 
@@ -87,16 +89,17 @@ class GroupPage extends StatelessWidget {
       if (context.mounted) context.read<SeenCubit>().markSeen(g);
     });
 
-    final days = [
-      for (final d in weekOrder)
+    final today = DateUtils.dateOnly(appNow());
+    // The group's whole routine, also courses this student hides from
+    // their own (Today and Routine leave those out).
+    final all = g.copyWith(hiddenCourses: const {});
+    final week = [
+      for (var i = 0; i < 7; i++)
         (
-          d,
-          [
-            for (final s in g.slots)
-              if (s.weekday == d) s,
-          ],
+          DateUtils.addDaysToDate(today, i),
+          classesOn([all], DateUtils.addDaysToDate(today, i)),
         ),
-    ].where((e) => e.$2.isNotEmpty);
+    ].where((e) => e.$2.isNotEmpty).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -143,9 +146,27 @@ class GroupPage extends StatelessWidget {
           ),
           children: [
             _Header(group: g),
-            const SizedBox(height: CsSpace.md),
-            _InviteCard(group: g),
-            const SizedBox(height: CsSpace.md),
+            const SizedBox(height: CsSpace.sm),
+            _InviteBar(group: g),
+            const SizedBox(height: CsSpace.lg),
+            if (g.slots.isEmpty)
+              _EmptyRoutine(group: g)
+            else
+              for (final (date, items) in week) ...[
+                CsSection(
+                  title: _dayTitle(context, date, today),
+                  children: [
+                    for (final i in items)
+                      ClassTile.on(i, onTap: () => showClassSheet(context, i)),
+                  ],
+                ),
+                const SizedBox(height: CsSpace.lg),
+              ],
+            GroupAssessments(group: g),
+            const SizedBox(height: CsSpace.lg),
+            AnnouncementsSection(group: g),
+            const SizedBox(height: CsSpace.lg),
+            ..._laterChanges(context, g, today),
             CsSection(
               children: [
                 if (g.slots.isNotEmpty)
@@ -164,30 +185,6 @@ class GroupPage extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: CsSpace.lg),
-            AnnouncementsSection(group: g),
-            const SizedBox(height: CsSpace.lg),
-            GroupAssessments(group: g),
-            const SizedBox(height: CsSpace.lg),
-            ..._upcomingChanges(context, g),
-            if (days.isEmpty)
-              _EmptyRoutine(group: g)
-            else
-              for (final (day, slots) in days) ...[
-                CsSection(
-                  title: weekdayName(context, day),
-                  children: [
-                    for (final s in slots)
-                      ClassTile(
-                        slot: s,
-                        onTap: g.isCr
-                            ? () => context.push(Routes.editSlot(g.id, s.id))
-                            : null,
-                      ),
-                  ],
-                ),
-                const SizedBox(height: CsSpace.lg),
-              ],
           ],
         ),
       ),
@@ -271,15 +268,29 @@ class _NewSemesterDialogState extends State<_NewSemesterDialog> {
   }
 }
 
-/// Changes from today on, each shown as the class on its date.
-List<Widget> _upcomingChanges(BuildContext context, ClassGroup g) {
+/// "Today · Wednesday, October 28", "Tomorrow · …", or the date.
+String _dayTitle(BuildContext context, DateTime date, DateTime today) {
   final l10n = AppLocalizations.of(context);
-  final today = DateUtils.dateOnly(appNow());
   final locale = Localizations.localeOf(context).toLanguageTag();
+  final text = DateFormat.MMMMEEEEd(locale).format(date);
+  if (date == today) return '${l10n.dayToday} · $text';
+  if (date == DateUtils.addDaysToDate(today, 1)) {
+    return '${l10n.dayTomorrow} · $text';
+  }
+  return text;
+}
+
+/// Changes after this week (this week's are in the days above), each shown
+/// as the class on its date.
+List<Widget> _laterChanges(BuildContext context, ClassGroup g, DateTime today) {
+  final l10n = AppLocalizations.of(context);
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  final weekEnd = DateUtils.addDaysToDate(today, 7);
   final items = [
     for (final c in g.changes)
-      if (!c.date.isBefore(today))
-        ...classesOn([g], c.date).where((i) => i.change?.id == c.id),
+      for (final d in {c.date, ?c.newDate})
+        if (!d.isBefore(weekEnd))
+          ...classesOn([g], d).where((i) => i.change?.id == c.id),
   ];
   if (items.isEmpty) return const [];
   return [
@@ -345,8 +356,9 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _InviteCard extends StatelessWidget {
-  const _InviteCard({required this.group});
+/// The join code on one line, with a copy-invite button.
+class _InviteBar extends StatelessWidget {
+  const _InviteBar({required this.group});
 
   final ClassGroup group;
 
@@ -354,60 +366,56 @@ class _InviteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cs = context.cs;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(CsSpace.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.inviteTitle, style: context.text.titleSmall),
-            Text(l10n.inviteHint, style: context.text.bodySmall),
-            const SizedBox(height: CsSpace.md),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: cs.primaryContainer,
-                      borderRadius: BorderRadius.circular(CsRadius.md),
-                    ),
-                    child: SelectableText(
-                      group.joinCode,
-                      style: context.text.headlineSmall?.copyWith(
-                        letterSpacing: 6,
-                        color: cs.onPrimaryContainer,
-                      ),
-                    ),
+    return Container(
+      padding: const EdgeInsetsDirectional.fromSTEB(CsSpace.md, 4, 4, 4),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(CsRadius.md),
+        border: Border.all(color: cs.border),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.person_add_alt_1_outlined,
+            size: 18,
+            color: cs.textSecondary,
+          ),
+          const SizedBox(width: CsSpace.sm),
+          Expanded(
+            child: Text(
+              l10n.inviteTitle,
+              style: context.text.bodyMedium,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          SelectableText(
+            group.joinCode,
+            style: context.text.titleMedium?.copyWith(
+              letterSpacing: 3,
+              fontWeight: FontWeight.w700,
+              color: cs.primary,
+            ),
+          ),
+          IconButton(
+            tooltip: l10n.copyInvite,
+            onPressed: () async {
+              await Clipboard.setData(
+                ClipboardData(
+                  text: l10n.inviteMessage(
+                    group.title,
+                    l10n.appName,
+                    group.joinCode,
                   ),
                 ),
-                const SizedBox(width: CsSpace.sm),
-                IconButton.filledTonal(
-                  tooltip: l10n.copyInvite,
-                  onPressed: () async {
-                    await Clipboard.setData(
-                      ClipboardData(
-                        text: l10n.inviteMessage(
-                          group.title,
-                          l10n.appName,
-                          group.joinCode,
-                        ),
-                      ),
-                    );
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(
-                        SnackBar(content: Text(l10n.inviteCopied)),
-                      );
-                  },
-                  icon: const Icon(Icons.copy_rounded),
-                ),
-              ],
-            ),
-          ],
-        ),
+              );
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(SnackBar(content: Text(l10n.inviteCopied)));
+            },
+            icon: const Icon(Icons.copy_rounded, size: 20),
+          ),
+        ],
       ),
     );
   }

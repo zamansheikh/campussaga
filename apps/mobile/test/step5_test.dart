@@ -69,7 +69,7 @@ void main() {
     await scrollAndTap(tester, find.text('CSE 61 · A'));
     await tester.pumpAndSettle();
     expect(find.text('3 of 3 courses in your routine'), findsOneWidget);
-    await tester.tap(find.text('My courses'));
+    await scrollAndTap(tester, find.text('My courses'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('CSE313'));
     await tester.pumpAndSettle();

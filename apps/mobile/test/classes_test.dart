@@ -110,7 +110,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(classes.mine.single.id, 'g-cse');
     expect(find.text('Invite classmates'), findsOneWidget);
-    expect(find.text('TUESDAY'), findsOneWidget);
+    expect(find.textContaining('TUESDAY'), findsOneWidget);
     expect(find.text('Add class'), findsNothing, reason: 'members only read');
 
     // Back home, today's classes are there.
@@ -201,8 +201,8 @@ void main() {
     expect(slots[2].weekday, DateTime.wednesday);
     expect(slots[2].startMin, 10 * 60, reason: 'starts when the last ended');
     expect(slots[2].endMin, 11 * 60 + 30);
-    expect(find.text('SATURDAY'), findsOneWidget);
-    expect(find.text('WEDNESDAY'), findsOneWidget);
+    expect(find.textContaining('SATURDAY'), findsOneWidget);
+    expect(find.textContaining('WEDNESDAY'), findsOneWidget);
 
     // A missing course code is caught before saving.
     await tester.tap(find.byType(FloatingActionButton));
@@ -224,7 +224,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Invite classmates'), findsOneWidget);
 
+    // Tapping a class opens its actions for that day; the weekly class is
+    // one of them.
     await scrollAndTap(tester, find.text('CSE313'));
+    await tester.pumpAndSettle();
+    expect(find.text('Change day, time or room'), findsOneWidget);
+    await scrollAndTap(tester, find.text('Edit weekly class'));
     await tester.pumpAndSettle();
     expect(find.text('Edit class'), findsOneWidget);
     await tester.enterText(find.widgetWithText(TextField, '602'), '701');
@@ -233,6 +238,8 @@ void main() {
     expect(classes.mine.single.slots[1].room, '701');
 
     await scrollAndTap(tester, find.text('CSE313'));
+    await tester.pumpAndSettle();
+    await scrollAndTap(tester, find.text('Edit weekly class'));
     await tester.pumpAndSettle();
     await scrollAndTap(tester, find.text('Delete class'));
     await tester.pumpAndSettle();
@@ -245,7 +252,9 @@ void main() {
     ]);
 
     // Editing: pick another day to put the class there too.
-    await scrollAndTap(tester, find.text('MAT201'));
+    await scrollAndTap(tester, find.text('MAT201').first);
+    await tester.pumpAndSettle();
+    await scrollAndTap(tester, find.text('Edit weekly class'));
     await tester.pumpAndSettle();
     await scrollAndTap(tester, find.text('Thu'));
     await scrollAndTap(tester, find.text('Save'));
@@ -258,7 +267,9 @@ void main() {
     );
 
     // Unpicking its own day moves the class.
-    await scrollAndTap(tester, find.text('CSE311'));
+    await scrollAndTap(tester, find.text('CSE311').first);
+    await tester.pumpAndSettle();
+    await scrollAndTap(tester, find.text('Edit weekly class'));
     await tester.pumpAndSettle();
     await scrollAndTap(tester, find.text('Tue'));
     await scrollAndTap(tester, find.text('Sun'));
