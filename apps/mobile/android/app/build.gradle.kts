@@ -62,6 +62,11 @@ android {
             } else {
                 signingConfigs.getByName("release")
             }
+            // Native symbol tables in the App Bundle, so Play Console shows
+            // readable native crash and ANR stack traces.
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
 }
