@@ -19,6 +19,7 @@ import 'package:campussaga/app/di.dart';
 import 'package:campussaga/app/router.dart';
 import 'package:campussaga/app/settings/bloc/settings_state.dart';
 import 'package:campussaga/app/settings/settings_storage.dart';
+import 'package:campussaga/features/cgpa/data/cgpa_store.dart';
 import 'package:campussaga/features/classes/presentation/widgets/class_tile.dart';
 import 'package:campussaga/features/reminders/data/reminder_scheduler.dart';
 import 'package:campussaga/features/reminders/data/reminder_store.dart';
@@ -325,6 +326,80 @@ void main() {
       await tester.tap(find.byType(ChoiceChip).at(2)); // Monday
       await tester.pumpAndSettle();
       await capture(tester, 'classes-${look.name}');
+    });
+
+    shot('cgpa ${look.name}', (tester) async {
+      final router = await start(tester, look, user: _student);
+      getIt.registerSingleton<CgpaStore>(
+        MemoryCgpaStore()
+          ..saved[_student.id] = jsonEncode(
+            const CgpaBook(
+              semesters: [
+                Semester(
+                  id: 's1',
+                  name: 'Spring 2026',
+                  courses: [
+                    CgpaCourse(
+                      id: 'a',
+                      code: 'CSE101',
+                      title: 'Structured Programming',
+                      letter: 'A+',
+                    ),
+                    CgpaCourse(
+                      id: 'b',
+                      code: 'MAT101',
+                      title: 'Calculus',
+                      letter: 'B',
+                    ),
+                    CgpaCourse(
+                      id: 'c',
+                      code: 'PHY101',
+                      credits: 1.5,
+                      title: 'Physics Lab',
+                      letter: 'C',
+                    ),
+                  ],
+                ),
+                Semester(
+                  id: 's2',
+                  name: 'Fall 2026',
+                  courses: [
+                    CgpaCourse(
+                      id: 'd',
+                      code: 'PHY101',
+                      credits: 1.5,
+                      title: 'Physics Lab',
+                      letter: 'A',
+                    ),
+                    CgpaCourse(
+                      id: 'e',
+                      code: 'CSE201',
+                      title: 'Data Structures',
+                      marks: 76,
+                    ),
+                    CgpaCourse(id: 'f', code: 'ENG101', title: 'English'),
+                  ],
+                ),
+              ],
+            ).toJson(),
+          ),
+      );
+      router.go(Routes.cgpa);
+      await tester.pumpAndSettle();
+      await capture(tester, 'cgpa-${look.name}');
+      unawaited(router.push(Routes.cgpaSemester('s2')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'cgpa-${look.name}');
+      await tester.tap(find.text('CSE201'));
+      await tester.pumpAndSettle();
+      await capture(tester, 'cgpa-${look.name}');
+      Navigator.of(tester.element(find.byType(SegmentedButton<bool>))).pop();
+      await tester.pumpAndSettle();
+      router.pop();
+      await tester.pumpAndSettle();
+      unawaited(router.push(Routes.cgpaScale));
+      await tester.pumpAndSettle();
+      await capture(tester, 'cgpa-${look.name}');
     });
 
     shot('reminders ${look.name}', (tester) async {

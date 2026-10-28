@@ -6,6 +6,7 @@ library;
 
 export 'src/auth/auth_models.dart';
 export 'src/auth/auth_repository.dart';
+export 'src/cgpa/cgpa.dart';
 export 'src/classes/assessment_models.dart';
 export 'src/classes/class_group_repository.dart';
 export 'src/classes/class_models.dart';

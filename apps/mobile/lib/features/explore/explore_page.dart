@@ -31,6 +31,12 @@ class ExplorePage extends StatelessWidget {
         hint: l10n.exploreRemindersHint,
         onTap: () => context.push(Routes.reminders),
       ),
+      _Feature(
+        icon: CsIcons.cgpa,
+        title: l10n.cgpaTitle,
+        hint: l10n.cgpaHint,
+        onTap: () => context.push(Routes.cgpa),
+      ),
       if (voice)
         _Feature(
           icon: CsIcons.myIssues,

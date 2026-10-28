@@ -230,6 +230,414 @@ abstract class AppLocalizations {
   /// **'We\'re building this. It will arrive in a future update.'**
   String get comingSoonNote;
 
+  /// No description provided for @cgpaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CGPA calculator'**
+  String get cgpaTitle;
+
+  /// No description provided for @cgpaHint.
+  ///
+  /// In en, this message translates to:
+  /// **'GPA, CGPA and targets'**
+  String get cgpaHint;
+
+  /// No description provided for @cgpaLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CGPA'**
+  String get cgpaLabel;
+
+  /// No description provided for @cgpaGpa.
+  ///
+  /// In en, this message translates to:
+  /// **'GPA {gpa}'**
+  String cgpaGpa(String gpa);
+
+  /// No description provided for @cgpaCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'{credits} credits'**
+  String cgpaCredits(String credits);
+
+  /// No description provided for @cgpaCreditsEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits earned'**
+  String get cgpaCreditsEarned;
+
+  /// No description provided for @cgpaLastSemester.
+  ///
+  /// In en, this message translates to:
+  /// **'Last semester'**
+  String get cgpaLastSemester;
+
+  /// No description provided for @cgpaScaleUgc.
+  ///
+  /// In en, this message translates to:
+  /// **'UGC scale'**
+  String get cgpaScaleUgc;
+
+  /// No description provided for @cgpaScaleCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom scale'**
+  String get cgpaScaleCustom;
+
+  /// No description provided for @cgpaNoGrades.
+  ///
+  /// In en, this message translates to:
+  /// **'No grades yet'**
+  String get cgpaNoGrades;
+
+  /// No description provided for @cgpaCoursesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 course} other{{count} courses}}'**
+  String cgpaCoursesCount(int count);
+
+  /// No description provided for @cgpaSemesters.
+  ///
+  /// In en, this message translates to:
+  /// **'Semesters'**
+  String get cgpaSemesters;
+
+  /// No description provided for @cgpaAddSemester.
+  ///
+  /// In en, this message translates to:
+  /// **'Add semester'**
+  String get cgpaAddSemester;
+
+  /// No description provided for @cgpaSemesterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Semester name'**
+  String get cgpaSemesterName;
+
+  /// No description provided for @cgpaSemesterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Spring 2026'**
+  String get cgpaSemesterHint;
+
+  /// No description provided for @cgpaRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get cgpaRename;
+
+  /// No description provided for @cgpaMoveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get cgpaMoveUp;
+
+  /// No description provided for @cgpaMoveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get cgpaMoveDown;
+
+  /// No description provided for @cgpaDeleteSemesterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this semester and its courses?'**
+  String get cgpaDeleteSemesterTitle;
+
+  /// No description provided for @cgpaEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your CGPA'**
+  String get cgpaEmptyTitle;
+
+  /// No description provided for @cgpaEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your semesters and grades. Everything stays on this phone.'**
+  String get cgpaEmptyBody;
+
+  /// No description provided for @cgpaAddCourse.
+  ///
+  /// In en, this message translates to:
+  /// **'Add course'**
+  String get cgpaAddCourse;
+
+  /// No description provided for @cgpaEditCourse.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit course'**
+  String get cgpaEditCourse;
+
+  /// No description provided for @cgpaCourseCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Course code'**
+  String get cgpaCourseCode;
+
+  /// No description provided for @cgpaCourseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Course title (optional)'**
+  String get cgpaCourseTitle;
+
+  /// No description provided for @cgpaCreditsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits'**
+  String get cgpaCreditsLabel;
+
+  /// No description provided for @cgpaCreditsInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits must be between 0.5 and 6.'**
+  String get cgpaCreditsInvalid;
+
+  /// No description provided for @cgpaCodeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a course code or title.'**
+  String get cgpaCodeRequired;
+
+  /// No description provided for @cgpaGradeLetter.
+  ///
+  /// In en, this message translates to:
+  /// **'Letter grade'**
+  String get cgpaGradeLetter;
+
+  /// No description provided for @cgpaGradeMarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Marks'**
+  String get cgpaGradeMarks;
+
+  /// No description provided for @cgpaNotGraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Not graded yet'**
+  String get cgpaNotGraded;
+
+  /// No description provided for @cgpaMarksLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Marks out of 100'**
+  String get cgpaMarksLabel;
+
+  /// No description provided for @cgpaMarksGives.
+  ///
+  /// In en, this message translates to:
+  /// **'Grade: {letter} ({points})'**
+  String cgpaMarksGives(String letter, String points);
+
+  /// No description provided for @cgpaMarksInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Marks must be 0 to 100.'**
+  String get cgpaMarksInvalid;
+
+  /// No description provided for @cgpaNotCounted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not counted: retaken'**
+  String get cgpaNotCounted;
+
+  /// No description provided for @cgpaFromRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'Add my routine\'s courses'**
+  String get cgpaFromRoutine;
+
+  /// No description provided for @cgpaFromRoutineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current courses, ready to grade.'**
+  String get cgpaFromRoutineHint;
+
+  /// No description provided for @cgpaTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan a target'**
+  String get cgpaTarget;
+
+  /// No description provided for @cgpaTargetCgpa.
+  ///
+  /// In en, this message translates to:
+  /// **'Target CGPA'**
+  String get cgpaTargetCgpa;
+
+  /// No description provided for @cgpaNextCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits left to take'**
+  String get cgpaNextCredits;
+
+  /// No description provided for @cgpaTargetNeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'You need a GPA of {gpa} in those credits.'**
+  String cgpaTargetNeeds(String gpa);
+
+  /// No description provided for @cgpaTargetReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re already there. Keep passing to stay above it.'**
+  String get cgpaTargetReached;
+
+  /// No description provided for @cgpaTargetOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Not reachable: it would need a GPA of {gpa}. Try more credits or a lower target.'**
+  String cgpaTargetOut(String gpa);
+
+  /// No description provided for @cgpaTargetInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a target CGPA and the credits left.'**
+  String get cgpaTargetInvalid;
+
+  /// No description provided for @cgpaGradingScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Grading scale'**
+  String get cgpaGradingScale;
+
+  /// No description provided for @cgpaUseUgc.
+  ///
+  /// In en, this message translates to:
+  /// **'UGC uniform scale (4.00)'**
+  String get cgpaUseUgc;
+
+  /// No description provided for @cgpaUseUgcHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Most Bangladeshi universities use it.'**
+  String get cgpaUseUgcHint;
+
+  /// No description provided for @cgpaUseCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'My university\'s own scale'**
+  String get cgpaUseCustom;
+
+  /// No description provided for @cgpaUseCustomHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your own grades, points and mark ranges.'**
+  String get cgpaUseCustomHint;
+
+  /// No description provided for @cgpaGradeShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Grade'**
+  String get cgpaGradeShort;
+
+  /// No description provided for @cgpaPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Points'**
+  String get cgpaPoints;
+
+  /// No description provided for @cgpaMinMarks.
+  ///
+  /// In en, this message translates to:
+  /// **'From marks'**
+  String get cgpaMinMarks;
+
+  /// No description provided for @cgpaAddGrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Add grade'**
+  String get cgpaAddGrade;
+
+  /// No description provided for @cgpaRetakeRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Retaken courses'**
+  String get cgpaRetakeRule;
+
+  /// No description provided for @cgpaRetakeBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Best attempt counts'**
+  String get cgpaRetakeBest;
+
+  /// No description provided for @cgpaRetakeBestHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The usual rule: a better grade replaces the earlier one.'**
+  String get cgpaRetakeBestHint;
+
+  /// No description provided for @cgpaRetakeLatest.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest attempt counts'**
+  String get cgpaRetakeLatest;
+
+  /// No description provided for @cgpaRetakeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Every attempt counts'**
+  String get cgpaRetakeAll;
+
+  /// No description provided for @cgpaRetakeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Attempts are matched by course code.'**
+  String get cgpaRetakeHint;
+
+  /// No description provided for @cgpaProblemEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one grade.'**
+  String get cgpaProblemEmpty;
+
+  /// No description provided for @cgpaProblemLetter.
+  ///
+  /// In en, this message translates to:
+  /// **'Every grade needs its own name.'**
+  String get cgpaProblemLetter;
+
+  /// No description provided for @cgpaProblemPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Points must be 0 to 5.'**
+  String get cgpaProblemPoints;
+
+  /// No description provided for @cgpaProblemMarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Each grade needs its own starting mark, 0 to 100.'**
+  String get cgpaProblemMarks;
+
+  /// No description provided for @cgpaProblemZero.
+  ///
+  /// In en, this message translates to:
+  /// **'One grade must start at 0 marks.'**
+  String get cgpaProblemZero;
+
+  /// No description provided for @cgpaProblemOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'More marks can\'t give fewer points.'**
+  String get cgpaProblemOrder;
+
+  /// No description provided for @cgpaClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear everything'**
+  String get cgpaClearAll;
+
+  /// No description provided for @cgpaClearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all semesters and grades on this phone?'**
+  String get cgpaClearTitle;
+
+  /// No description provided for @cgpaSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get cgpaSave;
+
   /// No description provided for @todayEmptyTitle.
   ///
   /// In en, this message translates to:
