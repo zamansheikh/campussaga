@@ -24,13 +24,19 @@ export default async function TransportPage({ searchParams }: { searchParams: Pr
   const universityId = sp.universityId && uuid.test(sp.universityId) ? sp.universityId : null;
   const [unis, routes, reps] = await Promise.all([
     load(() => allUniversities()),
-    universityId
-      ? load(() => api<{ routes: BusRoute[] }>(`/admin/transport/routes${query({ universityId })}`))
-      : Promise.resolve(null),
+    // No university chosen: every university's routes.
+    load(() => api<{ routes: BusRoute[] }>(`/admin/transport/routes${query({ universityId })}`)),
     load(() => api<{ items: TransportRep[] }>(`/admin/transport/reps${query({ universityId })}`)),
   ]);
   const universities = (unis.data ?? []).map((u) => ({ id: u.id, slug: u.slug, name: u.name }));
   const university = universities.find((u) => u.id === universityId);
+  const uniName = new Map(universities.map((u) => [u.id, u.name]));
+  const all = !universityId;
+  const list = [...(routes.data?.routes ?? [])].sort(
+    (a, b) =>
+      (uniName.get(a.universityId) ?? "").localeCompare(uniName.get(b.universityId) ?? "") ||
+      a.name.localeCompare(b.name),
+  );
 
   return (
     <>
@@ -45,13 +51,13 @@ export default async function TransportPage({ searchParams }: { searchParams: Pr
 
       {unis.error ? <ErrorPanel message={unis.error} /> : null}
 
-      {!routes ? (
-        <EmptyState title="Choose a university">Its bus routes show here.</EmptyState>
-      ) : routes.error ? (
+      {routes.error ? (
         <ErrorPanel message={routes.error} />
-      ) : routes.data && routes.data.routes.length === 0 ? (
+      ) : routes.data && list.length === 0 ? (
         <EmptyState title="No bus routes yet">
-          Add the first route for {university?.name ?? "this university"}, or name a transport rep to do it from the app.
+          {all
+            ? "Choose a university to add its first route, or name a transport rep to do it from the app."
+            : `Add the first route for ${university?.name ?? "this university"}, or name a transport rep to do it from the app.`}
         </EmptyState>
       ) : routes.data ? (
         <div className="overflow-hidden rounded-xl border bg-card">
@@ -59,6 +65,7 @@ export default async function TransportPage({ searchParams }: { searchParams: Pr
             <TableHeader>
               <TableRow>
                 <TableHead>Route</TableHead>
+                {all ? <TableHead className="hidden md:table-cell">University</TableHead> : null}
                 <TableHead className="hidden sm:table-cell">Stops</TableHead>
                 <TableHead>Departures</TableHead>
                 <TableHead className="hidden md:table-cell">First bus</TableHead>
@@ -66,7 +73,7 @@ export default async function TransportPage({ searchParams }: { searchParams: Pr
               </TableRow>
             </TableHeader>
             <TableBody>
-              {routes.data.routes.map((r) => {
+              {list.map((r) => {
                 const first = r.trips
                   .filter((t) => t.direction === "to_campus")
                   .map((t) => t.departs)
@@ -87,6 +94,13 @@ export default async function TransportPage({ searchParams }: { searchParams: Pr
                         </p>
                       ) : null}
                     </TableCell>
+                    {all ? (
+                      <TableCell className="hidden max-w-56 truncate md:table-cell">
+                        <Link href={`/admin/transport?universityId=${r.universityId}`} className="hover:underline">
+                          {uniName.get(r.universityId) ?? "—"}
+                        </Link>
+                      </TableCell>
+                    ) : null}
                     <TableCell className="hidden sm:table-cell">{r.stops.length}</TableCell>
                     <TableCell>{r.trips.length}</TableCell>
                     <TableCell className="hidden md:table-cell">

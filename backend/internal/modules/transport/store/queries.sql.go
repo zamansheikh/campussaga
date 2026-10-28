@@ -212,6 +212,44 @@ func (q *Queries) InsertTrip(ctx context.Context, arg InsertTripParams) error {
 	return err
 }
 
+const listAllRoutes = `-- name: ListAllRoutes :many
+SELECT id, university_id, name, color, notes, active, created_at, updated_at, path, path_key, driver_name, driver_phone FROM bus_routes ORDER BY university_id, name, id LIMIT 500
+`
+
+// Every university's routes (the admin panel's default view).
+func (q *Queries) ListAllRoutes(ctx context.Context) ([]BusRoute, error) {
+	rows, err := q.db.Query(ctx, listAllRoutes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BusRoute{}
+	for rows.Next() {
+		var i BusRoute
+		if err := rows.Scan(
+			&i.ID,
+			&i.UniversityID,
+			&i.Name,
+			&i.Color,
+			&i.Notes,
+			&i.Active,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Path,
+			&i.PathKey,
+			&i.DriverName,
+			&i.DriverPhone,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listReps = `-- name: ListReps :many
 SELECT r.user_id, r.university_id, r.created_at, u.email, u.display_name,
        un.name AS university_name, un.slug AS university_slug

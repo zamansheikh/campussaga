@@ -4,8 +4,7 @@ import Link from "next/link";
 
 import { ErrorPanel } from "@/components/admin/notice";
 import { UserBadges } from "@/components/admin/user-badges";
-import { initials } from "@/components/admin/user-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/admin/user-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -65,11 +64,7 @@ function UserView({
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <Avatar className="size-14">
-          <AvatarFallback className="bg-primary-soft text-lg font-semibold text-primary-soft-foreground">
-            {initials(user.displayName || user.email)}
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar user={user} className="size-14" textClassName="text-lg" />
         <div className="min-w-0">
           <h1 className="text-2xl font-semibold tracking-tight">
             {name}

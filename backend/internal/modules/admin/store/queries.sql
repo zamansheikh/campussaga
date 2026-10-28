@@ -48,7 +48,8 @@ SELECT u.id, u.email, u.display_name, u.department, u.batch, u.role, u.verified_
        u.blocked_at, u.created_at,
        -- 'epoch' = never (sqlc can't type a nullable subquery column).
        coalesce((SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = u.id), 'epoch'::timestamptz)::timestamptz AS last_active_at,
-       (SELECT count(*) FROM class_group_members m WHERE m.user_id = u.id)::int AS groups
+       (SELECT count(*) FROM class_group_members m WHERE m.user_id = u.id)::int AS groups,
+       u.photo_key, u.google_photo_url
 FROM users u
 LEFT JOIN universities un ON un.id = u.university_id
 WHERE (@q::text = '' OR u.email ILIKE @q_like OR u.display_name ILIKE @q_like OR u.university_email ILIKE @q_like)
@@ -78,7 +79,8 @@ SELECT u.id, u.email, u.display_name, u.department, u.batch, u.role, u.verified_
        u.blocked_at, u.created_at,
        -- 'epoch' = never (sqlc can't type a nullable subquery column).
        coalesce((SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = u.id), 'epoch'::timestamptz)::timestamptz AS last_active_at,
-       (SELECT count(*) FROM class_group_members m WHERE m.user_id = u.id)::int AS groups
+       (SELECT count(*) FROM class_group_members m WHERE m.user_id = u.id)::int AS groups,
+       u.photo_key, u.google_photo_url
 FROM users u
 LEFT JOIN universities un ON un.id = u.university_id
 WHERE u.id = @id;

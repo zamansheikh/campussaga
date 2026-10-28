@@ -5,7 +5,7 @@ import { useTransition } from "react";
 
 import { UniversityCombobox, type UniversityOption } from "@/components/admin/university-combobox";
 
-/** Picks the university whose bus routes are shown (?universityId=). */
+/** Picks the university whose bus routes are shown (?universityId=); none = all. */
 export function UniversitySelect({ universities }: { universities: UniversityOption[] }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -13,16 +13,27 @@ export function UniversitySelect({ universities }: { universities: UniversityOpt
   const [pending, startTransition] = useTransition();
 
   return (
-    <div className="sm:w-80" aria-busy={pending}>
-      <UniversityCombobox
-        id="transport-university"
-        universities={universities}
-        value={params.get("universityId")}
-        onChange={(id) =>
-          startTransition(() => router.replace(id ? `${pathname}?universityId=${id}` : pathname))
-        }
-        placeholder="Choose a university"
-      />
+    <div className="flex flex-wrap items-center gap-2" aria-busy={pending}>
+      <div className="w-full sm:w-80">
+        <UniversityCombobox
+          id="transport-university"
+          universities={universities}
+          value={params.get("universityId")}
+          onChange={(id) =>
+            startTransition(() => router.replace(id ? `${pathname}?universityId=${id}` : pathname))
+          }
+          placeholder="All universities"
+        />
+      </div>
+      {params.get("universityId") ? (
+        <button
+          type="button"
+          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          onClick={() => startTransition(() => router.replace(pathname))}
+        >
+          Show all
+        </button>
+      ) : null}
     </div>
   );
 }

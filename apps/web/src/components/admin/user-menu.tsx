@@ -1,7 +1,7 @@
 import { LogOut } from "lucide-react";
 
 import { signOut } from "@/app/admin/login/actions";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/admin/user-avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,11 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Me } from "@/lib/admin/types";
 
-export function initials(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return "?";
-  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? (parts.at(-1)?.[0] ?? "") : "")).toUpperCase();
-}
+export { initials } from "@/components/admin/user-avatar";
 
 export function UserMenu({ me }: { me: Me }) {
   const name = me.displayName || me.email;
@@ -25,11 +21,7 @@ export function UserMenu({ me }: { me: Me }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-10 gap-2 px-2" aria-label="Account menu">
-          <Avatar className="size-8">
-            <AvatarFallback className="bg-primary-soft text-xs font-semibold text-primary-soft-foreground">
-              {initials(name)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar user={me} className="size-8" textClassName="text-xs" />
           <span className="hidden max-w-40 truncate text-sm font-medium sm:inline">{name}</span>
         </Button>
       </DropdownMenuTrigger>

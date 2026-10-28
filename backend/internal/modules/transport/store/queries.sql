@@ -5,6 +5,10 @@ SELECT * FROM bus_routes
 WHERE university_id = @university_id AND (active OR @include_inactive::bool)
 ORDER BY name, id;
 
+-- Every university's routes (the admin panel's default view).
+-- name: ListAllRoutes :many
+SELECT * FROM bus_routes ORDER BY university_id, name, id LIMIT 500;
+
 -- name: CountRoutes :one
 SELECT count(*) FROM bus_routes WHERE university_id = @university_id;
 

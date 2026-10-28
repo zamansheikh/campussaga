@@ -278,7 +278,8 @@ SELECT u.id, u.email, u.display_name, u.department, u.batch, u.role, u.verified_
        u.blocked_at, u.created_at,
        -- 'epoch' = never (sqlc can't type a nullable subquery column).
        coalesce((SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = u.id), 'epoch'::timestamptz)::timestamptz AS last_active_at,
-       (SELECT count(*) FROM class_group_members m WHERE m.user_id = u.id)::int AS groups
+       (SELECT count(*) FROM class_group_members m WHERE m.user_id = u.id)::int AS groups,
+       u.photo_key, u.google_photo_url
 FROM users u
 LEFT JOIN universities un ON un.id = u.university_id
 WHERE u.id = $1
@@ -300,6 +301,8 @@ type GetUserRow struct {
 	CreatedAt       time.Time
 	LastActiveAt    time.Time
 	Groups          int32
+	PhotoKey        *string
+	GooglePhotoUrl  *string
 }
 
 func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (GetUserRow, error) {
@@ -321,6 +324,8 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (GetUserRow, error)
 		&i.CreatedAt,
 		&i.LastActiveAt,
 		&i.Groups,
+		&i.PhotoKey,
+		&i.GooglePhotoUrl,
 	)
 	return i, err
 }
@@ -764,7 +769,8 @@ SELECT u.id, u.email, u.display_name, u.department, u.batch, u.role, u.verified_
        u.blocked_at, u.created_at,
        -- 'epoch' = never (sqlc can't type a nullable subquery column).
        coalesce((SELECT max(s.last_used_at) FROM sessions s WHERE s.user_id = u.id), 'epoch'::timestamptz)::timestamptz AS last_active_at,
-       (SELECT count(*) FROM class_group_members m WHERE m.user_id = u.id)::int AS groups
+       (SELECT count(*) FROM class_group_members m WHERE m.user_id = u.id)::int AS groups,
+       u.photo_key, u.google_photo_url
 FROM users u
 LEFT JOIN universities un ON un.id = u.university_id
 WHERE ($1::text = '' OR u.email ILIKE $2 OR u.display_name ILIKE $2 OR u.university_email ILIKE $2)
@@ -803,6 +809,8 @@ type ListUsersRow struct {
 	CreatedAt       time.Time
 	LastActiveAt    time.Time
 	Groups          int32
+	PhotoKey        *string
+	GooglePhotoUrl  *string
 }
 
 // ---- users --------------------------------------------------------------------
@@ -838,6 +846,8 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUse
 			&i.CreatedAt,
 			&i.LastActiveAt,
 			&i.Groups,
+			&i.PhotoKey,
+			&i.GooglePhotoUrl,
 		); err != nil {
 			return nil, err
 		}

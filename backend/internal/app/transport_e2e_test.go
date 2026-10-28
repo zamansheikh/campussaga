@@ -154,6 +154,9 @@ func TestBusRoutes(t *testing.T) {
 	}
 	h.do("GET", "/admin/transport/routes?universityId="+uni, admin, nil).into(t, &adminList)
 	assert.Len(t, adminList.Routes, 1)
+	// No university: every university's routes.
+	h.do("GET", "/admin/transport/routes", admin, nil).into(t, &adminList)
+	assert.Len(t, adminList.Routes, 1)
 	r = h.do("POST", "/admin/transport/routes", admin, map[string]any{"universityId": h.universityID("other-uni"), "name": "Shuttle"})
 	require.Equal(t, http.StatusCreated, r.Status, r.Raw)
 	assert.Equal(t, http.StatusOK, h.do("PUT", base, admin, map[string]any{"name": "Route 4", "active": true}).Status)

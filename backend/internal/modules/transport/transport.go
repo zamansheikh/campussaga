@@ -737,8 +737,9 @@ func (s *Service) handleTrips(ctx context.Context, in *tripsReq) (*Route, error)
 
 // ---- admin --------------------------------------------------------------------
 
+// adminListReq: without a university, every university's routes.
 type adminListReq struct {
-	UniversityID string `json:"-" query:"universityId" validate:"required,uuid"`
+	UniversityID string `json:"-" query:"universityId" validate:"omitempty,uuid"`
 }
 
 type adminListRes struct {
@@ -747,7 +748,13 @@ type adminListRes struct {
 
 func (s *Service) handleAdminList(ctx context.Context, in *adminListReq) (*adminListRes, error) {
 	q := store.New(s.d.Q(ctx))
-	rows, err := q.ListRoutes(ctx, store.ListRoutesParams{UniversityID: uuid.MustParse(in.UniversityID), IncludeInactive: true})
+	var rows []store.BusRoute
+	var err error
+	if in.UniversityID == "" {
+		rows, err = q.ListAllRoutes(ctx)
+	} else {
+		rows, err = q.ListRoutes(ctx, store.ListRoutesParams{UniversityID: uuid.MustParse(in.UniversityID), IncludeInactive: true})
+	}
 	if err != nil {
 		return nil, err
 	}

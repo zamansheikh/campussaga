@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { UserAvatar } from "@/components/admin/user-avatar";
 import { ListFilters } from "@/components/admin/list-filters";
 import { EmptyState, ErrorPanel } from "@/components/admin/notice";
 import { PageHeader } from "@/components/admin/page-header";
@@ -69,14 +70,19 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
               <TableBody>
                 {users.data.items.map((u) => (
                   <TableRow key={u.id} className="relative">
-                    <TableCell className="max-w-64">
-                      <Link
-                        href={`/admin/users/${u.id}`}
-                        className="font-medium after:absolute after:inset-0 hover:underline focus-visible:outline-none"
-                      >
-                        {u.displayName || "No name yet"}
-                      </Link>
-                      <p className="truncate text-xs text-muted-foreground">{u.email}</p>
+                    <TableCell className="max-w-72">
+                      <div className="flex items-center gap-3">
+                        <UserAvatar user={u} className="size-9" textClassName="text-xs" />
+                        <div className="min-w-0">
+                          <Link
+                            href={`/admin/users/${u.id}`}
+                            className="font-medium after:absolute after:inset-0 hover:underline focus-visible:outline-none"
+                          >
+                            {u.displayName || "No name yet"}
+                          </Link>
+                          <p className="truncate text-xs text-muted-foreground">{u.email}</p>
+                        </div>
+                      </div>
                     </TableCell>
                     <TableCell className="hidden max-w-56 truncate md:table-cell">
                       {u.university?.name ?? <span className="text-muted-foreground">Not chosen</span>}

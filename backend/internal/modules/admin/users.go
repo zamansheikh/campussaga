@@ -37,6 +37,9 @@ type User struct {
 	CreatedAt       time.Time      `json:"createdAt"`
 	LastActiveAt    *time.Time     `json:"lastActiveAt"`
 	Groups          int            `json:"groups"`
+	// The profile photo: uploaded (GET /users/{id}/photo?v=…), else Google.
+	PhotoVersion   *string `json:"photoVersion"`
+	GooglePhotoURL *string `json:"googlePhotoUrl"`
 }
 
 // UserDetail adds where the user is and what they use.
@@ -63,7 +66,7 @@ func userView(r store.GetUserRow) User {
 		ID: r.ID, Email: r.Email, DisplayName: r.DisplayName, Department: r.Department, Batch: r.Batch,
 		Role: string(r.Role), Verified: r.VerifiedAt != nil, VerifiedAt: r.VerifiedAt,
 		UniversityEmail: r.UniversityEmail, BlockedAt: r.BlockedAt, CreatedAt: r.CreatedAt,
-		Groups: int(r.Groups),
+		Groups: int(r.Groups), PhotoVersion: r.PhotoKey, GooglePhotoURL: r.GooglePhotoUrl,
 	}
 	if r.UniversityID != nil && r.UniversitySlug != nil && r.UniversityName != nil {
 		u.University = &UniversityRef{ID: *r.UniversityID, Slug: *r.UniversitySlug, Name: *r.UniversityName}

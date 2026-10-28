@@ -17,6 +17,8 @@ export type Me = {
   displayName: string | null;
   role: string;
   university: UniversityRef | null;
+  photoVersion?: string | null;
+  googlePhotoUrl?: string | null;
 };
 
 export type SignedIn = { tokens: Tokens; user: Me };
@@ -58,6 +60,8 @@ export type AdminUser = {
   createdAt: string;
   lastActiveAt: string | null;
   groups: number;
+  photoVersion: string | null;
+  googlePhotoUrl: string | null;
 };
 
 export type AdminUserDetail = AdminUser & {
