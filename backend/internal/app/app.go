@@ -140,6 +140,10 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 	}, now)
 
 	store := o.Media
+	if store == nil && cfg.NimbusAPIKey != "" {
+		store = media.NewNimbus(cfg.NimbusURL, cfg.NimbusAPIKey, cfg.NimbusPrefix)
+		log.Info("media: photos on Nimbus", "prefix", cfg.NimbusPrefix)
+	}
 	if store == nil {
 		disk, err := media.NewDisk(cmp.Or(cfg.MediaDir, "tmp/media"))
 		if err != nil {

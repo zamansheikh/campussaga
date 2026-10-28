@@ -55,6 +55,11 @@ type Config struct {
 	// (required in production); MediaDir holds issue photos.
 	VoiceHMACSecret []byte
 	MediaDir        string
+	// Nimbus file store (capi.tecsior.com). With a key, photos are kept
+	// there (R2, off this server) instead of MediaDir.
+	NimbusURL    string
+	NimbusAPIKey string
+	NimbusPrefix string
 
 	ShutdownTimeout time.Duration
 }
@@ -89,6 +94,9 @@ func Load() (*Config, error) {
 		FCMCredentialsFile: get("FCM_CREDENTIALS_FILE", ""),
 		VoiceHMACSecret:    []byte(get("VOICE_HMAC_SECRET", devSecret+"-voice")),
 		MediaDir:           get("MEDIA_DIR", "tmp/media"),
+		NimbusURL:          get("NIMBUS_URL", "https://capi.tecsior.com/api/v1"),
+		NimbusAPIKey:       get("NIMBUS_API_KEY", ""),
+		NimbusPrefix:       get("NIMBUS_PREFIX", "campussaga/voice/"),
 		ShutdownTimeout:    getDuration("SHUTDOWN_TIMEOUT", 15*time.Second),
 	}
 	return c, c.validate()
