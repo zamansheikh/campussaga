@@ -12,7 +12,7 @@ sign-in still has to be switched on on the server** (section 2).
 | App icon | `store/google-play/icon-512.png` | 512 × 512 PNG |
 | Feature graphic | `store/google-play/<locale>/feature-graphic.png` | 1024 × 500 |
 | Phone screenshots | `store/google-play/<locale>/phone-01.png` … `phone-08.png` | 8 × 1080 × 1920 (9:16) |
-| Promo video | `store/google-play/<locale>/promo-video.mp4` (not in git; rebuild with `tool/store/build.sh`) | Play takes a **YouTube link**: upload it (Public or Unlisted, ads off) and paste the URL |
+| Promo video | `store/google-play/<locale>/promo-video.mp4` (not in git; rebuild with `tool/store/build.sh`): 47 s (EN) / 50 s (BN), 1080p, narration and music | Play takes a **YouTube link**: upload it (Public or Unlisted, ads off) and paste the URL |
 | Title, short and full description | `store/google-play/<locale>/title.txt`, `short-description.txt`, `full-description.txt` | 30 / 80 / 4000 characters |
 | Release notes | `store/google-play/<locale>/changelogs/3.txt` | 500 characters |
 
@@ -25,8 +25,16 @@ Campus Voice · Official replies · Find your class · Bus routes & CGPA.
 **Rebuilding the graphics** after app changes: `tool/store/build.sh` (needs
 Flutter, Node, Google Chrome and ffmpeg). It renders the app screens with demo
 data (`apps/mobile/tool/screenshots/store_test.dart`), then frames, the
-feature graphic, the icon and the videos (`tool/store/`). Captions are in
-`tool/store/content.mjs`.
+feature graphic, the icon and the videos (`tool/store/`). Captions and the
+narration script are in `tool/store/content.mjs`.
+
+**Narration and music** come from ElevenLabs (Starter plan, so commercial use
+is allowed): Bangla voice *Tazim* (native Bangladeshi accent), English voice
+*Jessica*, model `eleven_v4`, and a generated instrumental music bed. The
+clips are in `tool/store/audio/` (in git), so rebuilding costs nothing. After
+changing a line, run `ELEVENLABS_KEY_FILE=<path to key.txt> tool/store/build.sh`:
+only the changed lines are generated again. The mix ducks the music under the
+voice and levels it to -16 LUFS.
 
 ## 2. Before submitting: reviewer sign-in on the server
 

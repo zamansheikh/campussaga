@@ -1,7 +1,10 @@
-// Renders the Google Play promo video (1920 x 1080, 30 fps, no audio) for
+// Renders the Google Play promo video (1920 x 1080, 30 fps) for
 // each language: store/google-play/<locale>/promo-video.mp4. Play takes a
 // YouTube link, so upload the file to YouTube (unlisted is fine).
 // Frames are drawn by Chrome with a scripted timeline, then encoded by ffmpeg.
+// Narration (voice.mjs) and the music bed (audio/music-bed.mp3, made with
+// ElevenLabs Music on a paid plan, so cleared for commercial use) are mixed in
+// when present; scenes are timed to the narration.
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -57,7 +60,8 @@ const inCubic = (x) => x * x * x;
 const outBack = (x) => { const c = 1.5; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
 const span = (t, a, b) => clamp((t - a) / (b - a));
 
-function frameStyles(t, n) {
+function frameStyles(t, plan) {
+  const n = plan.scenes.length;
   const st = [];
   const brandIn = (cls, t0) => {
     const k = (a, b) => outCubic(span(t, t0 + a, t0 + b));
@@ -70,10 +74,10 @@ function frameStyles(t, n) {
   };
   // Intro, then fade it out as scene 0 starts.
   brandIn('intro', 0);
-  const introOut = inCubic(span(t, INTRO - 0.45, INTRO));
+  const introOut = inCubic(span(t, plan.intro - 0.45, plan.intro));
   st.push(['.intro', 1 - introOut, `translateY(${-introOut * 40}px)`]);
   for (let i = 0; i < n; i++) {
-    const t0 = INTRO + i * SCENE, t1 = t0 + SCENE;
+    const [t0, t1] = plan.scenes[i];
     const out = inCubic(span(t, t1 - 0.4, t1));
     const visible = t >= t0 - 0.01 && t <= t1 + 0.01;
     for (const [j, a] of [[0, 0.05], [1, 0.15], [2, 0.3]]) {
@@ -86,7 +90,7 @@ function frameStyles(t, n) {
       st.push([`.s${i}.p${j}`, visible ? v * (1 - out) : 0, `translateY(${(1 - v) * 160 + drift - out * 40}px)`]);
     }
   }
-  const o0 = INTRO + n * SCENE;
+  const o0 = plan.outro;
   if (t >= o0 - 0.01) {
     st.push(['.outro', 1, 'none']);
     brandIn('outro', o0);
@@ -94,12 +98,60 @@ function frameStyles(t, n) {
   return st;
 }
 
+
+// Scene times. With narration (voice.mjs), each part lasts as long as its
+// line plus a breath; without, the fixed defaults.
+function timeline(lang, n) {
+  const file = path.join(here, 'audio/voice', lang, 'timing.json');
+  const voice = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
+  if (voice) for (const v of Object.values(voice)) v.file = path.join(here, v.file);
+  const len = (name, min, pad) => (voice ? Math.max(min, voice[name].seconds + pad) : min);
+  const intro = len('intro', INTRO, 1.3);
+  const scenes = [];
+  const cues = voice ? [[voice.intro.file, 0.55]] : [];
+  let t = intro;
+  for (let i = 0; i < n; i++) {
+    const d = len(`scene-${i + 1}`, SCENE, 0.95);
+    scenes.push([t, t + d]);
+    if (voice) cues.push([voice[`scene-${i + 1}`].file, t + 0.3]);
+    t += d;
+  }
+  const outro = t;
+  if (voice) cues.push([voice.outro.file, outro + 0.6]);
+  const total = outro + len('outro', OUTRO, 1.8);
+  return { intro, scenes, outro, total, cues };
+}
+
+// Narration over the music bed: the music ducks under the voice, fades in and
+// out, and the mix is levelled to -16 LUFS (YouTube plays at about -14).
+function mixAudio(lang, plan) {
+  if (!plan.cues.length) return null;
+  const music = path.join(here, 'audio/music-bed.mp3');
+  const out = path.join(here, `.cache/audio-${lang}.m4a`);
+  const inputs = plan.cues.flatMap(([f]) => ['-i', f]);
+  const hasMusic = fs.existsSync(music);
+  if (hasMusic) inputs.push('-i', music);
+  const delays = plan.cues.map(([, at], i) => `[${i}:a]adelay=${Math.round(at * 1000)}:all=1[v${i}]`);
+  const voices = `${plan.cues.map((_, i) => `[v${i}]`).join('')}amix=inputs=${plan.cues.length}:normalize=0,apad,atrim=0:${plan.total.toFixed(3)},asplit=2[vo][key]`;
+  const m = plan.cues.length;
+  const graph = hasMusic
+    ? [...delays, voices,
+      `[${m}:a]atrim=0:${plan.total.toFixed(3)},afade=t=in:d=0.8,afade=t=out:st=${(plan.total - 2.2).toFixed(3)}:d=2.2,volume=0.2[bed]`,
+      `[bed][key]sidechaincompress=threshold=0.02:ratio=10:attack=15:release=400[duck]`,
+      `[duck][vo]amix=inputs=2:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11[a]`]
+    : [...delays, voices.replace(',asplit=2[vo][key]', '[vo]'), '[vo]loudnorm=I=-16:TP=-1.5:LRA=11[a]'];
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputs, '-filter_complex', graph.join(';'), '-map', '[a]',
+    '-ar', '48000', '-c:a', 'aac', '-b:a', '192k', out]);
+  return out;
+}
+
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--allow-file-access-from-files', '--font-render-hinting=none'] });
 try {
   for (const [lang, L] of Object.entries(languages)) {
     if (only && only !== lang) continue;
     const n = L.shots.length;
-    const total = INTRO + n * SCENE + OUTRO;
+    const plan = timeline(lang, n);
+    const total = plan.total;
     const frames = path.join(here, '.cache/frames', lang);
     fs.rmSync(frames, { recursive: true, force: true });
     fs.mkdirSync(frames, { recursive: true });
@@ -114,7 +166,7 @@ try {
     await page.evaluate(() => document.querySelectorAll('.phone').forEach((p) => { p.dataset.base = p.style.transform; }));
     const count = Math.round(total * FPS);
     for (let f = 0; f < count; f++) {
-      const styles = frameStyles(f / FPS, n);
+      const styles = frameStyles(f / FPS, plan);
       await page.evaluate((styles) => {
         for (const [sel, op, tr] of styles) {
           for (const el of document.querySelectorAll(sel)) {
@@ -127,9 +179,13 @@ try {
     }
     await page.close();
     const out = path.join(OUT, L.playLocale, 'promo-video.mp4');
+    const audio = mixAudio(lang, plan);
     execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(frames, '%05d.jpg'),
-      '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out]);
-    console.log(`${path.relative(root, out)} (${total.toFixed(1)} s, ${count} frames)`);
+      ...(audio ? ['-i', audio] : []),
+      '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p',
+      ...(audio ? ['-c:a', 'aac', '-b:a', '192k', '-shortest'] : []),
+      '-movflags', '+faststart', out]);
+    console.log(`${path.relative(root, out)} (${total.toFixed(1)} s, ${count} frames, ${audio ? 'voice + music' : 'no audio'})`);
   }
 } finally {
   await browser.close();

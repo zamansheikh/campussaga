@@ -1,0 +1,52 @@
+{
+  "intro": {
+    "file": "audio/voice/en/intro-e2d85f637a.mp3",
+    "seconds": 4.88,
+    "text": "Varsity Kotha. Your class routine and your campus voice, in one app."
+  },
+  "scene-1": {
+    "file": "audio/voice/en/scene-1-2815f81eda.mp3",
+    "seconds": 4.16,
+    "text": "Open it in the morning, and see your next class, room and teacher."
+  },
+  "scene-2": {
+    "file": "audio/voice/en/scene-2-3b6b587d4a.mp3",
+    "seconds": 3.6,
+    "text": "One routine for your whole section, always up to date."
+  },
+  "scene-3": {
+    "file": "audio/voice/en/scene-3-df7f0035ea.mp3",
+    "seconds": 4.56,
+    "text": "Class cancelled, or moved to another day? You’ll be the first to know."
+  },
+  "scene-4": {
+    "file": "audio/voice/en/scene-4-6353504d55.mp3",
+    "seconds": 3.52,
+    "text": "Reminders for tests and deadlines, the evening before."
+  },
+  "scene-5": {
+    "file": "audio/voice/en/scene-5-e3983bb756.mp3",
+    "seconds": 3.44,
+    "text": "Raise any campus problem, without giving your name."
+  },
+  "scene-6": {
+    "file": "audio/voice/en/scene-6-6449144009.mp3",
+    "seconds": 2.64,
+    "text": "And get answers straight from your university."
+  },
+  "scene-7": {
+    "file": "audio/voice/en/scene-7-e49c378175.mp3",
+    "seconds": 2.08,
+    "text": "Find your section in seconds."
+  },
+  "scene-8": {
+    "file": "audio/voice/en/scene-8-7d3173b73d.mp3",
+    "seconds": 3.52,
+    "text": "Bus times, your CGPA… it’s all here."
+  },
+  "outro": {
+    "file": "audio/voice/en/outro-8ea9afa421.mp3",
+    "seconds": 3.6,
+    "text": "Varsity Kotha! Get it free, on Google Play."
+  }
+}

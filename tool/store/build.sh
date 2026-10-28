@@ -2,7 +2,9 @@
 # Rebuilds every Google Play asset in store/google-play/ (docs/PLAY_STORE.md):
 #   1. app screens, rendered by Flutter with demo data (EN + BN)
 #   2. framed screenshots, feature graphics and the 512 px icon (Chrome)
-#   3. promo videos (Chrome frames + ffmpeg)
+#   3. promo videos (Chrome frames + ffmpeg), with ElevenLabs narration and music
+#      from tool/store/audio/. Changed narration lines are generated again only
+#      when ELEVENLABS_KEY_FILE points at the API key file.
 #
 #   tool/store/build.sh            # everything
 #   tool/store/build.sh --no-video # skip the videos (about a minute each)
@@ -31,5 +33,8 @@ rm -rf .cache/raw
   --dart-define=SHOTS_DIR="$here/.cache/raw")
 
 node render.mjs
-[ "$video" = y ] && node video.mjs
+if [ "$video" = y ]; then
+  [ -n "${ELEVENLABS_KEY_FILE:-}" ] && node voice.mjs
+  node video.mjs
+fi
 echo "Done: store/google-play/"

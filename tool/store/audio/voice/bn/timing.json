@@ -1,0 +1,52 @@
+{
+  "intro": {
+    "file": "audio/voice/bn/intro-5e05e9cb99.mp3",
+    "seconds": 4.88,
+    "text": "ভার্সিটি কথা। তোমার ক্লাস রুটিন আর ক্যাম্পাসের কথা, এক অ্যাপে।"
+  },
+  "scene-1": {
+    "file": "audio/voice/bn/scene-1-68cf739261.mp3",
+    "seconds": 4.48,
+    "text": "সকালে অ্যাপটা খুললেই দেখবে পরের ক্লাস, রুম আর টিচার।"
+  },
+  "scene-2": {
+    "file": "audio/voice/bn/scene-2-75b1091ee4.mp3",
+    "seconds": 3.92,
+    "text": "পুরো সেকশনের জন্য একটাই রুটিন, সবসময় আপডেটেড।"
+  },
+  "scene-3": {
+    "file": "audio/voice/bn/scene-3-8d6b9f9d9a.mp3",
+    "seconds": 4.88,
+    "text": "ক্লাস ক্যানসেল হলো, বা অন্য দিনে গেল? সবার আগে তুমিই জানবে।"
+  },
+  "scene-4": {
+    "file": "audio/voice/bn/scene-4-b8485ed717.mp3",
+    "seconds": 3.6,
+    "text": "ক্লাস টেস্ট আর অ্যাসাইনমেন্টের রিমাইন্ডার, আগের সন্ধ্যাতেই।"
+  },
+  "scene-5": {
+    "file": "audio/voice/bn/scene-5-60dc16f498.mp3",
+    "seconds": 3.52,
+    "text": "ক্যাম্পাসের যেকোনো সমস্যা তুলে ধরো, নাম না জানিয়েই।"
+  },
+  "scene-6": {
+    "file": "audio/voice/bn/scene-6-7aa05aa00d.mp3",
+    "seconds": 3.36,
+    "text": "আর উত্তর পাও সরাসরি বিশ্ববিদ্যালয়ের কাছ থেকে।"
+  },
+  "scene-7": {
+    "file": "audio/voice/bn/scene-7-6aae96a9c6.mp3",
+    "seconds": 3.04,
+    "text": "নিজের সেকশন খুঁজে নাও, মাত্র কয়েক সেকেন্ডে।"
+  },
+  "scene-8": {
+    "file": "audio/voice/bn/scene-8-2c0af6ab06.mp3",
+    "seconds": 3.76,
+    "text": "বাসের সময়, সিজিপিএ হিসাব… সবই এখানে।"
+  },
+  "outro": {
+    "file": "audio/voice/bn/outro-58365be681.mp3",
+    "seconds": 3.52,
+    "text": "ভার্সিটি কথা। আজই নামিয়ে নাও, গুগল প্লে থেকে।"
+  }
+}
