@@ -1,4 +1,4 @@
-import { Building2, Smartphone, UserCheck, UserRoundPlus, Users, UsersRound } from "lucide-react";
+import { Building2, Megaphone, Smartphone, UserCheck, UserRoundPlus, Users, UsersRound } from "lucide-react";
 import Link from "next/link";
 
 import { SignupsChart } from "@/components/admin/dashboard/signups-chart";
@@ -6,13 +6,14 @@ import { ErrorPanel } from "@/components/admin/notice";
 import { PageHeader } from "@/components/admin/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { load } from "@/lib/admin/load";
-import { api } from "@/lib/admin/session";
-import type { Stats } from "@/lib/admin/types";
+import { api, requireAdmin } from "@/lib/admin/session";
+import type { Stats, VoiceStats } from "@/lib/admin/types";
 import { formatNumber } from "@/lib/format";
 
 export const metadata = { title: "Dashboard" };
 
 export default async function DashboardPage() {
+  await requireAdmin();
   const { data: s, error } = await load(() => api<Stats>("/admin/stats"));
   return (
     <>
@@ -111,6 +112,8 @@ export default async function DashboardPage() {
             </Card>
           </div>
 
+          {s.voice ? <VoiceCard v={s.voice} /> : null}
+
           <div className="grid gap-4 sm:grid-cols-3">
             <MiniStat label="Admins" value={s.users.admins} href="/admin/users?status=admin" />
             <MiniStat label="Blocked accounts" value={s.users.blocked} href="/admin/users?status=blocked" />
@@ -119,6 +122,30 @@ export default async function DashboardPage() {
         </div>
       )}
     </>
+  );
+}
+
+/** Campus Voice at a glance, with the moderation work waiting. */
+function VoiceCard({ v }: { v: VoiceStats }) {
+  const waiting = v.held + v.reported;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Megaphone className="size-4 text-muted-foreground" /> Campus Voice
+        </CardTitle>
+        <CardDescription>
+          {formatNumber(v.issuesLast7Days)} new issues in the last 7 days ·{" "}
+          {waiting === 0 ? "nothing waiting for moderation" : `${formatNumber(waiting)} waiting for moderation`}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-3 sm:grid-cols-4">
+        <MiniStat label="Open" value={v.open} />
+        <MiniStat label="Solved" value={v.solved} />
+        <MiniStat label="Held for review" value={v.held} href="/admin/moderation" />
+        <MiniStat label="Reported" value={v.reported} href="/admin/moderation?kind=reported" />
+      </CardContent>
+    </Card>
   );
 }
 

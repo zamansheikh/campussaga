@@ -19,7 +19,7 @@ export default async function LoginPage({
   const { next, expired, error } = await searchParams;
   const notice =
     error === "not_admin"
-      ? "That account isn't an admin. Sign in with an admin account."
+      ? "That account isn't an admin or a moderator. Sign in with a staff account."
       : expired
         ? "Your session ended. Please sign in again."
         : undefined;

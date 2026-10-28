@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { load } from "@/lib/admin/load";
-import { api } from "@/lib/admin/session";
+import { api, requireAdmin } from "@/lib/admin/session";
 import type { AdminGroupDetail } from "@/lib/admin/types";
 import { formatDate, formatDateTime, formatNumber } from "@/lib/format";
 
@@ -17,6 +17,7 @@ import { DeleteGroup, MemberActions } from "./member-actions";
 export const metadata: Metadata = { title: "Class group" };
 
 export default async function GroupPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin();
   const { id } = await params;
   const res = await load(() => api<AdminGroupDetail>(`/admin/groups/${encodeURIComponent(id)}`));
   const g = res.data;

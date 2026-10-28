@@ -6,7 +6,7 @@ import { cache } from "react";
 
 import { ApiError } from "@/lib/admin/errors";
 import { callApi, COOKIE } from "@/lib/admin/tokens";
-import type { Me } from "@/lib/admin/types";
+import type { Me, PanelRole } from "@/lib/admin/types";
 
 const AUTH_CODES = new Set(["UNAUTHORIZED", "TOKEN_EXPIRED", "TOKEN_INVALID", "SESSION_ENDED", "REFRESH_INVALID", "ACCOUNT_BLOCKED"]);
 
@@ -22,17 +22,34 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
     return await callApi<T>(path, { ...init, accessToken });
   } catch (e) {
     if (e instanceof ApiError && AUTH_CODES.has(e.code)) redirect("/admin/login?expired=1");
-    if (e instanceof ApiError && e.code === "NOT_ADMIN") redirect("/admin/login?error=not_admin");
+    if (e instanceof ApiError && e.code === "NOT_ADMIN") {
+      // A moderator on an admin-only page: back to what they can use.
+      const me = path === "/me" ? undefined : await getAdmin();
+      redirect(me?.role === "moderator" ? "/admin/moderation" : "/admin/login?error=not_admin");
+    }
     throw e;
   }
 }
 
-/** The signed-in admin (once per request). */
-export const getAdmin = cache(async (): Promise<Me> => {
+/** The roles that can use the panel: admins see everything, moderators only Moderation. */
+export function panelRole(role: string): PanelRole | null {
+  return role === "admin" || role === "moderator" ? role : null;
+}
+
+/** The signed-in admin or moderator (once per request). */
+export const getAdmin = cache(async (): Promise<Me & { role: PanelRole }> => {
   const me = await api<Me>("/me");
-  if (me.role !== "admin") redirect("/admin/login?error=not_admin");
-  return me;
+  const role = panelRole(me.role);
+  if (!role) redirect("/admin/login?error=not_admin");
+  return { ...me, role };
 });
+
+/** Admin-only pages: a moderator is sent to Moderation instead. */
+export async function requireAdmin(): Promise<Me & { role: "admin" }> {
+  const me = await getAdmin();
+  if (me.role !== "admin") redirect("/admin/moderation");
+  return { ...me, role: "admin" };
+}
 
 /** Builds `?a=1&b=2` from defined, non-empty values. */
 export function query(params: Record<string, string | number | boolean | undefined | null>): string {

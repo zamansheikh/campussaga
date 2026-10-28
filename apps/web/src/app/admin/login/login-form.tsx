@@ -4,25 +4,38 @@ import { ArrowLeft, Loader2, Mail } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { login, type LoginState } from "./actions";
 
 export function LoginForm({ next, notice }: { next: string; notice?: string }) {
-  const [state, action, pending] = useActionState<LoginState, FormData>(login, { step: "email" });
+  const [state, action, pending] = useActionState<LoginState, FormData>(login, {
+    step: "email",
+  });
 
   return (
     <Card className="shadow-lg">
       {state.step === "email" ? (
         <>
           <CardHeader>
-            <CardTitle className="text-xl">Admin sign-in</CardTitle>
-            <CardDescription>We&apos;ll email a 6-digit code to your admin account.</CardDescription>
+            <CardTitle className="text-xl">Staff sign-in</CardTitle>
+            <CardDescription>
+              For admins and moderators. We&apos;ll email a 6-digit code to your
+              account.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {notice && !state.error ? <Alert tone="info">{notice}</Alert> : null}
+            {notice && !state.error ? (
+              <Alert tone="info">{notice}</Alert>
+            ) : null}
             <form action={action} className="space-y-4">
               <input type="hidden" name="intent" value="request" />
               <div className="space-y-2">
@@ -77,8 +90,9 @@ function CodeStep({
       <CardHeader>
         <CardTitle className="text-xl">Check your email</CardTitle>
         <CardDescription>
-          If <span className="font-medium text-foreground">{state.email}</span> is an admin account, a 6-digit code is
-          on its way. It expires in 10 minutes.
+          If <span className="font-medium text-foreground">{state.email}</span>{" "}
+          is an admin or moderator account, a 6-digit code is on its way. It
+          expires in 10 minutes.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -123,7 +137,12 @@ function CodeStep({
           </form>
           <form action={action}>
             <input type="hidden" name="intent" value="resend" />
-            <Button type="submit" variant="link" size="sm" disabled={pending || wait > 0}>
+            <Button
+              type="submit"
+              variant="link"
+              size="sm"
+              disabled={pending || wait > 0}
+            >
               {wait > 0 ? `Resend in ${wait}s` : "Resend code"}
             </Button>
           </form>
@@ -133,7 +152,15 @@ function CodeStep({
   );
 }
 
-function Alert({ tone, id, children }: { tone: "error" | "info"; id?: string; children: React.ReactNode }) {
+function Alert({
+  tone,
+  id,
+  children,
+}: {
+  tone: "error" | "info";
+  id?: string;
+  children: React.ReactNode;
+}) {
   return (
     <p
       id={id}

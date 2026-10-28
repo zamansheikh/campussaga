@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { load } from "@/lib/admin/load";
-import { api, getAdmin, requestNow } from "@/lib/admin/session";
+import { api, getAdmin, requestNow, requireAdmin } from "@/lib/admin/session";
 import type { AdminUserDetail } from "@/lib/admin/types";
 import { allUniversities } from "@/lib/admin/universities";
 import { formatDateTime, timeAgo } from "@/lib/format";
@@ -20,6 +20,7 @@ import { UserActions } from "./user-actions";
 export const metadata: Metadata = { title: "User" };
 
 export default async function UserPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin();
   const { id } = await params;
   const [me, res, unis] = await Promise.all([
     getAdmin(),

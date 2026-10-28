@@ -4,9 +4,16 @@ import { EmptyState, ErrorPanel } from "@/components/admin/notice";
 import { PageHeader } from "@/components/admin/page-header";
 import { Pagination, pageParam } from "@/components/admin/pagination";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { load } from "@/lib/admin/load";
-import { api, query } from "@/lib/admin/session";
+import { api, query, requireAdmin } from "@/lib/admin/session";
 import type { AuditEntry, Paged } from "@/lib/admin/types";
 import { formatDateTime } from "@/lib/format";
 
@@ -26,22 +33,48 @@ const actions: Record<string, string> = {
   "group.delete": "Deleted a group",
   "config.update": "Changed a setting",
   "push.send": "Sent a push",
+  "issue.status": "Changed an issue's status",
+  "issue.official_reply": "Posted an official reply",
+  "moderation.approve": "Approved a post",
+  "moderation.hide": "Hid a post",
+  "moderation.remove": "Removed a post",
+  "moderation.restore": "Restored a post",
+  "moderation.ban": "Banned a post's author",
+  "moderation.dismiss": "Dismissed reports",
+  "staff.add": "Added staff",
+  "staff.remove": "Removed staff",
 };
 
-function targetHref(type: string | null, id: string | null): string | undefined {
+function targetHref(
+  type: string | null,
+  id: string | null,
+): string | undefined {
   if (!id) return undefined;
   if (type === "user") return `/admin/users/${id}`;
   if (type === "group") return `/admin/groups/${id}`;
+  if (type === "issue") return `/admin/moderation/issues/${id}`;
   return undefined;
 }
 
-export default async function AuditPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+export default async function AuditPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  await requireAdmin();
   const sp = await searchParams;
   const page = pageParam(sp.page);
-  const res = await load(() => api<Paged<AuditEntry>>(`/admin/audit${query({ page, pageSize: PAGE_SIZE })}`));
+  const res = await load(() =>
+    api<Paged<AuditEntry>>(
+      `/admin/audit${query({ page, pageSize: PAGE_SIZE })}`,
+    ),
+  );
   return (
     <>
-      <PageHeader title="Audit log" description="Every admin change, newest first. Entries can't be edited or deleted." />
+      <PageHeader
+        title="Audit log"
+        description="Every admin, moderator and official action, newest first. Entries can't be edited or deleted, and never say who wrote a post."
+      />
       {res.error ? (
         <ErrorPanel message={res.error} />
       ) : res.data && res.data.items.length === 0 ? (
@@ -55,7 +88,9 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
                   <TableHead>When</TableHead>
                   <TableHead>Admin</TableHead>
                   <TableHead>Action</TableHead>
-                  <TableHead className="hidden md:table-cell">Details</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Details
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -64,29 +99,43 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
                   const hasMeta = a.meta && Object.keys(a.meta).length > 0;
                   return (
                     <TableRow key={a.id} className="align-top">
-                      <TableCell className="text-muted-foreground tabular-nums">{formatDateTime(a.createdAt)}</TableCell>
+                      <TableCell className="text-muted-foreground tabular-nums">
+                        {formatDateTime(a.createdAt)}
+                      </TableCell>
                       <TableCell className="max-w-48">
                         {a.actor ? (
                           <>
-                            <p className="truncate font-medium">{a.actor.name || a.actor.email}</p>
+                            <p className="truncate font-medium">
+                              {a.actor.name || a.actor.email}
+                            </p>
                             {a.actor.name ? (
-                              <p className="truncate text-xs text-muted-foreground">{a.actor.email}</p>
+                              <p className="truncate text-xs text-muted-foreground">
+                                {a.actor.email}
+                              </p>
                             ) : null}
                           </>
                         ) : (
-                          <span className="text-muted-foreground">Deleted admin</span>
+                          <span className="text-muted-foreground">
+                            Deleted admin
+                          </span>
                         )}
                       </TableCell>
                       <TableCell className="max-w-56 whitespace-normal">
                         <p>{actions[a.action] ?? a.action}</p>
-                        <Badge variant="outline" className="mt-1 font-mono text-[11px]">
+                        <Badge
+                          variant="outline"
+                          className="mt-1 font-mono text-[11px]"
+                        >
                           {a.action}
                         </Badge>
                         {a.targetId ? (
                           <p className="mt-1 truncate text-xs text-muted-foreground">
                             {a.targetType}:{" "}
                             {href ? (
-                              <Link href={href} className="font-mono hover:underline">
+                              <Link
+                                href={href}
+                                className="font-mono hover:underline"
+                              >
                                 {a.targetId}
                               </Link>
                             ) : (
@@ -115,7 +164,13 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
               </TableBody>
             </Table>
           </div>
-          <Pagination basePath="/admin/audit" params={{}} page={page} pageSize={res.data.pageSize || PAGE_SIZE} total={res.data.total} />
+          <Pagination
+            basePath="/admin/audit"
+            params={{}}
+            page={page}
+            pageSize={res.data.pageSize || PAGE_SIZE}
+            total={res.data.total}
+          />
         </>
       ) : null}
     </>

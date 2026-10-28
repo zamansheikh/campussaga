@@ -56,7 +56,9 @@ export async function verifyCode(prev: LoginState, form: FormData): Promise<Logi
   }
   const store = await cookies();
   for (const c of tokenCookies(signedIn.tokens)) store.set(c.name, c.value, c.options);
-  redirect(safeNext(String(form.get("next") ?? "")));
+  const next = safeNext(String(form.get("next") ?? ""));
+  // Moderators only use Moderation: straight there unless they asked for a page in it.
+  redirect(signedIn.user.role === "moderator" && !next.startsWith("/admin/moderation") ? "/admin/moderation" : next);
 }
 
 /** Ends the session on the server and forgets it here. */

@@ -2,7 +2,7 @@ import { ErrorPanel } from "@/components/admin/notice";
 import { PageHeader } from "@/components/admin/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { load } from "@/lib/admin/load";
-import { api } from "@/lib/admin/session";
+import { api, requireAdmin } from "@/lib/admin/session";
 import type { ConfigItem } from "@/lib/admin/types";
 import { formatDateTime } from "@/lib/format";
 
@@ -11,6 +11,7 @@ import { FeatureFlags, JsonSetting, MinBuild } from "./settings-forms";
 export const metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
+  await requireAdmin();
   const res = await load(() => api<{ items: ConfigItem[] }>("/admin/config"));
   const items = res.data?.items ?? [];
   const byKey = new Map(items.map((i) => [i.key, i]));

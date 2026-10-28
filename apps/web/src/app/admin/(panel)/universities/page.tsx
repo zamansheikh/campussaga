@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/admin/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { load } from "@/lib/admin/load";
-import { query } from "@/lib/admin/session";
+import { query, requireAdmin } from "@/lib/admin/session";
 import { allUniversities } from "@/lib/admin/universities";
 import { formatNumber } from "@/lib/format";
 
@@ -18,6 +18,7 @@ export default async function UniversitiesPage({
 }: {
   searchParams: Promise<{ q?: string; active?: string }>;
 }) {
+  await requireAdmin();
   const sp = await searchParams;
   const active = sp.active === "true" || sp.active === "false" ? sp.active : undefined;
   const res = await load(() => allUniversities(query({ q: sp.q, active })));

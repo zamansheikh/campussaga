@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { adminNav } from "@/components/admin/nav";
+import { navFor } from "@/components/admin/nav";
+import type { PanelRole } from "@/lib/admin/types";
 import { cn } from "@/lib/utils";
 
-export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+export function SidebarNav({ role, onNavigate }: { role: PanelRole; onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
     <nav aria-label="Admin" className="flex flex-col gap-1">
-      {adminNav.map(({ href, label, icon: Icon }) => {
+      {navFor(role).map(({ href, label, icon: Icon }) => {
         const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
         return (
           <Link

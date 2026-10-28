@@ -7,7 +7,7 @@ import { Pagination, pageParam } from "@/components/admin/pagination";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { load } from "@/lib/admin/load";
-import { api, query } from "@/lib/admin/session";
+import { api, query, requireAdmin } from "@/lib/admin/session";
 import type { AdminGroup, Paged } from "@/lib/admin/types";
 import { allUniversities } from "@/lib/admin/universities";
 import { formatDate, formatNumber } from "@/lib/format";
@@ -19,6 +19,7 @@ const PAGE_SIZE = 25;
 type Search = { q?: string; universityId?: string; page?: string };
 
 export default async function GroupsPage({ searchParams }: { searchParams: Promise<Search> }) {
+  await requireAdmin();
   const sp = await searchParams;
   const page = pageParam(sp.page);
   const [groups, unis] = await Promise.all([

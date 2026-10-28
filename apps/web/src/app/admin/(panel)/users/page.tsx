@@ -7,7 +7,7 @@ import { Pagination, pageParam } from "@/components/admin/pagination";
 import { UserBadges } from "@/components/admin/user-badges";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { load } from "@/lib/admin/load";
-import { api, query, requestNow } from "@/lib/admin/session";
+import { api, query, requestNow, requireAdmin } from "@/lib/admin/session";
 import type { AdminUser, Paged } from "@/lib/admin/types";
 import { allUniversities } from "@/lib/admin/universities";
 import { formatDate, formatNumber, timeAgo } from "@/lib/format";
@@ -25,6 +25,7 @@ const statuses = [
 type Search = { q?: string; status?: string; universityId?: string; page?: string };
 
 export default async function UsersPage({ searchParams }: { searchParams: Promise<Search> }) {
+  await requireAdmin();
   const sp = await searchParams;
   const page = pageParam(sp.page);
   const [users, unis] = await Promise.all([

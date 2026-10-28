@@ -7,8 +7,9 @@ import { SidebarNav } from "@/components/admin/sidebar-nav";
 import { BrandMark } from "@/components/site/brand-mark";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import type { PanelRole } from "@/lib/admin/types";
 
-export function MobileNav() {
+export function MobileNav({ role }: { role: PanelRole }) {
   const [open, setOpen] = useState(false);
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -23,7 +24,7 @@ export function MobileNav() {
             <BrandMark /> Campus Saga admin
           </SheetTitle>
         </SheetHeader>
-        <SidebarNav onNavigate={() => setOpen(false)} />
+        <SidebarNav role={role} onNavigate={() => setOpen(false)} />
       </SheetContent>
     </Sheet>
   );

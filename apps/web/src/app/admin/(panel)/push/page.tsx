@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/admin/page-header";
 import { load } from "@/lib/admin/load";
-import { api } from "@/lib/admin/session";
+import { api, requireAdmin } from "@/lib/admin/session";
 import type { AdminUserDetail } from "@/lib/admin/types";
 
 import { PushForm } from "./push-form";
@@ -8,6 +8,7 @@ import { PushForm } from "./push-form";
 export const metadata = { title: "Push" };
 
 export default async function PushPage({ searchParams }: { searchParams: Promise<{ userId?: string }> }) {
+  await requireAdmin();
   const { userId } = await searchParams;
   const user = userId ? await load(() => api<AdminUserDetail>(`/admin/users/${encodeURIComponent(userId)}`)) : undefined;
   const initialUser = user?.data
