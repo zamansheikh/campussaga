@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs>
+  <linearGradient id="bg" x1="0.15" y1="0" x2="0.85" y2="1">
+    <stop offset="0" stop-color="#2DD4BF"/>
+    <stop offset="0.48" stop-color="#0F9488"/>
+    <stop offset="1" stop-color="#0B5E57"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="0.25" cy="0.12" r="0.8">
+    <stop offset="0" stop-color="#ffffff" stop-opacity="0.20"/>
+    <stop offset="0.6" stop-color="#ffffff" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="ink" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#0F766E"/>
+    <stop offset="1" stop-color="#0B5E57"/>
+  </linearGradient>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffffff"/>
+    <stop offset="1" stop-color="#EEF7F5"/>
+  </linearGradient>
+  <filter id="shadow" x="-25%" y="-25%" width="150%" height="160%">
+    <feDropShadow dx="0" dy="14" stdDeviation="20" flood-color="#083F3B" flood-opacity="0.32"/>
+  </filter></defs><rect width="1024" height="1024" fill="url(#bg)"/><rect width="1024" height="1024" fill="url(#glow)"/></svg>

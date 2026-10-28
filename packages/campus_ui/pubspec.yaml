@@ -18,6 +18,9 @@ dev_dependencies:
     sdk: flutter
 
 flutter:
+  # The VarsityKotha mark (CsBrandMark), 1x/2x/3x.
+  assets:
+    - assets/brand/
   # Noto Sans Bengali (SIL Open Font License, fonts/NotoSansBengali/OFL.txt),
   # bundled so Bangla renders the same on every phone. Used as the fallback
   # font: Latin text keeps the platform font.

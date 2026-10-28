@@ -1,18 +1,20 @@
-import { GraduationCap } from "lucide-react";
-
+import { brandColors, brandPaths } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
-/** The teal graduation-cap mark, as in the app. */
+/** The VarsityKotha mark (ক in a speech bubble), as in the app icon. */
 export function BrandMark({ className }: { className?: string }) {
   return (
     <span
       aria-hidden
-      className={cn(
-        "inline-flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground",
-        className,
-      )}
+      className={cn("inline-flex size-8 shrink-0 overflow-hidden rounded-[23%] shadow-sm", className)}
+      style={{
+        background: `linear-gradient(160deg, ${brandColors.tileFrom} 0%, ${brandColors.tileVia} 48%, ${brandColors.tileTo} 100%)`,
+      }}
     >
-      <GraduationCap className="size-5" />
+      <svg viewBox="0 0 1024 1024" className="size-full">
+        <path d={brandPaths.bubble} fill="#fff" />
+        <path d={brandPaths.ka} fill={brandColors.ink} />
+      </svg>
     </span>
   );
 }

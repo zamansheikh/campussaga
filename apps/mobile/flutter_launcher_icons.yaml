@@ -1,17 +1,18 @@
-# Launcher icons. The current images are a PLACEHOLDER until the new logo
-# is designed. To change the icon: replace the files in assets/launcher/
-# and run `dart run flutter_launcher_icons` in apps/mobile.
+# Launcher icons: the VarsityKotha mark (ক in a speech bubble). The images in
+# assets/launcher/ are exported from the master SVGs in assets/icon/ at the
+# repo root. After changing them, run `dart run flutter_launcher_icons` in
+# apps/mobile.
 #
-#   icon.png             1024x1024 ideal (full icon, used for iOS and old Android)
-#   icon_foreground.png  logo inside the central 66% safe zone, transparent background
-#   icon_monochrome.png  (add with the new logo) single-color silhouette for
-#                        Android 13+ themed icons, then enable the line below
+#   icon.png             1024x1024 full icon (iOS, older Android)
+#   icon_foreground.png  bubble + ক on transparent, inside the adaptive safe zone
+#   icon_background.png  the teal gradient
+#   icon_monochrome.png  white silhouette for Android 13+ themed icons
 flutter_launcher_icons:
   android: true
   ios: true
   image_path: assets/launcher/icon.png
   remove_alpha_ios: true
-  background_color_ios: "#FFFFFF"
-  adaptive_icon_background: "#FFFFFF"
+  background_color_ios: "#0F9488"
+  adaptive_icon_background: assets/launcher/icon_background.png
   adaptive_icon_foreground: assets/launcher/icon_foreground.png
-  # adaptive_icon_monochrome: assets/launcher/icon_monochrome.png
+  adaptive_icon_monochrome: assets/launcher/icon_monochrome.png

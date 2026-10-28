@@ -49,8 +49,9 @@ In Flutter:
 | `error` | `#DC2626` | `#F87171` | Errors, destructive |
 
 Teal reads as trust and calm, and stays clear of red (alarm) and of Facebook blue.
-The palette is chosen for the product's context, **not taken from the logo**:
-the name and logo are placeholders and will change (see section 9).
+The palette was chosen for the product's context first; the logo (section 9)
+is built from it: a white speech bubble with a deep-teal ক on the teal
+gradient (`#2DD4BF` → `#0F9488` → `#0B5E57`).
 
 ### Issue status (always icon + text + color, never color alone)
 
@@ -134,7 +135,7 @@ check animation, the only playful moment.
 - `CsSection` + `CsRow` — titled group of rows on one card (settings style): icon tile, title, subtitle, value, chevron, destructive variant
 - `CsAvatar` — initials on a colour picked from the name
 - `CsBadge` — pill label; tones primary, success, neutral, accent
-- `CsBrandMark` — placeholder logo tile; the one widget to replace with the final logo
+- `CsBrandMark` — the logo tile (ক in a speech bubble), from `packages/campus_ui/assets/brand/`
 - `CsCodeField` — 6-box one-time code; one hidden field underneath, so paste and code autofill work
 - `CsDots` — page indicator
 - `CsOptionSheet` — bottom sheet with a single-choice list (theme, language)
@@ -241,8 +242,10 @@ packages/campus_ui/test/goldens/
 
 ## 9. Rebranding checklist
 
-The product name and logo are placeholders. Brand values live in a few known
-places so a rename takes an hour, not a refactor:
+The product was renamed to VarsityKotha on 2026-10-28. The logo is ক (Baloo
+Da 2 ExtraBold, SIL OFL, kept as outlines) in a speech bubble; master SVGs are
+in `assets/icon/`. Brand values live in a few known places so a rename takes
+an hour, not a refactor:
 
 | What | Where |
 |---|---|
@@ -250,10 +253,12 @@ places so a rename takes an hour, not a refactor:
 | In-app name | `brand.dart` → `CsBrand.appName`, and `appName` in `packages/campus_l10n/lib/src/arb/app_en.arb` + `app_bn.arb` |
 | Android app name | `apps/mobile/android/app/src/main/AndroidManifest.xml` → `android:label` |
 | iOS app name | `apps/mobile/ios/Runner/Info.plist` → `CFBundleDisplayName` |
-| In-app logo | `CsBrandMark` in `packages/campus_ui/lib/src/components/cs_brand_mark.dart` (splash, sign-in, onboarding, profile footer) |
-| Launcher icon | replace files in `apps/mobile/assets/launcher/`, run `dart run flutter_launcher_icons` in `apps/mobile` |
+| In-app logo | `CsBrandMark` (`packages/campus_ui/lib/src/components/cs_brand_mark.dart`, images in `packages/campus_ui/assets/brand/`: splash, sign-in, onboarding, profile footer) |
+| Launcher icon | export from `assets/icon/*.svg` into `apps/mobile/assets/launcher/`, run `dart run flutter_launcher_icons` in `apps/mobile` |
+| Notification + widget badge | `apps/mobile/android/app/src/main/res/drawable/ic_notification.xml` (the monochrome mark) |
+| Web logo + favicon | `apps/web/src/lib/brand.ts` (paths), `apps/web/src/app/icon.svg`, `apple-icon.png` |
 | README / docs | `README.md`, `assets/icon/` |
-| Website + policy links | `site/` pages (name, contact), and `siteUrl` in `apps/mobile/lib/app/env.dart` once the domain changes |
+| Website + policy links | `site/` pages (name, contact), `siteUrl` in `apps/mobile/lib/app/env.dart`, `SITE_URL` in `backend/deploy/compose.yaml` |
 
 **Do not change** the app ID `com.silifton.varsitykotha` after the first store
 release: stores treat a new ID as a different app. The package names

@@ -1,20 +1,52 @@
 <div align="center">
 
-<img src="assets/icon/Campus_Saga_Icon.png" width="120" height="120" alt="VarsityKotha icon (placeholder)">
+<img src="assets/icon/varsitykotha-icon.png" width="120" height="120" alt="VarsityKotha icon">
 
-# VarsityKotha
+# VarsityKotha · ভার্সিটি কথা
 
-**The daily app for university students:** class routine and reminders every
-morning, and a safe, anonymous voice to get campus problems fixed.
+**The daily app for university students in Bangladesh:** class routine and
+reminders every morning, and a safe, anonymous voice to get campus problems
+fixed.
+
+[varsitykotha.com](https://varsitykotha.com) ·
+[Privacy](https://varsitykotha.com/privacy) ·
+Android app ID `com.silifton.varsitykotha`
 
 </div>
 
-> Renamed from "Campus Saga" to VarsityKotha (ভার্সিটি কথা) on 2026-10-28.
-> The repo, server and Firebase project use the new name; the Dart packages
-> (`campussaga`, `campus_*`) and the `campusapi` binary keep the old one.
+> Renamed from "Campus Saga" on 2026-10-28. The repo, domain, server and
+> Firebase project use the new name; the Dart packages (`campussaga`,
+> `campus_*`) and the `campusapi` binary keep the old one. The old v1 app is
+> kept at the git tag `v1-archive`.
 
-> v2 is a fresh start. The old v1 app is kept at the git tag `v1-archive`.
-> The name and logo are placeholders and will change.
+## What's in it
+
+- **My Class:** class groups with a shared routine, reminders, cancelled or
+  moved classes (also to another day), tests and deadlines, announcements and
+  pushes, retakes, personal classes, and a home-screen widget.
+- **Find your class:** search routines other students made and join the whole
+  group or just the courses you take.
+- **Campus Voice:** anonymous campus issues with photos, checked by an
+  on-server photo filter and a word list, and moderated from the admin panel.
+- **Explore:** bus routes and a CGPA calculator, with more on the way.
+- **Admin panel** at [varsitykotha.com/admin](https://varsitykotha.com/admin):
+  users, universities, groups, moderation, bus routes, pushes and app settings.
+
+English and Bangla throughout.
+
+## Where it runs
+
+| | |
+|---|---|
+| Site + admin | https://varsitykotha.com (`apps/web`, Next.js) |
+| API | https://api.varsitykotha.com/api/v1 (`backend`, Go + PostgreSQL 18) |
+| Server | Tecsior VPS, `/opt/varsitykotha`, compose project `varsitykotha` ([docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)) |
+| DNS | Cloudflare, DNS only (not proxied) |
+| Firebase | project `varsitykotha`: Google sign-in, push (FCM), Crashlytics |
+| Photos | Nimbus object storage |
+
+The old addresses (`campus.silifton.com`, `api-campus.silifton.com`) still
+work: the site redirects, and the API keeps serving older app builds.
 
 ## Docs
 
@@ -23,20 +55,28 @@ morning, and a safe, anonymous voice to get campus problems fixed.
 | [PLAN.md](PLAN.md) | Vision, users, principles, growth, risks |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Releases R0–R5, scope, definition of done |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Database, system design, data model, app structure |
-| [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Colors, type, components, rebranding checklist |
-| [site/](site/) | Public website on GitHub Pages: landing page, privacy policy, account deletion (published by `.github/workflows/pages.yml`) |
-| [docs/UNIVERSITIES.md](docs/UNIVERSITIES.md) | All 169 Bangladeshi universities and their student email domains, with patterns |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Running the Go API + Postgres on our VPS |
+| [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Colors, type, icons (Phosphor), components, rebranding checklist |
+| [docs/ADMIN.md](docs/ADMIN.md) | Web and admin panel, admin API |
+| [docs/CAMPUS_VOICE.md](docs/CAMPUS_VOICE.md) | Campus Voice: spec, moderation, photos |
+| [docs/TESTS_AND_MOVES.md](docs/TESTS_AND_MOVES.md) | Classes moved to another day, tests and deadlines |
+| [docs/BETA.md](docs/BETA.md) | Beta checklist: builds, Play Console, phone tests |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Running the API, web and Postgres on our VPS |
+| [docs/UNIVERSITIES.md](docs/UNIVERSITIES.md) | All 169 Bangladeshi universities and their student email domains |
+| [site/](site/) | Static copy of the public pages on GitHub Pages |
 
 ## Project layout
 
 ```
 apps/mobile/            Flutter app (Android, iOS)  · com.silifton.varsitykotha
+apps/web/               Next.js: public pages + superadmin panel (varsitykotha.com)
 packages/campus_core/   Domain models, repository interfaces (pure Dart)
-packages/campus_ui/     Design system: tokens, theme, components
+packages/campus_ui/     Design system: tokens, theme, components, brand mark
 packages/campus_data/   HTTP implementations of the repositories (talks to the Go API)
 packages/campus_l10n/   English + Bangla strings
 backend/                Go API: cmd/campusapi, internal/ (platform, modules), migrations/
+backend/nsfw/           On-server photo check (ONNX model) for Campus Voice
+backend/deploy/         compose.yaml, nginx vhosts, deploy and backup scripts
+assets/icon/            Master icon artwork (SVG)
 tool/                   Scripts (test_all.sh)
 ```
 
@@ -54,12 +94,9 @@ Requires Flutter 3.47+ (Dart 3.13+).
 
 ```bash
 flutter pub get
-cp apps/mobile/env/example.json apps/mobile/env/local.json   # fill in backend values later
+cp apps/mobile/env/example.json apps/mobile/env/local.json
 cd apps/mobile && flutter run --dart-define-from-file=env/local.json
 ```
-
-The app runs without a backend for now; it connects once the env file has
-real values.
 
 ## Backend (local)
 
@@ -78,6 +115,17 @@ in Mailpit at http://localhost:58025 (without SMTP configured, the server
 logs it). Set `API_BASE_URL` in `apps/mobile/env/local.json`: the Android
 emulator reaches your Mac at `http://10.0.2.2:8090/api/v1`.
 
+The web app: `cd apps/web && npm install && npm run dev` (see
+[apps/web/README.md](apps/web/README.md)).
+
+## Build and deploy
+
+```bash
+apps/mobile/tool/build.sh          # asks: server, APK/App Bundle, build number, phone to install on
+backend/deploy/deploy.sh           # API: backup, build, migrate, restart, health check
+backend/deploy/deploy-web.sh       # site + admin panel
+```
+
 ## Everyday commands
 
 ```bash
@@ -89,4 +137,11 @@ flutter analyze               # lint the whole workspace
 Changing text: edit `packages/campus_l10n/lib/src/arb/*.arb`, then run
 `flutter gen-l10n` inside `packages/campus_l10n`.
 
-Changing the launcher icon: see `apps/mobile/flutter_launcher_icons.yaml`.
+## Brand
+
+The mark is ক (Baloo Da 2 ExtraBold, SIL Open Font License, kept as
+outlines) in a speech bubble on a teal tile: *kotha* means "talk". Master
+artwork is in [assets/icon/](assets/icon/). To change the launcher icons,
+export new PNGs into `apps/mobile/assets/launcher/` and run
+`dart run flutter_launcher_icons` in `apps/mobile`
+(see `apps/mobile/flutter_launcher_icons.yaml`).

@@ -23,7 +23,7 @@
             android:background="@drawable/widget_icon_bg"
             android:importantForAccessibility="no"
             android:padding="5dp"
-            android:src="@drawable/ic_widget_school"
+            android:src="@drawable/ic_notification"
             android:tint="@color/widget_accent" />
 
         <TextView
