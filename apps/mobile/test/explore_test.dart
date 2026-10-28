@@ -22,7 +22,7 @@ void main() {
     expect(find.text('Coming soon'), findsWidgets);
 
     // A coming feature explains itself.
-    await scrollAndTap(tester, find.text('Bus routes'));
+    await scrollAndTap(tester, find.text('Teacher evaluations'));
     await tester.pumpAndSettle();
     expect(
       find.text("We're building this. It will arrive in a future update."),

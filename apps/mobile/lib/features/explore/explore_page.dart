@@ -44,14 +44,14 @@ class ExplorePage extends StatelessWidget {
           hint: l10n.exploreIssuesHint,
           onTap: () => context.push(Routes.campusMine),
         ),
-    ];
-    final soon = [
       _Feature(
         icon: CsIcons.bus,
         title: l10n.busRoutesTitle,
         hint: l10n.busRoutesBody,
-        soon: true,
+        onTap: () => context.push(Routes.bus),
       ),
+    ];
+    final soon = [
       _Feature(
         icon: CsIcons.teacherReviews,
         title: l10n.teacherReviewsTitle,

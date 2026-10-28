@@ -1,6 +1,7 @@
 import {
   Bell,
   Building2,
+  Bus,
   LayoutDashboard,
   ScrollText,
   Settings,
@@ -29,6 +30,7 @@ export const adminNav: readonly NavItem[] = [
   { href: "/admin/users", label: "Users", icon: Users, roles: ADMIN },
   { href: "/admin/universities", label: "Universities", icon: Building2, roles: ADMIN },
   { href: "/admin/groups", label: "Class groups", icon: UsersRound, roles: ADMIN },
+  { href: "/admin/transport", label: "Bus routes", icon: Bus, roles: ADMIN },
   { href: "/admin/staff", label: "Staff", icon: ShieldCheck, roles: ADMIN },
   { href: "/admin/push", label: "Push", icon: Bell, roles: ADMIN },
   { href: "/admin/settings", label: "Settings", icon: Settings, roles: ADMIN },
