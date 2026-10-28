@@ -384,7 +384,11 @@ class _HeroCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            // Wraps, so a long badge never cuts the countdown off.
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -404,7 +408,6 @@ class _HeroCard extends StatelessWidget {
                   ),
                 ),
                 if (item.moved || item.extra) ...[
-                  const SizedBox(width: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
@@ -433,7 +436,6 @@ class _HeroCard extends StatelessWidget {
                   item.date,
                   s.courseCode,
                 )) ...[
-                  const SizedBox(width: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
@@ -452,12 +454,11 @@ class _HeroCard extends StatelessWidget {
                     ),
                   ),
                 ],
-                const SizedBox(width: CsSpace.sm),
-                Flexible(
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 2),
                   child: Text(
                     timing,
                     style: context.text.labelLarge?.copyWith(color: white),
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
