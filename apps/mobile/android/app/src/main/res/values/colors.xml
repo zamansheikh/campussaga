@@ -3,4 +3,14 @@
     <color name="ic_launcher_background">#FFFFFF</color>
     <!-- Brand teal for the notification icon tint (CsBrand.primaryLight). -->
     <color name="notification_color">#0F766E</color>
+    <!-- Home-screen widget (night values in values-night/colors.xml). -->
+    <color name="widget_bg">#FFFFFF</color>
+    <color name="widget_text">#0F1724</color>
+    <color name="widget_text2">#5B6676</color>
+    <color name="widget_accent">#0F766E</color>
+    <color name="widget_accent_soft">#E3F4F1</color>
+    <color name="widget_panel">#F2F5F8</color>
+    <color name="widget_on_accent">#FFFFFF</color>
+    <color name="widget_warn">#B45309</color>
+    <color name="widget_warn_soft">#FDF0DC</color>
 </resources>

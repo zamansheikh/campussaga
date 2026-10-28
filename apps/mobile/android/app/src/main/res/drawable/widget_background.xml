@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Home-screen widget: the brand's teal gradient. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_bg" />
     <corners android:radius="24dp" />
-    <gradient
-        android:angle="135"
-        android:startColor="#0F766E"
-        android:endColor="#14B8A6" />
 </shape>

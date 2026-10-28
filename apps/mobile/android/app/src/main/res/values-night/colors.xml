@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home-screen widget, dark theme. -->
+    <color name="widget_bg">#141C2B</color>
+    <color name="widget_text">#F3F6FA</color>
+    <color name="widget_text2">#9AA6B8</color>
+    <color name="widget_accent">#2DD4BF</color>
+    <color name="widget_accent_soft">#173B39</color>
+    <color name="widget_panel">#1D2638</color>
+    <color name="widget_on_accent">#06201D</color>
+    <color name="widget_warn">#F6B35C</color>
+    <color name="widget_warn_soft">#3A2B16</color>
+</resources>

@@ -32,7 +32,7 @@ Map<String, Object?> buildWidgetData({
   final t = WidgetTexts.of(lang);
   if (!signedIn) {
     return {
-      'v': 1,
+      'v': 2,
       'lang': t.lang,
       'signedIn': false,
       'labels': {'signedOut': t.labels['signedOut']},
@@ -55,15 +55,19 @@ Map<String, Object?> buildWidgetData({
     final day = DateTime(today.year, today.month, today.day + i);
     for (final c in classesOn(routine, day)) {
       if (c.off || !c.endsAt.isAfter(now)) continue;
+      final from = c.movedFrom;
       classes.add({
         'start': c.startsAt.millisecondsSinceEpoch,
         'end': c.endsAt.millisecondsSinceEpoch,
         'course': c.slot.courseCode,
-        'badge': c.extra ? t.extra : (c.moved ? t.moved : ''),
-        'line': join([
-          '${time(day, c.startMin)} – ${time(day, c.endMin)}',
-          room(c.room),
-        ]),
+        'title': c.slot.courseTitle,
+        'time': '${time(day, c.startMin)} – ${time(day, c.endMin)}',
+        'room': room(c.room),
+        'badge': c.extra
+            ? t.extra
+            : from != null
+            ? t.movedFrom(dateFmt.format(from))
+            : (c.moved ? t.moved : ''),
         'date': dateFmt.format(day),
       });
       if (classes.length >= _maxClasses) break;
@@ -100,6 +104,7 @@ Map<String, Object?> buildWidgetData({
             if (when.isNotEmpty) a.kind.isDeadline ? '${t.due} $when' : when,
             room(a.room),
           ]),
+          'deadline': a.kind.isDeadline,
           'date': dateFmt.format(a.date),
         },
       ));
@@ -111,7 +116,7 @@ Map<String, Object?> buildWidgetData({
   });
 
   return {
-    'v': 1,
+    'v': 2,
     'lang': t.lang,
     'signedIn': true,
     'labels': t.labels,

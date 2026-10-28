@@ -19,6 +19,8 @@ class WidgetTexts {
       'nextTest',
       'now',
       'inMin',
+      'minLeft',
+      'inDays',
       'today',
       'tomorrow',
       'noClass',
@@ -29,6 +31,7 @@ class WidgetTexts {
   };
 
   String get moved => _t['moved']!;
+  String movedFrom(String date) => _t['movedFrom']!.replaceAll('{d}', date);
   String get extra => _t['extra']!;
   String get room => _t['room']!;
   String get due => _t['due']!;
@@ -40,13 +43,16 @@ class WidgetTexts {
     'nextTest': 'Next test',
     'now': 'Now',
     'inMin': 'in {m} min',
+    'minLeft': '{m} min left',
+    'inDays': 'in {d} days',
     'today': 'Today',
     'tomorrow': 'Tomorrow',
     'noClass': 'No classes in the next 2 weeks',
     'noTest': 'No tests coming up',
     'signedOut': 'Sign in to see your classes',
-    'moved': 'Moved',
-    'extra': 'Extra',
+    'moved': 'Time or room changed',
+    'movedFrom': 'Moved from {d}',
+    'extra': 'Extra class',
     'room': 'Room',
     'due': 'Due',
     'kind.class_test': 'Class test',
@@ -64,13 +70,16 @@ class WidgetTexts {
     'nextTest': 'পরের পরীক্ষা',
     'now': 'এখন',
     'inMin': '{m} মিনিট পর',
+    'minLeft': '{m} মিনিট বাকি',
+    'inDays': '{d} দিন পর',
     'today': 'আজ',
     'tomorrow': 'আগামীকাল',
     'noClass': 'আগামী ২ সপ্তাহে কোনো ক্লাস নেই',
     'noTest': 'সামনে কোনো পরীক্ষা নেই',
     'signedOut': 'ক্লাস দেখতে সাইন ইন করো',
-    'moved': 'সরানো',
-    'extra': 'অতিরিক্ত',
+    'moved': 'সময় বা রুম বদলেছে',
+    'movedFrom': 'সরানো, আগে ছিল {d}',
+    'extra': 'অতিরিক্ত ক্লাস',
     'room': 'রুম',
     'due': 'জমা',
     'kind.class_test': 'ক্লাস টেস্ট',

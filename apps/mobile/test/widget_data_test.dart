@@ -117,14 +117,17 @@ void main() {
         'CSE102@2026-11-06 10:00:00.000', // Tue 3 Nov cancelled; nothing from 10 Nov
       ],
     );
-    expect(n(classes[0]['line']), '9:00 AM – 10:30 AM · Room 301');
+    expect(n(classes[0]['time']), '9:00 AM – 10:30 AM');
+    expect(classes[0]['room'], 'Room 301');
     expect(classes[0]['date'], 'Tue 27 Oct');
     expect(classes[0]['badge'], '');
     expect(classes[0]['end'], ms(2026, 10, 27, 10, 30));
-    expect(classes[1]['badge'], 'Moved');
-    expect(n(classes[1]['line']), '11:00 AM – 12:30 PM · Room 805');
-    expect(classes[2]['badge'], 'Extra');
-    expect(n(classes[2]['line']), '2:00 PM – 3:00 PM', reason: 'no room');
+    expect(classes[1]['badge'], 'Moved from Fri 30 Oct');
+    expect(n(classes[1]['time']), '11:00 AM – 12:30 PM');
+    expect(classes[1]['room'], 'Room 805');
+    expect(classes[2]['badge'], 'Extra class');
+    expect(n(classes[2]['time']), '2:00 PM – 3:00 PM');
+    expect(classes[2]['room'], '', reason: 'no room');
   });
 
   test('a class that already ended today is left out', () {
@@ -220,8 +223,8 @@ void main() {
     expect(labels['now'], 'এখন');
     expect(labels['inMin'], '{m} মিনিট পর');
     final c = list(d, 'classes').first;
-    expect(c['line'] as String, contains('৯:০০'));
-    expect(c['line'] as String, contains('রুম 301'));
+    expect(c['time'] as String, contains('৯:০০'));
+    expect(c['room'], 'রুম 301');
     expect(list(d, 'tests').first['title'], 'ক্লাস টেস্ট · CSE101');
   });
 
@@ -235,7 +238,7 @@ void main() {
       ),
     );
     expect(d, {
-      'v': 1,
+      'v': 2,
       'lang': 'en',
       'signedIn': false,
       'labels': {'signedOut': 'Sign in to see your classes'},
