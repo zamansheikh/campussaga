@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="14dp">
 
     <!-- Header: badge, "NEXT CLASS", status pill. -->
     <LinearLayout
@@ -60,11 +60,11 @@
         android:id="@+id/class_course"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="6dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/widget_text"
-        android:textSize="22sp"
+        android:textSize="21sp"
         android:textStyle="bold" />
 
     <TextView
@@ -80,7 +80,7 @@
         android:id="@+id/class_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="4dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -119,31 +119,31 @@
             android:maxLines="1"
             android:textColor="@color/widget_text"
             android:textSize="13sp" />
-    </LinearLayout>
 
-    <!-- Moved / extra class tag. -->
-    <TextView
-        android:id="@+id/class_badge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/widget_pill_warn"
-        android:maxLines="1"
-        android:paddingStart="8dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="2dp"
-        android:textColor="@color/widget_warn"
-        android:textSize="11sp"
-        android:textStyle="bold"
-        android:visibility="gone" />
+        <!-- Moved / extra class tag. -->
+        <TextView
+            android:id="@+id/class_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/widget_pill_warn"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="2dp"
+            android:textColor="@color/widget_warn"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
 
     <!-- While the class runs: progress and time left. -->
     <LinearLayout
         android:id="@+id/class_progress_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:visibility="gone">
@@ -173,9 +173,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:minHeight="8dp" />
+        android:minHeight="6dp" />
 
-    <!-- Next test or deadline. -->
+    <!-- Next test or deadline: one line. -->
     <LinearLayout
         android:id="@+id/test_panel"
         android:layout_width="match_parent"
@@ -183,48 +183,45 @@
         android:background="@drawable/widget_panel"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:paddingStart="8dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="6dp">
 
         <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:background="@drawable/widget_icon_bg"
             android:importantForAccessibility="no"
-            android:padding="6dp"
+            android:padding="4dp"
             android:src="@drawable/ic_widget_test"
             android:tint="@color/widget_accent" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/test_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:maxLines="1"
+            android:textColor="@color/widget_text"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/test_sub"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="6dp"
             android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/test_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/widget_text"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/test_sub"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/widget_text2"
-                android:textSize="12sp" />
-        </LinearLayout>
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/widget_text2"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/test_when"
             style="@style/WidgetPill"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="6dp"
             android:background="@drawable/widget_pill_soft"
             android:textColor="@color/widget_accent" />
     </LinearLayout>
