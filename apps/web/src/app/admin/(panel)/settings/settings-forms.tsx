@@ -14,8 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { updateConfig } from "./actions";
 
 const featureNames: Record<string, { label: string; hint: string }> = {
-  myClass: { label: "My Class", hint: "Class groups, routine, reminders and announcements (R1)." },
-  campusVoice: { label: "Campus Voice", hint: "Anonymous campus issues (R2, not built yet)." },
+  myClass: { label: "My Class", hint: "Class groups, routine, reminders and announcements. The app doesn't read this switch yet, so it stays on." },
+  campusVoice: { label: "Campus Voice", hint: "Anonymous campus issues, \"Me too\" votes and official replies. Off hides it in the app." },
 };
 
 /** One switch per feature flag; each change asks first (it reaches every phone). */
