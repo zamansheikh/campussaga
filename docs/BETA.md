@@ -9,11 +9,11 @@ critical bugs**, Android first. iPhones follow once the Apple push key is set.
 |---|---|
 | R1 features (groups, routine, reminders, changes, announcements, pushes, retakes, personal classes, new semester, co-CRs) | Built and tested |
 | Android release build | Signed App Bundle builds (`0.9.0+2`) |
-| Upload key | `~/campussaga-secrets/upload-keystore.jks` (+ `key.properties.backup`). **Back both up to the password manager now.** Losing the upload key is recoverable with Play App Signing, but slow |
+| Upload key | `~/varsitykotha-secrets/upload-keystore.jks` (+ `key.properties.backup`). **Back both up to the password manager now.** Losing the upload key is recoverable with Play App Signing, but slow |
 | Upload key in Firebase | SHA-1 and SHA-256 registered (Google sign-in works in release builds) |
 | Privacy policy / account deletion page | Updated for groups, personal classes, announcements and pushes (`site/`; publishes on push to `main`) |
 | Backend on a public server | **Live (2026-10-28): https://api.varsitykotha.com** on the Tecsior VPS, `/opt/varsitykotha`, compose project `varsitykotha` (containers `varsitykotha-*-1`, volumes `varsitykotha_pgdata` / `varsitykotha_media`; renamed from `campussaga` on 2026-10-28) (127.0.0.1:7030), nginx `fx-api.varsitykotha.com.conf`, Let's Encrypt (auto-renew), DNS on Cloudflare (DNS only, not proxied). The old `api-campus.silifton.com` still serves older app builds. Redeploy: `backend/deploy/deploy.sh`. Nightly DB dump + weekly log wipe: `/etc/cron.d/varsitykotha` (from `backend/deploy/varsitykotha.cron`). Off-site backups still to set up |
-| Push delivery | **Live (2026-10-28)** on Android: Firebase project `varsitykotha` (moved from `bitlaabuzz` on 2026-10-28), service-account key on the server (`deploy/secrets/fcm-service-account.json`; local copy `~/campussaga-secrets/fcm-service-account.varsitykotha.json`, back it up with the upload key) |
+| Push delivery | **Live (2026-10-28)** on Android: Firebase project `varsitykotha` (moved from `bitlaabuzz` on 2026-10-28), service-account key on the server (`deploy/secrets/fcm-service-account.json`; local copy `~/varsitykotha-secrets/fcm-service-account.varsitykotha.json`, back it up with the upload key) |
 | iPhone | Builds; pushes need the APNs key; sign-in uses the browser sheet |
 
 ## 1. Server address (`api.varsitykotha.com`)
@@ -148,7 +148,7 @@ instructions with
 
 **Kept on permanently** (since 2026-10-28): Google reviews every update with
 the same login, so the code stays in `.env` (copy in
-`~/campussaga-secrets/play-review-code.txt`). The cron file re-runs the seed
+`~/varsitykotha-secrets/play-review-code.txt`). The cron file re-runs the seed
 every night, so the demo tests and deadlines are always upcoming.
 
 **Change the code** only if it leaks: change `REVIEW_CODE` in `.env`,
