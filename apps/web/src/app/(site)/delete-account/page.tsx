@@ -50,6 +50,10 @@ export default function DeleteAccountPage() {
             Your class group memberships, hidden courses, personal classes and push notification tokens. Groups you are
             in stay for the other members; if you were their only CR, the longest member becomes CR.
           </li>
+          <li>
+            Campus Voice: the link between you and your anonymous posts and comments, your &quot;Me too&quot; votes,
+            the issues you follow and the reports you sent.
+          </li>
         </ul>
 
         <h2>What is kept, and for how long</h2>
@@ -61,6 +65,11 @@ export default function DeleteAccountPage() {
           </li>
           <li>
             <strong>Server logs</strong> that contain your internal account ID are deleted after at most 30 days.
+          </li>
+          <li>
+            <strong>Campus Voice posts and comments</strong> stay for other students, with no link to you. Posts and
+            comments that showed your name show &quot;Deleted account&quot; instead. To hide a post or comment from
+            everyone, delete it in the app first (it is then kept hidden, for moderation only).
           </li>
           <li>
             <strong>Crash reports</strong> are not linked to your account.
@@ -108,6 +117,10 @@ export default function DeleteAccountPage() {
             তোমার ক্লাস গ্রুপের সদস্যপদ, লুকানো কোর্স, ব্যক্তিগত ক্লাস ও পুশ নোটিফিকেশন টোকেন। গ্রুপগুলো অন্য সদস্যদের
             জন্য থেকে যায়; তুমি একমাত্র সিআর হলে সবচেয়ে পুরোনো সদস্য সিআর হয়ে যায়।
           </li>
+          <li>
+            ক্যাম্পাস ভয়েস: তোমার বেনামি পোস্ট ও মন্তব্যের সাথে তোমার সংযোগ, তোমার &quot;আমারও&quot; ভোট, ফলো করা ইস্যু
+            আর তোমার পাঠানো রিপোর্ট।
+          </li>
         </ul>
 
         <h2>কী থেকে যায় এবং কতদিন</h2>
@@ -117,6 +130,11 @@ export default function DeleteAccountPage() {
           </li>
           <li>
             তোমার অভ্যন্তরীণ আইডিসহ <strong>সার্ভার লগ</strong> সর্বোচ্চ ৩০ দিনে মুছে যায়।
+          </li>
+          <li>
+            <strong>ক্যাম্পাস ভয়েসের পোস্ট ও মন্তব্য</strong> অন্য শিক্ষার্থীদের জন্য থেকে যায়, তোমার সাথে কোনো সংযোগ
+            ছাড়া। যেগুলোতে তোমার নাম দেখানো ছিল সেখানে &quot;মুছে ফেলা অ্যাকাউন্ট&quot; দেখায়। কোনো পোস্ট বা মন্তব্য
+            সবার কাছ থেকে লুকাতে চাইলে আগে অ্যাপে সেটি মুছে দাও (তারপর শুধু মডারেশনের জন্য লুকানো থাকে)।
           </li>
           <li>
             <strong>ক্র্যাশ রিপোর্ট</strong> তোমার অ্যাকাউন্টের সাথে যুক্ত নয়।
