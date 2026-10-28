@@ -121,7 +121,8 @@ messages, audio, files, web history, installed apps.
    production. Organisation accounts can skip this.
 4. **Production**: promote the tested release. Review usually takes a few
    days for a new app.
-5. After the review: rotate or remove `REVIEW_CODE` (BETA.md).
+5. Keep the reviewer login on: Google reviews every update with it. The
+   demo data is refreshed every night, so its tests and deadlines stay upcoming.
 
 Every new upload needs a higher build number: `apps/mobile/tool/build.sh`
 asks, or pass `--bump`.

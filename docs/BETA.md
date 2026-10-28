@@ -146,8 +146,13 @@ instructions with
 - Steps: open the app, tap "Use university email instead", enter the email, tap
   Send code, then type the code. No email arrives; the code is the fixed one.
 
-**Rotate the code:** change `REVIEW_CODE` in `.env`, `docker compose up -d api`,
-update the Play Console instructions. Do this after every review round.
+**Kept on permanently** (since 2026-10-28): Google reviews every update with
+the same login, so the code stays in `.env` (copy in
+`~/campussaga-secrets/play-review-code.txt`). The cron file re-runs the seed
+every night, so the demo tests and deadlines are always upcoming.
+
+**Change the code** only if it leaks: change `REVIEW_CODE` in `.env`,
+`docker compose up -d api`, and update Play Console's App access the same day.
 
 **Disable and clean up:** remove both variables from `.env` and restart the
 API (the reviewer can no longer sign in). To also delete the demo data:

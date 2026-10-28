@@ -3,3 +3,5 @@
 10 3 * * * root sh /opt/varsitykotha/deploy/backup.sh >> /var/log/varsitykotha-backup.log 2>&1
 # Privacy policy: API logs are gone within 30 days (also capped at 3 x 10 MB in compose.yaml).
 30 3 * * 0 root truncate -s 0 "$(docker inspect --format '{{.LogPath}}' varsitykotha-api-1)"
+# Play reviewer demo data: rebuilt nightly so its tests and deadlines stay upcoming (docs/BETA.md).
+15 4 * * * root cd /opt/varsitykotha/deploy && docker compose exec -T postgres psql -q -U campus -d campus < ../backend/deploy/review-seed.sql >> /var/log/varsitykotha-review-seed.log 2>&1

@@ -89,7 +89,7 @@ Template: [backend/deploy/env.example](../backend/deploy/env.example).
 | `JWT_SECRET` | 64 random bytes (`openssl rand -base64 64`); signs access tokens |
 | `CODE_HMAC_SECRET` | 64 random bytes; hashes sign-in codes |
 | `FIREBASE_PROJECT_ID` | `varsitykotha` (enables Google sign-in; not a secret) |
-| `REVIEW_EMAIL` / `REVIEW_CODE` | Optional, off when unset. App-store reviewer sign-in: that one email signs in with that fixed 6-digit code and no email is sent. Both or neither (the API refuses to start otherwise, or if the code is not 6 digits). Needs `backend/deploy/review-seed.sql`; see [BETA.md](BETA.md#reviewer-access). Keep the code secret and set it only during a review |
+| `REVIEW_EMAIL` / `REVIEW_CODE` | Optional, off when unset. App-store reviewer sign-in: that one email signs in with that fixed 6-digit code and no email is sent. Both or neither (the API refuses to start otherwise, or if the code is not 6 digits). Needs `backend/deploy/review-seed.sql`; see [BETA.md](BETA.md#reviewer-access). On permanently in production (since 2026-10-28): Google re-reviews every update with the same login. Code also in `~/campussaga-secrets/play-review-code.txt`. The demo data is refreshed nightly by `/etc/cron.d/varsitykotha` |
 | `SMTP_HOST` / `SMTP_PORT` | `smtp.resend.com` / `587` |
 | `SMTP_USERNAME` | `resend` |
 | `SMTP_PASSWORD` | the Resend API key |
