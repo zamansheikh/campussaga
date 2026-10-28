@@ -3,23 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1001688697061-jgaqh4kieo04l0345h5fb7g38atil0ri.apps.googleusercontent.com</string>
+	<string>1058979568560-it5l2accu28p1id7iie42v82gm6sbpkd.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1001688697061-jgaqh4kieo04l0345h5fb7g38atil0ri</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>1001688697061-398lucao7tjbpcoedh7io5joj7baq9ql.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.1058979568560-it5l2accu28p1id7iie42v82gm6sbpkd</string>
 	<key>API_KEY</key>
-	<string>AIzaSyB10HkzsSQIhUQRhBxunpQZJ-rCGvTW77o</string>
+	<string>AIzaSyBc7WYW7oR2nQxB_zNR9Wp3F5eKjuYfY_E</string>
 	<key>GCM_SENDER_ID</key>
-	<string>1001688697061</string>
+	<string>1058979568560</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.silifton.varsitykotha</string>
 	<key>PROJECT_ID</key>
-	<string>bitlaabuzz</string>
+	<string>varsitykotha</string>
 	<key>STORAGE_BUCKET</key>
-	<string>bitlaabuzz.firebasestorage.app</string>
+	<string>varsitykotha.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,8 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1001688697061:ios:e5eb2e45a78a87f44f2c0c</string>
-	<key>DATABASE_URL</key>
-	<string>https://bitlaabuzz.firebaseio.com</string>
+	<string>1:1058979568560:ios:c9d8176c517a589bed5475</string>
 </dict>
 </plist>

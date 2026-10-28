@@ -50,22 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCfSD9uCBDRKqf1c4pyaxjIMsX54YTcCxk',
-    appId: '1:1001688697061:android:6d3b0fd2ea894f2e4f2c0c',
-    messagingSenderId: '1001688697061',
-    projectId: 'bitlaabuzz',
-    databaseURL: 'https://bitlaabuzz.firebaseio.com',
-    storageBucket: 'bitlaabuzz.firebasestorage.app',
+    apiKey: 'AIzaSyAMi2Jl0u8f0ky-ioXANfS4Hn8pMdALYGg',
+    appId: '1:1058979568560:android:4cd9ab36c355f065ed5475',
+    messagingSenderId: '1058979568560',
+    projectId: 'varsitykotha',
+    storageBucket: 'varsitykotha.firebasestorage.app',
   );
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB10HkzsSQIhUQRhBxunpQZJ-rCGvTW77o',
-    appId: '1:1001688697061:ios:e5eb2e45a78a87f44f2c0c',
-    messagingSenderId: '1001688697061',
-    projectId: 'bitlaabuzz',
-    databaseURL: 'https://bitlaabuzz.firebaseio.com',
-    storageBucket: 'bitlaabuzz.firebasestorage.app',
-    androidClientId: '1001688697061-feedip2nb7q7ve0ldc7213t45941619e.apps.googleusercontent.com',
-    iosClientId: '1001688697061-0td807cocr84l1ip1og357op741ossrk.apps.googleusercontent.com',
+    apiKey: 'AIzaSyBc7WYW7oR2nQxB_zNR9Wp3F5eKjuYfY_E',
+    appId: '1:1058979568560:ios:c9d8176c517a589bed5475',
+    messagingSenderId: '1058979568560',
+    projectId: 'varsitykotha',
+    storageBucket: 'varsitykotha.firebasestorage.app',
+    iosClientId: '1058979568560-it5l2accu28p1id7iie42v82gm6sbpkd.apps.googleusercontent.com',
     iosBundleId: 'com.silifton.varsitykotha',
   );
 }
