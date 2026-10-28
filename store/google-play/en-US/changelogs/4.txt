@@ -1,5 +1,7 @@
 • Bus routes on the map, along the roads, with stop names
 • Where am I: see yourself on the route and your nearest stop
 • Call the bus driver from the route page
-• Clearer times: when a stop has no time, it says when the bus leaves
-• For transport reps: paste a notice's stops, place stops on the map, and add several times at once
+• Profile photo: your Google photo, or add and crop your own
+• Invite links: share a link, classmates install and join in one tap
+• Safer Delete account, kept apart from Sign out
+• Reps: paste a notice's stops, place them on the map, add many times at once
