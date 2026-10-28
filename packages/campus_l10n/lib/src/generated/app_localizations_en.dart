@@ -768,7 +768,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancelThisClass => 'Cancel this class';
 
   @override
-  String get changeTimeOrRoom => 'Change time or room';
+  String get changeTimeOrRoom => 'Change day, time or room';
 
   @override
   String get undoChange => 'Undo change';
@@ -1167,4 +1167,151 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moveAction => 'Move';
+
+  @override
+  String movedToDay(String day) {
+    return 'Moved to $day';
+  }
+
+  @override
+  String movedFromDay(String day) {
+    return 'Moved from $day';
+  }
+
+  @override
+  String movedDayNotice(String from, String to) {
+    return 'This week only: from $from to $to. The weekly routine stays the same.';
+  }
+
+  @override
+  String get dayTapToChange => 'Tap to move it to another day';
+
+  @override
+  String get dayToday => 'Today';
+
+  @override
+  String get dayTomorrow => 'Tomorrow';
+
+  @override
+  String get testsAndDeadlines => 'Tests & deadlines';
+
+  @override
+  String get comingUp => 'Coming up';
+
+  @override
+  String get addTest => 'Add test or deadline';
+
+  @override
+  String get editTest => 'Edit test or deadline';
+
+  @override
+  String get noTestsYet =>
+      'No tests or deadlines yet. Anyone in the group can add one.';
+
+  @override
+  String get testKindLabel => 'What is it?';
+
+  @override
+  String get kindClassTest => 'Class test';
+
+  @override
+  String get kindQuiz => 'Quiz';
+
+  @override
+  String get kindAssignment => 'Assignment';
+
+  @override
+  String get kindLabReport => 'Lab report';
+
+  @override
+  String get kindPresentation => 'Presentation';
+
+  @override
+  String get kindMidterm => 'Mid-term';
+
+  @override
+  String get kindFinal => 'Final exam';
+
+  @override
+  String get kindOther => 'Other';
+
+  @override
+  String get testTimeLabel => 'Time';
+
+  @override
+  String get testNoTime => 'No time';
+
+  @override
+  String get testAddTime => 'Add a time';
+
+  @override
+  String get testAddEnd => 'Add an end time';
+
+  @override
+  String get dueLabel => 'Due';
+
+  @override
+  String dueAt(String time) {
+    return 'Due $time';
+  }
+
+  @override
+  String get topicsLabel => 'Topics or details (optional)';
+
+  @override
+  String get topicsHint => 'e.g. Chapters 1–3, bring a calculator';
+
+  @override
+  String get testSaved => 'Saved. Classmates get a notification.';
+
+  @override
+  String get testDeleted => 'Deleted';
+
+  @override
+  String deleteTestTitle(String kind) {
+    return 'Delete this $kind?';
+  }
+
+  @override
+  String get deleteTestBody => 'It\'s removed for everyone in the group.';
+
+  @override
+  String addedBy(String name) {
+    return 'Added by $name';
+  }
+
+  @override
+  String get testOnlyOwnerHint => 'Only who added it or a CR can change it.';
+
+  @override
+  String reminderTestTomorrow(String kind, String course) {
+    return 'Tomorrow: $kind · $course';
+  }
+
+  @override
+  String reminderTestSoon(String kind, String course) {
+    return '$kind soon · $course';
+  }
+
+  @override
+  String reminderTestToday(String kind, String course) {
+    return 'Today: $kind · $course';
+  }
+
+  @override
+  String get errorAssessmentDate => 'Pick a date from today, within 6 months.';
+
+  @override
+  String get errorAssessmentLimit =>
+      'This group already has the most upcoming tests and deadlines allowed.';
+
+  @override
+  String get errorAssessmentGone => 'This was already deleted.';
+
+  @override
+  String get errorNotAssessmentOwner =>
+      'Only who added it or a CR can change it.';
+
+  @override
+  String get errorMoveDate => 'Pick a day from today, within 6 months.';
 }

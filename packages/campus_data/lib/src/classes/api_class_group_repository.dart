@@ -86,6 +86,34 @@ class ApiClassGroupRepository implements ClassGroupRepository {
       _api.delete('/groups/${_id(groupId)}/changes/${_id(changeId)}');
 
   @override
+  Future<Assessment> addAssessment(
+    String groupId,
+    AssessmentDraft draft,
+  ) async => Assessment.fromJson(
+    _map(
+      await _api.post('/groups/${_id(groupId)}/assessments', draft.toJson()),
+    ),
+  );
+
+  @override
+  Future<Assessment> updateAssessment(
+    String groupId,
+    String assessmentId,
+    AssessmentDraft draft,
+  ) async => Assessment.fromJson(
+    _map(
+      await _api.put(
+        '/groups/${_id(groupId)}/assessments/${_id(assessmentId)}',
+        draft.toJson(),
+      ),
+    ),
+  );
+
+  @override
+  Future<void> deleteAssessment(String groupId, String assessmentId) =>
+      _api.delete('/groups/${_id(groupId)}/assessments/${_id(assessmentId)}');
+
+  @override
   Future<Announcement> postAnnouncement(
     String groupId,
     String body, {

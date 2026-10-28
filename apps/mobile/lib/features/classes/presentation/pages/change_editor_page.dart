@@ -12,8 +12,8 @@ import '../class_format.dart';
 import '../widgets/class_sheet.dart';
 import '../widgets/editor_widgets.dart';
 
-/// For one date only (CR): move a class to another time or room, or add an
-/// extra class. The weekly routine stays the same.
+/// For one date only (CR): move a class to another day, time or room, or
+/// add an extra class. The weekly routine stays the same.
 class ChangeEditorPage extends StatefulWidget {
   const ChangeEditorPage({
     super.key,
@@ -23,6 +23,8 @@ class ChangeEditorPage extends StatefulWidget {
   });
 
   final String groupId;
+
+  /// The class's own date (for a move), or the extra class's date.
   final DateTime date;
 
   /// The class to move; null = a new extra class.
@@ -45,15 +47,21 @@ class _ChangeEditorPageState extends State<ChangeEditorPage> {
 
   bool get _extra => widget.slotId == null;
 
-  late DateTime _date = widget.date;
-  late int _start = _item?.startMin ?? 14 * 60;
-  late int _end = _item?.endMin ?? 15 * 60 + 30;
+  /// An earlier move of this class on this date (edited, not stacked).
+  ClassChange? get _move =>
+      _item?.change?.kind == ChangeKind.moved ? _item!.change : null;
+
+  late DateTime _date = _move?.newDate ?? widget.date;
+  late int _start = _move?.startMin ?? _item?.startMin ?? 14 * 60;
+  late int _end = _move?.endMin ?? _item?.endMin ?? 15 * 60 + 30;
   late ClassKind _kind = ClassKind.theory;
   late final _code = TextEditingController();
   late final _title = TextEditingController();
   late final _teacher = TextEditingController();
-  late final _room = TextEditingController(text: _item?.room);
-  final _note = TextEditingController();
+  late final _room = TextEditingController(
+    text: (_move?.room.isNotEmpty ?? false) ? _move!.room : _item?.slot.room,
+  );
+  late final _note = TextEditingController(text: _move?.note);
   final _codeFocus = FocusNode();
 
   bool _busy = false;
@@ -143,6 +151,7 @@ class _ChangeEditorPageState extends State<ChangeEditorPage> {
         : ChangeDraft.move(
             slotId: widget.slotId!,
             date: widget.date,
+            newDate: _date == widget.date ? null : _date,
             startMin: _start,
             endMin: _end,
             // The weekly room means "unchanged".
@@ -192,10 +201,22 @@ class _ChangeEditorPageState extends State<ChangeEditorPage> {
               const SizedBox(height: CsSpace.sm),
             ],
             NoticeCard(
-              icon: Icons.event_outlined,
-              text: l10n.onlyThisDay(dateText(context, _date)),
-              onTap: _extra && !_busy ? _pickDate : null,
+              icon: _date == widget.date
+                  ? Icons.event_outlined
+                  : Icons.event_repeat_outlined,
+              text: _extra || _date == widget.date
+                  ? l10n.onlyThisDay(dateText(context, _date))
+                  : l10n.movedDayNotice(
+                      dateText(context, widget.date),
+                      dateText(context, _date),
+                    ),
+              onTap: _busy ? null : _pickDate,
             ),
+            if (!_extra && _date == widget.date)
+              Padding(
+                padding: const EdgeInsets.only(top: CsSpace.xs),
+                child: Text(l10n.dayTapToChange, style: context.text.bodySmall),
+              ),
             const SizedBox(height: CsSpace.lg),
             if (_extra) ...[
               RawAutocomplete<ClassSlot>(

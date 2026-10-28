@@ -39,7 +39,7 @@ void main() {
 
   test('upcoming classes in time order, past reminders skipped', () {
     final r = planReminders(groups: [g], now: now, settings: on, days: 2);
-    expect(r.map((x) => x.item.slot.courseCode), ['CSE313', 'MAT 201']);
+    expect(r.map((x) => x.item!.slot.courseCode), ['CSE313', 'MAT 201']);
     expect(r.first.at, DateTime(2026, 10, 27, 11, 20));
     expect(r.last.at, DateTime(2026, 10, 28, 8, 50));
     expect(r.map((x) => x.id), [1, 2]);
@@ -65,7 +65,7 @@ void main() {
       settings: on.copyWith(minutesBefore: 30, muted: {'MAT201'}),
       days: 2,
     );
-    expect(r.single.item.slot.courseCode, 'CSE313');
+    expect(r.single.item!.slot.courseCode, 'CSE313');
     expect(r.single.at, DateTime(2026, 10, 27, 11));
     expect(on.copyWith(muted: {'MAT201'}).isMuted('mat 201'), isTrue);
   });

@@ -65,12 +65,19 @@ class ClassTile extends StatelessWidget {
     final cs = context.cs;
     final it = item;
     final cancelled = it?.cancelled ?? false;
+    // Cancelled, or moved to another day: shown struck through.
+    final off = it?.off ?? false;
+    final movedTo = it?.movedTo;
+    final movedFrom = it?.movedFrom;
+    final tests = it == null
+        ? const <Assessment>[]
+        : it.group.assessmentsOn(it.date, slot.courseCode);
     final start = it?.startMin ?? slot.startMin;
     final end = it?.endMin ?? slot.endMin;
     final room = it?.room ?? slot.room;
     final note = it?.change?.note ?? '';
-    final past = state == ClassTileState.past || cancelled;
-    final strike = cancelled
+    final past = state == ClassTileState.past || off;
+    final strike = off
         ? const TextStyle(decoration: TextDecoration.lineThrough)
         : null;
     final meta = [
@@ -154,16 +161,35 @@ class ClassTile extends StatelessWidget {
                           label: l10n.changeCancelled,
                           tone: CsBadgeTone.danger,
                         ),
-                      if (it != null && it.moved)
+                      if (movedTo != null)
+                        CsBadge(
+                          label: l10n.movedToDay(shortDate(context, movedTo)),
+                          icon: Icons.east_rounded,
+                          tone: CsBadgeTone.accent,
+                        )
+                      else if (movedFrom != null)
+                        CsBadge(
+                          label: l10n.movedFromDay(
+                            shortDate(context, movedFrom),
+                          ),
+                          tone: CsBadgeTone.accent,
+                        )
+                      else if (it != null && it.moved)
                         CsBadge(
                           label: l10n.changeMoved,
                           tone: CsBadgeTone.accent,
+                        ),
+                      for (final t in tests)
+                        CsBadge(
+                          label: assessmentKindText(l10n, t.kind),
+                          icon: Icons.quiz_outlined,
+                          tone: CsBadgeTone.danger,
                         ),
                       if (it != null && it.extra)
                         CsBadge(label: l10n.changeExtra),
                       if (slot.kind == ClassKind.lab)
                         CsBadge(label: l10n.classLab, tone: CsBadgeTone.accent),
-                      if (state == ClassTileState.now && !cancelled)
+                      if (state == ClassTileState.now && !off)
                         CsBadge(
                           label: l10n.nowInClass,
                           tone: CsBadgeTone.success,

@@ -1,3 +1,5 @@
+import 'assessment_models.dart';
+
 /// A student's role in a class group.
 enum GroupRole {
   /// Class representative: keeps the routine up to date.
@@ -147,6 +149,7 @@ class ClassGroup {
     this.slots = const [],
     this.changes = const [],
     this.announcements = const [],
+    this.assessments = const [],
     this.hiddenCourses = const {},
   });
 
@@ -183,6 +186,10 @@ class ClassGroup {
       for (final a in json['announcements'] as List<Object?>? ?? const [])
         Announcement.fromJson(a! as Map<String, Object?>),
     ],
+    assessments: sortAssessments([
+      for (final a in json['assessments'] as List<Object?>? ?? const [])
+        Assessment.fromJson(a! as Map<String, Object?>),
+    ]),
     hiddenCourses: {
       for (final c in json['hiddenCourses'] as List<Object?>? ?? const [])
         c! as String,
@@ -205,6 +212,9 @@ class ClassGroup {
   /// The pinned one first, then the last 30 days' newest first.
   final List<Announcement> announcements;
 
+  /// Tests and deadlines from yesterday on, earliest first.
+  final List<Assessment> assessments;
+
   /// Course keys (see [courseKey]) the student doesn't take in this group.
   final Set<String> hiddenCourses;
 
@@ -219,6 +229,15 @@ class ClassGroup {
   String get title =>
       [department, batch].join(' ') + (section.isEmpty ? '' : ' · $section');
 
+  /// The tests and deadlines of [courseCode] on [date].
+  List<Assessment> assessmentsOn(DateTime date, String courseCode) {
+    final key = courseKey(courseCode);
+    return [
+      for (final a in assessments)
+        if (a.date == date && courseKey(a.courseCode) == key) a,
+    ];
+  }
+
   Map<String, Object?> toJson() => {
     'id': id,
     'department': department,
@@ -231,6 +250,7 @@ class ClassGroup {
     'slots': [for (final s in slots) s.toJson()],
     'changes': [for (final c in changes) c.toJson()],
     'announcements': [for (final a in announcements) a.toJson()],
+    'assessments': [for (final a in assessments) a.toJson()],
     'hiddenCourses': hiddenCourses.toList()..sort(),
   };
 
@@ -238,6 +258,7 @@ class ClassGroup {
     List<ClassSlot>? slots,
     List<ClassChange>? changes,
     List<Announcement>? announcements,
+    List<Assessment>? assessments,
     Set<String>? hiddenCourses,
     String? semester,
     GroupRole? role,
@@ -254,6 +275,7 @@ class ClassGroup {
     slots: slots ?? this.slots,
     changes: changes ?? this.changes,
     announcements: announcements ?? this.announcements,
+    assessments: assessments ?? this.assessments,
     hiddenCourses: hiddenCourses ?? this.hiddenCourses,
   );
 }
@@ -405,7 +427,8 @@ enum ChangeKind {
   /// The class doesn't happen on that date.
   cancelled,
 
-  /// It happens at another time and/or room on that date.
+  /// It happens at another time and/or room, on that date or on another
+  /// day ([ClassChange.newDate]).
   moved,
 
   /// An extra (makeup) class, not in the weekly routine.
@@ -430,16 +453,22 @@ class ClassChange {
     this.startMin,
     this.endMin,
     this.note = '',
+    this.newDate,
   });
 
   factory ClassChange.fromJson(Map<String, Object?> json) {
     final start = json['start'] as String?;
     final end = json['end'] as String?;
+    final newDate = json['newDate'] as String?;
+    final date = parseDate(json['date']! as String);
+    final moveTo = newDate == null || newDate.isEmpty
+        ? null
+        : parseDate(newDate);
     return ClassChange(
       id: json['id']! as String,
       kind: ChangeKind.parse(json['kind'] as String?),
       slotId: json['slotId'] as String?,
-      date: parseDate(json['date']! as String),
+      date: date,
       courseCode: json['courseCode'] as String? ?? '',
       courseTitle: json['courseTitle'] as String? ?? '',
       teacher: json['teacher'] as String? ?? '',
@@ -448,6 +477,7 @@ class ClassChange {
       startMin: start == null ? null : Clock.parse(start),
       endMin: end == null ? null : Clock.parse(end),
       note: json['note'] as String? ?? '',
+      newDate: moveTo == date ? null : moveTo,
     );
   }
 
@@ -470,6 +500,13 @@ class ClassChange {
   final int? endMin;
   final String note;
 
+  /// Moved: the day the class happens instead (null = the same day).
+  final DateTime? newDate;
+
+  /// Moved to another day.
+  bool get movesDay =>
+      kind == ChangeKind.moved && newDate != null && newDate != date;
+
   Map<String, Object?> toJson() => {
     'id': id,
     'kind': kind.name,
@@ -483,6 +520,7 @@ class ClassChange {
     'start': startMin == null ? null : Clock.format(startMin!),
     'end': endMin == null ? null : Clock.format(endMin!),
     'note': note,
+    'newDate': movesDay ? formatDate(newDate!) : null,
   };
 }
 
@@ -504,6 +542,7 @@ class ChangeDraft {
     required this.date,
     this.note = '',
   }) : kind = ChangeKind.cancelled,
+       newDate = null,
        startMin = null,
        endMin = null,
        room = '',
@@ -512,6 +551,7 @@ class ChangeDraft {
        teacher = '',
        classKind = ClassKind.theory;
 
+  /// Another time and/or room on [date], or on [newDate] instead.
   const ChangeDraft.move({
     required this.slotId,
     required this.date,
@@ -519,6 +559,7 @@ class ChangeDraft {
     required int this.endMin,
     this.room = '',
     this.note = '',
+    this.newDate,
   }) : kind = ChangeKind.moved,
        courseCode = '',
        courseTitle = '',
@@ -536,11 +577,15 @@ class ChangeDraft {
     this.classKind = ClassKind.theory,
     this.note = '',
   }) : kind = ChangeKind.extra,
+       newDate = null,
        slotId = null;
 
   final ChangeKind kind;
   final String? slotId;
   final DateTime date;
+
+  /// Moved: the day it happens instead (null or [date] = the same day).
+  final DateTime? newDate;
   final int? startMin;
   final int? endMin;
   final String room;
@@ -554,6 +599,7 @@ class ChangeDraft {
     'kind': kind.name,
     'slotId': ?slotId,
     'date': formatDate(date),
+    if (newDate != null && newDate != date) 'newDate': formatDate(newDate!),
     if (startMin != null) 'start': Clock.format(startMin!),
     if (endMin != null) 'end': Clock.format(endMin!),
     'room': room,
@@ -574,6 +620,7 @@ class ClassOnDay {
     required this.group,
     required this.date,
     this.change,
+    this.movedFrom,
   });
 
   /// The weekly class (for an extra class: built from the change).
@@ -582,8 +629,21 @@ class ClassOnDay {
   final DateTime date;
   final ClassChange? change;
 
+  /// Set when the class was moved here from that day.
+  final DateTime? movedFrom;
+
   bool get cancelled => change?.kind == ChangeKind.cancelled;
-  bool get moved => change?.kind == ChangeKind.moved;
+
+  /// The class's own day, but it was moved to [movedTo].
+  bool get movedAway => movedFrom == null && (change?.movesDay ?? false);
+  DateTime? get movedTo => movedAway ? change!.newDate : null;
+
+  /// It doesn't happen here (cancelled, or moved to another day): no
+  /// reminder, never the "next class".
+  bool get off => cancelled || movedAway;
+
+  /// Happens at another time/room (same day), or was moved here.
+  bool get moved => change?.kind == ChangeKind.moved && !movedAway;
   bool get extra => change?.kind == ChangeKind.extra;
 
   int get startMin => moved ? change!.startMin! : slot.startMin;
@@ -592,16 +652,19 @@ class ClassOnDay {
       moved && change!.room.isNotEmpty ? change!.room : slot.room;
 
   bool get timeChanged =>
-      moved && (startMin != slot.startMin || endMin != slot.endMin);
-  bool get roomChanged => moved && room != slot.room;
+      moved &&
+      movedFrom == null &&
+      (startMin != slot.startMin || endMin != slot.endMin);
+  bool get roomChanged => moved && movedFrom == null && room != slot.room;
 
   DateTime get startsAt => date.add(Duration(minutes: startMin));
   DateTime get endsAt => date.add(Duration(minutes: endMin));
 }
 
 /// The classes of all [groups] on [day] (local date), earliest first, with
-/// that date's changes applied: cancelled classes are kept (marked), moved
-/// ones use their new time and room, extra classes are added.
+/// that date's changes applied: cancelled classes and classes moved to
+/// another day are kept (marked), moved ones use their new time and room,
+/// extra classes and classes moved here from another day are added.
 List<ClassOnDay> classesOn(List<ClassGroup> groups, DateTime day) {
   final date = DateTime(day.year, day.month, day.day);
   final out = <ClassOnDay>[];
@@ -636,9 +699,25 @@ List<ClassOnDay> classesOn(List<ClassGroup> groups, DateTime day) {
         ),
       );
     }
+    // Moved here from another day.
+    for (final c in g.changes) {
+      if (!c.movesDay || c.newDate != date) continue;
+      final s = _slot(g, c.slotId);
+      if (s == null || g.hides(s.courseCode)) continue;
+      out.add(
+        ClassOnDay(slot: s, group: g, date: date, change: c, movedFrom: c.date),
+      );
+    }
   }
   return out..sort((a, b) {
     final t = a.startMin.compareTo(b.startMin);
     return t != 0 ? t : a.slot.courseCode.compareTo(b.slot.courseCode);
   });
+}
+
+ClassSlot? _slot(ClassGroup g, String? id) {
+  for (final s in g.slots) {
+    if (s.id == id) return s;
+  }
+  return null;
 }

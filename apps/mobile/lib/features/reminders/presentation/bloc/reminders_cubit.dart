@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/clock.dart';
+import '../../../classes/presentation/class_format.dart';
 import '../../data/reminder_scheduler.dart';
 import '../../data/reminder_store.dart';
 
@@ -154,17 +155,52 @@ class RemindersCubit extends Cubit<RemindersState> {
   });
 
   ReminderNotification _notification(AppLocalizations l10n, PlannedReminder r) {
-    final s = r.item.slot;
+    final item = r.item;
+    if (item == null) return _testNotification(l10n, r);
+    final s = item.slot;
     return ReminderNotification(
       id: r.id,
       at: r.at,
       title: l10n.notificationTitle(s.courseCode, state.settings.minutesBefore),
       body: [
         if (s.courseTitle.isNotEmpty) s.courseTitle,
-        if (r.item.room.isNotEmpty) l10n.roomShort(r.item.room),
-        _time(r.item.startsAt),
+        if (item.room.isNotEmpty) l10n.roomShort(item.room),
+        _time(item.startsAt),
       ].join(' · '),
-      payload: r.item.group.id,
+      payload: item.group.id,
+    );
+  }
+
+  /// "Tomorrow: Class test · CSE 101" / "Class test soon · CSE 101".
+  ReminderNotification _testNotification(
+    AppLocalizations l10n,
+    PlannedReminder r,
+  ) {
+    final a = r.assessment!;
+    final kind = assessmentKindText(l10n, a.kind);
+    final title = switch (r.when!) {
+      AssessmentReminder.eveningBefore => l10n.reminderTestTomorrow(
+        kind,
+        a.courseCode,
+      ),
+      AssessmentReminder.soon when a.hasTime => l10n.reminderTestSoon(
+        kind,
+        a.courseCode,
+      ),
+      AssessmentReminder.soon => l10n.reminderTestToday(kind, a.courseCode),
+    };
+    final start = a.startMin;
+    return ReminderNotification(
+      id: r.id,
+      at: r.at,
+      title: title,
+      body: [
+        if (start != null)
+          a.kind.isDeadline ? l10n.dueAt(_time(a.startsAt)) : _time(a.startsAt),
+        if (a.room.isNotEmpty) l10n.roomShort(a.room),
+        if (a.topics.isNotEmpty) a.topics,
+      ].join(' · '),
+      payload: r.groupId,
     );
   }
 

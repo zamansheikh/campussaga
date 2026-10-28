@@ -12,6 +12,7 @@ import '../../../app/clock.dart';
 import '../../../app/router.dart';
 import '../../announcements/presentation/announcement_widgets.dart';
 import '../../announcements/presentation/seen_cubit.dart';
+import '../../assessments/presentation/assessment_widgets.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../classes/presentation/bloc/my_classes_cubit.dart';
 import '../../classes/presentation/class_format.dart';
@@ -103,7 +104,7 @@ class _TodayPageState extends State<TodayPage> {
   ) {
     final l10n = AppLocalizations.of(context);
     final today = classesOn(groups, now);
-    final happening = today.where((c) => !c.cancelled);
+    final happening = today.where((c) => !c.off);
     final current = happening.where(
       (c) => !c.startsAt.isAfter(now) && c.endsAt.isAfter(now),
     );
@@ -146,6 +147,7 @@ class _TodayPageState extends State<TodayPage> {
         groups: groups.where((g) => !g.isPersonal).toList(),
         now: now,
       ),
+      ComingUpSection(groups: groups, now: now),
       if (today.isNotEmpty) ...[
         const SizedBox(height: CsSpace.lg),
         CsSection(
@@ -412,9 +414,38 @@ class _HeroCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(CsRadius.full),
                     ),
                     child: Text(
-                      item.moved ? l10n.changeMoved : l10n.changeExtra,
+                      item.movedFrom != null
+                          ? l10n.movedFromDay(
+                              shortDate(context, item.movedFrom!),
+                            )
+                          : item.moved
+                          ? l10n.changeMoved
+                          : l10n.changeExtra,
                       style: context.text.labelMedium?.copyWith(
                         color: const Color(0xFF78350F),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+                for (final t in item.group.assessmentsOn(
+                  item.date,
+                  s.courseCode,
+                )) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFECACA),
+                      borderRadius: BorderRadius.circular(CsRadius.full),
+                    ),
+                    child: Text(
+                      assessmentKindText(l10n, t.kind),
+                      style: context.text.labelMedium?.copyWith(
+                        color: const Color(0xFF7F1D1D),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -514,7 +545,7 @@ class _NothingLeft extends StatelessWidget {
       final list = classesOn(
         groups,
         now.add(Duration(days: i)),
-      ).where((c) => !c.cancelled);
+      ).where((c) => !c.off);
       if (list.isNotEmpty) next = list.first;
     }
     final crGroup = groups

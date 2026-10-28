@@ -11,6 +11,7 @@ import '../../../../app/clock.dart';
 import '../../../../app/router.dart';
 import '../../../announcements/presentation/announcement_widgets.dart';
 import '../../../announcements/presentation/seen_cubit.dart';
+import '../../../assessments/presentation/assessment_widgets.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
 import '../widgets/class_sheet.dart';
@@ -165,6 +166,8 @@ class GroupPage extends StatelessWidget {
             ),
             const SizedBox(height: CsSpace.lg),
             AnnouncementsSection(group: g),
+            const SizedBox(height: CsSpace.lg),
+            GroupAssessments(group: g),
             const SizedBox(height: CsSpace.lg),
             ..._upcomingChanges(context, g),
             if (days.isEmpty)

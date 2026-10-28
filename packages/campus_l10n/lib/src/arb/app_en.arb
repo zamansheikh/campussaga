@@ -83,7 +83,13 @@
   "saveProfile": "Save",
   "setupLater": "Later",
   "signedInAs": "Signed in as {email}",
-  "@signedInAs": { "placeholders": { "email": { "type": "String" } } },
+  "@signedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "useAnotherAccount": "Use a different account",
   "editProfile": "Edit profile",
   "profileSaved": "Profile saved",
@@ -367,7 +373,7 @@
   "changeMoved": "Changed",
   "changeExtra": "Extra class",
   "cancelThisClass": "Cancel this class",
-  "changeTimeOrRoom": "Change time or room",
+  "changeTimeOrRoom": "Change day, time or room",
   "undoChange": "Undo change",
   "removeExtraClass": "Remove extra class",
   "editWeeklyClass": "Edit weekly class",
@@ -561,5 +567,122 @@
   "leaveVerifiedBody": "You'll show as not verified until you verify with an email from your new university. Your class groups stay.",
   "changeUniversitySubtitle": "Enter your email at your new university. We'll send a 6-digit code to it.",
   "universityChanged": "University changed",
-  "moveAction": "Move"
+  "moveAction": "Move",
+  "movedToDay": "Moved to {day}",
+  "@movedToDay": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "movedFromDay": "Moved from {day}",
+  "@movedFromDay": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "movedDayNotice": "This week only: from {from} to {to}. The weekly routine stays the same.",
+  "@movedDayNotice": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "dayTapToChange": "Tap to move it to another day",
+  "dayToday": "Today",
+  "dayTomorrow": "Tomorrow",
+  "testsAndDeadlines": "Tests & deadlines",
+  "comingUp": "Coming up",
+  "addTest": "Add test or deadline",
+  "editTest": "Edit test or deadline",
+  "noTestsYet": "No tests or deadlines yet. Anyone in the group can add one.",
+  "testKindLabel": "What is it?",
+  "kindClassTest": "Class test",
+  "kindQuiz": "Quiz",
+  "kindAssignment": "Assignment",
+  "kindLabReport": "Lab report",
+  "kindPresentation": "Presentation",
+  "kindMidterm": "Mid-term",
+  "kindFinal": "Final exam",
+  "kindOther": "Other",
+  "testTimeLabel": "Time",
+  "testNoTime": "No time",
+  "testAddTime": "Add a time",
+  "testAddEnd": "Add an end time",
+  "dueLabel": "Due",
+  "dueAt": "Due {time}",
+  "@dueAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "topicsLabel": "Topics or details (optional)",
+  "topicsHint": "e.g. Chapters 1–3, bring a calculator",
+  "testSaved": "Saved. Classmates get a notification.",
+  "testDeleted": "Deleted",
+  "deleteTestTitle": "Delete this {kind}?",
+  "@deleteTestTitle": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteTestBody": "It's removed for everyone in the group.",
+  "addedBy": "Added by {name}",
+  "@addedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "testOnlyOwnerHint": "Only who added it or a CR can change it.",
+  "reminderTestTomorrow": "Tomorrow: {kind} · {course}",
+  "@reminderTestTomorrow": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "course": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderTestSoon": "{kind} soon · {course}",
+  "@reminderTestSoon": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "course": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderTestToday": "Today: {kind} · {course}",
+  "@reminderTestToday": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "course": {
+        "type": "String"
+      }
+    }
+  },
+  "errorAssessmentDate": "Pick a date from today, within 6 months.",
+  "errorAssessmentLimit": "This group already has the most upcoming tests and deadlines allowed.",
+  "errorAssessmentGone": "This was already deleted.",
+  "errorNotAssessmentOwner": "Only who added it or a CR can change it.",
+  "errorMoveDate": "Pick a day from today, within 6 months."
 }

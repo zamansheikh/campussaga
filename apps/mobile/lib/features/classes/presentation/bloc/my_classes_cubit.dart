@@ -170,6 +170,49 @@ class MyClassesCubit extends Cubit<MyClassesState> {
     }
   }
 
+  /// Adds a test or deadline (any member).
+  Future<Assessment> addAssessment(
+    String groupId,
+    AssessmentDraft draft,
+  ) async {
+    final a = await _repo.addAssessment(groupId, draft);
+    _putAssessment(groupId, a);
+    return a;
+  }
+
+  Future<void> updateAssessment(
+    String groupId,
+    String id,
+    AssessmentDraft draft,
+  ) async =>
+      _putAssessment(groupId, await _repo.updateAssessment(groupId, id, draft));
+
+  Future<void> deleteAssessment(String groupId, String id) async {
+    await _repo.deleteAssessment(groupId, id);
+    final g = state.group(groupId);
+    if (g != null) {
+      _replace(
+        g.copyWith(
+          assessments: g.assessments.where((x) => x.id != id).toList(),
+        ),
+      );
+    }
+  }
+
+  void _putAssessment(String groupId, Assessment a) {
+    final g = state.group(groupId);
+    if (g == null) return;
+    _replace(
+      g.copyWith(
+        assessments: sortAssessments([
+          for (final x in g.assessments)
+            if (x.id != a.id) x,
+          a,
+        ]),
+      ),
+    );
+  }
+
   Future<void> postAnnouncement(
     String groupId,
     String body, {

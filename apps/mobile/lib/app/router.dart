@@ -5,6 +5,7 @@ import 'package:campus_l10n/campus_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/assessments/presentation/assessment_editor_page.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/email_sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
@@ -59,6 +60,19 @@ abstract final class Routes {
   /// Add an extra class on one date.
   static String extraClass(String groupId, DateTime date) =>
       '/groups/$groupId/change?date=${formatDate(date)}';
+
+  /// Add a test or deadline (optionally for a course on a date).
+  static String newTest(String groupId, {String? course, DateTime? date}) =>
+      Uri(
+        path: '/groups/$groupId/test/new',
+        queryParameters: {
+          'course': ?course,
+          if (date != null) 'date': formatDate(date),
+        },
+      ).toString();
+
+  static String editTest(String groupId, String testId) =>
+      '/groups/$groupId/test/$testId';
 }
 
 /// App routes. Signed-out students see the welcome slides once, then only
@@ -162,6 +176,24 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
                   groupId: state.pathParameters['id']!,
                   slotId: state.uri.queryParameters['slot'],
                   date: parseDate(state.uri.queryParameters['date']!),
+                ),
+              ),
+              GoRoute(
+                path: 'test/new',
+                builder: (context, state) {
+                  final q = state.uri.queryParameters;
+                  return AssessmentEditorPage(
+                    groupId: state.pathParameters['id']!,
+                    courseCode: q['course'],
+                    date: q['date'] == null ? null : parseDate(q['date']!),
+                  );
+                },
+              ),
+              GoRoute(
+                path: 'test/:testId',
+                builder: (context, state) => AssessmentEditorPage(
+                  groupId: state.pathParameters['id']!,
+                  assessmentId: state.pathParameters['testId'],
                 ),
               ),
               GoRoute(

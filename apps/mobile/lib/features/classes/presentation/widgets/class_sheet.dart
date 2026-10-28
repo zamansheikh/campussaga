@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/clock.dart';
 import '../../../../app/router.dart';
+import '../../../assessments/presentation/assessment_widgets.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
 import 'class_tile.dart';
@@ -48,6 +49,12 @@ class _ClassSheet extends StatelessWidget {
     final personal = item.group.isPersonal;
     final canChange =
         item.group.isCr && !personal && !item.date.isBefore(today);
+    // The class's own date (a class moved here keeps its original date).
+    final ownDate = item.movedFrom ?? item.date;
+    final movedTo = item.movedTo;
+    final tests = personal
+        ? const <Assessment>[]
+        : item.group.assessmentsOn(item.date, s.courseCode);
 
     void close(void Function() then) {
       Navigator.of(context).pop();
@@ -100,6 +107,8 @@ class _ClassSheet extends StatelessWidget {
                 ),
                 if (item.cancelled)
                   CsBadge(label: l10n.changeCancelled, tone: CsBadgeTone.danger)
+                else if (movedTo != null || item.movedFrom != null)
+                  CsBadge(label: l10n.changeMoved, tone: CsBadgeTone.accent)
                 else if (item.moved)
                   CsBadge(label: l10n.changeMoved, tone: CsBadgeTone.accent)
                 else if (item.extra)
@@ -108,6 +117,21 @@ class _ClassSheet extends StatelessWidget {
             ),
             const SizedBox(height: CsSpace.md),
             _Line(Icons.event_outlined, dateText(context, item.date)),
+            if (movedTo != null)
+              _Line(
+                Icons.east_rounded,
+                l10n.movedToDay(
+                  '${dateText(context, movedTo)}, '
+                  '${rangeText(context, ClassSlot(id: s.id, courseCode: s.courseCode, weekday: movedTo.weekday, startMin: item.change!.startMin!, endMin: item.change!.endMin!))}',
+                ),
+                strong: true,
+              ),
+            if (item.movedFrom != null)
+              _Line(
+                Icons.west_rounded,
+                l10n.movedFromDay(dateText(context, item.movedFrom!)),
+                strong: true,
+              ),
             _Line(
               Icons.access_time_rounded,
               item.timeChanged
@@ -134,25 +158,36 @@ class _ClassSheet extends StatelessWidget {
                 ),
                 child: Text(item.change!.note, style: context.text.bodyMedium),
               ),
+            if (tests.isNotEmpty) ...[
+              const SizedBox(height: CsSpace.sm),
+              for (final t in tests)
+                _TestChip(
+                  test: t,
+                  onTap: () =>
+                      close(() => showAssessmentSheet(host, t, item.group)),
+                ),
+            ],
             const SizedBox(height: CsSpace.md),
             if (canChange && !item.extra && !item.cancelled) ...[
               OutlinedButton.icon(
                 onPressed: () => close(
                   () => host.push(
-                    Routes.changeClass(item.group.id, s.id, item.date),
+                    Routes.changeClass(item.group.id, s.id, ownDate),
                   ),
                 ),
                 icon: const Icon(Icons.edit_calendar_outlined),
                 label: Text(l10n.changeTimeOrRoom),
               ),
               const SizedBox(height: CsSpace.sm),
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(foregroundColor: cs.error),
-                onPressed: () => close(() => confirmCancel(host, item)),
-                icon: const Icon(Icons.event_busy_outlined),
-                label: Text(l10n.cancelThisClass),
-              ),
-              const SizedBox(height: CsSpace.sm),
+              if (movedTo == null) ...[
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(foregroundColor: cs.error),
+                  onPressed: () => close(() => confirmCancel(host, item)),
+                  icon: const Icon(Icons.event_busy_outlined),
+                  label: Text(l10n.cancelThisClass),
+                ),
+                const SizedBox(height: CsSpace.sm),
+              ],
             ],
             if (canChange && item.change != null) ...[
               OutlinedButton.icon(
@@ -188,6 +223,21 @@ class _ClassSheet extends StatelessWidget {
             else
               Row(
                 children: [
+                  if (!item.date.isBefore(today) && !item.off)
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => close(
+                          () => host.push(
+                            Routes.newTest(
+                              item.group.id,
+                              course: s.courseCode,
+                              date: item.date,
+                            ),
+                          ),
+                        ),
+                        child: Text(l10n.addTest, textAlign: TextAlign.center),
+                      ),
+                    ),
                   if (item.group.isCr && !item.extra)
                     Expanded(
                       child: TextButton(
@@ -250,22 +300,87 @@ class _ClassSheet extends StatelessWidget {
 }
 
 class _Line extends StatelessWidget {
-  const _Line(this.icon, this.text);
+  const _Line(this.icon, this.text, {this.strong = false});
 
   final IconData icon;
   final String text;
 
+  /// Highlighted (where a moved class went or came from).
+  final bool strong;
+
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 6),
-    child: Row(
-      children: [
-        Icon(icon, size: 18, color: context.cs.textSecondary),
-        const SizedBox(width: 10),
-        Expanded(child: Text(text, style: context.text.bodyMedium)),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final color = strong ? context.cs.statusInProgress.fg : null;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: color ?? context.cs.textSecondary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: context.text.bodyMedium?.copyWith(
+                color: color,
+                fontWeight: strong ? FontWeight.w600 : null,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A test or deadline of this class on this day.
+class _TestChip extends StatelessWidget {
+  const _TestChip({required this.test, required this.onTap});
+
+  final Assessment test;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cs = context.cs;
+    final time = assessmentTimeText(context, test);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: CsSpace.xs),
+      child: Material(
+        color: cs.statusRejected.bg,
+        borderRadius: BorderRadius.circular(CsRadius.md),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Icon(assessmentIcon(test.kind), color: cs.statusRejected.fg),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    [
+                      assessmentKindText(l10n, test.kind),
+                      if (time.isNotEmpty) time,
+                      if (test.topics.isNotEmpty) test.topics,
+                    ].join(' · '),
+                    style: context.text.bodyMedium?.copyWith(
+                      color: cs.statusRejected.fg,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, color: cs.statusRejected.fg),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Asks to cancel [item] on its date, with an optional note.
@@ -279,7 +394,11 @@ Future<void> confirmCancel(BuildContext context, ClassOnDay item) async {
     context,
     () => context.read<MyClassesCubit>().addChange(
       item.group.id,
-      ChangeDraft.cancel(slotId: item.slot.id, date: item.date, note: note),
+      ChangeDraft.cancel(
+        slotId: item.slot.id,
+        date: item.movedFrom ?? item.date,
+        note: note,
+      ),
     ),
   );
 }

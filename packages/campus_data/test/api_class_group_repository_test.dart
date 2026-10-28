@@ -87,4 +87,55 @@ void main() {
       'DELETE /api/v1/groups/g1/slots/a%2Fb ',
     ]);
   });
+
+  test('tests and deadlines endpoints', () async {
+    final seen = <String>[];
+    const a = {
+      'id': 'a1',
+      'kind': 'class_test',
+      'courseCode': 'CSE 101',
+      'courseTitle': '',
+      'date': '2026-10-30',
+      'start': '10:00',
+      'end': '10:30',
+      'room': '402',
+      'topics': 'Ch 1-3',
+      'createdBy': {'id': 'u1', 'name': 'Rafi'},
+      'canEdit': true,
+    };
+    final client = MockClient((r) async {
+      seen.add('${r.method} ${r.url.path} ${r.body}');
+      return r.method == 'DELETE'
+          ? http.Response('', 204)
+          : ok(a, r.method == 'POST' ? 201 : 200);
+    });
+    final repo = ApiClassGroupRepository(
+      ApiClient(
+        const ApiConfig(baseUrl: 'https://api.test/api/v1'),
+        httpClient: client,
+        accessToken: () => 't',
+      ),
+    );
+    final draft = AssessmentDraft(
+      kind: AssessmentKind.classTest,
+      courseCode: 'CSE 101',
+      date: DateTime(2026, 10, 30),
+      startMin: 600,
+      endMin: 630,
+      room: '402',
+      topics: 'Ch 1-3',
+    );
+    final added = await repo.addAssessment('g1', draft);
+    expect(added.createdByName, 'Rafi');
+    expect(added.canEdit, isTrue);
+    await repo.updateAssessment('g1', 'a1', draft);
+    await repo.deleteAssessment('g1', 'a1');
+    const body =
+        '{"kind":"class_test","courseCode":"CSE 101","courseTitle":"","date":"2026-10-30","start":"10:00","end":"10:30","room":"402","topics":"Ch 1-3"}';
+    expect(seen, [
+      'POST /api/v1/groups/g1/assessments $body',
+      'PUT /api/v1/groups/g1/assessments/a1 $body',
+      'DELETE /api/v1/groups/g1/assessments/a1 ',
+    ]);
+  });
 }

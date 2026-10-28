@@ -18,6 +18,7 @@ import '../features/push/push_messaging.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/data/reminder_store.dart';
 import '../features/reminders/presentation/bloc/reminders_cubit.dart';
+import '../features/widget/home_widget.dart';
 import 'di.dart';
 import 'router.dart';
 import 'settings/bloc/settings_cubit.dart';
@@ -57,6 +58,8 @@ class _CampusAppState extends State<CampusApp> {
     onOpened: _onPushOpened,
   );
   String? _pushUser;
+  // Android home-screen widget: next class and next test.
+  late final HomeWidgetSync _homeWidget = HomeWidgetSync();
   late final SettingsCubit _settings = SettingsCubit(getIt<SettingsStorage>());
   late final GoRouter _router = buildRouter(_auth, _settings);
   late final VersionGateCubit _versionGate = VersionGateCubit(
@@ -85,6 +88,7 @@ class _CampusAppState extends State<CampusApp> {
     unawaited(_reminders.start());
     unawaited(_seen.start());
     _push.start();
+    _homeWidget.attach(classes: _classes, auth: _auth, settings: _settings);
     _classesSub = _classes.stream
         .map((s) => s.routine)
         .distinct()
@@ -142,6 +146,7 @@ class _CampusAppState extends State<CampusApp> {
     unawaited(_authSub.cancel());
     unawaited(_classesSub.cancel());
     _push.dispose();
+    _homeWidget.dispose();
     _reminders.close();
     _seen.close();
     _classes.close();

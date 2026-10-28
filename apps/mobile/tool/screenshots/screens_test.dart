@@ -365,6 +365,109 @@ void main() {
       await capture(tester, 'changes-${look.name}');
     });
 
+    shot('tests ${look.name}', (tester) async {
+      DateTime d(int day) => DateTime(2026, 10, day);
+      final g = _group(GroupRole.member).copyWith(
+        changes: [
+          // MAT201 (Tuesday 14:30) moved to Thursday morning.
+          ClassChange(
+            id: 'm1',
+            kind: ChangeKind.moved,
+            slotId: '5',
+            date: d(27),
+            newDate: d(29),
+            startMin: 9 * 60,
+            endMin: 10 * 60 + 30,
+            room: '410',
+            note: 'The teacher is at a seminar on Tuesday',
+          ),
+        ],
+        assessments: [
+          Assessment(
+            id: 't1',
+            kind: AssessmentKind.classTest,
+            courseCode: 'CSE312',
+            courseTitle: 'Database Lab',
+            date: d(27),
+            startMin: 10 * 60 + 30,
+            endMin: 11 * 60,
+            room: 'Lab 3',
+            topics: 'SQL joins and subqueries',
+            createdById: 'u9',
+            createdByName: 'Tanvir',
+          ),
+          Assessment(
+            id: 't2',
+            kind: AssessmentKind.quiz,
+            courseCode: 'CSE313',
+            courseTitle: 'Operating Systems',
+            date: d(28),
+            startMin: 9 * 60,
+            endMin: 9 * 60 + 20,
+            room: '602',
+            topics: 'Process scheduling, chapters 3–5',
+            createdById: 'u1',
+            createdByName: 'Rafiul Islam',
+            canEdit: true,
+          ),
+          Assessment(
+            id: 't3',
+            kind: AssessmentKind.assignment,
+            courseCode: 'ENG102',
+            date: d(29),
+            startMin: 23 * 60 + 59,
+            topics: 'Report on a campus problem, 800 words',
+          ),
+          Assessment(
+            id: 't4',
+            kind: AssessmentKind.midterm,
+            courseCode: 'CSE311',
+            courseTitle: 'Database Systems',
+            date: d(31),
+            startMin: 10 * 60,
+            endMin: 11 * 60 + 30,
+            room: '504',
+          ),
+        ],
+      );
+      final router = await start(tester, look, user: _student, groups: [g]);
+      await capture(tester, 'tests-${look.name}');
+      await tester.tap(find.textContaining('· CSE313').first);
+      await tester.pumpAndSettle();
+      await capture(tester, 'tests-${look.name}');
+      Navigator.of(tester.element(find.byType(BottomSheet))).pop();
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('MAT201'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+      await capture(tester, 'tests-${look.name}');
+      await tester.tap(find.text('MAT201'));
+      await tester.pumpAndSettle();
+      await capture(tester, 'tests-${look.name}');
+      Navigator.of(tester.element(find.byType(BottomSheet))).pop();
+      await tester.pumpAndSettle();
+      unawaited(router.push(Routes.group('g1')));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byIcon(Icons.add_rounded).last,
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.pumpAndSettle();
+      await capture(tester, 'tests-${look.name}');
+      unawaited(router.push(Routes.editTest('g1', 't2')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'tests-${look.name}');
+      router.pop();
+      await tester.pumpAndSettle();
+      unawaited(router.push(Routes.changeClass('g1', '5', d(27))));
+      await tester.pumpAndSettle();
+      await capture(tester, 'tests-${look.name}');
+    });
+
     shot('news ${look.name}', (tester) async {
       final g = _group(GroupRole.cr).copyWith(
         announcements: [

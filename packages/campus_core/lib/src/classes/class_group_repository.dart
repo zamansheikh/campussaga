@@ -1,3 +1,4 @@
+import 'assessment_models.dart';
 import 'class_models.dart';
 
 /// Class groups and their routines. Every method throws a `Failure`.
@@ -32,6 +33,19 @@ abstract interface class ClassGroupRepository {
 
   /// Undoes a change (CR).
   Future<void> deleteChange(String groupId, String changeId);
+
+  /// Adds a test or deadline (any member).
+  Future<Assessment> addAssessment(String groupId, AssessmentDraft draft);
+
+  /// Changes one (who added it, or a CR).
+  Future<Assessment> updateAssessment(
+    String groupId,
+    String assessmentId,
+    AssessmentDraft draft,
+  );
+
+  /// Deletes one (who added it, or a CR).
+  Future<void> deleteAssessment(String groupId, String assessmentId);
 
   /// Posts a message to the group (CR); pinning unpins the previous one.
   Future<Announcement> postAnnouncement(

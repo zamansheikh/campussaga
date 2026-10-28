@@ -69,7 +69,7 @@ void main() {
     final classes = await signedIn(tester, sampleGroup(role: GroupRole.cr));
     await scrollAndTap(tester, find.text('CSE313'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Change time or room'));
+    await tester.tap(find.text('Change day, time or room'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Only for Tuesday'), findsOneWidget);
     expect(find.widgetWithText(TextField, '602'), findsOneWidget);

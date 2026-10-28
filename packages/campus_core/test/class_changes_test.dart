@@ -100,7 +100,7 @@ void main() {
       settings: const ReminderSettings(enabled: true),
       days: 2,
     );
-    expect(r.map((x) => (x.item.slot.courseCode, x.at)), [
+    expect(r.map((x) => (x.item!.slot.courseCode, x.at)), [
       ('CSE313', DateTime(2026, 10, 28, 7, 50)),
       ('MAT201', DateTime(2026, 10, 28, 13, 50)),
     ]);
@@ -137,7 +137,7 @@ void main() {
         now: DateTime(2026, 10, 27, 20),
         settings: const ReminderSettings(enabled: true),
         days: 2,
-      ).map((r) => r.item.slot.courseCode),
+      ).map((r) => r.item!.slot.courseCode),
       ['CSE311'],
     );
     expect(ClassGroup.fromJson(g.toJson()).hiddenCourses, g.hiddenCourses);

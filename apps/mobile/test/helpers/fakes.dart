@@ -527,6 +527,7 @@ class FakeClassGroupRepository implements ClassGroupRepository {
       startMin: d.startMin,
       endMin: d.endMin,
       note: d.note,
+      newDate: d.newDate == d.date ? null : d.newDate,
     );
     _put(
       g.copyWith(
@@ -541,6 +542,68 @@ class FakeClassGroupRepository implements ClassGroupRepository {
     );
     return c;
   }
+
+  /// Tests and deadlines added, changed or deleted (for assertions).
+  final assessmentCalls = <String>[];
+
+  @override
+  Future<Assessment> addAssessment(String groupId, AssessmentDraft d) async {
+    _check();
+    final g = _mine(groupId);
+    final a = _assessment(_id('t'), d);
+    assessmentCalls.add('add ${d.kind.wire} ${d.courseCode}');
+    _put(g.copyWith(assessments: sortAssessments([...g.assessments, a])));
+    return a;
+  }
+
+  @override
+  Future<Assessment> updateAssessment(
+    String groupId,
+    String assessmentId,
+    AssessmentDraft d,
+  ) async {
+    _check();
+    final g = _mine(groupId);
+    final a = _assessment(assessmentId, d);
+    assessmentCalls.add('update $assessmentId');
+    _put(
+      g.copyWith(
+        assessments: sortAssessments([
+          for (final x in g.assessments)
+            if (x.id != assessmentId) x,
+          a,
+        ]),
+      ),
+    );
+    return a;
+  }
+
+  @override
+  Future<void> deleteAssessment(String groupId, String assessmentId) async {
+    _check();
+    final g = _mine(groupId);
+    assessmentCalls.add('delete $assessmentId');
+    _put(
+      g.copyWith(
+        assessments: g.assessments.where((x) => x.id != assessmentId).toList(),
+      ),
+    );
+  }
+
+  static Assessment _assessment(String id, AssessmentDraft d) => Assessment(
+    id: id,
+    kind: d.kind,
+    courseCode: d.courseCode,
+    courseTitle: d.courseTitle,
+    date: d.date,
+    startMin: d.startMin,
+    endMin: d.startMin == null ? null : d.endMin,
+    room: d.room,
+    topics: d.topics,
+    createdById: 'me',
+    createdByName: 'Me',
+    canEdit: true,
+  );
 
   @override
   Future<Announcement> postAnnouncement(

@@ -746,7 +746,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get cancelThisClass => 'এই ক্লাস বাতিল করো';
 
   @override
-  String get changeTimeOrRoom => 'সময় বা রুম বদলাও';
+  String get changeTimeOrRoom => 'দিন, সময় বা রুম বদলাও';
 
   @override
   String get undoChange => 'পরিবর্তন ফিরিয়ে নাও';
@@ -1136,4 +1136,152 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get moveAction => 'বদলাও';
+
+  @override
+  String movedToDay(String day) {
+    return 'সরানো: $day';
+  }
+
+  @override
+  String movedFromDay(String day) {
+    return 'আগে ছিল: $day';
+  }
+
+  @override
+  String movedDayNotice(String from, String to) {
+    return 'শুধু এই সপ্তাহে: $from থেকে $to। সাপ্তাহিক রুটিন একই থাকবে।';
+  }
+
+  @override
+  String get dayTapToChange => 'অন্য দিনে সরাতে চাপ দাও';
+
+  @override
+  String get dayToday => 'আজ';
+
+  @override
+  String get dayTomorrow => 'আগামীকাল';
+
+  @override
+  String get testsAndDeadlines => 'পরীক্ষা ও ডেডলাইন';
+
+  @override
+  String get comingUp => 'সামনে আসছে';
+
+  @override
+  String get addTest => 'পরীক্ষা বা ডেডলাইন যোগ করো';
+
+  @override
+  String get editTest => 'পরীক্ষা বা ডেডলাইন সম্পাদনা';
+
+  @override
+  String get noTestsYet =>
+      'এখনো কোনো পরীক্ষা বা ডেডলাইন নেই। গ্রুপের যে কেউ যোগ করতে পারে।';
+
+  @override
+  String get testKindLabel => 'কী ধরনের?';
+
+  @override
+  String get kindClassTest => 'ক্লাস টেস্ট';
+
+  @override
+  String get kindQuiz => 'কুইজ';
+
+  @override
+  String get kindAssignment => 'অ্যাসাইনমেন্ট';
+
+  @override
+  String get kindLabReport => 'ল্যাব রিপোর্ট';
+
+  @override
+  String get kindPresentation => 'প্রেজেন্টেশন';
+
+  @override
+  String get kindMidterm => 'মিডটার্ম';
+
+  @override
+  String get kindFinal => 'ফাইনাল পরীক্ষা';
+
+  @override
+  String get kindOther => 'অন্যান্য';
+
+  @override
+  String get testTimeLabel => 'সময়';
+
+  @override
+  String get testNoTime => 'সময় নেই';
+
+  @override
+  String get testAddTime => 'সময় যোগ করো';
+
+  @override
+  String get testAddEnd => 'শেষের সময় যোগ করো';
+
+  @override
+  String get dueLabel => 'জমার সময়';
+
+  @override
+  String dueAt(String time) {
+    return 'জমা $time';
+  }
+
+  @override
+  String get topicsLabel => 'বিষয় বা বিস্তারিত (ঐচ্ছিক)';
+
+  @override
+  String get topicsHint => 'যেমন অধ্যায় ১–৩, ক্যালকুলেটর আনতে হবে';
+
+  @override
+  String get testSaved => 'সংরক্ষিত। সহপাঠীরা নোটিফিকেশন পাবে।';
+
+  @override
+  String get testDeleted => 'মুছে ফেলা হয়েছে';
+
+  @override
+  String deleteTestTitle(String kind) {
+    return 'এই $kind মুছে ফেলবে?';
+  }
+
+  @override
+  String get deleteTestBody => 'গ্রুপের সবার কাছ থেকে মুছে যাবে।';
+
+  @override
+  String addedBy(String name) {
+    return 'যোগ করেছে $name';
+  }
+
+  @override
+  String get testOnlyOwnerHint => 'যে যোগ করেছে বা সিআর-ই শুধু বদলাতে পারে।';
+
+  @override
+  String reminderTestTomorrow(String kind, String course) {
+    return 'আগামীকাল: $kind · $course';
+  }
+
+  @override
+  String reminderTestSoon(String kind, String course) {
+    return 'শিগগিরই $kind · $course';
+  }
+
+  @override
+  String reminderTestToday(String kind, String course) {
+    return 'আজ: $kind · $course';
+  }
+
+  @override
+  String get errorAssessmentDate =>
+      'আজ থেকে ৬ মাসের মধ্যে একটি তারিখ বেছে নাও।';
+
+  @override
+  String get errorAssessmentLimit =>
+      'এই গ্রুপে সামনের পরীক্ষা ও ডেডলাইন সর্বোচ্চ সংখ্যায় পৌঁছে গেছে।';
+
+  @override
+  String get errorAssessmentGone => 'এটি আগেই মুছে ফেলা হয়েছে।';
+
+  @override
+  String get errorNotAssessmentOwner =>
+      'যে যোগ করেছে বা সিআর-ই শুধু বদলাতে পারে।';
+
+  @override
+  String get errorMoveDate => 'আজ থেকে ৬ মাসের মধ্যে একটি দিন বেছে নাও।';
 }

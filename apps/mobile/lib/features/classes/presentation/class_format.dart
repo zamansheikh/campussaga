@@ -42,6 +42,11 @@ String classErrorText(AppLocalizations l10n, Failure f) => switch (f.code) {
   'LAST_CR' => l10n.errorLastCr,
   'REMOVE_CR' => l10n.errorRemoveCr,
   'PERSONAL_LIMIT_REACHED' => l10n.errorPersonalLimit,
+  'ASSESSMENT_LIMIT_REACHED' => l10n.errorAssessmentLimit,
+  'ASSESSMENT_NOT_FOUND' => l10n.errorAssessmentGone,
+  'NOT_ASSESSMENT_OWNER' => l10n.errorNotAssessmentOwner,
+  _ when _field(f, 'newDate') => l10n.errorMoveDate,
+  _ when _field(f, 'date') => l10n.errorAssessmentDate,
   _ when f is RateLimitedFailure => l10n.errorTooManyRequests,
   _ => authErrorText(l10n, f),
 };
@@ -63,3 +68,48 @@ String agoText(BuildContext context, DateTime t, DateTime now) {
 /// How a group is named in lists: its title, or "Personal".
 String groupLabel(BuildContext context, ClassGroup g) =>
     g.isPersonal ? AppLocalizations.of(context).personalClasses : g.title;
+
+bool _field(Failure f, String name) =>
+    f is ValidationFailure && f.fieldErrors.containsKey(name);
+
+/// "Wed, Oct 28" (or the Bangla form).
+String shortDate(BuildContext context, DateTime d) =>
+    DateFormat.MMMEd(_locale(context)).format(d);
+
+/// "Today", "Tomorrow", or [shortDate].
+String dayText(BuildContext context, DateTime d, DateTime now) {
+  final l10n = AppLocalizations.of(context);
+  final today = DateTime(now.year, now.month, now.day);
+  final day = DateTime(d.year, d.month, d.day);
+  if (day == today) return l10n.dayToday;
+  if (day == DateTime(today.year, today.month, today.day + 1)) {
+    return l10n.dayTomorrow;
+  }
+  return shortDate(context, d);
+}
+
+/// "Class test", "Assignment", ...
+String assessmentKindText(AppLocalizations l10n, AssessmentKind k) =>
+    switch (k) {
+      AssessmentKind.classTest => l10n.kindClassTest,
+      AssessmentKind.quiz => l10n.kindQuiz,
+      AssessmentKind.assignment => l10n.kindAssignment,
+      AssessmentKind.labReport => l10n.kindLabReport,
+      AssessmentKind.presentation => l10n.kindPresentation,
+      AssessmentKind.midterm => l10n.kindMidterm,
+      AssessmentKind.finalExam => l10n.kindFinal,
+      AssessmentKind.other => l10n.kindOther,
+    };
+
+/// "10:00 AM", "10:00 – 10:30 AM", "Due 11:59 PM", or "" without a time.
+String assessmentTimeText(BuildContext context, Assessment a) {
+  final start = a.startMin;
+  if (start == null) return '';
+  if (a.kind.isDeadline) {
+    return AppLocalizations.of(context).dueAt(clockText(context, start));
+  }
+  final end = a.endMin;
+  return end == null
+      ? clockText(context, start)
+      : '${clockText(context, start)} – ${clockText(context, end)}';
+}

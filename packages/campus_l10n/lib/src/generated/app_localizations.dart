@@ -1349,7 +1349,7 @@ abstract class AppLocalizations {
   /// No description provided for @changeTimeOrRoom.
   ///
   /// In en, this message translates to:
-  /// **'Change time or room'**
+  /// **'Change day, time or room'**
   String get changeTimeOrRoom;
 
   /// No description provided for @undoChange.
@@ -2011,6 +2011,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Move'**
   String get moveAction;
+
+  /// No description provided for @movedToDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved to {day}'**
+  String movedToDay(String day);
+
+  /// No description provided for @movedFromDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved from {day}'**
+  String movedFromDay(String day);
+
+  /// No description provided for @movedDayNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This week only: from {from} to {to}. The weekly routine stays the same.'**
+  String movedDayNotice(String from, String to);
+
+  /// No description provided for @dayTapToChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to move it to another day'**
+  String get dayTapToChange;
+
+  /// No description provided for @dayToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get dayToday;
+
+  /// No description provided for @dayTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get dayTomorrow;
+
+  /// No description provided for @testsAndDeadlines.
+  ///
+  /// In en, this message translates to:
+  /// **'Tests & deadlines'**
+  String get testsAndDeadlines;
+
+  /// No description provided for @comingUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming up'**
+  String get comingUp;
+
+  /// No description provided for @addTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Add test or deadline'**
+  String get addTest;
+
+  /// No description provided for @editTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit test or deadline'**
+  String get editTest;
+
+  /// No description provided for @noTestsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No tests or deadlines yet. Anyone in the group can add one.'**
+  String get noTestsYet;
+
+  /// No description provided for @testKindLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What is it?'**
+  String get testKindLabel;
+
+  /// No description provided for @kindClassTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Class test'**
+  String get kindClassTest;
+
+  /// No description provided for @kindQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiz'**
+  String get kindQuiz;
+
+  /// No description provided for @kindAssignment.
+  ///
+  /// In en, this message translates to:
+  /// **'Assignment'**
+  String get kindAssignment;
+
+  /// No description provided for @kindLabReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Lab report'**
+  String get kindLabReport;
+
+  /// No description provided for @kindPresentation.
+  ///
+  /// In en, this message translates to:
+  /// **'Presentation'**
+  String get kindPresentation;
+
+  /// No description provided for @kindMidterm.
+  ///
+  /// In en, this message translates to:
+  /// **'Mid-term'**
+  String get kindMidterm;
+
+  /// No description provided for @kindFinal.
+  ///
+  /// In en, this message translates to:
+  /// **'Final exam'**
+  String get kindFinal;
+
+  /// No description provided for @kindOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get kindOther;
+
+  /// No description provided for @testTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get testTimeLabel;
+
+  /// No description provided for @testNoTime.
+  ///
+  /// In en, this message translates to:
+  /// **'No time'**
+  String get testNoTime;
+
+  /// No description provided for @testAddTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a time'**
+  String get testAddTime;
+
+  /// No description provided for @testAddEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an end time'**
+  String get testAddEnd;
+
+  /// No description provided for @dueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get dueLabel;
+
+  /// No description provided for @dueAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {time}'**
+  String dueAt(String time);
+
+  /// No description provided for @topicsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Topics or details (optional)'**
+  String get topicsLabel;
+
+  /// No description provided for @topicsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Chapters 1–3, bring a calculator'**
+  String get topicsHint;
+
+  /// No description provided for @testSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved. Classmates get a notification.'**
+  String get testSaved;
+
+  /// No description provided for @testDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted'**
+  String get testDeleted;
+
+  /// No description provided for @deleteTestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this {kind}?'**
+  String deleteTestTitle(String kind);
+
+  /// No description provided for @deleteTestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s removed for everyone in the group.'**
+  String get deleteTestBody;
+
+  /// No description provided for @addedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Added by {name}'**
+  String addedBy(String name);
+
+  /// No description provided for @testOnlyOwnerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Only who added it or a CR can change it.'**
+  String get testOnlyOwnerHint;
+
+  /// No description provided for @reminderTestTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow: {kind} · {course}'**
+  String reminderTestTomorrow(String kind, String course);
+
+  /// No description provided for @reminderTestSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'{kind} soon · {course}'**
+  String reminderTestSoon(String kind, String course);
+
+  /// No description provided for @reminderTestToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today: {kind} · {course}'**
+  String reminderTestToday(String kind, String course);
+
+  /// No description provided for @errorAssessmentDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date from today, within 6 months.'**
+  String get errorAssessmentDate;
+
+  /// No description provided for @errorAssessmentLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'This group already has the most upcoming tests and deadlines allowed.'**
+  String get errorAssessmentLimit;
+
+  /// No description provided for @errorAssessmentGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This was already deleted.'**
+  String get errorAssessmentGone;
+
+  /// No description provided for @errorNotAssessmentOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Only who added it or a CR can change it.'**
+  String get errorNotAssessmentOwner;
+
+  /// No description provided for @errorMoveDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a day from today, within 6 months.'**
+  String get errorMoveDate;
 }
 
 class _AppLocalizationsDelegate
