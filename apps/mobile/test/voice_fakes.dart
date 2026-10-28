@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:campus_core/campus_core.dart';
-import 'package:campussaga/features/voice/data/photo_picker.dart';
 import 'package:flutter/painting.dart' show Color;
+import 'package:varsitykotha/features/voice/data/photo_picker.dart';
 
 /// A 1×1 PNG, so Image.memory works in tests.
 final onePixelPng = base64Decode(

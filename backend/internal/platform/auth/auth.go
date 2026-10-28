@@ -22,8 +22,13 @@ import (
 )
 
 const (
-	issuer   = "campussaga"
-	audience = "campussaga-app"
+	issuer   = "varsitykotha"
+	audience = "varsitykotha-app"
+	// Tokens made before the rename (2026-10-29) are still accepted until
+	// they expire (15 minutes), so nobody is signed out by it. Safe to
+	// remove after that.
+	oldIssuer   = "campussaga"
+	oldAudience = "campussaga-app"
 )
 
 var (
@@ -97,15 +102,12 @@ func (t *Tokens) Issue(c Claims) (string, time.Time, error) {
 
 // Verify checks signature, algorithm, issuer, audience and expiry.
 func (t *Tokens) Verify(token string) (*Claims, error) {
-	var jc jwtClaims
-	_, err := jwt.ParseWithClaims(token, &jc,
-		func(*jwt.Token) (any, error) { return t.secret, nil },
-		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}),
-		jwt.WithIssuer(issuer),
-		jwt.WithAudience(audience),
-		jwt.WithExpirationRequired(),
-		jwt.WithTimeFunc(t.now),
-	)
+	jc, err := t.parse(token, issuer, audience)
+	if err != nil && !errors.Is(err, jwt.ErrTokenExpired) {
+		if old, oerr := t.parse(token, oldIssuer, oldAudience); oerr == nil || errors.Is(oerr, jwt.ErrTokenExpired) {
+			jc, err = old, oerr
+		}
+	}
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, ErrTokenExpired
@@ -119,6 +121,19 @@ func (t *Tokens) Verify(token string) (*Claims, error) {
 		return nil, ErrTokenInvalid
 	}
 	return &Claims{UserID: uid, SessionID: sid, UniversityID: uni, Role: jc.Role, ExpiresAt: jc.ExpiresAt.Time}, nil
+}
+
+func (t *Tokens) parse(token, iss, aud string) (jwtClaims, error) {
+	var jc jwtClaims
+	_, err := jwt.ParseWithClaims(token, &jc,
+		func(*jwt.Token) (any, error) { return t.secret, nil },
+		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}),
+		jwt.WithIssuer(iss),
+		jwt.WithAudience(aud),
+		jwt.WithExpirationRequired(),
+		jwt.WithTimeFunc(t.now),
+	)
+	return jc, err
 }
 
 type userKey struct{}

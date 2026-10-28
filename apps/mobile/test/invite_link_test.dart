@@ -1,8 +1,8 @@
-import 'package:campussaga/app/router.dart';
-import 'package:campussaga/features/classes/data/invite_link.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:varsitykotha/app/router.dart';
+import 'package:varsitykotha/features/classes/data/invite_link.dart';
 
 import 'classes_test.dart' show signedIn;
 import 'helpers/fakes.dart' show sampleGroup;

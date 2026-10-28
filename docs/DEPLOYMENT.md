@@ -125,7 +125,7 @@ capabilities in Xcode.
 In the repo: [backend/deploy/compose.yaml](../backend/deploy/compose.yaml). Copy it to `/opt/varsitykotha/deploy/`.
 
 ```yaml
-name: campussaga
+name: varsitykotha
 services:
   postgres:
     image: postgres:18-alpine

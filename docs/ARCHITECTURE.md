@@ -3,9 +3,11 @@
 > The product was renamed from "Campus Saga" to VarsityKotha (ভার্সিটি কথা) on
 > 2026-10-28. The repo, Go module, app ID, domain, Firebase project, server
 > directory (`/opt/varsitykotha`), cron file, compose project, containers,
-> images and volumes use the new name. Still the old name: the Dart package
-> `campussaga`, the `campus_*` packages, the `campusapi` binary and the
-> database (`campus`).
+> images, volumes, the app package (`varsitykotha`, renamed 2026-10-29) and
+> the web package use the new name. Plain "campus" names stay: the
+> `campus_*` packages, the `campusapi` binary and the database (`campus`).
+> The live photo storage folder stays `campussaga/voice/` (`NIMBUS_PREFIX`)
+> so existing photos keep working.
 
 Goal: ship each release properly with a small team, without painting
 ourselves into a corner. Every choice below can be replaced later without
@@ -215,7 +217,7 @@ issue_authors   (issue_id, user_id)   ← no endpoint ever returns this table
 ### Monorepo layout (Dart pub workspace + Go backend)
 
 ```
-campussaga/
+varsitykotha/
 ├─ apps/
 │  ├─ mobile/                 # the student app
 │  └─ web/                    # varsitykotha.com: public pages + superadmin panel (Next.js, docs/ADMIN.md)

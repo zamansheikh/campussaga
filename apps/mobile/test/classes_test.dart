@@ -1,13 +1,13 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_ui/campus_ui.dart';
-import 'package:campussaga/app/app.dart';
-import 'package:campussaga/app/clock.dart';
-import 'package:campussaga/features/classes/data/routine_cache.dart';
-import 'package:campussaga/features/classes/presentation/bloc/my_classes_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/app/app.dart';
+import 'package:varsitykotha/app/clock.dart';
+import 'package:varsitykotha/features/classes/data/routine_cache.dart';
+import 'package:varsitykotha/features/classes/presentation/bloc/my_classes_cubit.dart';
 
 import 'helpers/fakes.dart';
 

@@ -1,8 +1,8 @@
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
-import 'package:campussaga/features/voice/presentation/voice_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/features/voice/presentation/voice_format.dart';
 
 void main() {
   final en = lookupAppLocalizations(const Locale('en'));

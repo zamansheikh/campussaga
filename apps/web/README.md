@@ -60,8 +60,8 @@ No secrets: the app holds no keys; admin sessions come from the Go API.
 ## Docker
 
 ```sh
-docker build -t campussaga-web apps/web       # needs internet (npm ci, fonts)
-docker run -p 127.0.0.1:7031:7031 -e API_URL=http://api:8090/api/v1 campussaga-web
+docker build -t varsitykotha-web apps/web       # needs internet (npm ci, fonts)
+docker run -p 127.0.0.1:7031:7031 -e API_URL=http://api:8090/api/v1 varsitykotha-web
 ```
 
 The image runs `node server.js` as the non-root `node` user, listens on

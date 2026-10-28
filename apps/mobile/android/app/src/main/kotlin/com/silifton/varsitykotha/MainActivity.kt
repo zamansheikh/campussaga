@@ -8,7 +8,7 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         // The home-screen widget's data (lib/features/widget/home_widget.dart).
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "campussaga/widget")
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "varsitykotha/widget")
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "save" -> {

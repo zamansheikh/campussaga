@@ -1,9 +1,9 @@
-import 'package:campussaga/app/app.dart';
-import 'package:campussaga/app/clock.dart';
-import 'package:campussaga/features/push/push_messaging.dart';
-import 'package:campussaga/features/reminders/data/reminder_scheduler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/app/app.dart';
+import 'package:varsitykotha/app/clock.dart';
+import 'package:varsitykotha/features/push/push_messaging.dart';
+import 'package:varsitykotha/features/reminders/data/reminder_scheduler.dart';
 
 import 'helpers/fakes.dart';
 

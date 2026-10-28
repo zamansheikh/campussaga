@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:campus_core/campus_core.dart';
-import 'package:campussaga/features/widget/home_widget.dart';
-import 'package:campussaga/features/widget/widget_data.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:varsitykotha/features/widget/home_widget.dart';
+import 'package:varsitykotha/features/widget/widget_data.dart';
 
 // Tuesday 27 October 2026, 08:05.
 final now = DateTime(2026, 10, 27, 8, 5);

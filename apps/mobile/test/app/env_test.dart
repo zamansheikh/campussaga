@@ -1,5 +1,5 @@
-import 'package:campussaga/app/env.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/app/env.dart';
 
 void main() {
   test('debug builds without an env file use the local backend', () {

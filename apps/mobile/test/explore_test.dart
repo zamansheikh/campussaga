@@ -1,8 +1,8 @@
-import 'package:campussaga/app/app.dart';
-import 'package:campussaga/app/di.dart';
-import 'package:campussaga/features/cgpa/data/cgpa_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/app/app.dart';
+import 'package:varsitykotha/app/di.dart';
+import 'package:varsitykotha/features/cgpa/data/cgpa_store.dart';
 
 import 'helpers/fakes.dart';
 

@@ -14,10 +14,13 @@ Android app ID `com.silifton.varsitykotha`
 
 </div>
 
-> Renamed from "Campus Saga" on 2026-10-28. The repo, domain, server and
-> Firebase project use the new name; the Dart packages (`campussaga`,
-> `campus_*`) and the `campusapi` binary keep the old one. The old v1 app is
-> kept at the git tag `v1-archive`.
+> Renamed from "Campus Saga" on 2026-10-28. Everything uses the new name: repo,
+> domain, server, Firebase project, the app package (`varsitykotha`) and the
+> web package. The shared `campus_*` packages, the `campusapi` binary and the
+> `campus` database are plain "campus" names. Only history keeps the old name
+> (old migrations), plus the live photo storage folder (`campussaga/voice/`,
+> pinned with `NIMBUS_PREFIX` so existing photos keep working). The old v1
+> app is kept at the git tag `v1-archive`.
 
 ## What's in it
 

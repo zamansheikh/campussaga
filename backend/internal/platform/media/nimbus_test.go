@@ -83,11 +83,11 @@ func newFakeNimbus(t *testing.T) (*fakeNimbus, *httptest.Server) {
 
 func TestNimbusStore(t *testing.T) {
 	f, srv := newFakeNimbus(t)
-	n := NewNimbus(srv.URL+"/api/v1/", "test-key", "campussaga/voice/")
+	n := NewNimbus(srv.URL+"/api/v1/", "test-key", "varsitykotha/voice/")
 	key := "0b6f1c2e-5a9d-4c1e-9b7a-3d2f1e0c9b8a-full.jpg"
 
 	require.NoError(t, n.Put(key, []byte("jpeg-bytes")))
-	assert.Equal(t, "campussaga/voice/"+key, f.fields["key"])
+	assert.Equal(t, "varsitykotha/voice/"+key, f.fields["key"])
 	assert.Equal(t, "false", f.fields["optimize"], "already re-encoded: upload byte for byte")
 	assert.Equal(t, "image/jpeg", f.fields["contentType"])
 
@@ -98,7 +98,7 @@ func TestNimbusStore(t *testing.T) {
 	assert.Equal(t, 0, f.lookups, "the id from the upload is remembered")
 
 	// A fresh store (another process) finds it by key.
-	n2 := NewNimbus(srv.URL+"/api/v1", "test-key", "campussaga/voice/")
+	n2 := NewNimbus(srv.URL+"/api/v1", "test-key", "varsitykotha/voice/")
 	r, err = n2.Open(key)
 	require.NoError(t, err)
 	b, _ = io.ReadAll(r)

@@ -12,13 +12,13 @@ import '../classes/presentation/bloc/my_classes_cubit.dart';
 import 'widget_data.dart';
 
 /// Where the widget's data goes (Android: NextClassWidget, through the
-/// "campussaga/widget" channel in MainActivity).
+/// "varsitykotha/widget" channel in MainActivity).
 abstract interface class WidgetBridge {
   Future<void> save(String json);
 }
 
 class AndroidWidgetBridge implements WidgetBridge {
-  static const _channel = MethodChannel('campussaga/widget');
+  static const _channel = MethodChannel('varsitykotha/widget');
 
   @override
   Future<void> save(String json) async {

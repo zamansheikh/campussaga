@@ -1,11 +1,11 @@
 import 'package:campus_core/campus_core.dart';
-import 'package:campussaga/app/app.dart';
-import 'package:campussaga/app/clock.dart';
-import 'package:campussaga/app/di.dart';
-import 'package:campussaga/features/transport/data/transport_store.dart';
-import 'package:campussaga/features/transport/presentation/bus_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/app/app.dart';
+import 'package:varsitykotha/app/clock.dart';
+import 'package:varsitykotha/app/di.dart';
+import 'package:varsitykotha/features/transport/data/transport_store.dart';
+import 'package:varsitykotha/features/transport/presentation/bus_cubit.dart';
 
 import 'helpers/fakes.dart';
 

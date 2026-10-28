@@ -1,6 +1,6 @@
-import 'package:campussaga/app/crash/crash_reporter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/app/crash/crash_reporter.dart';
 
 class _Boom extends Cubit<int> {
   _Boom() : super(0);

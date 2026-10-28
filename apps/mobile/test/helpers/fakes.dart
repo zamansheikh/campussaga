@@ -2,23 +2,23 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:campus_core/campus_core.dart';
-import 'package:campussaga/app/clock.dart';
-import 'package:campussaga/app/crash/crash_reporter.dart';
-import 'package:campussaga/app/di.dart';
-import 'package:campussaga/app/settings/bloc/settings_state.dart';
-import 'package:campussaga/app/settings/settings_storage.dart';
-import 'package:campussaga/app/version/app_version.dart';
-import 'package:campussaga/features/announcements/data/seen_store.dart';
-import 'package:campussaga/features/auth/data/google_auth.dart';
-import 'package:campussaga/features/classes/data/routine_cache.dart';
-import 'package:campussaga/features/push/push_messaging.dart';
-import 'package:campussaga/features/reminders/data/phone_info.dart';
-import 'package:campussaga/features/reminders/data/reminder_scheduler.dart';
-import 'package:campussaga/features/reminders/data/reminder_store.dart';
-import 'package:campussaga/features/voice/data/photo_picker.dart';
-import 'package:campussaga/features/voice/data/voice_cache.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/app/clock.dart';
+import 'package:varsitykotha/app/crash/crash_reporter.dart';
+import 'package:varsitykotha/app/di.dart';
+import 'package:varsitykotha/app/settings/bloc/settings_state.dart';
+import 'package:varsitykotha/app/settings/settings_storage.dart';
+import 'package:varsitykotha/app/version/app_version.dart';
+import 'package:varsitykotha/features/announcements/data/seen_store.dart';
+import 'package:varsitykotha/features/auth/data/google_auth.dart';
+import 'package:varsitykotha/features/classes/data/routine_cache.dart';
+import 'package:varsitykotha/features/push/push_messaging.dart';
+import 'package:varsitykotha/features/reminders/data/phone_info.dart';
+import 'package:varsitykotha/features/reminders/data/reminder_scheduler.dart';
+import 'package:varsitykotha/features/reminders/data/reminder_store.dart';
+import 'package:varsitykotha/features/voice/data/photo_picker.dart';
+import 'package:varsitykotha/features/voice/data/voice_cache.dart';
 
 import '../voice_fakes.dart';
 

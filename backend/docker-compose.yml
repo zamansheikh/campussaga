@@ -3,7 +3,7 @@
 #
 #   make deps-up     # start
 #   make deps-down   # stop (data kept)
-name: campussaga
+name: varsitykotha
 
 services:
   postgres:

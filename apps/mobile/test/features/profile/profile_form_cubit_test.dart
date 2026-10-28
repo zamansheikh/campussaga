@@ -1,7 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:campus_core/campus_core.dart';
-import 'package:campussaga/features/profile/presentation/bloc/profile_form_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/features/profile/presentation/bloc/profile_form_cubit.dart';
 
 import '../../helpers/fakes.dart';
 

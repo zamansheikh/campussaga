@@ -1,10 +1,9 @@
 import 'package:campus_core/campus_core.dart';
-import 'package:campussaga/app/app.dart';
-import 'package:campussaga/app/settings/bloc/settings_state.dart';
-import 'package:campussaga/app/settings/settings_storage.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/app/app.dart';
+import 'package:varsitykotha/app/settings/bloc/settings_state.dart';
+import 'package:varsitykotha/app/settings/settings_storage.dart';
 
 import 'helpers/fakes.dart';
 

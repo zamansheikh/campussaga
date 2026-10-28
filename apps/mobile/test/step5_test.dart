@@ -1,9 +1,9 @@
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_ui/campus_ui.dart';
-import 'package:campussaga/app/app.dart';
-import 'package:campussaga/app/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/app/app.dart';
+import 'package:varsitykotha/app/clock.dart';
 
 import 'helpers/fakes.dart';
 

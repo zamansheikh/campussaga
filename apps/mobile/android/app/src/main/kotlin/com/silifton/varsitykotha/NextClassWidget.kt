@@ -20,7 +20,7 @@ import java.util.Calendar
  * Home-screen widget: the next class and the next test or deadline.
  *
  * The app saves the next two weeks of classes and tests, with their texts
- * already in the app's language ([save], from the "campussaga/widget"
+ * already in the app's language ([save], from the "varsitykotha/widget"
  * channel in MainActivity). The widget picks what is next by the phone's
  * clock, so it stays right while the app is closed, and asks to be redrawn
  * at the next moment that changes what it shows (a class starting or

@@ -69,7 +69,7 @@ export async function callApi<T>(
         Accept: "application/json",
         ...(init.body !== undefined ? { "Content-Type": "application/json" } : {}),
         ...(init.accessToken ? { Authorization: `Bearer ${init.accessToken}` } : {}),
-        "User-Agent": "campussaga-web-admin",
+        "User-Agent": "varsitykotha-web-admin",
       },
       body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
       cache: "no-store",

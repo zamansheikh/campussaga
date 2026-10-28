@@ -1,8 +1,8 @@
 import 'package:campus_core/campus_core.dart';
-import 'package:campussaga/features/auth/data/google_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
+import 'package:varsitykotha/features/auth/data/google_auth.dart';
 
 class _FakeFirebase extends Fake implements FirebaseAuth {}
 

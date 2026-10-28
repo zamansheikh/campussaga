@@ -1,5 +1,5 @@
 # varsitykotha.com: Next.js standalone server (public pages + /admin).
-# Build: docker build -t campussaga-web apps/web
+# Build: docker build -t varsitykotha-web apps/web
 # Needs internet at build time (npm ci, Google Fonts are self-hosted by next/font).
 
 FROM node:24-alpine AS deps

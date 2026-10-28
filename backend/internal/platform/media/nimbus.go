@@ -20,12 +20,12 @@ import (
 // students after its own visibility checks, so no Nimbus link ever reaches
 // the app.
 //
-// Objects are named Prefix + key ("campussaga/voice/<uuid>-full.jpg"),
+// Objects are named Prefix + key ("varsitykotha/voice/<uuid>-full.jpg"),
 // uploaded byte for byte (optimize=false: they are already re-encoded).
 type Nimbus struct {
 	BaseURL string // e.g. https://capi.tecsior.com/api/v1
 	APIKey  string
-	Prefix  string // e.g. "campussaga/voice/"
+	Prefix  string // e.g. "varsitykotha/voice/"
 	Client  *http.Client
 
 	ids sync.Map // object key → Nimbus asset id (saves a lookup per view)
@@ -62,7 +62,7 @@ func (n *Nimbus) Put(key string, data []byte) error {
 	w := multipart.NewWriter(&body)
 	for k, v := range map[string]string{
 		"key": obj, "optimize": "false", "contentType": "image/jpeg",
-		"cacheControl": "private, no-store", "tags": "campussaga,voice",
+		"cacheControl": "private, no-store", "tags": "varsitykotha,voice",
 	} {
 		if err := w.WriteField(k, v); err != nil {
 			return err
