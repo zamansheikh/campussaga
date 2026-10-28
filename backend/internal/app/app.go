@@ -53,6 +53,8 @@ type Options struct {
 	Google accounts.GoogleVerifier // nil = Firebase verifier from config (if configured)
 	Push   push.Sender             // nil = FCM from config, or log only
 	Media  media.Store             // nil = a directory at cfg.MediaDir
+	// PhotoChecker replaces the backend/nsfw service (tests).
+	PhotoChecker voice.PhotoChecker
 }
 
 // New assembles the app on an open, migrated database.
@@ -153,6 +155,17 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		}
 	}
 	voiceSvc := voice.NewService(d, store, cfg.VoiceHMACSecret, now, log)
+	checker := o.PhotoChecker
+	if checker == nil && cfg.NSFWURL != "" {
+		checker = voice.NewHTTPChecker(cfg.NSFWURL)
+	}
+	if checker == nil && cfg.IsProduction() {
+		log.Warn("voice: NSFW_URL not set; photos are held for moderators until the photo check runs")
+	}
+	voiceSvc.SetPhotoCheck(voice.PhotoCheck{
+		Checker: checker, Reject: cmp.Or(cfg.NSFWReject, 0.98), Hold: cmp.Or(cfg.NSFWHold, 0.70),
+		Required: cfg.IsProduction(),
+	})
 	voiceSvc.SetNotifier(func(userIDs []uuid.UUID, n voice.Notice) {
 		texts := make(map[string]push.Text, len(n.Texts))
 		for lang, t := range n.Texts {

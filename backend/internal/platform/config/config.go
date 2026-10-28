@@ -60,6 +60,11 @@ type Config struct {
 	NimbusURL    string
 	NimbusAPIKey string
 	NimbusPrefix string
+	// Photo check (backend/nsfw on the compose network). Without a URL the
+	// check is skipped, except in production, where photos are then held.
+	NSFWURL    string
+	NSFWReject float64
+	NSFWHold   float64
 
 	ShutdownTimeout time.Duration
 }
@@ -97,6 +102,9 @@ func Load() (*Config, error) {
 		NimbusURL:          get("NIMBUS_URL", "https://capi.tecsior.com/api/v1"),
 		NimbusAPIKey:       get("NIMBUS_API_KEY", ""),
 		NimbusPrefix:       get("NIMBUS_PREFIX", "campussaga/voice/"),
+		NSFWURL:            get("NSFW_URL", ""),
+		NSFWReject:         getFloat("NSFW_REJECT", 0.98),
+		NSFWHold:           getFloat("NSFW_HOLD", 0.70),
 		ShutdownTimeout:    getDuration("SHUTDOWN_TIMEOUT", 15*time.Second),
 	}
 	return c, c.validate()
@@ -109,6 +117,9 @@ func (c *Config) validate() error {
 	}
 	if !strings.HasPrefix(c.APIPrefix, "/") {
 		errs = append(errs, errors.New("API_PREFIX must start with /"))
+	}
+	if c.NSFWHold <= 0 || c.NSFWHold > 1 || c.NSFWReject <= c.NSFWHold || c.NSFWReject > 1 {
+		return fmt.Errorf("config: NSFW_HOLD and NSFW_REJECT must satisfy 0 < hold < reject <= 1")
 	}
 	if c.IsProduction() {
 		for name, s := range map[string][]byte{"JWT_SECRET": c.JWTSecret, "CODE_HMAC_SECRET": c.CodeSecret, "VOICE_HMAC_SECRET": c.VoiceHMACSecret} {
@@ -152,6 +163,15 @@ func getDuration(key string, def time.Duration) time.Duration {
 	if v := os.Getenv(key); v != "" {
 		if d, err := time.ParseDuration(v); err == nil {
 			return d
+		}
+	}
+	return def
+}
+
+func getFloat(key string, def float64) float64 {
+	if v := os.Getenv(key); v != "" {
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			return f
 		}
 	}
 	return def

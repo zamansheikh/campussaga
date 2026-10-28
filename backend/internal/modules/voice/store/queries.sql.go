@@ -836,7 +836,7 @@ func (q *Queries) GetIssue(ctx context.Context, arg GetIssueParams) (GetIssueRow
 }
 
 const getUpload = `-- name: GetUpload :one
-SELECT id, user_id, full_key, thumb_key, width, height, created_at FROM uploads WHERE id = $1 AND user_id = $2
+SELECT id, user_id, full_key, thumb_key, width, height, created_at, nsfw_score, flagged FROM uploads WHERE id = $1 AND user_id = $2
 `
 
 type GetUploadParams struct {
@@ -855,8 +855,41 @@ func (q *Queries) GetUpload(ctx context.Context, arg GetUploadParams) (Upload, e
 		&i.Width,
 		&i.Height,
 		&i.CreatedAt,
+		&i.NsfwScore,
+		&i.Flagged,
 	)
 	return i, err
+}
+
+const imageChecks = `-- name: ImageChecks :many
+SELECT id, nsfw_score, flagged FROM issue_images WHERE issue_id = $1 ORDER BY position
+`
+
+type ImageChecksRow struct {
+	ID        uuid.UUID
+	NsfwScore *float32
+	Flagged   bool
+}
+
+// Photo check results, for moderators only.
+func (q *Queries) ImageChecks(ctx context.Context, issueID uuid.UUID) ([]ImageChecksRow, error) {
+	rows, err := q.db.Query(ctx, imageChecks, issueID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ImageChecksRow{}
+	for rows.Next() {
+		var i ImageChecksRow
+		if err := rows.Scan(&i.ID, &i.NsfwScore, &i.Flagged); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const insertAudit = `-- name: InsertAudit :exec
@@ -912,18 +945,20 @@ func (q *Queries) InsertIssueAuthor(ctx context.Context, arg InsertIssueAuthorPa
 }
 
 const insertIssueImage = `-- name: InsertIssueImage :exec
-INSERT INTO issue_images (id, issue_id, position, full_key, thumb_key, width, height)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO issue_images (id, issue_id, position, full_key, thumb_key, width, height, nsfw_score, flagged)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 `
 
 type InsertIssueImageParams struct {
-	ID       uuid.UUID
-	IssueID  uuid.UUID
-	Position int16
-	FullKey  string
-	ThumbKey string
-	Width    int32
-	Height   int32
+	ID        uuid.UUID
+	IssueID   uuid.UUID
+	Position  int16
+	FullKey   string
+	ThumbKey  string
+	Width     int32
+	Height    int32
+	NsfwScore *float32
+	Flagged   bool
 }
 
 func (q *Queries) InsertIssueImage(ctx context.Context, arg InsertIssueImageParams) error {
@@ -935,6 +970,8 @@ func (q *Queries) InsertIssueImage(ctx context.Context, arg InsertIssueImagePara
 		arg.ThumbKey,
 		arg.Width,
 		arg.Height,
+		arg.NsfwScore,
+		arg.Flagged,
 	)
 	return err
 }
@@ -1015,18 +1052,20 @@ func (q *Queries) InsertStatusUpdate(ctx context.Context, arg InsertStatusUpdate
 
 const insertUpload = `-- name: InsertUpload :one
 
-INSERT INTO uploads (user_id, full_key, thumb_key, width, height, created_at)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO uploads (user_id, full_key, thumb_key, width, height, created_at, nsfw_score, flagged)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id, width, height
 `
 
 type InsertUploadParams struct {
-	UserID   uuid.UUID
-	FullKey  string
-	ThumbKey string
-	Width    int32
-	Height   int32
-	Now      time.Time
+	UserID    uuid.UUID
+	FullKey   string
+	ThumbKey  string
+	Width     int32
+	Height    int32
+	Now       time.Time
+	NsfwScore *float32
+	Flagged   bool
 }
 
 type InsertUploadRow struct {
@@ -1044,6 +1083,8 @@ func (q *Queries) InsertUpload(ctx context.Context, arg InsertUploadParams) (Ins
 		arg.Width,
 		arg.Height,
 		arg.Now,
+		arg.NsfwScore,
+		arg.Flagged,
 	)
 	var i InsertUploadRow
 	err := row.Scan(&i.ID, &i.Width, &i.Height)
@@ -1756,7 +1797,7 @@ func (q *Queries) Staff(ctx context.Context, userID uuid.UUID) (StaffRow, error)
 }
 
 const takeUpload = `-- name: TakeUpload :one
-SELECT id, user_id, full_key, thumb_key, width, height, created_at FROM uploads WHERE id = $1 AND user_id = $2 FOR UPDATE
+SELECT id, user_id, full_key, thumb_key, width, height, created_at, nsfw_score, flagged FROM uploads WHERE id = $1 AND user_id = $2 FOR UPDATE
 `
 
 type TakeUploadParams struct {
@@ -1775,6 +1816,8 @@ func (q *Queries) TakeUpload(ctx context.Context, arg TakeUploadParams) (Upload,
 		&i.Width,
 		&i.Height,
 		&i.CreatedAt,
+		&i.NsfwScore,
+		&i.Flagged,
 	)
 	return i, err
 }

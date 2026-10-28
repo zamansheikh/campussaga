@@ -63,6 +63,8 @@ export const holdReasonLabel: Record<string, string> = {
   unverified: "Posted by a not-verified student",
   reports: "Hidden automatically after 5 reports",
   moderator: "Hidden by a moderator",
+  photo_check: "A photo was flagged by the photo check",
+  photo_check_unavailable: "A photo couldn't be checked (the photo check was down)",
 };
 
 export const actorLabel: Record<string, string> = {

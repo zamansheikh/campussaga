@@ -404,9 +404,30 @@ class _PhotoThumb extends StatelessWidget {
                 ),
               ),
             if (photo.failure != null)
-              ColoredBox(
-                color: cs.error.withValues(alpha: 0.6),
-                child: Icon(Icons.error_outline, color: cs.onError),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(CsRadius.sm),
+                child: ColoredBox(
+                  color: cs.error.withValues(alpha: 0.75),
+                  child: photo.failure!.code == 'PHOTO_NOT_ALLOWED'
+                      ? Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.block, color: cs.onError, size: 20),
+                              Text(
+                                AppLocalizations.of(context).voicePhotoRefused,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                style: context.text.labelSmall?.copyWith(
+                                  color: cs.onError,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Icon(Icons.error_outline, color: cs.onError),
+                ),
               ),
             Positioned(
               top: 2,

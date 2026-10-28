@@ -255,6 +255,15 @@ type ModerationIssue struct {
 	Issue
 	Reports  []ReportView `json:"reports"`
 	Comments []Comment    `json:"comments"`
+	// PhotoChecks: the photo check's result per image (moderators only).
+	PhotoChecks []PhotoCheckView `json:"photoChecks"`
+}
+
+// PhotoCheckView: score nil = not checked (checker down, or development).
+type PhotoCheckView struct {
+	ImageID uuid.UUID `json:"imageId"`
+	Score   *float32  `json:"score"`
+	Flagged bool      `json:"flagged"`
 }
 
 type ReportView struct {
@@ -281,7 +290,14 @@ func (s *Service) handleModerationIssue(ctx context.Context, in *issueReq) (*Mod
 	if err != nil {
 		return nil, err
 	}
-	out := &ModerationIssue{Issue: *is, Reports: []ReportView{}, Comments: []Comment{}}
+	out := &ModerationIssue{Issue: *is, Reports: []ReportView{}, Comments: []Comment{}, PhotoChecks: []PhotoCheckView{}}
+	checks, err := q.ImageChecks(ctx, r.ID)
+	if err != nil {
+		return nil, err
+	}
+	for _, c := range checks {
+		out.PhotoChecks = append(out.PhotoChecks, PhotoCheckView{ImageID: c.ID, Score: c.NsfwScore, Flagged: c.Flagged})
+	}
 	reps, err := q.IssueReports(ctx, r.ID)
 	if err != nil {
 		return nil, err

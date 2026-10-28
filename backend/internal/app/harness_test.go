@@ -41,6 +41,12 @@ type harness struct {
 
 func newHarness(t *testing.T) *harness {
 	t.Helper()
+	return newHarnessWith(t, nil)
+}
+
+// newHarnessWith lets a test change the app's options (e.g. a fake photo check).
+func newHarnessWith(t *testing.T, tune func(*Options)) *harness {
+	t.Helper()
 	d := testkit.NewDB(t)
 	h := &harness{t: t, mail: &mail.Memory{}, google: firebasetest.New("campus-test"), push: &push.MemorySender{}, now: time.Date(2026, 10, 27, 9, 0, 0, 0, time.UTC)}
 	cfg := &config.Config{
@@ -54,7 +60,11 @@ func newHarness(t *testing.T) *harness {
 	}
 	h.media, _ = media.NewDisk(t.TempDir())
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
-	h.app = New(cfg, log, d, Options{Now: h.Now, Mailer: h.mail, Google: firebase.NewVerifier("campus-test", h.google.Keys(), h.Now), Push: h.push, Media: h.media})
+	opts := Options{Now: h.Now, Mailer: h.mail, Google: firebase.NewVerifier("campus-test", h.google.Keys(), h.Now), Push: h.push, Media: h.media}
+	if tune != nil {
+		tune(&opts)
+	}
+	h.app = New(cfg, log, d, opts)
 	h.srv = httptest.NewServer(h.app.Handler())
 	t.Cleanup(h.srv.Close)
 

@@ -1489,6 +1489,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceHeldLanguage => 'It may contain words that aren\'t allowed.';
 
   @override
+  String get voiceHeldPhoto => 'A moderator checks a photo in this post first.';
+
+  @override
   String get voiceHeldUnverified =>
       'Posts from accounts without a verified university email are checked first.';
 
@@ -1815,6 +1818,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorImageTooLarge => 'That photo is too large.';
+
+  @override
+  String get errorPhotoNotAllowed =>
+      'This photo can\'t be posted. Choose another photo.';
+
+  @override
+  String get voicePhotoRefused => 'Can\'t be posted';
 
   @override
   String get errorEditWindowClosed =>

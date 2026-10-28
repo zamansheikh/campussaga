@@ -354,7 +354,7 @@ university (`c.UniversityID`; `UNIVERSITY_REQUIRED` 409 when none). Others →
 // Issue (detail) = IssueCard + 
 {
   "body": "…",
-  "images": [{"id": "uuid", "width": 1600, "height": 1200}],
+  "images": [{"id": "uuid", "width": 1280, "height": 960}],
   "timeline": [{"from": "open", "to": "acknowledged", "actorKind": "authority",
                 "actorTitle": "Proctor Office", "note": "…", "createdAt": "time"}],
   "holdReason": "",          // mine/staff only (otherwise "")
@@ -377,7 +377,7 @@ university (`c.UniversityID`; `UNIVERSITY_REQUIRED` 409 when none). Others →
   "createdAt": "time (rounded if anonymous)"
 }
 // Upload
-{"id": "uuid", "width": 1600, "height": 1200}
+{"id": "uuid", "width": 1280, "height": 960}
 // Page
 {"items": [...], "nextCursor": "opaque|null"}
 ```
@@ -521,8 +521,8 @@ Removed content keeps its row for the record; authors see the reason.
 reading still works. Moderators choose 7 / 30 days or permanent.
 
 **Images**: decoded with a size check first (`image.DecodeConfig`, ≤ 8000 ×
-8000 px), auto-oriented, re-encoded JPEG q82 (full: long edge ≤ 1600 px;
-thumb: ≤ 480 px). Re-encoding drops all metadata. The original bytes are
+8000 px), auto-oriented, re-encoded JPEG (full: long edge ≤ 1280 px at q70;
+thumb: ≤ 400 px at q65; ~110 KB + 12 KB for a detailed photo). Re-encoding drops all metadata. The original bytes are
 never written to disk. No AI/NSFW service in this release (decision D11);
 images can be reported like text.
 
@@ -542,7 +542,7 @@ to the DB dump). 165 GB free on the VPS: years of headroom.
 not read here) implementing the same `Store` interface, still served through
 the API (or signed URLs) — switch when traffic or backups make it worth it.
 
-**Flow**: app picks a photo → compresses on the phone (≤ 1600 px JPEG, q85)
+**Flow**: app picks a photo → compresses on the phone (≤ 1280 px JPEG, q80)
 → `POST /uploads` per photo (progress shown) → `POST /issues` with
 `imageIds`. Unattached uploads and their files are deleted after 24 h by
 the daily ticker. Deleting/removing an issue keeps images for moderation;
@@ -664,7 +664,7 @@ against the local API.
 | D8 | Launch gating | One global `campusVoice` flag, turned on after moderators and at least one authority exist |
 | D9 | Where authorities work | In the app (R2); web dashboard in R4 |
 | D10 | Moderators | Silifton staff, all universities, web panel |
-| D11 | Image moderation | No AI service; reports + manual review |
+| D11 | Image moderation | ~~No AI service~~ Decided 2026-10-28: an NSFW model on our own server (§14), plus reports and manual review |
 | D12 | Limits | 5 issues/day, 60 comments/day, 300 votes/hour, 20 reports/day, 20 uploads/day, 4 photos/issue, 8 MB/photo |
 | D13 | Edit window | 60 minutes for issues; comments can't be edited, only deleted |
 | D14 | Push audience | Author + voters + commenters + explicit followers; nothing on new issues |
@@ -738,3 +738,48 @@ Small fixes found while building the API; the app and web follow these.
     `media` volume (compose); the API image pre-creates `/data/media` owned
     by the nonroot user so a fresh volume is writable. `backup.sh` also tars
     the `campussaga_media` volume (via a throwaway alpine container).
+
+## 14. Photo check (2026-10-28)
+
+Every photo is scored by an NSFW image classifier **running on our own
+server** before anyone can see it. Photos never leave our systems for this
+(no third-party AI service).
+
+**Model:** [AdamCodd/vit-base-nsfw-detector](https://huggingface.co/AdamCodd/vit-base-nsfw-detector)
+(Apache-2.0), ViT-base/16 at 384 px fine-tuned on ~25,000 photos and drawings,
+two classes (sfw, nsfw). Reported accuracy 96.5 %, AUC 0.995 on its
+evaluation set; weaker on AI-generated images (86 %). It is deliberately
+strict: "sexy" photos (much skin, cleavage) count as NSFW. We use its
+uint8-quantized ONNX export (88 MB), pinned to revision `8587de9` and
+checked by sha256 when the image is built.
+
+**Service:** `backend/nsfw` (Python, onnxruntime + Pillow + NumPy, no
+torch), compose service `nsfw` on the internal network only (no published
+port), `mem_limit 600m`, non-root, model baked in (no network at runtime).
+`POST /classify` (image bytes) → `{"sfw", "nsfw", "model"}`; `GET /health`.
+It keeps and logs nothing about the photos. Measured locally (4 vCPU Docker
+VM): ~205 ms per photo, ~240 MB memory.
+
+**Flow** (`voice/photo_check.go`): after re-encoding, the API sends the
+thumbnail (≤ 400 px) to the service, before anything is stored.
+
+| Score (nsfw) | Result |
+|---|---|
+| ≥ `NSFW_REJECT` (0.98) | Refused: `422 PHOTO_NOT_ALLOWED`, not stored |
+| ≥ `NSFW_HOLD` (0.70) | Stored, flagged; the issue it's posted with is **held** (`holdReason: photo_check`) until a moderator approves it |
+| lower | Fine |
+| service down / not configured, production | Stored, flagged, issue held (`photo_check_unavailable`): never let through unchecked |
+| service down / not configured, development | Skipped (log line) |
+
+Scores are kept on `uploads` / `issue_images` (`nsfw_score`, `flagged`,
+migration 00540) and shown only to moderators: `GET
+/moderation/issues/{id}` → `photoChecks: [{imageId, score, flagged}]`. The
+admin panel blurs flagged photos ("Flagged by the photo check (score
+0.82)") until the moderator chooses to look. Students never see scores.
+Logs carry scores only, never photos or who sent them.
+
+**Env:** `NSFW_URL` (compose sets `http://nsfw:8000` for the API),
+`NSFW_REJECT` (default 0.98), `NSFW_HOLD` (default 0.70).
+
+Text stays on the word list (§6), not AI.
+

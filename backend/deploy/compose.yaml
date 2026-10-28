@@ -22,6 +22,9 @@ services:
     image: campusapi:latest
     restart: unless-stopped
     env_file: .env
+    environment:
+      # Campus Voice photo check (the nsfw service below).
+      NSFW_URL: http://nsfw:8000
     depends_on:
       postgres: {condition: service_healthy}
     ports: ["127.0.0.1:7030:8090"]
@@ -31,6 +34,18 @@ services:
     # The privacy policy promises server logs are gone within 30 days:
     # cap them by size here, and the weekly cron in docs/DEPLOYMENT.md
     # (section "Log retention") wipes them by age.
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
+  # Campus Voice photo check: an NSFW classifier (backend/nsfw) on our own
+  # server, so students' photos never leave it. No published port: only the
+  # API reaches it. If it is down, the API holds photos for moderators.
+  nsfw:
+    build: ../backend/nsfw
+    image: campusnsfw:latest
+    restart: unless-stopped
+    mem_limit: 600m
     logging:
       driver: json-file
       options: {max-size: "10m", max-file: "3"}

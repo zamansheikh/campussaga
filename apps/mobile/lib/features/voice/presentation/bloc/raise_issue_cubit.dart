@@ -217,9 +217,12 @@ class RaiseIssueCubit extends Cubit<RaiseState> {
       next = DraftPhoto(key: photo.key, bytes: photo.bytes, failure: f);
     }
     if (isClosed) return;
+    // A photo the photo check refused: say why, not just mark the tile.
+    final refused = next.failure?.code == 'PHOTO_NOT_ALLOWED';
     emit(
       state.copyWith(
         photos: [for (final p in state.photos) p.key == photo.key ? next : p],
+        failure: refused ? () => next.failure : null,
       ),
     );
   }

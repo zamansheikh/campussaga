@@ -1459,6 +1459,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get voiceHeldLanguage => 'এতে হয়তো এমন শব্দ আছে যা অনুমোদিত নয়।';
 
   @override
+  String get voiceHeldPhoto => 'এই পোস্টের একটি ছবি আগে একজন মডারেটর দেখবেন।';
+
+  @override
   String get voiceHeldUnverified =>
       'যাচাই করা বিশ্ববিদ্যালয় ইমেইল ছাড়া অ্যাকাউন্টের পোস্ট আগে যাচাই হয়।';
 
@@ -1786,6 +1789,13 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get errorImageTooLarge => 'ছবিটি অনেক বড়।';
+
+  @override
+  String get errorPhotoNotAllowed =>
+      'এই ছবিটি পোস্ট করা যাবে না। অন্য একটি ছবি বেছে নাও।';
+
+  @override
+  String get voicePhotoRefused => 'পোস্ট করা যাবে না';
 
   @override
   String get errorEditWindowClosed =>

@@ -2,6 +2,7 @@ import { ArrowLeft, EyeOff, Flag, Lock, MapPin, MessageSquare, ShieldAlert, Thum
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { CheckedPhoto } from "@/components/admin/moderation/checked-photo";
 import { ModerationButtons } from "@/components/admin/moderation/moderation-buttons";
 import { ErrorPanel } from "@/components/admin/notice";
 import { Badge } from "@/components/ui/badge";
@@ -126,23 +127,14 @@ function IssueView({ issue, now }: { issue: ModerationIssue; now: number }) {
               <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {issue.images.map((img, i) => (
                   <li key={img.id}>
-                    <a
-                      href={`/admin/media/${img.id}?size=full`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block overflow-hidden rounded-lg border bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                    >
-                      {/* Private photos come through our authenticated proxy, not the image optimizer. */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={`/admin/media/${img.id}?size=thumb`}
-                        alt={`Photo ${i + 1} of ${issue.images.length} (opens full size)`}
-                        width={img.width}
-                        height={img.height}
-                        loading="lazy"
-                        className="aspect-square w-full object-cover"
-                      />
-                    </a>
+                    <CheckedPhoto
+                      id={img.id}
+                      width={img.width}
+                      height={img.height}
+                      index={i}
+                      count={issue.images.length}
+                      check={issue.photoChecks?.find((c) => c.imageId === img.id)}
+                    />
                   </li>
                 ))}
               </ul>

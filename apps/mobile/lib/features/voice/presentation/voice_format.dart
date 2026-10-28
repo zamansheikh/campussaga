@@ -83,6 +83,7 @@ String holdReasonText(AppLocalizations l10n, String reason) => switch (reason) {
   'language' => l10n.voiceHeldLanguage,
   'unverified' => l10n.voiceHeldUnverified,
   'moderator' => l10n.voiceHeldModerator,
+  'photo_check' || 'photo_check_unavailable' => l10n.voiceHeldPhoto,
   _ => '',
 };
 
@@ -119,6 +120,7 @@ String voiceErrorText(BuildContext context, Failure f) {
     'UPLOAD_NOT_FOUND' => l10n.errorUploadNotFound,
     'IMAGE_INVALID' => l10n.errorImageInvalid,
     'IMAGE_TOO_LARGE' => l10n.errorImageTooLarge,
+    'PHOTO_NOT_ALLOWED' => l10n.errorPhotoNotAllowed,
     'EDIT_WINDOW_CLOSED' => l10n.errorEditWindowClosed,
     'REOPEN_NOT_ALLOWED' => l10n.errorReopenNotAllowed,
     'ISSUE_CLOSED' => l10n.errorIssueClosed,

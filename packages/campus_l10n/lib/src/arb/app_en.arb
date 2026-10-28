@@ -763,6 +763,7 @@
   "voiceHeldNotice": "Only you can see this while it's checked. It usually takes less than a day.",
   "voiceHeldPersonalInfo": "It may contain a phone number, email, link or ID number.",
   "voiceHeldLanguage": "It may contain words that aren't allowed.",
+  "voiceHeldPhoto": "A moderator checks a photo in this post first.",
   "voiceHeldUnverified": "Posts from accounts without a verified university email are checked first.",
   "voiceRemovedNotice": "Removed by moderators: {reason}",
   "@voiceRemovedNotice": {
@@ -901,6 +902,8 @@
   "errorUploadNotFound": "A photo didn't finish uploading. Remove it and add it again.",
   "errorImageInvalid": "That file isn't a photo we can use.",
   "errorImageTooLarge": "That photo is too large.",
+  "errorPhotoNotAllowed": "This photo can't be posted. Choose another photo.",
+  "voicePhotoRefused": "Can't be posted",
   "errorEditWindowClosed": "Issues can only be edited in the first 60 minutes.",
   "errorReopenNotAllowed": "Only solved issues can be reopened, within 30 days.",
   "errorIssueClosed": "This issue was removed, so it can't get new comments.",

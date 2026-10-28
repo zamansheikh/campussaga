@@ -48,6 +48,13 @@ func (s *Service) handleUpload(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteError(w, r, ErrImageInvalid)
 		return
 	}
+	// The photo check sees the re-encoded thumbnail (≤ 480 px) before
+	// anything is stored; a refused photo is never kept.
+	score, flagged, err := s.checkPhoto(ctx, p.Thumb)
+	if err != nil {
+		httpx.WriteError(w, r, err)
+		return
+	}
 	key := uuid.New().String()
 	full, thumb := key+"-full.jpg", key+"-thumb.jpg"
 	if err := s.media.Put(full, p.Full); err != nil {
@@ -60,7 +67,7 @@ func (s *Service) handleUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	up, err := q.InsertUpload(ctx, store.InsertUploadParams{UserID: v.id, FullKey: full, ThumbKey: thumb,
-		Width: int32(p.Width), Height: int32(p.Height), Now: s.now()})
+		Width: int32(p.Width), Height: int32(p.Height), Now: s.now(), NsfwScore: score, Flagged: flagged})
 	if err != nil {
 		_ = s.media.Delete(full)
 		_ = s.media.Delete(thumb)

@@ -144,6 +144,10 @@ LIMIT 5;
 -- name: IssueImages :many
 SELECT id, width, height FROM issue_images WHERE issue_id = @issue_id ORDER BY position;
 
+-- Photo check results, for moderators only.
+-- name: ImageChecks :many
+SELECT id, nsfw_score, flagged FROM issue_images WHERE issue_id = @issue_id ORDER BY position;
+
 -- name: GetImage :one
 SELECT im.issue_id, im.full_key, im.thumb_key FROM issue_images im WHERE im.id = @id;
 
@@ -219,8 +223,8 @@ SELECT user_id FROM issue_follows WHERE issue_id = @issue_id;
 -- ---- photos -----------------------------------------------------------------------------
 
 -- name: InsertUpload :one
-INSERT INTO uploads (user_id, full_key, thumb_key, width, height, created_at)
-VALUES (@user_id, @full_key, @thumb_key, @width, @height, @now)
+INSERT INTO uploads (user_id, full_key, thumb_key, width, height, created_at, nsfw_score, flagged)
+VALUES (@user_id, @full_key, @thumb_key, @width, @height, @now, sqlc.narg(nsfw_score), @flagged)
 RETURNING id, width, height;
 
 -- name: TakeUpload :one
@@ -233,8 +237,8 @@ SELECT * FROM uploads WHERE id = @id AND user_id = @user_id;
 DELETE FROM uploads WHERE id = @id;
 
 -- name: InsertIssueImage :exec
-INSERT INTO issue_images (id, issue_id, position, full_key, thumb_key, width, height)
-VALUES (@id, @issue_id, @position, @full_key, @thumb_key, @width, @height);
+INSERT INTO issue_images (id, issue_id, position, full_key, thumb_key, width, height, nsfw_score, flagged)
+VALUES (@id, @issue_id, @position, @full_key, @thumb_key, @width, @height, sqlc.narg(nsfw_score), @flagged);
 
 -- name: ExpiredUploads :many
 SELECT id, full_key, thumb_key FROM uploads WHERE created_at < @before LIMIT 500;

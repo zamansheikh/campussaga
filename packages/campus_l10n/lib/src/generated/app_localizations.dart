@@ -2582,6 +2582,12 @@ abstract class AppLocalizations {
   /// **'It may contain words that aren\'t allowed.'**
   String get voiceHeldLanguage;
 
+  /// No description provided for @voiceHeldPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'A moderator checks a photo in this post first.'**
+  String get voiceHeldPhoto;
+
   /// No description provided for @voiceHeldUnverified.
   ///
   /// In en, this message translates to:
@@ -3139,6 +3145,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That photo is too large.'**
   String get errorImageTooLarge;
+
+  /// No description provided for @errorPhotoNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo can\'t be posted. Choose another photo.'**
+  String get errorPhotoNotAllowed;
+
+  /// No description provided for @voicePhotoRefused.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t be posted'**
+  String get voicePhotoRefused;
 
   /// No description provided for @errorEditWindowClosed.
   ///

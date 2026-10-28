@@ -217,7 +217,12 @@ export type VoiceReport = {
   createdAt: string;
 };
 
-export type ModerationIssue = Issue & { reports: VoiceReport[]; comments: VoiceComment[] };
+export type ModerationIssue = Issue & {
+  reports: VoiceReport[];
+  comments: VoiceComment[];
+  /** The photo check's result per image (older servers: absent). */
+  photoChecks?: { imageId: string; score: number | null; flagged: boolean }[];
+};
 
 export type QueueKind = "held" | "reported" | "hidden" | "private";
 

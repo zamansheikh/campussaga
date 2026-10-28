@@ -52,6 +52,7 @@ type Service struct {
 	now    func() time.Time
 	log    *slog.Logger
 	notify Notifier
+	photo  PhotoCheck
 
 	mu          sync.Mutex
 	lastComment map[uuid.UUID]time.Time // issue → last "new comment" push

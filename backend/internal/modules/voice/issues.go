@@ -296,6 +296,23 @@ func (s *Service) handleCreate(ctx context.Context, in *IssueInput) (*Issue, err
 		if hold == "" && !v.verified && !v.isStaff() {
 			hold = HoldUnverified
 		}
+		// A flagged photo (or one the checker couldn't see) holds the issue
+		// for a moderator; the photo reason wins over "unverified".
+		for _, upID := range ids {
+			up, err := q.GetUpload(ctx, store.GetUploadParams{ID: upID, UserID: v.id})
+			if db.IsNoRows(err) {
+				return ErrUploadNotFound.WithDetails(map[string]string{"imageId": upID.String()})
+			}
+			if err != nil {
+				return err
+			}
+			if up.Flagged && (hold == "" || hold == HoldUnverified || hold == HoldPhotoCheckUnavailable) {
+				hold = HoldPhotoCheck
+				if up.NsfwScore == nil {
+					hold = HoldPhotoCheckUnavailable
+				}
+			}
+		}
 		if hold != "" {
 			visibility = "held"
 		}
@@ -326,7 +343,8 @@ func (s *Service) handleCreate(ctx context.Context, in *IssueInput) (*Issue, err
 				return err
 			}
 			if err := q.InsertIssueImage(ctx, store.InsertIssueImageParams{ID: up.ID, IssueID: id, Position: int16(pos),
-				FullKey: up.FullKey, ThumbKey: up.ThumbKey, Width: up.Width, Height: up.Height}); err != nil {
+				FullKey: up.FullKey, ThumbKey: up.ThumbKey, Width: up.Width, Height: up.Height,
+				NsfwScore: up.NsfwScore, Flagged: up.Flagged}); err != nil {
 				return err
 			}
 			if err := q.DeleteUpload(ctx, up.ID); err != nil {

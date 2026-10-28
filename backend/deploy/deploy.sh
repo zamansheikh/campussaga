@@ -20,9 +20,9 @@ ssh "$HOST" 'set -e
 cd /opt/campussaga/deploy
 sh backup.sh
 docker tag campusapi:latest campusapi:rollback 2>/dev/null || true
-docker compose build api
+docker compose build api nsfw
 docker compose run --rm api migrate
-docker compose up -d api
+docker compose up -d nsfw api
 for i in $(seq 1 30); do
   if curl -fsS http://127.0.0.1:7030/api/v1/health; then echo; echo deployed; exit 0; fi
   sleep 2

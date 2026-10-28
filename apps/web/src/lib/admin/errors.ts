@@ -49,6 +49,7 @@ const messages: Record<string, string> = {
   UPLOAD_NOT_FOUND: "That photo doesn't exist.",
   IMAGE_INVALID: "That file isn't a photo we can use.",
   IMAGE_TOO_LARGE: "That photo is too large.",
+  PHOTO_NOT_ALLOWED: "The photo check refused this photo.",
   ISSUE_CLOSED: "This issue is closed.",
   ALREADY_REPORTED: "This was already reported.",
   STATUS_CHANGE_INVALID: "That status change isn't allowed.",

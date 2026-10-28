@@ -60,4 +60,6 @@ type Upload struct {
 	Width     int32
 	Height    int32
 	CreatedAt time.Time
+	NsfwScore *float32
+	Flagged   bool
 }
