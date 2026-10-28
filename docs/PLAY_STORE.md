@@ -102,10 +102,15 @@ Google's reviewers have no university email. The API has a reviewer sign-in
 Not collected: location, contacts, phone number, financial info, health,
 messages, audio, files, web history, installed apps.
 
-Bus route maps don't change this: the app never reads the phone's location
-(no location permission). Stop locations are places transport reps put on
-the map. Map images and place search come from OpenStreetMap, which sees
-the phone's IP address like any website (listed in the privacy policy).
+Bus route maps and location (build 4 and later): the app has the
+foreground location permission (`ACCESS_FINE_LOCATION`, asked only when
+someone taps "Where am I" or "Use my location"; no background location).
+"Where am I" uses the location on the phone only. A transport rep's "Use my
+location" saves the stop's position with the route, so declare
+**Location → Precise location: collected, optional, App functionality, not
+shared** to be safe. Map images and place search come from OpenStreetMap,
+which sees the phone's IP address and the map area like any website (listed
+in the privacy policy).
 
 ### Permissions to explain if asked
 - `SCHEDULE_EXACT_ALARM`: class reminders at the exact time (the student

@@ -11,6 +11,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"math"
 	"regexp"
 	"slices"
@@ -45,11 +46,18 @@ var (
 )
 
 type Service struct {
-	d   *db.DB
-	now func() time.Time
+	d     *db.DB
+	now   func() time.Time
+	roads RoadRouter // nil: maps draw straight lines between stops
+	log   *slog.Logger
 }
 
-func NewService(d *db.DB, now func() time.Time) *Service { return &Service{d: d, now: now} }
+func NewService(d *db.DB, now func() time.Time, roads RoadRouter, log *slog.Logger) *Service {
+	if log == nil {
+		log = slog.Default()
+	}
+	return &Service{d: d, now: now, roads: roads, log: log}
+}
 
 // Routes mounts the module's endpoints.
 func (s *Service) Routes(r *httpx.Router) {
@@ -80,7 +88,10 @@ type Route struct {
 	Active       bool      `json:"active"`
 	Stops        []Stop    `json:"stops"`
 	Trips        []Trip    `json:"trips"`
-	UpdatedAt    time.Time `json:"updatedAt"`
+	// Path is the road path through the placed stops, an encoded polyline
+	// (precision 5); null: draw straight lines.
+	Path      *string   `json:"path"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 // Stop: offsets are minutes after a trip starts, per direction (null: the
@@ -132,7 +143,7 @@ func routesView(ctx context.Context, q *store.Queries, rows []store.BusRoute) ([
 		ids[i], at[r.ID] = r.ID, i
 		out = append(out, Route{
 			ID: r.ID, UniversityID: r.UniversityID, Name: r.Name, Color: r.Color, Notes: r.Notes,
-			Active: r.Active, Stops: []Stop{}, Trips: []Trip{}, UpdatedAt: r.UpdatedAt,
+			Active: r.Active, Stops: []Stop{}, Trips: []Trip{}, Path: r.Path, UpdatedAt: r.UpdatedAt,
 		})
 	}
 	stops, err := q.StopsForRoutes(ctx, ids)
@@ -535,7 +546,51 @@ func (s *Service) handleStops(ctx context.Context, in *stopsReq) (*Route, error)
 		out, err = s.one(ctx, q, r)
 		return err
 	})
-	return out, err
+	if err != nil || out == nil {
+		return out, err
+	}
+	if p, changed := s.refreshPath(ctx, out); changed {
+		out.Path = p
+	}
+	return out, nil
+}
+
+// refreshPath works out the road path through the route's placed stops
+// when they changed, and stores it. A failed lookup stores no path (maps
+// then draw straight lines) and is tried again on the next save.
+func (s *Service) refreshPath(ctx context.Context, r *Route) (*string, bool) {
+	var pts []LatLng
+	for _, st := range r.Stops {
+		if st.Location != nil {
+			pts = append(pts, *st.Location)
+		}
+	}
+	key := ""
+	if len(pts) >= 2 && s.roads != nil {
+		key = pathKey(pts)
+	}
+	q := store.New(s.d.Q(ctx))
+	row, err := q.GetRoute(ctx, r.ID)
+	if err != nil || (row.PathKey == key && key != "") || (key == "" && row.Path == nil) {
+		return nil, false
+	}
+	var path *string
+	if key != "" {
+		c, cancel := context.WithTimeout(ctx, 10*time.Second)
+		p, err := s.roads.Path(c, pts)
+		cancel()
+		if err != nil {
+			s.log.Warn("transport: road path failed; maps show straight lines", "route", r.ID, "err", err)
+			key = ""
+		} else {
+			path = &p
+		}
+	}
+	if err := q.SetRoutePath(ctx, store.SetRoutePathParams{ID: r.ID, Path: path, PathKey: key}); err != nil {
+		s.log.Warn("transport: saving road path", "route", r.ID, "err", err)
+		return nil, false
+	}
+	return path, true
 }
 
 type TripInput struct {

@@ -3,6 +3,10 @@
     <!-- Class reminders: re-scheduled after a restart, on time when allowed. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- Bus route map, "Where am I": asked only when the student taps it,
+         used on the phone only (never sent), while the app is open. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application
         android:label="VarsityKotha"
         android:name="${applicationName}"

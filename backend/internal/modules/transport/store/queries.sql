@@ -78,3 +78,6 @@ SELECT EXISTS (SELECT 1 FROM universities WHERE id = @id);
 -- name: InsertAudit :exec
 INSERT INTO audit_log (actor_id, action, target_type, target_id, meta)
 VALUES (@actor_id, @action, @target_type, @target_id, @meta);
+
+-- name: SetRoutePath :exec
+UPDATE bus_routes SET path = sqlc.narg(path), path_key = @path_key WHERE id = @id;

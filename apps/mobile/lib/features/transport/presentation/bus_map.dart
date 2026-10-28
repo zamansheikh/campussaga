@@ -1,4 +1,5 @@
 import 'package:campus_core/campus_core.dart';
+import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -56,52 +57,214 @@ class BusMapAttribution extends StatelessWidget {
   );
 }
 
-/// The route's line through its located stops.
+/// The route's line: along the roads when the server has worked the path
+/// out, else straight between the placed stops.
+List<LatLng> routeLinePoints(BusRoute route) {
+  final path = route.path;
+  if (path != null && path.isNotEmpty) {
+    final pts = decodePolyline(path);
+    if (pts.length >= 2) return [for (final p in pts) LatLng(p.lat, p.lng)];
+  }
+  return routePoints(route);
+}
+
 PolylineLayer routeLine(BusRoute route) => PolylineLayer(
   polylines: [
     Polyline(
-      points: routePoints(route),
-      strokeWidth: 5,
-      color: Color(route.argb).withValues(alpha: 0.85),
-      borderStrokeWidth: 2,
-      borderColor: Colors.white.withValues(alpha: 0.9),
+      points: routeLinePoints(route),
+      strokeWidth: 6,
+      color: Color(route.argb),
+      borderStrokeWidth: 2.5,
+      borderColor: Colors.white.withValues(alpha: 0.95),
+      strokeJoin: StrokeJoin.round,
+      strokeCap: StrokeCap.round,
     ),
   ],
 );
 
-/// A numbered marker for each located stop; [onTap] gets the stop.
-MarkerLayer stopMarkers(
+/// Which stops get their name next to the marker.
+enum StopLabels {
+  /// First, last, my stop and the selected one; all of them once zoomed in.
+  auto,
+
+  /// Every stop.
+  all,
+}
+
+/// The placed stops as numbered markers with name labels; [onTap] gets the
+/// stop. Labels follow the zoom so they don't pile up.
+Widget stopMarkers(
   BusRoute route, {
   String? myStopId,
   String? selectedId,
   ValueChanged<BusStop>? onTap,
-}) {
-  final color = Color(route.argb);
-  return MarkerLayer(
-    markers: [
-      for (final (i, s) in route.stops.indexed)
-        if (stopPoint(s) case final p?)
-          Marker(
-            point: p,
-            width: 40,
-            height: 40,
-            child: GestureDetector(
-              onTap: onTap == null ? null : () => onTap(s),
-              child: StopDot(
-                number: i + 1,
-                color: color,
-                filled: s.id == myStopId || s.id == selectedId,
-                big:
-                    i == 0 ||
-                    i == route.stops.length - 1 ||
-                    s.id == myStopId ||
-                    s.id == selectedId,
-              ),
+  StopLabels labels = StopLabels.auto,
+}) => _StopMarkers(
+  route: route,
+  myStopId: myStopId,
+  selectedId: selectedId,
+  onTap: onTap,
+  labels: labels,
+);
+
+class _StopMarkers extends StatelessWidget {
+  const _StopMarkers({
+    required this.route,
+    required this.myStopId,
+    required this.selectedId,
+    required this.onTap,
+    required this.labels,
+  });
+
+  final BusRoute route;
+  final String? myStopId;
+  final String? selectedId;
+  final ValueChanged<BusStop>? onTap;
+  final StopLabels labels;
+
+  @override
+  Widget build(BuildContext context) {
+    final zoom = MapCamera.of(context).zoom;
+    final color = Color(route.argb);
+    final last = route.stops.length - 1;
+    final markers = <Marker>[];
+    // Plain stops first, so the important ones draw on top.
+    final order =
+        [
+          for (final (i, s) in route.stops.indexed)
+            if (s.hasLocation) (i, s),
+        ]..sort(
+          (a, b) => _rank(a.$1, a.$2, last).compareTo(_rank(b.$1, b.$2, last)),
+        );
+    for (final (i, s) in order) {
+      final key = i == 0 || i == last || s.id == myStopId || s.id == selectedId;
+      final showLabel = switch (labels) {
+        StopLabels.all => true,
+        StopLabels.auto => key || zoom >= 14.5,
+      };
+      markers.add(
+        Marker(
+          point: stopPoint(s)!,
+          width: 168,
+          height: 92,
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: onTap == null ? null : () => onTap!(s),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                StopDot(
+                  number: i + 1,
+                  color: color,
+                  filled: s.id == myStopId || s.id == selectedId,
+                  big: key,
+                ),
+                if (showLabel)
+                  Positioned(
+                    top: 46 + (key ? 17 : 14),
+                    child: _Label(
+                      text: s.name,
+                      strong: key,
+                      color: s.id == myStopId ? color : null,
+                    ),
+                  ),
+              ],
             ),
           ),
-    ],
-  );
+        ),
+      );
+    }
+    return MarkerLayer(markers: markers);
+  }
+
+  int _rank(int i, BusStop s, int last) {
+    if (s.id == selectedId) return 4;
+    if (s.id == myStopId) return 3;
+    if (i == 0 || i == last) return 2;
+    return 1;
+  }
 }
+
+class _Label extends StatelessWidget {
+  const _Label({required this.text, required this.strong, this.color});
+
+  final String text;
+  final bool strong;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = context.cs;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 160),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color ?? cs.surface.withValues(alpha: 0.94),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 3,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: context.text.labelSmall?.copyWith(
+              fontWeight: strong ? FontWeight.w700 : FontWeight.w600,
+              color: color == null ? cs.textPrimary : Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The student's own position: a blue dot with its accuracy ring.
+MarkerLayer meMarker(LatLng at) => MarkerLayer(
+  markers: [
+    Marker(
+      point: at,
+      width: 44,
+      height: 44,
+      child: Center(
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFF2563EB).withValues(alpha: 0.18),
+          ),
+          alignment: Alignment.center,
+          child: Container(
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF2563EB),
+              border: Border.all(color: Colors.white, width: 3),
+              boxShadow: const [
+                BoxShadow(color: Colors.black26, blurRadius: 4),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  ],
+);
+
+/// "650 m" or "2.4 km".
+String distanceText(AppLocalizations l10n, double metres) => metres < 1000
+    ? l10n.busDistanceM((metres / 10).round() * 10)
+    : l10n.busDistanceKm((metres / 1000).toStringAsFixed(1));
 
 /// A round stop marker with its number.
 class StopDot extends StatelessWidget {

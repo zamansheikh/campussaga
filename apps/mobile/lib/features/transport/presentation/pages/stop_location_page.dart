@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../data/my_location.dart';
 import '../../data/place_search.dart';
 import '../bus_map.dart';
 
@@ -71,6 +72,7 @@ class _StopLocationPageState extends State<StopLocationPage> {
   late LatLng _center = widget.initial ?? widget.near ?? busMapFallback;
   List<Place>? _results;
   bool _searching = false;
+  bool _locating = false;
   String? _searchError;
 
   @override
@@ -117,6 +119,42 @@ class _StopLocationPageState extends State<StopLocationPage> {
     } finally {
       if (mounted) setState(() => _searching = false);
     }
+  }
+
+  /// A rep standing at the stop: put the pin where the phone is.
+  Future<void> _useMe() async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _locating = true);
+    final res = await MyLocation.instance.current();
+    if (!mounted) return;
+    setState(() => _locating = false);
+    final pos = res.position;
+    final problem = res.problem;
+    if (pos == null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            problem == LocationProblem.serviceOff
+                ? l10n.busLocationServiceOff
+                : l10n.busLocationDenied,
+          ),
+          action: problem == null
+              ? null
+              : SnackBarAction(
+                  label: l10n.busOpenSettings,
+                  onPressed: () => MyLocation.instance.openSettings(problem),
+                ),
+        ),
+      );
+      return;
+    }
+    final p = LatLng(pos.latitude, pos.longitude);
+    setState(() {
+      _results = null;
+      _center = p;
+    });
+    _map.move(p, 18);
   }
 
   void _go(Place p) {
@@ -177,6 +215,21 @@ class _StopLocationPageState extends State<StopLocationPage> {
               ),
               const BusMapAttribution(),
             ],
+          ),
+          Positioned(
+            right: CsSpace.md,
+            bottom: CsSpace.lg,
+            child: FloatingActionButton.extended(
+              heroTag: null,
+              onPressed: _locating ? null : _useMe,
+              icon: _locating
+                  ? const SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(CsIcons.directions),
+              label: Text(l10n.busUseMyLocation),
+            ),
           ),
           // The pin: its tip marks the middle of the map.
           IgnorePointer(

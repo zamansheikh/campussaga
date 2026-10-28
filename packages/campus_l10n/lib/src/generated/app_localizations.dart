@@ -854,6 +854,72 @@ abstract class AppLocalizations {
   /// **'No times yet'**
   String get busNoTimesYet;
 
+  /// No description provided for @busDistanceM.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres} m'**
+  String busDistanceM(int metres);
+
+  /// No description provided for @busDistanceKm.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km'**
+  String busDistanceKm(String km);
+
+  /// No description provided for @busWhereAmI.
+  ///
+  /// In en, this message translates to:
+  /// **'Where am I'**
+  String get busWhereAmI;
+
+  /// No description provided for @busNearestStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest stop: {stop}, {distance} away'**
+  String busNearestStop(String stop, String distance);
+
+  /// No description provided for @busLocationServiceOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is off on this phone. Turn it on to see where you are.'**
+  String get busLocationServiceOff;
+
+  /// No description provided for @busLocationDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'VarsityKotha can\'t use your location. You can allow it in Settings.'**
+  String get busLocationDenied;
+
+  /// No description provided for @busOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get busOpenSettings;
+
+  /// No description provided for @busFitRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole route'**
+  String get busFitRoute;
+
+  /// No description provided for @busLocationPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location stays on your phone.'**
+  String get busLocationPrivate;
+
+  /// No description provided for @busUseMyLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my location'**
+  String get busUseMyLocation;
+
+  /// No description provided for @busFindingYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding you…'**
+  String get busFindingYou;
+
   /// No description provided for @teacherReviewsTitle.
   ///
   /// In en, this message translates to:

@@ -119,4 +119,33 @@ void main() {
     expect(s.copyWith(name: 'X').lat, 23.8069);
     expect(BusStop.fromJson({'id': 'b', 'name': 'B'}).hasLocation, isFalse);
   });
+
+  test('polyline: the example from the format description', () {
+    final pts = decodePolyline('_p~iF~ps|U_ulLnnqC_mqNvxq`@');
+    expect(pts.length, 3);
+    expect(pts[0].lat, closeTo(38.5, 1e-9));
+    expect(pts[0].lng, closeTo(-120.2, 1e-9));
+    expect(pts[2].lat, closeTo(43.252, 1e-9));
+    expect(pts[2].lng, closeTo(-126.453, 1e-9));
+    expect(decodePolyline(''), isEmpty);
+    expect(decodePolyline('_p~iF'), isEmpty); // half a point
+  });
+
+  test('nearest stop and distance', () {
+    const r = BusRoute(
+      id: 'r',
+      name: 'R',
+      path: 'x',
+      stops: [
+        BusStop(id: 'a', name: 'Mirpur 10', lat: 23.8069, lng: 90.3687),
+        BusStop(id: 'b', name: 'Unplaced'),
+        BusStop(id: 'c', name: 'Gabtoli', lat: 23.7838, lng: 90.3445),
+      ],
+    );
+    final n = nearestStop(r, 23.7850, 90.3450)!;
+    expect(n.stop.name, 'Gabtoli');
+    expect(n.metres, inInclusiveRange(100, 200));
+    expect(BusRoute.fromJson(r.toJson()).path, 'x');
+    expect(nearestStop(const BusRoute(id: 'x', name: 'X'), 0, 0), isNull);
+  });
 }

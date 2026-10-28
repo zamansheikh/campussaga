@@ -56,6 +56,8 @@ type Options struct {
 	Media  media.Store             // nil = a directory at cfg.MediaDir
 	// PhotoChecker replaces the backend/nsfw service (tests).
 	PhotoChecker voice.PhotoChecker
+	// RoadRouter replaces OSRM for bus route paths (tests).
+	RoadRouter transport.RoadRouter
 }
 
 // New assembles the app on an open, migrated database.
@@ -157,6 +159,10 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		}
 	}
 	voiceSvc := voice.NewService(d, store, cfg.VoiceHMACSecret, now, log)
+	roads := o.RoadRouter
+	if roads == nil && cfg.RoadRouterURL != "" && cfg.RoadRouterURL != "off" {
+		roads = transport.NewOSRM(cfg.RoadRouterURL)
+	}
 	checker := o.PhotoChecker
 	if checker == nil && cfg.NSFWURL != "" {
 		checker = voice.NewHTTPChecker(cfg.NSFWURL)
@@ -193,7 +199,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		pushSvc.Routes(r)
 		adminSvc.Routes(r)
 		voiceSvc.Routes(r)
-		transport.NewService(d, now).Routes(r)
+		transport.NewService(d, now, roads, log).Routes(r)
 	})
 
 	var h http.Handler = root

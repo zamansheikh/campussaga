@@ -462,6 +462,47 @@ class AppLocalizationsBn extends AppLocalizations {
   String get busNoTimesYet => 'এখনো সময় দেওয়া হয়নি';
 
   @override
+  String busDistanceM(int metres) {
+    return '$metres মিটার';
+  }
+
+  @override
+  String busDistanceKm(String km) {
+    return '$km কিমি';
+  }
+
+  @override
+  String get busWhereAmI => 'আমি কোথায়';
+
+  @override
+  String busNearestStop(String stop, String distance) {
+    return 'সবচেয়ে কাছের স্টপ: $stop, $distance দূরে';
+  }
+
+  @override
+  String get busLocationServiceOff =>
+      'এই ফোনে লোকেশন বন্ধ। তুমি কোথায় দেখতে লোকেশন চালু করো।';
+
+  @override
+  String get busLocationDenied =>
+      'ভার্সিটি কথা তোমার লোকেশন ব্যবহার করতে পারছে না। সেটিংসে অনুমতি দিতে পারো।';
+
+  @override
+  String get busOpenSettings => 'সেটিংস';
+
+  @override
+  String get busFitRoute => 'পুরো রুট';
+
+  @override
+  String get busLocationPrivate => 'তোমার লোকেশন শুধু তোমার ফোনেই থাকে।';
+
+  @override
+  String get busUseMyLocation => 'আমার লোকেশন';
+
+  @override
+  String get busFindingYou => 'তোমাকে খোঁজা হচ্ছে…';
+
+  @override
   String get teacherReviewsTitle => 'শিক্ষক মূল্যায়ন';
 
   @override

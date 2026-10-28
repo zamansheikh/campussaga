@@ -19,6 +19,8 @@ type BusRoute struct {
 	Active       bool
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+	Path         *string
+	PathKey      string
 }
 
 type BusStop struct {

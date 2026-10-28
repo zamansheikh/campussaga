@@ -48,7 +48,7 @@ class BusRouteMapCard extends StatelessWidget {
                 initialCameraFit: points.length > 1
                     ? CameraFit.coordinates(
                         coordinates: points,
-                        padding: const EdgeInsets.all(28),
+                        padding: const EdgeInsets.fromLTRB(36, 40, 36, 44),
                         maxZoom: 16,
                       )
                     : null,

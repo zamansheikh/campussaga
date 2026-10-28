@@ -170,8 +170,15 @@ export default function PrivacyPage() {
           ]}
         />
         <p>
-          We do not collect your phone number, contacts or location, and we never see photos or files you don&apos;t
-          choose to attach. The app does not use advertising identifiers.
+          <strong>Your location.</strong> Only if you tap &quot;Where am I&quot; on a bus route map, the app asks for
+          your phone&apos;s location and uses it on your phone, to show you on the map and find your nearest stop. It
+          is not sent to us and stops when you leave the map. A transport rep placing a bus stop can tap &quot;Use my
+          location&quot;: then the stop&apos;s position (one point on the map, not who was there or when) is saved
+          with the route.
+        </p>
+        <p>
+          We do not collect your phone number, contacts or location history, and we never see photos or files you
+          don&apos;t choose to attach. The app does not use advertising identifiers.
         </p>
 
         <h2>Who else handles your information</h2>
@@ -197,7 +204,7 @@ export default function PrivacyPage() {
             [
               "OpenStreetMap Foundation",
               "Serves the map images on bus route maps, and finds places by name when a transport rep places a stop.",
-              "Your IP address and the map area your phone loads (as with any website), and the place name a rep searches for. No account details and no location from your phone.",
+              "Your IP address and the map area your phone loads (as with any website; after “Where am I” that is the area around you), and the place name a rep searches for. No account details.",
             ],
             [
               "Server and storage providers",
@@ -412,8 +419,14 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p>
-          আমরা তোমার ফোন নম্বর, কন্টাক্ট বা লোকেশন নিই না, আর তুমি নিজে যুক্ত না করলে কোনো ছবি বা ফাইল দেখি না। অ্যাপে
-          বিজ্ঞাপনের আইডি ব্যবহার হয় না।
+          <strong>তোমার লোকেশন:</strong> বাসের রুটের ম্যাপে শুধু &quot;আমি কোথায়&quot; চাপলে অ্যাপ ফোনের লোকেশন চায় এবং
+          তোমার ফোনেই ব্যবহার করে, ম্যাপে তোমাকে দেখাতে ও সবচেয়ে কাছের স্টপ খুঁজতে। এটি আমাদের কাছে পাঠানো হয় না এবং
+          ম্যাপ থেকে বের হলে বন্ধ হয়। ট্রান্সপোর্ট প্রতিনিধি স্টপ বসানোর সময় &quot;আমার লোকেশন&quot; চাপলে শুধু স্টপের
+          অবস্থান (ম্যাপের একটি বিন্দু, কে বা কখন ছিল তা নয়) রুটের সাথে সংরক্ষিত হয়।
+        </p>
+        <p>
+          আমরা তোমার ফোন নম্বর, কন্টাক্ট বা লোকেশনের ইতিহাস নিই না, আর তুমি নিজে যুক্ত না করলে কোনো ছবি বা ফাইল দেখি
+          না। অ্যাপে বিজ্ঞাপনের আইডি ব্যবহার হয় না।
         </p>
 
         <h2>আর কারা তথ্য ব্যবহার করে</h2>
@@ -435,7 +448,7 @@ export default function PrivacyPage() {
           <li>
             <strong>OpenStreetMap Foundation:</strong> বাসের রুটের ম্যাপের ছবি দেখায়, আর ট্রান্সপোর্ট প্রতিনিধি স্টপ বসানোর
             সময় নাম দিয়ে জায়গা খুঁজে দেয় (যেকোনো ওয়েবসাইটের মতো তোমার IP ঠিকানা ও ফোন যে ম্যাপের অংশ লোড করে, আর খোঁজা
-            জায়গার নাম; কোনো অ্যাকাউন্টের তথ্য বা ফোনের লোকেশন নয়)।
+            জায়গার নাম; &quot;আমি কোথায়&quot; চাপলে তোমার আশপাশের ম্যাপ; কোনো অ্যাকাউন্টের তথ্য নয়)।
           </li>
           <li>
             <strong>সার্ভার ও স্টোরেজ প্রদানকারী:</strong> আমাদের সার্ভার, ডাটাবেস, ছবির স্টোরেজ ও এনক্রিপ্টেড ব্যাকআপ

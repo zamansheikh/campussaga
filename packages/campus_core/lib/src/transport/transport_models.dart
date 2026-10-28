@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import '../classes/class_models.dart' show Clock;
 
 /// Which way a bus trip runs.
@@ -136,6 +138,7 @@ class BusRoute {
     this.active = true,
     this.stops = const [],
     this.trips = const [],
+    this.path,
   });
 
   factory BusRoute.fromJson(Map<String, Object?> j) => BusRoute(
@@ -152,6 +155,7 @@ class BusRoute {
       for (final t in (j['trips'] as List? ?? const []))
         BusTrip.fromJson((t as Map).cast()),
     ],
+    path: j['path'] as String?,
   );
 
   final String id;
@@ -161,6 +165,10 @@ class BusRoute {
   final bool active;
   final List<BusStop> stops;
   final List<BusTrip> trips;
+
+  /// The road path through the placed stops, an encoded polyline
+  /// (precision 5; see [decodePolyline]). Null: draw straight lines.
+  final String? path;
 
   /// "Mirpur 10 → Campus" (to-campus order).
   String get span => stops.isEmpty
@@ -183,7 +191,77 @@ class BusRoute {
     'active': active,
     'stops': [for (final s in stops) s.toJson()],
     'trips': [for (final t in trips) t.toJson()],
+    'path': path,
   };
+}
+
+/// Points of an encoded polyline (Google's format, as OSRM sends it),
+/// as (lat, lng). Stops at the first malformed character.
+List<({double lat, double lng})> decodePolyline(String s, {int precision = 5}) {
+  final out = <({double lat, double lng})>[];
+  var i = 0, lat = 0, lng = 0;
+  final factor = _pow10(precision);
+  int? next() {
+    var result = 0, shift = 0;
+    while (true) {
+      if (i >= s.length) return null;
+      final b = s.codeUnitAt(i++) - 63;
+      if (b < 0) return null;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+      if (b < 0x20) break;
+      if (shift > 30) return null;
+    }
+    return (result & 1) != 0 ? ~(result >> 1) : result >> 1;
+  }
+
+  while (i < s.length) {
+    final dLat = next();
+    final dLng = next();
+    if (dLat == null || dLng == null) break;
+    lat += dLat;
+    lng += dLng;
+    out.add((lat: lat / factor, lng: lng / factor));
+  }
+  return out;
+}
+
+double _pow10(int n) {
+  var v = 1.0;
+  for (var k = 0; k < n; k++) {
+    v *= 10;
+  }
+  return v;
+}
+
+/// Distance in metres between two points (haversine).
+double distanceMetres(double lat1, double lng1, double lat2, double lng2) {
+  const r = 6371000.0;
+  final dLat = (lat2 - lat1) * math.pi / 180;
+  final dLng = (lng2 - lng1) * math.pi / 180;
+  final a =
+      math.sin(dLat / 2) * math.sin(dLat / 2) +
+      math.cos(lat1 * math.pi / 180) *
+          math.cos(lat2 * math.pi / 180) *
+          math.sin(dLng / 2) *
+          math.sin(dLng / 2);
+  return 2 * r * math.asin(math.min(1, math.sqrt(a)));
+}
+
+/// The placed stop of [route] nearest to (lat, lng), with the distance in
+/// metres; null when no stop is placed.
+({BusStop stop, double metres})? nearestStop(
+  BusRoute route,
+  double lat,
+  double lng,
+) {
+  ({BusStop stop, double metres})? best;
+  for (final s in route.stops) {
+    if (!s.hasLocation) continue;
+    final d = distanceMetres(lat, lng, s.lat!, s.lng!);
+    if (best == null || d < best.metres) best = (stop: s, metres: d);
+  }
+  return best;
 }
 
 /// The routes of the student's university, and whether they may edit them.

@@ -27,7 +27,7 @@ func (q *Queries) CountRoutes(ctx context.Context, universityID uuid.UUID) (int6
 const createRoute = `-- name: CreateRoute :one
 INSERT INTO bus_routes (university_id, name, color, notes, active)
 VALUES ($1, $2, $3, $4, $5)
-RETURNING id, university_id, name, color, notes, active, created_at, updated_at
+RETURNING id, university_id, name, color, notes, active, created_at, updated_at, path, path_key
 `
 
 type CreateRouteParams struct {
@@ -56,6 +56,8 @@ func (q *Queries) CreateRoute(ctx context.Context, arg CreateRouteParams) (BusRo
 		&i.Active,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Path,
+		&i.PathKey,
 	)
 	return i, err
 }
@@ -103,7 +105,7 @@ func (q *Queries) DeleteTrips(ctx context.Context, routeID uuid.UUID) error {
 }
 
 const getRoute = `-- name: GetRoute :one
-SELECT id, university_id, name, color, notes, active, created_at, updated_at FROM bus_routes WHERE id = $1
+SELECT id, university_id, name, color, notes, active, created_at, updated_at, path, path_key FROM bus_routes WHERE id = $1
 `
 
 func (q *Queries) GetRoute(ctx context.Context, id uuid.UUID) (BusRoute, error) {
@@ -118,6 +120,8 @@ func (q *Queries) GetRoute(ctx context.Context, id uuid.UUID) (BusRoute, error) 
 		&i.Active,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Path,
+		&i.PathKey,
 	)
 	return i, err
 }
@@ -250,7 +254,7 @@ func (q *Queries) ListReps(ctx context.Context, universityID *uuid.UUID) ([]List
 
 const listRoutes = `-- name: ListRoutes :many
 
-SELECT id, university_id, name, color, notes, active, created_at, updated_at FROM bus_routes
+SELECT id, university_id, name, color, notes, active, created_at, updated_at, path, path_key FROM bus_routes
 WHERE university_id = $1 AND (active OR $2::bool)
 ORDER BY name, id
 `
@@ -279,6 +283,8 @@ func (q *Queries) ListRoutes(ctx context.Context, arg ListRoutesParams) ([]BusRo
 			&i.Active,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Path,
+			&i.PathKey,
 		); err != nil {
 			return nil, err
 		}
@@ -299,6 +305,21 @@ func (q *Queries) RepUniversity(ctx context.Context, userID uuid.UUID) (uuid.UUI
 	var university_id uuid.UUID
 	err := row.Scan(&university_id)
 	return university_id, err
+}
+
+const setRoutePath = `-- name: SetRoutePath :exec
+UPDATE bus_routes SET path = $1, path_key = $2 WHERE id = $3
+`
+
+type SetRoutePathParams struct {
+	Path    *string
+	PathKey string
+	ID      uuid.UUID
+}
+
+func (q *Queries) SetRoutePath(ctx context.Context, arg SetRoutePathParams) error {
+	_, err := q.db.Exec(ctx, setRoutePath, arg.Path, arg.PathKey, arg.ID)
+	return err
 }
 
 const stopsForRoutes = `-- name: StopsForRoutes :many
@@ -423,7 +444,7 @@ func (q *Queries) UniversityExists(ctx context.Context, id uuid.UUID) (bool, err
 const updateRoute = `-- name: UpdateRoute :one
 UPDATE bus_routes SET name = $1, color = $2, notes = $3, active = $4
 WHERE id = $5
-RETURNING id, university_id, name, color, notes, active, created_at, updated_at
+RETURNING id, university_id, name, color, notes, active, created_at, updated_at, path, path_key
 `
 
 type UpdateRouteParams struct {
@@ -452,6 +473,8 @@ func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) (BusRo
 		&i.Active,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Path,
+		&i.PathKey,
 	)
 	return i, err
 }

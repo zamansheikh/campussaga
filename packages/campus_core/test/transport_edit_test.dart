@@ -101,10 +101,13 @@ void main() {
     });
 
     test('commas inside brackets stay in the landmark', () {
-      expect(parseStopList('Motijheel (Bangladesh Bank, front gate), Paltan'), const [
-        StopDraft('Motijheel', 'Bangladesh Bank, front gate'),
-        StopDraft('Paltan'),
-      ]);
+      expect(
+        parseStopList('Motijheel (Bangladesh Bank, front gate), Paltan'),
+        const [
+          StopDraft('Motijheel', 'Bangladesh Bank, front gate'),
+          StopDraft('Paltan'),
+        ],
+      );
     });
 
     test('single hyphens and dashes', () {

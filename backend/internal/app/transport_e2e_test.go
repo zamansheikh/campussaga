@@ -2,11 +2,15 @@ package app
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/transport"
 )
 
 type busRouteJSON struct {
@@ -162,4 +166,66 @@ func TestBusRoutes(t *testing.T) {
 	var n int
 	require.NoError(t, h.app.DB.Pool.QueryRow(context.Background(), `SELECT count(*) FROM audit_log WHERE action LIKE 'transport.%'`).Scan(&n))
 	assert.GreaterOrEqual(t, n, 8)
+}
+
+type fakeRoads struct {
+	calls int
+	fail  bool
+}
+
+func (f *fakeRoads) Path(_ context.Context, pts []transport.LatLng) (string, error) {
+	f.calls++
+	if f.fail {
+		return "", errors.New("router down")
+	}
+	return fmt.Sprintf("path-%d", len(pts)), nil
+}
+
+func TestBusRoutePath(t *testing.T) {
+	roads := &fakeRoads{}
+	h := newHarnessFull(t, func(o *Options) { o.RoadRouter = roads }, nil)
+	admin := h.makeAdmin("admin@test.ac.bd")
+	r := h.do("POST", "/admin/transport/routes", admin, map[string]any{"universityId": h.universityID("test-uni"), "name": "Route 1"})
+	require.Equal(t, http.StatusCreated, r.Status, r.Raw)
+	var route struct {
+		ID   string  `json:"id"`
+		Path *string `json:"path"`
+	}
+	r.into(t, &route)
+	base := "/transport/routes/" + route.ID + "/stops"
+	at := func(lat, lng float64) map[string]float64 { return map[string]float64{"lat": lat, "lng": lng} }
+	put := func(stops []map[string]any) *string {
+		t.Helper()
+		r := h.do("PUT", base, admin, map[string]any{"stops": stops})
+		require.Equal(t, http.StatusOK, r.Status, r.Raw)
+		r.into(t, &route)
+		return route.Path
+	}
+
+	// Two placed stops (of three): routed through those two.
+	two := []map[string]any{
+		{"name": "A", "location": at(23.80, 90.36)},
+		{"name": "B", "location": nil},
+		{"name": "C", "location": at(23.88, 90.26)},
+	}
+	require.NotNil(t, put(two))
+	assert.Equal(t, "path-2", *route.Path)
+	assert.Equal(t, 1, roads.calls)
+
+	// Same places again (a renamed stop): not routed again, path kept.
+	two[1]["name"] = "B2"
+	require.NotNil(t, put(two))
+	assert.Equal(t, 1, roads.calls)
+	r = h.do("GET", "/transport/routes/"+route.ID, admin, nil)
+	r.into(t, &route)
+	require.NotNil(t, route.Path, "GET returns the stored path")
+
+	// Fewer than two placed: no path.
+	assert.Nil(t, put([]map[string]any{{"name": "A", "location": at(23.80, 90.36)}}))
+
+	// The router failing: saved anyway, straight lines, tried on the next save.
+	roads.fail = true
+	assert.Nil(t, put(two))
+	roads.fail = false
+	assert.NotNil(t, put(two))
 }

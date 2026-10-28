@@ -70,6 +70,9 @@ type Config struct {
 	NSFWURL    string
 	NSFWReject float64
 	NSFWHold   float64
+	// Road router (OSRM) for bus route paths on the map; "off" or empty:
+	// maps draw straight lines between stops.
+	RoadRouterURL string
 
 	ShutdownTimeout time.Duration
 }
@@ -112,6 +115,7 @@ func Load() (*Config, error) {
 		NSFWURL:            get("NSFW_URL", ""),
 		NSFWReject:         getFloat("NSFW_REJECT", 0.98),
 		NSFWHold:           getFloat("NSFW_HOLD", 0.70),
+		RoadRouterURL:      get("ROAD_ROUTER_URL", "https://router.project-osrm.org"),
 		ShutdownTimeout:    getDuration("SHUTDOWN_TIMEOUT", 15*time.Second),
 	}
 	return c, c.validate()

@@ -467,6 +467,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get busNoTimesYet => 'No times yet';
 
   @override
+  String busDistanceM(int metres) {
+    return '$metres m';
+  }
+
+  @override
+  String busDistanceKm(String km) {
+    return '$km km';
+  }
+
+  @override
+  String get busWhereAmI => 'Where am I';
+
+  @override
+  String busNearestStop(String stop, String distance) {
+    return 'Nearest stop: $stop, $distance away';
+  }
+
+  @override
+  String get busLocationServiceOff =>
+      'Location is off on this phone. Turn it on to see where you are.';
+
+  @override
+  String get busLocationDenied =>
+      'VarsityKotha can\'t use your location. You can allow it in Settings.';
+
+  @override
+  String get busOpenSettings => 'Settings';
+
+  @override
+  String get busFitRoute => 'Whole route';
+
+  @override
+  String get busLocationPrivate => 'Your location stays on your phone.';
+
+  @override
+  String get busUseMyLocation => 'Use my location';
+
+  @override
+  String get busFindingYou => 'Finding you…';
+
+  @override
   String get teacherReviewsTitle => 'Teacher evaluations';
 
   @override
