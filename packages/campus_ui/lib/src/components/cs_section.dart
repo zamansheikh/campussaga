@@ -6,12 +6,7 @@ import '../tokens/dimensions.dart';
 
 /// A titled group of rows on one rounded card, like a settings section.
 class CsSection extends StatelessWidget {
-  const CsSection({
-    super.key,
-    this.title,
-    this.action,
-    required this.children,
-  });
+  const CsSection({super.key, this.title, this.action, required this.children});
 
   final String? title;
 
@@ -164,7 +159,12 @@ class CsSectionTitle extends StatelessWidget {
       ),
       child: action == null
           ? text
-          : Row(children: [Expanded(child: text), action!]),
+          : Row(
+              children: [
+                Expanded(child: text),
+                action!,
+              ],
+            ),
     );
   }
 }

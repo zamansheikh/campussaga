@@ -194,6 +194,11 @@ mkdir -p build/out
 ext="${src##*.}"
 out="build/out/varsitykotha-${new_version/+/-}-$label-$mode.$ext"
 cp "$src" "$out"
+# App Bundles (for Google Play) go to the Desktop, ready to upload.
+if [ "$type" = aab ] && [ -d "$HOME/Desktop" ]; then
+  mv -f "$out" "$HOME/Desktop/"
+  out="$HOME/Desktop/$(basename "$out")"
+fi
 bold "✓ $(cd "$(dirname "$out")" && pwd)/$(basename "$out")"
 [ "$type" = split ] && note "Other CPUs: build/app/outputs/flutter-apk/app-*-release.apk"
 
