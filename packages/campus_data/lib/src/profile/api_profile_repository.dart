@@ -2,7 +2,7 @@ import 'package:campus_core/campus_core.dart';
 
 import '../api_client.dart';
 
-/// [ProfileRepository] on top of the Campus Saga API.
+/// [ProfileRepository] on top of the VarsityKotha API.
 class ApiProfileRepository implements ProfileRepository {
   ApiProfileRepository(this._api);
 

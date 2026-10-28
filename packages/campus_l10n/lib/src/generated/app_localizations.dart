@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// Product name. Change here when rebranding.
   ///
   /// In en, this message translates to:
-  /// **'Campus Saga'**
+  /// **'VarsityKotha'**
   String get appName;
 
   /// No description provided for @navToday.
@@ -137,7 +137,7 @@ abstract class AppLocalizations {
   /// No description provided for @exploreSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Everything Campus Saga does for you, in one place.'**
+  /// **'Everything VarsityKotha does for you, in one place.'**
   String get exploreSubtitle;
 
   /// No description provided for @exploreYourTools.
@@ -3497,7 +3497,7 @@ abstract class AppLocalizations {
   /// No description provided for @voiceActorSystem.
   ///
   /// In en, this message translates to:
-  /// **'Campus Saga'**
+  /// **'VarsityKotha'**
   String get voiceActorSystem;
 
   /// No description provided for @voiceHeldNotice.

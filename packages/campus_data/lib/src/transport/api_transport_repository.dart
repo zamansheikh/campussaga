@@ -2,7 +2,7 @@ import 'package:campus_core/campus_core.dart';
 
 import '../api_client.dart';
 
-/// [TransportRepository] on top of the Campus Saga API (/transport).
+/// [TransportRepository] on top of the VarsityKotha API (/transport).
 class ApiTransportRepository implements TransportRepository {
   ApiTransportRepository(this._api);
 

@@ -2,7 +2,7 @@ import 'package:campus_core/campus_core.dart';
 
 import '../api_client.dart';
 
-/// [DeviceRepository] on top of the Campus Saga API.
+/// [DeviceRepository] on top of the VarsityKotha API.
 class ApiDeviceRepository implements DeviceRepository {
   ApiDeviceRepository(this._api);
 

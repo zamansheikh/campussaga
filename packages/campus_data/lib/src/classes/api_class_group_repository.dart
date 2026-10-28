@@ -2,7 +2,7 @@ import 'package:campus_core/campus_core.dart';
 
 import '../api_client.dart';
 
-/// [ClassGroupRepository] on top of the Campus Saga API.
+/// [ClassGroupRepository] on top of the VarsityKotha API.
 class ApiClassGroupRepository implements ClassGroupRepository {
   ApiClassGroupRepository(this._api);
 

@@ -18,7 +18,7 @@ abstract final class Env {
   /// and on Android with `adb reverse tcp:8090 tcp:8090`.
   static const String localApiBaseUrl = 'http://localhost:8090/api/v1';
 
-  /// Campus Saga API, including the /api/v1 prefix. Release builds must set
+  /// VarsityKotha API, including the /api/v1 prefix. Release builds must set
   /// API_BASE_URL; they never fall back to localhost.
   static String get apiBaseUrl => _apiBaseUrl.isNotEmpty
       ? _apiBaseUrl
@@ -27,6 +27,7 @@ abstract final class Env {
   /// Public web pages (apps/web on campus.silifton.com; GitHub Pages keeps
   /// a copy). Move to the product domain once it is chosen; the rebranding
   /// checklist lists this line.
+  // Moves to https://varsitykotha.com once that domain is live.
   static const String siteUrl = 'https://campus.silifton.com';
   static const String privacyPolicyUrl = '$siteUrl/privacy.html';
 

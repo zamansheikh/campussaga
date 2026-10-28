@@ -6,7 +6,7 @@ import 'package:campus_core/campus_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
-/// Where the Campus Saga API lives, from the app's env file.
+/// Where the VarsityKotha API lives, from the app's env file.
 class ApiConfig {
   const ApiConfig({
     required this.baseUrl,
@@ -33,7 +33,7 @@ typedef AccessTokenProvider = FutureOr<String?> Function();
 /// Gets a new access token; true when one is ready.
 typedef SessionRefresher = Future<bool> Function();
 
-/// Thin JSON client for the Campus Saga API.
+/// Thin JSON client for the VarsityKotha API.
 ///
 /// Every response uses the envelope
 /// `{success, data, error: {code, message, details}, meta}`. Success returns

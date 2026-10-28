@@ -11,7 +11,7 @@ import 'dart:ui';
 /// tool for students), not taken from the current logo.
 abstract final class CsBrand {
   /// Display name used inside the app (titles, about screen).
-  static const String appName = 'Campus Saga';
+  static const String appName = 'VarsityKotha';
 
   /// Main brand hue: deep teal. Reads as trust and calm, stays clear of
   /// alarm red and of social-media blue.

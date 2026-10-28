@@ -1,5 +1,5 @@
 name: campus_data
-description: Backend implementations of campus_core repositories. The only package that talks to the Campus Saga API (HTTP).
+description: Backend implementations of campus_core repositories. The only package that talks to the VarsityKotha API (HTTP).
 publish_to: none
 version: 0.1.0
 

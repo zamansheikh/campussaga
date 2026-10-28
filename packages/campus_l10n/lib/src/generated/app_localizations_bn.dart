@@ -10,7 +10,7 @@ class AppLocalizationsBn extends AppLocalizations {
   AppLocalizationsBn([String locale = 'bn']) : super(locale);
 
   @override
-  String get appName => 'ক্যাম্পাস সাগা';
+  String get appName => 'ভার্সিটি কথা';
 
   @override
   String get navToday => 'আজ';
@@ -28,7 +28,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get exploreTitle => 'এক্সপ্লোর';
 
   @override
-  String get exploreSubtitle => 'ক্যাম্পাস সাগার সব সুবিধা, এক জায়গায়।';
+  String get exploreSubtitle => 'ভার্সিটি কথার সব সুবিধা, এক জায়গায়।';
 
   @override
   String get exploreYourTools => 'তোমার টুলস';
@@ -1971,7 +1971,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get voiceActorModerator => 'মডারেটর';
 
   @override
-  String get voiceActorSystem => 'ক্যাম্পাস সাগা';
+  String get voiceActorSystem => 'ভার্সিটি কথা';
 
   @override
   String get voiceHeldNotice =>

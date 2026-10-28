@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appName": "Campus Saga",
+  "appName": "VarsityKotha",
   "@appName": {
     "description": "Product name. Change here when rebranding."
   },
@@ -9,7 +9,7 @@
   "navProfile": "Profile",
   "navExplore": "Explore",
   "exploreTitle": "Explore",
-  "exploreSubtitle": "Everything Campus Saga does for you, in one place.",
+  "exploreSubtitle": "Everything VarsityKotha does for you, in one place.",
   "exploreYourTools": "Your tools",
   "exploreComingSoon": "On the way",
   "exploreRemindersHint": "Before every class",
@@ -929,7 +929,7 @@
   },
   "voiceActorAuthor": "The author",
   "voiceActorModerator": "Moderator",
-  "voiceActorSystem": "Campus Saga",
+  "voiceActorSystem": "VarsityKotha",
   "voiceHeldNotice": "Only you can see this while it's checked. It usually takes less than a day.",
   "voiceHeldPersonalInfo": "It may contain a phone number, email, link or ID number.",
   "voiceHeldLanguage": "It may contain words that aren't allowed.",

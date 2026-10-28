@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Campus Saga</string>
+	<string>VarsityKotha</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -19,7 +19,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>To add photos to an issue you raise in Campus Voice. Location and phone details are removed.</string>
 	<key>CFBundleName</key>
-	<string>campussaga</string>
+	<string>VarsityKotha</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

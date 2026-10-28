@@ -5,7 +5,7 @@ import 'package:campus_core/campus_core.dart';
 import '../api_client.dart';
 import 'token_store.dart';
 
-/// [AuthRepository] on top of the Campus Saga API.
+/// [AuthRepository] on top of the VarsityKotha API.
 ///
 /// It also owns the session for [ApiClient]: it hands out the access token
 /// and refreshes it when the API says `TOKEN_EXPIRED`. Refreshes are

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the Campus Saga Android app, asking what to build:
+# Build the VarsityKotha Android app, asking what to build:
 #   - which server it talks to (beta, this Mac, the local network, or a URL)
 #   - APK, App Bundle (Google Play) or smaller per-CPU APKs
 #   - whether to raise the build number

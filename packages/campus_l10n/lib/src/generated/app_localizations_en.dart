@@ -10,7 +10,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Campus Saga';
+  String get appName => 'VarsityKotha';
 
   @override
   String get navToday => 'Today';
@@ -29,7 +29,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exploreSubtitle =>
-      'Everything Campus Saga does for you, in one place.';
+      'Everything VarsityKotha does for you, in one place.';
 
   @override
   String get exploreYourTools => 'Your tools';
@@ -2015,7 +2015,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceActorModerator => 'Moderator';
 
   @override
-  String get voiceActorSystem => 'Campus Saga';
+  String get voiceActorSystem => 'VarsityKotha';
 
   @override
   String get voiceHeldNotice =>
