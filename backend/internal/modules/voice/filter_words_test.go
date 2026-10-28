@@ -67,5 +67,7 @@ func TestLanguageCheckIsFast(t *testing.T) {
 	for range 20 {
 		checkText(long)
 	}
-	assert.Less(t, time.Since(start)/20, 50*time.Millisecond, "a long post checks in well under 50 ms")
+	// Catches runaway matching (seconds), not small slowdowns: CI runs with
+	// the race detector, several times slower than production (~10 ms here).
+	assert.Less(t, time.Since(start)/20, 500*time.Millisecond, "a long post checks quickly")
 }
