@@ -71,6 +71,7 @@ abstract final class CsIcons {
   static const IconData light = PhosphorIconsRegular.sun;
   static const IconData lock = PhosphorIconsRegular.lock;
   static const IconData maintenance = PhosphorIconsRegular.wrench;
+
   /// Three-dot menus (Flutter's default is a Material icon).
   static const IconData more = PhosphorIconsBold.dotsThreeVertical;
   static const IconData members = PhosphorIconsRegular.users;
