@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
@@ -44,7 +46,55 @@ class _GroupFormPageState extends State<GroupFormPage> {
   Failure? _failure;
   bool _busy = false;
 
+  /// Findable by search at the university (edit only; new groups are).
+  late bool _discoverable = _group?.discoverable ?? true;
+
+  /// Groups of the same department and batch, so a CR joins instead of
+  /// making a second routine for the same class (create only).
+  List<FoundGroup> _similar = const [];
+  Timer? _similarTimer;
+  String _similarFor = '';
+
   bool get _editing => _group != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_editing) {
+      for (final c in [_department, _batch, _section]) {
+        c.addListener(_scheduleSimilar);
+      }
+      _findSimilar();
+    }
+  }
+
+  void _scheduleSimilar() {
+    _similarTimer?.cancel();
+    _similarTimer = Timer(const Duration(milliseconds: 500), _findSimilar);
+  }
+
+  Future<void> _findSimilar() async {
+    final department = _department.text.trim();
+    final batch = _batch.text.trim();
+    final section = _section.text.trim();
+    final key = '$department|$batch|$section'.toLowerCase();
+    if (key == _similarFor) return;
+    _similarFor = key;
+    if (department.isEmpty || batch.isEmpty) {
+      if (_similar.isNotEmpty) setState(() => _similar = const []);
+      return;
+    }
+    try {
+      final found = await context.read<MyClassesCubit>().similarGroups(
+        department: department,
+        batch: batch,
+        section: section,
+      );
+      if (mounted && key == _similarFor) setState(() => _similar = found);
+    } on Failure {
+      // Only a hint: offline or failing, the form still works.
+    }
+  }
 
   /// This term and the next ("Fall 2026", "Spring 2027"): Spring is
   /// January to April, Summer May to August, Fall September to December.
@@ -61,6 +111,7 @@ class _GroupFormPageState extends State<GroupFormPage> {
 
   @override
   void dispose() {
+    _similarTimer?.cancel();
     _department.dispose();
     _batch.dispose();
     _section.dispose();
@@ -74,6 +125,9 @@ class _GroupFormPageState extends State<GroupFormPage> {
       batch: _batch.text.trim(),
       section: _section.text.trim(),
       semester: _semester.text.trim(),
+      discoverable: _editing && _discoverable != _group!.discoverable
+          ? _discoverable
+          : null,
     );
     setState(() {
       _failure = null;
@@ -195,6 +249,30 @@ class _GroupFormPageState extends State<GroupFormPage> {
                   ),
               ],
             ),
+            if (_editing) ...[
+              const SizedBox(height: CsSpace.lg),
+              CsSection(
+                children: [
+                  SwitchListTile(
+                    secondary: const Icon(CsIcons.search),
+                    title: Text(
+                      l10n.findableTitle(
+                        _user?.university?.shortName ?? l10n.universityLabel,
+                      ),
+                    ),
+                    subtitle: Text(l10n.findableBody),
+                    value: _discoverable,
+                    onChanged: _busy
+                        ? null
+                        : (v) => setState(() => _discoverable = v),
+                  ),
+                ],
+              ),
+            ],
+            if (!_editing && _similar.isNotEmpty) ...[
+              const SizedBox(height: CsSpace.lg),
+              SimilarGroupsCard(groups: _similar),
+            ],
             if (_failure != null) ...[
               const SizedBox(height: CsSpace.md),
               NoticeBanner(text: classErrorText(l10n, _failure!)),
@@ -209,6 +287,96 @@ class _GroupFormPageState extends State<GroupFormPage> {
                     )
                   : Text(_editing ? l10n.saveProfile : l10n.createAction),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "This class may already exist": groups like the one being created, each
+/// with "Join instead".
+class SimilarGroupsCard extends StatelessWidget {
+  const SimilarGroupsCard({super.key, required this.groups});
+
+  final List<FoundGroup> groups;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cs = context.cs;
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      child: Container(
+        padding: const EdgeInsets.all(CsSpace.md),
+        decoration: BoxDecoration(
+          color: cs.accent.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(CsRadius.md + 2),
+          border: Border.all(color: cs.accent.withValues(alpha: 0.35)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(CsIcons.info, color: cs.accent),
+                const SizedBox(width: CsSpace.sm),
+                Expanded(
+                  child: Text(
+                    l10n.similarGroupsTitle,
+                    style: context.text.titleSmall,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: CsSpace.xs),
+            Text(
+              l10n.similarGroupsBody,
+              style: context.text.bodySmall?.copyWith(color: cs.textSecondary),
+            ),
+            for (final g in groups) ...[
+              const SizedBox(height: CsSpace.sm),
+              Material(
+                color: cs.surface,
+                borderRadius: BorderRadius.circular(CsRadius.md),
+                clipBehavior: Clip.antiAlias,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    CsSpace.md,
+                    CsSpace.sm,
+                    CsSpace.xs,
+                    CsSpace.sm,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(g.title, style: context.text.titleSmall),
+                            Text(
+                              [
+                                if (g.semester.isNotEmpty) g.semester,
+                                l10n.membersCount(g.memberCount),
+                                if (g.crName != null && g.crName!.isNotEmpty)
+                                  l10n.findClassCr(g.crName!),
+                              ].join(' · '),
+                              style: context.text.bodySmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () =>
+                            context.push(Routes.classPreview(g.id)),
+                        child: Text(l10n.joinInstead),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

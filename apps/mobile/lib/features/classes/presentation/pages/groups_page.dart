@@ -17,7 +17,16 @@ class GroupsPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final groups = context.select((MyClassesCubit c) => c.state.groups);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.classGroups)),
+      appBar: AppBar(
+        title: Text(l10n.classGroups),
+        actions: [
+          IconButton(
+            tooltip: l10n.findClass,
+            icon: const Icon(CsIcons.search),
+            onPressed: () => context.push(Routes.findClass),
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: context.read<MyClassesCubit>().refresh,
         child: CsPage(
@@ -66,7 +75,7 @@ class _GroupRow extends StatelessWidget {
   }
 }
 
-/// "Join with a code" and "I'm the CR" buttons.
+/// "Find your class", "Join with a code" and "I'm the CR" buttons.
 class JoinOrCreate extends StatelessWidget {
   const JoinOrCreate({super.key});
 
@@ -77,6 +86,12 @@ class JoinOrCreate extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         FilledButton.icon(
+          onPressed: () => context.push(Routes.findClass),
+          icon: const Icon(CsIcons.search),
+          label: Text(l10n.findClass),
+        ),
+        const SizedBox(height: CsSpace.sm),
+        OutlinedButton.icon(
           onPressed: () => context.push(Routes.joinGroup),
           icon: const Icon(CsIcons.key),
           label: Text(l10n.joinWithCode),

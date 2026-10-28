@@ -13,6 +13,8 @@ import '../features/auth/presentation/pages/email_sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
 import '../features/classes/presentation/pages/change_editor_page.dart';
+import '../features/classes/presentation/pages/class_preview_page.dart';
+import '../features/classes/presentation/pages/find_class_page.dart';
 import '../features/classes/presentation/pages/group_form_page.dart';
 import '../features/classes/presentation/pages/group_page.dart';
 import '../features/classes/presentation/pages/groups_page.dart';
@@ -90,6 +92,13 @@ abstract final class Routes {
   static const campusMine = '/campus/mine';
   static const campusAnonymity = '/campus/anonymity';
   static String campusIssue(String id) => '/campus/issues/$id';
+
+  // Find your class (routine discovery).
+  static const findClass = '/find-class';
+  static String classPreview(String groupId, {String? code}) => Uri(
+    path: '/find-class/$groupId',
+    queryParameters: code == null ? null : {'code': code},
+  ).toString();
 }
 
 /// App routes. Signed-out students see the welcome slides once, then only
@@ -171,6 +180,20 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
         path: '/campus/issues/:id',
         builder: (context, state) =>
             IssuePage(issueId: state.pathParameters['id']!),
+      ),
+      // Find your class: search, then a group's routine preview.
+      GoRoute(
+        path: Routes.findClass,
+        builder: (context, state) => const FindClassPage(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (context, state) => ClassPreviewPage(
+              groupId: state.pathParameters['id']!,
+              code: state.uri.queryParameters['code'],
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: Routes.groups,

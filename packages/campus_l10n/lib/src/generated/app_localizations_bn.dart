@@ -491,6 +491,84 @@ class AppLocalizationsBn extends AppLocalizations {
   String get joinCodeLabel => 'যোগদানের কোড';
 
   @override
+  String get findClass => 'তোমার ক্লাস খুঁজে নাও';
+
+  @override
+  String get findClassHint => 'বিভাগ, ব্যাচ, কোর্স কোড বা শিক্ষক';
+
+  @override
+  String get findClassIntro =>
+      'তোমার বিশ্ববিদ্যালয়ের ক্লাস রুটিন খোঁজো। পুরো সেকশনে যোগ দাও, বা শুধু তোমার কোর্সগুলো নাও।';
+
+  @override
+  String get findClassEmptyTitle => 'কোনো ক্লাস পাওয়া যায়নি';
+
+  @override
+  String get findClassEmptyBody =>
+      'কোর্স কোড (CSE 311), বা বিভাগ আর ব্যাচ দিয়ে খোঁজো। অথবা সিআরের কাছে যোগদানের কোড চাও।';
+
+  @override
+  String get findClassOffline => 'খুঁজতে ইন্টারনেট সংযোগ লাগবে।';
+
+  @override
+  String get findClassJoined => 'যুক্ত আছ';
+
+  @override
+  String findClassCr(String name) {
+    return 'সিআর: $name';
+  }
+
+  @override
+  String get findClassMore => 'আরও দেখাও';
+
+  @override
+  String get findClassHaveCode => 'যোগদানের কোড আছে?';
+
+  @override
+  String get previewPickHint =>
+      'যে কোর্সগুলো তুমি নাও না, সেগুলোর টিক তুলে দাও। শুধু রাখা কোর্সগুলোই দেখবে।';
+
+  @override
+  String get previewNoClasses => 'এই রুটিনে এখনো কোনো ক্লাস নেই।';
+
+  @override
+  String get joinWholeSection => 'পুরো সেকশনে যোগ দাও';
+
+  @override
+  String addSelectedCourses(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countStringটি কোর্স যোগ করো';
+  }
+
+  @override
+  String get saveMyCourses => 'আমার কোর্স সংরক্ষণ করো';
+
+  @override
+  String get addedToRoutine => 'তোমার রুটিনে যোগ হয়েছে';
+
+  @override
+  String get similarGroupsTitle => 'এই ক্লাসটি হয়তো আগেই আছে';
+
+  @override
+  String get similarGroupsBody =>
+      'নতুন না বানিয়ে এতে যোগ দাও, যাতে তোমার ক্লাসের রুটিন একটাই থাকে।';
+
+  @override
+  String get joinInstead => 'এতে যোগ দাও';
+
+  @override
+  String findableTitle(String university) {
+    return '$university-এ খুঁজে পাওয়া যাবে';
+  }
+
+  @override
+  String get findableBody =>
+      'তোমার বিশ্ববিদ্যালয়ের শিক্ষার্থীরা খুঁজে এই ক্লাসটি পাবে। বন্ধ থাকলে: শুধু যোগদানের কোড দিয়ে যোগ দেওয়া যাবে।';
+
+  @override
   String get joinAction => 'গ্রুপে যোগ দাও';
 
   @override

@@ -668,15 +668,26 @@ class _JoinCard extends StatelessWidget {
               foregroundColor: const Color(0xFF0F766E),
               minimumSize: const Size(0, 48),
             ),
-            onPressed: () => context.push(Routes.joinGroup),
-            icon: const Icon(CsIcons.key),
-            label: Text(l10n.joinWithCode),
+            onPressed: () => context.push(Routes.findClass),
+            icon: const Icon(CsIcons.search),
+            label: Text(l10n.findClass),
           ),
           const SizedBox(height: CsSpace.xs),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: white),
-            onPressed: () => context.push(Routes.newGroup),
-            child: Text(l10n.imTheCr),
+          Wrap(
+            spacing: CsSpace.xs,
+            children: [
+              TextButton.icon(
+                style: TextButton.styleFrom(foregroundColor: white),
+                onPressed: () => context.push(Routes.joinGroup),
+                icon: const Icon(CsIcons.key, size: 18),
+                label: Text(l10n.joinWithCode),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: white),
+                onPressed: () => context.push(Routes.newGroup),
+                child: Text(l10n.imTheCr),
+              ),
+            ],
           ),
         ],
       ),
