@@ -64,6 +64,10 @@ export default function PrivacyPage() {
             and the class groups, routines and personal classes you use.
           </li>
           <li>
+            <strong>Campus Voice posts are anonymous by default.</strong> No student, CR, staff member or university
+            official can see who wrote an anonymous post.
+          </li>
+          <li>
             <strong>No ads, no selling or renting your data, no tracking analytics.</strong>
           </li>
           <li>
@@ -115,6 +119,27 @@ export default function PrivacyPage() {
               "Entries you add for yourself (for example a tuition): name, details, place, day and time. Only you can see them.",
             ],
             [
+              <strong key="k">Find your class</strong>,
+              "If your CR keeps your class findable, students of your university can find it by search and see its department, batch, section, courses, teachers and the CR's name. The CR can turn this off.",
+            ],
+            [
+              <strong key="k">Campus Voice posts</strong>,
+              <>
+                The issues and comments you post, the place you type (for example &quot;Hall 2&quot;), your &quot;Me
+                too&quot; votes, the issues you follow and the reports you send. Posts are <strong>anonymous</strong>{" "}
+                unless you choose to show your name. The link between you and an anonymous post is kept separately and
+                is never shown on any screen, to any student, CR, staff member or university official; we use it only
+                to show you your own posts and to block someone who breaks the rules. Students and officials of your
+                university see the posts. Posts in the Safety category are private: only moderators and your
+                university&apos;s officials see them. Moderators see reported posts and the reasons given, never who
+                reported them.
+              </>,
+            ],
+            [
+              <strong key="k">Photos you attach to Campus Voice</strong>,
+              "Up to 4 photos per post, chosen with your phone's photo picker: the app cannot see your other photos. Our server re-encodes and shrinks each photo, which removes hidden details such as location, phone model and the time it was taken, and checks it with a nudity filter that runs on our own server (photos are not sent to any outside service for this). Photos you add but don't post are deleted after 24 hours.",
+            ],
+            [
               <strong key="k">Push notification token</strong>,
               "A token from Firebase Cloud Messaging, your phone type and the app language, so we can tell you when your CR changes a class or posts an announcement. It is tied to your sign-in on that phone: signing out stops notifications there.",
             ],
@@ -140,13 +165,13 @@ export default function PrivacyPage() {
             ],
             [
               <strong key="k">Settings on your phone</strong>,
-              "Your theme and language, class reminder choices, and a copy of your routine (so the app works offline) are saved only on your phone. Class reminders are scheduled on your phone; we don't need to know about them.",
+              "Your theme and language, class reminder choices, your CGPA calculator entries, your chosen bus stop and a copy of your routine (so the app works offline) are saved only on your phone. Class reminders are scheduled on your phone; we don't need to know about them.",
             ],
           ]}
         />
         <p>
-          We do not collect your phone number, contacts, location, photos or files. The app does not use advertising
-          identifiers.
+          We do not collect your phone number, contacts or location, and we never see photos or files you don&apos;t
+          choose to attach. The app does not use advertising identifiers.
         </p>
 
         <h2>Who else handles your information</h2>
@@ -171,7 +196,7 @@ export default function PrivacyPage() {
             ["Resend", "Delivers the email with your sign-in code.", "Your email address and the email's content."],
             [
               "Server and storage providers",
-              "Run our server, database and encrypted backups.",
+              "Run our server, database, photo storage and encrypted backups.",
               "The information stored in our database.",
             ],
           ]}
@@ -196,6 +221,13 @@ export default function PrivacyPage() {
             <strong>Class groups:</strong> until the CR deletes the group or its last member leaves. One-day changes are
             no longer shown a day after their date; announcements after 30 days (unless pinned). Your membership,
             hidden courses and personal classes are deleted with your account.
+          </li>
+          <li>
+            <strong>Campus Voice:</strong> posts, comments and photos stay until the author deletes them or moderators
+            remove them. Deleted and removed posts are hidden from everyone at once and kept, hidden, for moderation.
+            When you delete your account, your link to your anonymous posts and your votes, follows and reports are
+            deleted; the posts stay with no link to you, and posts that showed your name show &quot;Deleted
+            account&quot;.
           </li>
           <li>
             <strong>Push tokens:</strong> stop being used when you sign out; deleted with your account or when Firebase
@@ -286,6 +318,10 @@ export default function PrivacyPage() {
             গ্রুপ, রুটিন ও ব্যক্তিগত ক্লাস।
           </li>
           <li>
+            <strong>ক্যাম্পাস ভয়েসের পোস্ট স্বাভাবিকভাবে বেনামি।</strong> বেনামি পোস্ট কে লিখেছে তা কোনো শিক্ষার্থী,
+            সিআর, স্টাফ বা বিশ্ববিদ্যালয়ের কর্মকর্তা দেখতে পারে না।
+          </li>
+          <li>
             <strong>কোনো বিজ্ঞাপন নেই, তথ্য বিক্রি বা ভাড়া দেওয়া হয় না, কোনো ট্র্যাকিং অ্যানালিটিক্স নেই।</strong>
           </li>
           <li>
@@ -327,6 +363,25 @@ export default function PrivacyPage() {
             সময়। শুধু তুমি দেখো।
           </li>
           <li>
+            <strong>ক্লাস খুঁজে নাও:</strong> সিআর ক্লাসটি খোঁজার যোগ্য রাখলে তোমার বিশ্ববিদ্যালয়ের শিক্ষার্থীরা খুঁজে
+            বিভাগ, ব্যাচ, সেকশন, কোর্স, শিক্ষক ও সিআর-এর নাম দেখতে পায়। সিআর এটি বন্ধ করতে পারে।
+          </li>
+          <li>
+            <strong>ক্যাম্পাস ভয়েসের পোস্ট:</strong> তোমার দেওয়া ইস্যু ও মন্তব্য, তুমি যে জায়গা লেখো (যেমন &quot;হল
+            ২&quot;), তোমার &quot;আমারও&quot; ভোট, যে ইস্যু ফলো করো আর যে রিপোর্ট পাঠাও। নাম দেখাতে না চাইলে পোস্ট{" "}
+            <strong>বেনামি</strong>। বেনামি পোস্টের সাথে তোমার সংযোগ আলাদাভাবে রাখা হয় এবং কোনো স্ক্রিনে, কোনো
+            শিক্ষার্থী, সিআর, স্টাফ বা বিশ্ববিদ্যালয়ের কর্মকর্তাকে কখনো দেখানো হয় না; শুধু তোমার নিজের পোস্ট দেখাতে
+            আর নিয়ম ভাঙলে কাউকে আটকাতে এটি ব্যবহার হয়। তোমার বিশ্ববিদ্যালয়ের শিক্ষার্থী ও কর্মকর্তারা পোস্ট দেখে।
+            নিরাপত্তা বিভাগের পোস্ট গোপন: শুধু মডারেটর ও তোমার বিশ্ববিদ্যালয়ের কর্মকর্তারা দেখে। মডারেটররা রিপোর্ট
+            করা পোস্ট ও কারণ দেখে, কে রিপোর্ট করেছে তা কখনো নয়।
+          </li>
+          <li>
+            <strong>ক্যাম্পাস ভয়েসে দেওয়া ছবি:</strong> প্রতি পোস্টে সর্বোচ্চ ৪টি ছবি, ফোনের ফটো পিকার দিয়ে বাছাই করা;
+            অ্যাপ তোমার অন্য ছবি দেখতে পারে না। আমাদের সার্ভার প্রতিটি ছবি নতুন করে তৈরি ও ছোট করে, এতে লোকেশন, ফোনের
+            মডেল ও ছবি তোলার সময়ের মতো লুকানো তথ্য মুছে যায়, আর আমাদের নিজের সার্ভারে চলা একটি অশ্লীলতা-ফিল্টার দিয়ে
+            পরীক্ষা করে (এজন্য ছবি বাইরের কোনো সেবায় পাঠানো হয় না)। যোগ করে পোস্ট না করা ছবি ২৪ ঘণ্টা পর মুছে যায়।
+          </li>
+          <li>
             <strong>পুশ নোটিফিকেশন টোকেন:</strong> Firebase Cloud Messaging-এর একটি টোকেন, ফোনের ধরন ও অ্যাপের ভাষা,
             যাতে সিআর ক্লাস বদলালে বা ঘোষণা দিলে তোমাকে জানাতে পারি। এটি ওই ফোনের সাইন-ইনের সাথে যুক্ত: সাইন আউট করলে
             ওই ফোনে নোটিফিকেশন বন্ধ হয়।
@@ -346,11 +401,14 @@ export default function PrivacyPage() {
             মেমরিতে ব্যবহার হয়, লগে লেখা হয় না।
           </li>
           <li>
-            <strong>ফোনের সেটিংস:</strong> থিম, ভাষা, ক্লাস রিমাইন্ডারের পছন্দ এবং রুটিনের একটি কপি (অফলাইনে চালানোর
-            জন্য) শুধু তোমার ফোনে থাকে। ক্লাস রিমাইন্ডার ফোনেই সেট হয়, আমাদের জানার দরকার হয় না।
+            <strong>ফোনের সেটিংস:</strong> থিম, ভাষা, ক্লাস রিমাইন্ডারের পছন্দ, সিজিপিএ ক্যালকুলেটরের তথ্য, বেছে নেওয়া বাস
+            স্টপ এবং রুটিনের একটি কপি (অফলাইনে চালানোর জন্য) শুধু তোমার ফোনে থাকে। ক্লাস রিমাইন্ডার ফোনেই সেট হয়, আমাদের জানার দরকার হয় না।
           </li>
         </ul>
-        <p>আমরা তোমার ফোন নম্বর, কন্টাক্ট, লোকেশন, ছবি বা ফাইল নিই না। অ্যাপে বিজ্ঞাপনের আইডি ব্যবহার হয় না।</p>
+        <p>
+          আমরা তোমার ফোন নম্বর, কন্টাক্ট বা লোকেশন নিই না, আর তুমি নিজে যুক্ত না করলে কোনো ছবি বা ফাইল দেখি না। অ্যাপে
+          বিজ্ঞাপনের আইডি ব্যবহার হয় না।
+        </p>
 
         <h2>আর কারা তথ্য ব্যবহার করে</h2>
         <ul>
@@ -369,7 +427,8 @@ export default function PrivacyPage() {
             <strong>Resend:</strong> সাইন-ইন কোডসহ ইমেইল পাঠায় (তোমার ইমেইল ঠিকানা ও ইমেইলের লেখা)।
           </li>
           <li>
-            <strong>সার্ভার ও স্টোরেজ প্রদানকারী:</strong> আমাদের সার্ভার, ডাটাবেস ও এনক্রিপ্টেড ব্যাকআপ চালায়।
+            <strong>সার্ভার ও স্টোরেজ প্রদানকারী:</strong> আমাদের সার্ভার, ডাটাবেস, ছবির স্টোরেজ ও এনক্রিপ্টেড ব্যাকআপ
+            চালায়।
           </li>
         </ul>
         <p>
@@ -387,6 +446,12 @@ export default function PrivacyPage() {
             <strong>ক্লাস গ্রুপ:</strong> সিআর গ্রুপ মুছে না ফেলা বা শেষ সদস্য চলে না যাওয়া পর্যন্ত। এক দিনের পরিবর্তন
             তারিখের এক দিন পর আর দেখানো হয় না; ঘোষণা ৩০ দিন পর (পিন করা না থাকলে)। তোমার সদস্যপদ, লুকানো কোর্স ও
             ব্যক্তিগত ক্লাস অ্যাকাউন্টের সাথে মুছে যায়।
+          </li>
+          <li>
+            <strong>ক্যাম্পাস ভয়েস:</strong> পোস্ট, মন্তব্য ও ছবি থাকে যতক্ষণ না লেখক মুছে ফেলে বা মডারেটর সরিয়ে দেয়।
+            মুছে ফেলা ও সরানো পোস্ট সাথে সাথে সবার কাছ থেকে লুকানো হয় এবং মডারেশনের জন্য লুকানো অবস্থায় রাখা হয়।
+            অ্যাকাউন্ট মুছলে বেনামি পোস্টের সাথে তোমার সংযোগ এবং তোমার ভোট, ফলো ও রিপোর্ট মুছে যায়; পোস্টগুলো তোমার
+            সাথে কোনো সংযোগ ছাড়া থেকে যায়, আর যেসব পোস্টে নাম দেখানো ছিল সেখানে &quot;মুছে ফেলা অ্যাকাউন্ট&quot; দেখায়।
           </li>
           <li>
             <strong>পুশ টোকেন:</strong> সাইন আউট করলে আর ব্যবহার হয় না; অ্যাকাউন্ট মুছলে বা ফোন থেকে অ্যাপ সরানো হলে
