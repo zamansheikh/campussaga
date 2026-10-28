@@ -2263,6 +2263,942 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick a day from today, within 6 months.'**
   String get errorMoveDate;
+
+  /// No description provided for @navCampus.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus'**
+  String get navCampus;
+
+  /// No description provided for @voiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus Voice'**
+  String get voiceTitle;
+
+  /// No description provided for @voiceSortTrending.
+  ///
+  /// In en, this message translates to:
+  /// **'Trending'**
+  String get voiceSortTrending;
+
+  /// No description provided for @voiceSortNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get voiceSortNew;
+
+  /// No description provided for @voiceSortSolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Solved'**
+  String get voiceSortSolved;
+
+  /// No description provided for @voiceAllCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get voiceAllCategories;
+
+  /// No description provided for @voiceSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search issues'**
+  String get voiceSearchHint;
+
+  /// No description provided for @voiceRaiseIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise issue'**
+  String get voiceRaiseIssue;
+
+  /// No description provided for @voiceMyIssues.
+  ///
+  /// In en, this message translates to:
+  /// **'My issues'**
+  String get voiceMyIssues;
+
+  /// No description provided for @voiceSafetyReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety reports'**
+  String get voiceSafetyReports;
+
+  /// No description provided for @voiceEmptyFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'No issues here yet'**
+  String get voiceEmptyFeed;
+
+  /// No description provided for @voiceEmptyFeedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Something wrong on campus? Raise it. You stay anonymous.'**
+  String get voiceEmptyFeedHint;
+
+  /// No description provided for @voiceEmptySearch.
+  ///
+  /// In en, this message translates to:
+  /// **'No issues match your search'**
+  String get voiceEmptySearch;
+
+  /// No description provided for @voiceEmptyMine.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t raised an issue yet'**
+  String get voiceEmptyMine;
+
+  /// No description provided for @voiceEmptyMineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Issues you raise show here, including ones under review.'**
+  String get voiceEmptyMineHint;
+
+  /// No description provided for @voiceCatAcademic.
+  ///
+  /// In en, this message translates to:
+  /// **'Academic'**
+  String get voiceCatAcademic;
+
+  /// No description provided for @voiceCatHostel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hostel'**
+  String get voiceCatHostel;
+
+  /// No description provided for @voiceCatTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get voiceCatTransport;
+
+  /// No description provided for @voiceCatFacilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Facilities'**
+  String get voiceCatFacilities;
+
+  /// No description provided for @voiceCatSafety.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety'**
+  String get voiceCatSafety;
+
+  /// No description provided for @voiceCatAdministration.
+  ///
+  /// In en, this message translates to:
+  /// **'Administration'**
+  String get voiceCatAdministration;
+
+  /// No description provided for @voiceCatFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get voiceCatFood;
+
+  /// No description provided for @voiceCatIt.
+  ///
+  /// In en, this message translates to:
+  /// **'IT / Wi-Fi'**
+  String get voiceCatIt;
+
+  /// No description provided for @voiceCatOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get voiceCatOther;
+
+  /// No description provided for @voiceStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get voiceStatusOpen;
+
+  /// No description provided for @voiceStatusAcknowledged.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledged'**
+  String get voiceStatusAcknowledged;
+
+  /// No description provided for @voiceStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get voiceStatusInProgress;
+
+  /// No description provided for @voiceStatusSolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Solved'**
+  String get voiceStatusSolved;
+
+  /// No description provided for @voiceStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get voiceStatusRejected;
+
+  /// No description provided for @voiceUnderReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Under review'**
+  String get voiceUnderReview;
+
+  /// No description provided for @voiceRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed'**
+  String get voiceRemoved;
+
+  /// No description provided for @voiceHiddenBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden for review'**
+  String get voiceHiddenBadge;
+
+  /// No description provided for @voicePrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get voicePrivate;
+
+  /// No description provided for @voiceAnonymous.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous'**
+  String get voiceAnonymous;
+
+  /// No description provided for @voiceYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get voiceYou;
+
+  /// No description provided for @voiceHandle.
+  ///
+  /// In en, this message translates to:
+  /// **'Student {handle}'**
+  String voiceHandle(String handle);
+
+  /// No description provided for @voiceAuthorTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Author'**
+  String get voiceAuthorTag;
+
+  /// No description provided for @voiceDeletedAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted account'**
+  String get voiceDeletedAccount;
+
+  /// No description provided for @voiceOfficial.
+  ///
+  /// In en, this message translates to:
+  /// **'Official'**
+  String get voiceOfficial;
+
+  /// No description provided for @voiceMeToo.
+  ///
+  /// In en, this message translates to:
+  /// **'Me too'**
+  String get voiceMeToo;
+
+  /// No description provided for @voiceMeTooSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Me too, {count} students'**
+  String voiceMeTooSemantics(int count);
+
+  /// No description provided for @voiceFollow.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow'**
+  String get voiceFollow;
+
+  /// No description provided for @voiceFollowing.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get voiceFollowing;
+
+  /// No description provided for @voiceComments.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get voiceComments;
+
+  /// No description provided for @voiceStatusHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get voiceStatusHistory;
+
+  /// No description provided for @voiceRaised.
+  ///
+  /// In en, this message translates to:
+  /// **'Raised'**
+  String get voiceRaised;
+
+  /// No description provided for @voiceStepBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{who} · {when}'**
+  String voiceStepBy(String who, String when);
+
+  /// No description provided for @voiceActorAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'The author'**
+  String get voiceActorAuthor;
+
+  /// No description provided for @voiceActorModerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderator'**
+  String get voiceActorModerator;
+
+  /// No description provided for @voiceActorSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus Saga'**
+  String get voiceActorSystem;
+
+  /// No description provided for @voiceHeldNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Only you can see this while it\'s checked. It usually takes less than a day.'**
+  String get voiceHeldNotice;
+
+  /// No description provided for @voiceHeldPersonalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'It may contain a phone number, email, link or ID number.'**
+  String get voiceHeldPersonalInfo;
+
+  /// No description provided for @voiceHeldLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'It may contain words that aren\'t allowed.'**
+  String get voiceHeldLanguage;
+
+  /// No description provided for @voiceHeldUnverified.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts from accounts without a verified university email are checked first.'**
+  String get voiceHeldUnverified;
+
+  /// No description provided for @voiceRemovedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed by moderators: {reason}'**
+  String voiceRemovedNotice(String reason);
+
+  /// No description provided for @voiceRemovedByYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You deleted this issue.'**
+  String get voiceRemovedByYou;
+
+  /// No description provided for @voiceHiddenNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden while moderators look at reports.'**
+  String get voiceHiddenNotice;
+
+  /// No description provided for @voicePrivateNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Private: only you, moderators and your university\'s officials can see this.'**
+  String get voicePrivateNotice;
+
+  /// No description provided for @voiceCommentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a comment'**
+  String get voiceCommentHint;
+
+  /// No description provided for @voiceCommentAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Commenting as {who}'**
+  String voiceCommentAs(String who);
+
+  /// No description provided for @voiceCommentAnonymously.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymously'**
+  String get voiceCommentAnonymously;
+
+  /// No description provided for @voiceCommentWithName.
+  ///
+  /// In en, this message translates to:
+  /// **'With my name'**
+  String get voiceCommentWithName;
+
+  /// No description provided for @voiceNoComments.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet'**
+  String get voiceNoComments;
+
+  /// No description provided for @voiceCommentRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'This comment was removed.'**
+  String get voiceCommentRemoved;
+
+  /// No description provided for @voiceCommentUnderReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Only you can see this comment while it\'s checked.'**
+  String get voiceCommentUnderReview;
+
+  /// No description provided for @voiceLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get voiceLoadMore;
+
+  /// No description provided for @voiceSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get voiceSend;
+
+  /// No description provided for @voiceReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get voiceReport;
+
+  /// No description provided for @voiceReopen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopen'**
+  String get voiceReopen;
+
+  /// No description provided for @voiceReopenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopen this issue?'**
+  String get voiceReopenTitle;
+
+  /// No description provided for @voiceReopenHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell officials what\'s still wrong'**
+  String get voiceReopenHint;
+
+  /// No description provided for @voiceDeleteIssueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this issue?'**
+  String get voiceDeleteIssueTitle;
+
+  /// No description provided for @voiceDeleteIssueBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It disappears for everyone. This can\'t be undone.'**
+  String get voiceDeleteIssueBody;
+
+  /// No description provided for @voiceDeleteCommentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this comment?'**
+  String get voiceDeleteCommentTitle;
+
+  /// No description provided for @voiceEditIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit issue'**
+  String get voiceEditIssue;
+
+  /// No description provided for @voiceEditWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'You can edit for 60 minutes after posting.'**
+  String get voiceEditWindow;
+
+  /// No description provided for @voiceReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Why are you reporting this?'**
+  String get voiceReportTitle;
+
+  /// No description provided for @voiceReportSpam.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam'**
+  String get voiceReportSpam;
+
+  /// No description provided for @voiceReportAbuse.
+  ///
+  /// In en, this message translates to:
+  /// **'Abusive or hateful'**
+  String get voiceReportAbuse;
+
+  /// No description provided for @voiceReportPersonalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares someone\'s personal information'**
+  String get voiceReportPersonalInfo;
+
+  /// No description provided for @voiceReportFalseInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'False information'**
+  String get voiceReportFalseInfo;
+
+  /// No description provided for @voiceReportInappropriate.
+  ///
+  /// In en, this message translates to:
+  /// **'Inappropriate'**
+  String get voiceReportInappropriate;
+
+  /// No description provided for @voiceReportOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Something else'**
+  String get voiceReportOther;
+
+  /// No description provided for @voiceReportDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details (optional)'**
+  String get voiceReportDetails;
+
+  /// No description provided for @voiceReportSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks. Moderators will look at it.'**
+  String get voiceReportSent;
+
+  /// No description provided for @voiceReportAnon.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports are anonymous.'**
+  String get voiceReportAnon;
+
+  /// No description provided for @voiceChangeStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Change status'**
+  String get voiceChangeStatus;
+
+  /// No description provided for @voiceStatusNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note for students'**
+  String get voiceStatusNote;
+
+  /// No description provided for @voiceStatusNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s being done, or why'**
+  String get voiceStatusNoteHint;
+
+  /// No description provided for @voiceNoteRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Say why it\'s rejected.'**
+  String get voiceNoteRequired;
+
+  /// No description provided for @voiceOfficialReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Official reply'**
+  String get voiceOfficialReply;
+
+  /// No description provided for @voiceOfficialReplyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a public reply. Your title and name are shown.'**
+  String get voiceOfficialReplyHint;
+
+  /// No description provided for @voiceStatusUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Status updated'**
+  String get voiceStatusUpdated;
+
+  /// No description provided for @voiceReplyPosted.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply posted'**
+  String get voiceReplyPosted;
+
+  /// No description provided for @voiceOfficialBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'University official'**
+  String get voiceOfficialBadge;
+
+  /// No description provided for @voiceNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise an issue'**
+  String get voiceNewTitle;
+
+  /// No description provided for @voiceStepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {step} of 3'**
+  String voiceStepOf(int step);
+
+  /// No description provided for @voiceStepCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'What is it about?'**
+  String get voiceStepCategory;
+
+  /// No description provided for @voiceSafetyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety reports are private: only moderators and your university\'s officials see them.'**
+  String get voiceSafetyNote;
+
+  /// No description provided for @voiceStepDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us what\'s wrong'**
+  String get voiceStepDetails;
+
+  /// No description provided for @voiceTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get voiceTitleLabel;
+
+  /// No description provided for @voiceTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. No water in Hall 2 since Sunday'**
+  String get voiceTitleHint;
+
+  /// No description provided for @voiceBodyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get voiceBodyLabel;
+
+  /// No description provided for @voiceBodyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What happens, where and since when. Don\'t include names, phone numbers or roll numbers.'**
+  String get voiceBodyHint;
+
+  /// No description provided for @voicePlaceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Place (optional)'**
+  String get voicePlaceLabel;
+
+  /// No description provided for @voicePlaceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Library, 3rd floor'**
+  String get voicePlaceHint;
+
+  /// No description provided for @voicePhotosLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get voicePhotosLabel;
+
+  /// No description provided for @voiceAddPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get voiceAddPhoto;
+
+  /// No description provided for @voicePhotosHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to 4. Location and phone details are removed.'**
+  String get voicePhotosHint;
+
+  /// No description provided for @voicePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {n}'**
+  String voicePhoto(int n);
+
+  /// No description provided for @voiceRemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get voiceRemovePhoto;
+
+  /// No description provided for @voiceAtLeast.
+  ///
+  /// In en, this message translates to:
+  /// **'Write at least {n} characters.'**
+  String voiceAtLeast(int n);
+
+  /// No description provided for @voiceStepReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you post'**
+  String get voiceStepReview;
+
+  /// No description provided for @voiceSimilarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Similar issues'**
+  String get voiceSimilarTitle;
+
+  /// No description provided for @voiceSimilarHint.
+  ///
+  /// In en, this message translates to:
+  /// **'If one of these is the same, tap Me too there instead of posting again.'**
+  String get voiceSimilarHint;
+
+  /// No description provided for @voiceNoSimilar.
+  ///
+  /// In en, this message translates to:
+  /// **'No similar issues found.'**
+  String get voiceNoSimilar;
+
+  /// No description provided for @voicePostAnon.
+  ///
+  /// In en, this message translates to:
+  /// **'Post anonymously'**
+  String get voicePostAnon;
+
+  /// No description provided for @voicePostAnonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name, email and class are never shown.'**
+  String get voicePostAnonHint;
+
+  /// No description provided for @voicePostNamedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Students will see your name on this issue.'**
+  String get voicePostNamedHint;
+
+  /// No description provided for @voiceHowAnonymity.
+  ///
+  /// In en, this message translates to:
+  /// **'How anonymity works'**
+  String get voiceHowAnonymity;
+
+  /// No description provided for @voicePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get voicePost;
+
+  /// No description provided for @voiceNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get voiceNext;
+
+  /// No description provided for @voiceBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get voiceBack;
+
+  /// No description provided for @voicePosted.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue posted'**
+  String get voicePosted;
+
+  /// No description provided for @voicePostedHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'Posted. Others will see it after a quick check.'**
+  String get voicePostedHeld;
+
+  /// No description provided for @voiceUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading photos…'**
+  String get voiceUploading;
+
+  /// No description provided for @voiceDraftKept.
+  ///
+  /// In en, this message translates to:
+  /// **'Your draft is kept on this phone.'**
+  String get voiceDraftKept;
+
+  /// No description provided for @voiceOfflineAction.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re offline. Try again when you\'re connected.'**
+  String get voiceOfflineAction;
+
+  /// No description provided for @voiceAnonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How anonymity works'**
+  String get voiceAnonTitle;
+
+  /// No description provided for @voiceAnonIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus Voice is built so you can speak up safely.'**
+  String get voiceAnonIntro;
+
+  /// No description provided for @voiceAnon1.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name, email and class are never shown on anonymous posts.'**
+  String get voiceAnon1;
+
+  /// No description provided for @voiceAnon2.
+  ///
+  /// In en, this message translates to:
+  /// **'Who wrote what is stored separately. No screen, staff member or university official can see it, in the app or in our admin panel.'**
+  String get voiceAnon2;
+
+  /// No description provided for @voiceAnon3.
+  ///
+  /// In en, this message translates to:
+  /// **'Your handle (like “Student 7KQF”) is different on every issue.'**
+  String get voiceAnon3;
+
+  /// No description provided for @voiceAnon4.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos are cleaned: location and phone details are removed.'**
+  String get voiceAnon4;
+
+  /// No description provided for @voiceAnon5.
+  ///
+  /// In en, this message translates to:
+  /// **'Times are shown roughly, not to the minute.'**
+  String get voiceAnon5;
+
+  /// No description provided for @voiceAnon6.
+  ///
+  /// In en, this message translates to:
+  /// **'Breaking the rules (threats, naming people, spam) can get your posting blocked, without anyone seeing who you are.'**
+  String get voiceAnon6;
+
+  /// No description provided for @voiceAnon7.
+  ///
+  /// In en, this message translates to:
+  /// **'What you write can still give you away. Don\'t include your name, roll number or details only you would know. Anyone can screenshot a public post.'**
+  String get voiceAnon7;
+
+  /// No description provided for @voiceAnon8.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety reports are private: only moderators and your university\'s officials see them.'**
+  String get voiceAnon8;
+
+  /// No description provided for @errorFeatureDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus Voice isn\'t open yet.'**
+  String get errorFeatureDisabled;
+
+  /// No description provided for @errorVoiceBanned.
+  ///
+  /// In en, this message translates to:
+  /// **'You can\'t post, comment or vote right now because of a rules break.'**
+  String get errorVoiceBanned;
+
+  /// No description provided for @errorVoiceBannedUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'You can\'t post, comment or vote until {date} because of a rules break.'**
+  String errorVoiceBannedUntil(String date);
+
+  /// No description provided for @errorIssueNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This issue isn\'t available.'**
+  String get errorIssueNotFound;
+
+  /// No description provided for @errorCommentNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This comment isn\'t available.'**
+  String get errorCommentNotFound;
+
+  /// No description provided for @errorUploadNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'A photo didn\'t finish uploading. Remove it and add it again.'**
+  String get errorUploadNotFound;
+
+  /// No description provided for @errorImageInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That file isn\'t a photo we can use.'**
+  String get errorImageInvalid;
+
+  /// No description provided for @errorImageTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'That photo is too large.'**
+  String get errorImageTooLarge;
+
+  /// No description provided for @errorEditWindowClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Issues can only be edited in the first 60 minutes.'**
+  String get errorEditWindowClosed;
+
+  /// No description provided for @errorReopenNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Only solved issues can be reopened, within 30 days.'**
+  String get errorReopenNotAllowed;
+
+  /// No description provided for @errorIssueClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'This issue was removed, so it can\'t get new comments.'**
+  String get errorIssueClosed;
+
+  /// No description provided for @errorCannotVoteOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'You raised this issue, so it already counts you.'**
+  String get errorCannotVoteOwn;
+
+  /// No description provided for @errorAlreadyReported.
+  ///
+  /// In en, this message translates to:
+  /// **'You already reported this.'**
+  String get errorAlreadyReported;
+
+  /// No description provided for @errorStatusChangeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That status change isn\'t possible.'**
+  String get errorStatusChangeInvalid;
+
+  /// No description provided for @errorNoteRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note saying why.'**
+  String get errorNoteRequired;
+
+  /// No description provided for @voiceFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get voiceFromGallery;
+
+  /// No description provided for @voiceTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get voiceTakePhoto;
+
+  /// No description provided for @voiceHeldModerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderators hid this while they look at it.'**
+  String get voiceHeldModerator;
 }
 
 class _AppLocalizationsDelegate

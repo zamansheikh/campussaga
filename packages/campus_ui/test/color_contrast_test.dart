@@ -47,6 +47,31 @@ void main() {
         'status solved': (c.statusSolved.fg, c.statusSolved.bg),
         'status rejected': (c.statusRejected.fg, c.statusRejected.bg),
       };
+      // Category icons (3:1 for icons) on the card and on their own tint.
+      for (final cat in const [
+        'academic',
+        'hostel',
+        'transport',
+        'facilities',
+        'safety',
+        'administration',
+        'food',
+        'it',
+        'other',
+      ]) {
+        final color = CsCategoryStyle.color(cat);
+        final tint = Color.alphaBlend(color.withValues(alpha: 0.13), c.surface);
+        test('category icon $cat', () {
+          for (final bg in [c.surface, tint]) {
+            final ratio = contrast(color, bg);
+            expect(
+              ratio,
+              greaterThanOrEqualTo(3),
+              reason: '$cat icon is ${ratio.toStringAsFixed(2)}:1',
+            );
+          }
+        });
+      }
       for (final MapEntry(key: label, value: (fg, bg)) in pairs.entries) {
         test(label, () {
           final ratio = contrast(fg, bg);

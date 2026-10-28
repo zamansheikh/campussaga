@@ -1314,4 +1314,539 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorMoveDate => 'Pick a day from today, within 6 months.';
+
+  @override
+  String get navCampus => 'Campus';
+
+  @override
+  String get voiceTitle => 'Campus Voice';
+
+  @override
+  String get voiceSortTrending => 'Trending';
+
+  @override
+  String get voiceSortNew => 'New';
+
+  @override
+  String get voiceSortSolved => 'Solved';
+
+  @override
+  String get voiceAllCategories => 'All';
+
+  @override
+  String get voiceSearchHint => 'Search issues';
+
+  @override
+  String get voiceRaiseIssue => 'Raise issue';
+
+  @override
+  String get voiceMyIssues => 'My issues';
+
+  @override
+  String get voiceSafetyReports => 'Safety reports';
+
+  @override
+  String get voiceEmptyFeed => 'No issues here yet';
+
+  @override
+  String get voiceEmptyFeedHint =>
+      'Something wrong on campus? Raise it. You stay anonymous.';
+
+  @override
+  String get voiceEmptySearch => 'No issues match your search';
+
+  @override
+  String get voiceEmptyMine => 'You haven\'t raised an issue yet';
+
+  @override
+  String get voiceEmptyMineHint =>
+      'Issues you raise show here, including ones under review.';
+
+  @override
+  String get voiceCatAcademic => 'Academic';
+
+  @override
+  String get voiceCatHostel => 'Hostel';
+
+  @override
+  String get voiceCatTransport => 'Transport';
+
+  @override
+  String get voiceCatFacilities => 'Facilities';
+
+  @override
+  String get voiceCatSafety => 'Safety';
+
+  @override
+  String get voiceCatAdministration => 'Administration';
+
+  @override
+  String get voiceCatFood => 'Food';
+
+  @override
+  String get voiceCatIt => 'IT / Wi-Fi';
+
+  @override
+  String get voiceCatOther => 'Other';
+
+  @override
+  String get voiceStatusOpen => 'Open';
+
+  @override
+  String get voiceStatusAcknowledged => 'Acknowledged';
+
+  @override
+  String get voiceStatusInProgress => 'In progress';
+
+  @override
+  String get voiceStatusSolved => 'Solved';
+
+  @override
+  String get voiceStatusRejected => 'Rejected';
+
+  @override
+  String get voiceUnderReview => 'Under review';
+
+  @override
+  String get voiceRemoved => 'Removed';
+
+  @override
+  String get voiceHiddenBadge => 'Hidden for review';
+
+  @override
+  String get voicePrivate => 'Private';
+
+  @override
+  String get voiceAnonymous => 'Anonymous';
+
+  @override
+  String get voiceYou => 'You';
+
+  @override
+  String voiceHandle(String handle) {
+    return 'Student $handle';
+  }
+
+  @override
+  String get voiceAuthorTag => 'Author';
+
+  @override
+  String get voiceDeletedAccount => 'Deleted account';
+
+  @override
+  String get voiceOfficial => 'Official';
+
+  @override
+  String get voiceMeToo => 'Me too';
+
+  @override
+  String voiceMeTooSemantics(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Me too, $countString students';
+  }
+
+  @override
+  String get voiceFollow => 'Follow';
+
+  @override
+  String get voiceFollowing => 'Following';
+
+  @override
+  String get voiceComments => 'Comments';
+
+  @override
+  String get voiceStatusHistory => 'Status';
+
+  @override
+  String get voiceRaised => 'Raised';
+
+  @override
+  String voiceStepBy(String who, String when) {
+    return '$who · $when';
+  }
+
+  @override
+  String get voiceActorAuthor => 'The author';
+
+  @override
+  String get voiceActorModerator => 'Moderator';
+
+  @override
+  String get voiceActorSystem => 'Campus Saga';
+
+  @override
+  String get voiceHeldNotice =>
+      'Only you can see this while it\'s checked. It usually takes less than a day.';
+
+  @override
+  String get voiceHeldPersonalInfo =>
+      'It may contain a phone number, email, link or ID number.';
+
+  @override
+  String get voiceHeldLanguage => 'It may contain words that aren\'t allowed.';
+
+  @override
+  String get voiceHeldUnverified =>
+      'Posts from accounts without a verified university email are checked first.';
+
+  @override
+  String voiceRemovedNotice(String reason) {
+    return 'Removed by moderators: $reason';
+  }
+
+  @override
+  String get voiceRemovedByYou => 'You deleted this issue.';
+
+  @override
+  String get voiceHiddenNotice => 'Hidden while moderators look at reports.';
+
+  @override
+  String get voicePrivateNotice =>
+      'Private: only you, moderators and your university\'s officials can see this.';
+
+  @override
+  String get voiceCommentHint => 'Add a comment';
+
+  @override
+  String voiceCommentAs(String who) {
+    return 'Commenting as $who';
+  }
+
+  @override
+  String get voiceCommentAnonymously => 'Anonymously';
+
+  @override
+  String get voiceCommentWithName => 'With my name';
+
+  @override
+  String get voiceNoComments => 'No comments yet';
+
+  @override
+  String get voiceCommentRemoved => 'This comment was removed.';
+
+  @override
+  String get voiceCommentUnderReview =>
+      'Only you can see this comment while it\'s checked.';
+
+  @override
+  String get voiceLoadMore => 'Load more';
+
+  @override
+  String get voiceSend => 'Send';
+
+  @override
+  String get voiceReport => 'Report';
+
+  @override
+  String get voiceReopen => 'Reopen';
+
+  @override
+  String get voiceReopenTitle => 'Reopen this issue?';
+
+  @override
+  String get voiceReopenHint => 'Tell officials what\'s still wrong';
+
+  @override
+  String get voiceDeleteIssueTitle => 'Delete this issue?';
+
+  @override
+  String get voiceDeleteIssueBody =>
+      'It disappears for everyone. This can\'t be undone.';
+
+  @override
+  String get voiceDeleteCommentTitle => 'Delete this comment?';
+
+  @override
+  String get voiceEditIssue => 'Edit issue';
+
+  @override
+  String get voiceEditWindow => 'You can edit for 60 minutes after posting.';
+
+  @override
+  String get voiceReportTitle => 'Why are you reporting this?';
+
+  @override
+  String get voiceReportSpam => 'Spam';
+
+  @override
+  String get voiceReportAbuse => 'Abusive or hateful';
+
+  @override
+  String get voiceReportPersonalInfo =>
+      'Shares someone\'s personal information';
+
+  @override
+  String get voiceReportFalseInfo => 'False information';
+
+  @override
+  String get voiceReportInappropriate => 'Inappropriate';
+
+  @override
+  String get voiceReportOther => 'Something else';
+
+  @override
+  String get voiceReportDetails => 'Details (optional)';
+
+  @override
+  String get voiceReportSent => 'Thanks. Moderators will look at it.';
+
+  @override
+  String get voiceReportAnon => 'Reports are anonymous.';
+
+  @override
+  String get voiceChangeStatus => 'Change status';
+
+  @override
+  String get voiceStatusNote => 'Note for students';
+
+  @override
+  String get voiceStatusNoteHint => 'What\'s being done, or why';
+
+  @override
+  String get voiceNoteRequired => 'Say why it\'s rejected.';
+
+  @override
+  String get voiceOfficialReply => 'Official reply';
+
+  @override
+  String get voiceOfficialReplyHint =>
+      'Write a public reply. Your title and name are shown.';
+
+  @override
+  String get voiceStatusUpdated => 'Status updated';
+
+  @override
+  String get voiceReplyPosted => 'Reply posted';
+
+  @override
+  String get voiceOfficialBadge => 'University official';
+
+  @override
+  String get voiceNewTitle => 'Raise an issue';
+
+  @override
+  String voiceStepOf(int step) {
+    final intl.NumberFormat stepNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String stepString = stepNumberFormat.format(step);
+
+    return 'Step $stepString of 3';
+  }
+
+  @override
+  String get voiceStepCategory => 'What is it about?';
+
+  @override
+  String get voiceSafetyNote =>
+      'Safety reports are private: only moderators and your university\'s officials see them.';
+
+  @override
+  String get voiceStepDetails => 'Tell us what\'s wrong';
+
+  @override
+  String get voiceTitleLabel => 'Title';
+
+  @override
+  String get voiceTitleHint => 'e.g. No water in Hall 2 since Sunday';
+
+  @override
+  String get voiceBodyLabel => 'Details';
+
+  @override
+  String get voiceBodyHint =>
+      'What happens, where and since when. Don\'t include names, phone numbers or roll numbers.';
+
+  @override
+  String get voicePlaceLabel => 'Place (optional)';
+
+  @override
+  String get voicePlaceHint => 'e.g. Library, 3rd floor';
+
+  @override
+  String get voicePhotosLabel => 'Photos';
+
+  @override
+  String get voiceAddPhoto => 'Add photo';
+
+  @override
+  String get voicePhotosHint =>
+      'Up to 4. Location and phone details are removed.';
+
+  @override
+  String voicePhoto(int n) {
+    final intl.NumberFormat nNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String nString = nNumberFormat.format(n);
+
+    return 'Photo $nString';
+  }
+
+  @override
+  String get voiceRemovePhoto => 'Remove photo';
+
+  @override
+  String voiceAtLeast(int n) {
+    final intl.NumberFormat nNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String nString = nNumberFormat.format(n);
+
+    return 'Write at least $nString characters.';
+  }
+
+  @override
+  String get voiceStepReview => 'Before you post';
+
+  @override
+  String get voiceSimilarTitle => 'Similar issues';
+
+  @override
+  String get voiceSimilarHint =>
+      'If one of these is the same, tap Me too there instead of posting again.';
+
+  @override
+  String get voiceNoSimilar => 'No similar issues found.';
+
+  @override
+  String get voicePostAnon => 'Post anonymously';
+
+  @override
+  String get voicePostAnonHint => 'Your name, email and class are never shown.';
+
+  @override
+  String get voicePostNamedHint => 'Students will see your name on this issue.';
+
+  @override
+  String get voiceHowAnonymity => 'How anonymity works';
+
+  @override
+  String get voicePost => 'Post';
+
+  @override
+  String get voiceNext => 'Next';
+
+  @override
+  String get voiceBack => 'Back';
+
+  @override
+  String get voicePosted => 'Issue posted';
+
+  @override
+  String get voicePostedHeld =>
+      'Posted. Others will see it after a quick check.';
+
+  @override
+  String get voiceUploading => 'Uploading photos…';
+
+  @override
+  String get voiceDraftKept => 'Your draft is kept on this phone.';
+
+  @override
+  String get voiceOfflineAction =>
+      'You\'re offline. Try again when you\'re connected.';
+
+  @override
+  String get voiceAnonTitle => 'How anonymity works';
+
+  @override
+  String get voiceAnonIntro =>
+      'Campus Voice is built so you can speak up safely.';
+
+  @override
+  String get voiceAnon1 =>
+      'Your name, email and class are never shown on anonymous posts.';
+
+  @override
+  String get voiceAnon2 =>
+      'Who wrote what is stored separately. No screen, staff member or university official can see it, in the app or in our admin panel.';
+
+  @override
+  String get voiceAnon3 =>
+      'Your handle (like “Student 7KQF”) is different on every issue.';
+
+  @override
+  String get voiceAnon4 =>
+      'Photos are cleaned: location and phone details are removed.';
+
+  @override
+  String get voiceAnon5 => 'Times are shown roughly, not to the minute.';
+
+  @override
+  String get voiceAnon6 =>
+      'Breaking the rules (threats, naming people, spam) can get your posting blocked, without anyone seeing who you are.';
+
+  @override
+  String get voiceAnon7 =>
+      'What you write can still give you away. Don\'t include your name, roll number or details only you would know. Anyone can screenshot a public post.';
+
+  @override
+  String get voiceAnon8 =>
+      'Safety reports are private: only moderators and your university\'s officials see them.';
+
+  @override
+  String get errorFeatureDisabled => 'Campus Voice isn\'t open yet.';
+
+  @override
+  String get errorVoiceBanned =>
+      'You can\'t post, comment or vote right now because of a rules break.';
+
+  @override
+  String errorVoiceBannedUntil(String date) {
+    return 'You can\'t post, comment or vote until $date because of a rules break.';
+  }
+
+  @override
+  String get errorIssueNotFound => 'This issue isn\'t available.';
+
+  @override
+  String get errorCommentNotFound => 'This comment isn\'t available.';
+
+  @override
+  String get errorUploadNotFound =>
+      'A photo didn\'t finish uploading. Remove it and add it again.';
+
+  @override
+  String get errorImageInvalid => 'That file isn\'t a photo we can use.';
+
+  @override
+  String get errorImageTooLarge => 'That photo is too large.';
+
+  @override
+  String get errorEditWindowClosed =>
+      'Issues can only be edited in the first 60 minutes.';
+
+  @override
+  String get errorReopenNotAllowed =>
+      'Only solved issues can be reopened, within 30 days.';
+
+  @override
+  String get errorIssueClosed =>
+      'This issue was removed, so it can\'t get new comments.';
+
+  @override
+  String get errorCannotVoteOwn =>
+      'You raised this issue, so it already counts you.';
+
+  @override
+  String get errorAlreadyReported => 'You already reported this.';
+
+  @override
+  String get errorStatusChangeInvalid => 'That status change isn\'t possible.';
+
+  @override
+  String get errorNoteRequired => 'Add a note saying why.';
+
+  @override
+  String get voiceFromGallery => 'Choose from gallery';
+
+  @override
+  String get voiceTakePhoto => 'Take a photo';
+
+  @override
+  String get voiceHeldModerator => 'Moderators hid this while they look at it.';
 }

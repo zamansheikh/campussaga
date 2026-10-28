@@ -30,6 +30,7 @@ dependencies:
   go_router: ^18.1.1
   google_sign_in_android: ^7.2.18
   google_sign_in_platform_interface: ^3.1.0
+  image_picker: ^1.2.4
   intl: ^0.20.3
   package_info_plus: ^10.2.2
   shared_preferences: ^2.5.6

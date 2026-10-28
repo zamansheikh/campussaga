@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/assessments/presentation/assessment_editor_page.dart';
@@ -26,7 +27,13 @@ import '../features/profile/presentation/profile_page.dart';
 import '../features/reminders/presentation/reminders_page.dart';
 import '../features/routine/presentation/routine_page.dart';
 import '../features/today/presentation/today_page.dart';
+import '../features/voice/presentation/pages/anonymity_page.dart';
+import '../features/voice/presentation/pages/campus_page.dart';
+import '../features/voice/presentation/pages/issue_page.dart';
+import '../features/voice/presentation/pages/my_issues_page.dart';
+import '../features/voice/presentation/pages/raise_issue_page.dart';
 import 'settings/bloc/settings_cubit.dart';
+import 'version/version_gate_cubit.dart';
 
 abstract final class Routes {
   static const splash = '/splash';
@@ -73,6 +80,13 @@ abstract final class Routes {
 
   static String editTest(String groupId, String testId) =>
       '/groups/$groupId/test/$testId';
+
+  /// Campus Voice (behind the campusVoice feature flag).
+  static const campus = '/campus';
+  static const campusNew = '/campus/new';
+  static const campusMine = '/campus/mine';
+  static const campusAnonymity = '/campus/anonymity';
+  static String campusIssue(String id) => '/campus/issues/$id';
 }
 
 /// App routes. Signed-out students see the welcome slides once, then only
@@ -137,6 +151,23 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
             slotId: id == 'new' ? null : id,
           );
         },
+      ),
+      GoRoute(
+        path: Routes.campusNew,
+        builder: (context, state) => const RaiseIssuePage(),
+      ),
+      GoRoute(
+        path: Routes.campusMine,
+        builder: (context, state) => const MyIssuesPage(),
+      ),
+      GoRoute(
+        path: Routes.campusAnonymity,
+        builder: (context, state) => const AnonymityPage(),
+      ),
+      GoRoute(
+        path: '/campus/issues/:id',
+        builder: (context, state) =>
+            IssuePage(issueId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.groups,
@@ -234,6 +265,14 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: Routes.campus,
+                builder: (context, state) => const CampusPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: Routes.profile,
                 builder: (context, state) => const ProfilePage(),
                 routes: [
@@ -276,21 +315,36 @@ class _StreamListenable extends ChangeNotifier {
   }
 }
 
-/// Bottom navigation that keeps each tab's state.
+/// Bottom navigation that keeps each tab's state. The Campus tab (branch
+/// [_campusBranch]) shows only while the campusVoice flag is on.
 class _HomeShell extends StatelessWidget {
   const _HomeShell({required this.shell});
 
   final StatefulNavigationShell shell;
 
+  static const _campusBranch = 2;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final voice = context.select(
+      (VersionGateCubit g) => g.state.feature('campusVoice'),
+    );
+    // Visible tabs → branch indexes.
+    final branches = [0, 1, if (voice) _campusBranch, 3];
+    final selected = branches.indexOf(shell.currentIndex);
+    if (selected < 0) {
+      // The flag went off while on the Campus tab: back to Today.
+      WidgetsBinding.instance.addPostFrameCallback((_) => shell.goBranch(0));
+    }
     return Scaffold(
       body: shell,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: shell.currentIndex,
-        onDestinationSelected: (index) =>
-            shell.goBranch(index, initialLocation: index == shell.currentIndex),
+        selectedIndex: selected < 0 ? 0 : selected,
+        onDestinationSelected: (i) {
+          final branch = branches[i];
+          shell.goBranch(branch, initialLocation: branch == shell.currentIndex);
+        },
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.today_outlined),
@@ -302,6 +356,12 @@ class _HomeShell extends StatelessWidget {
             selectedIcon: const Icon(Icons.calendar_view_week),
             label: l10n.navRoutine,
           ),
+          if (voice)
+            NavigationDestination(
+              icon: const Icon(Icons.forum_outlined),
+              selectedIcon: const Icon(Icons.forum),
+              label: l10n.navCampus,
+            ),
           NavigationDestination(
             icon: const Icon(Icons.person_outline),
             selectedIcon: const Icon(Icons.person),

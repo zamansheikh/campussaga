@@ -18,6 +18,8 @@ import '../features/push/push_messaging.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/data/reminder_store.dart';
 import '../features/reminders/presentation/bloc/reminders_cubit.dart';
+import '../features/voice/data/voice_cache.dart';
+import '../features/voice/presentation/widgets/voice_image.dart';
 import '../features/widget/home_widget.dart';
 import 'di.dart';
 import 'router.dart';
@@ -109,6 +111,9 @@ class _CampusAppState extends State<CampusApp> {
       if (!s.needsProfileSetup) unawaited(_push.askPermission());
     } else if (s.status == AuthStatus.signedOut) {
       unawaited(_classes.clear());
+      // Campus Voice: nothing of this account stays on the phone.
+      unawaited(getIt<VoiceCache>().clear());
+      VoiceImage.clear();
       _pushUser = null;
       _push.signedOut();
     }
@@ -116,7 +121,9 @@ class _CampusAppState extends State<CampusApp> {
 
   /// A push while the app is open: show it, and fetch what changed.
   void _onPush(PushNote note) {
-    unawaited(_classes.refresh());
+    if (!'${note.data['type']}'.startsWith('issue_')) {
+      unawaited(_classes.refresh());
+    }
     final title = note.title;
     if (title == null) return;
     unawaited(
@@ -128,8 +135,20 @@ class _CampusAppState extends State<CampusApp> {
     );
   }
 
-  /// A push was tapped: fetch what changed and open its group.
+  /// A push was tapped: open its issue (Campus Voice) or, after fetching
+  /// what changed, its group.
   void _onPushOpened(PushNote note) {
+    final issue = note.data['issueId'];
+    if ('${note.data['type']}'.startsWith('issue_') && issue is String) {
+      WidgetsBinding.instance
+        ..addPostFrameCallback((_) {
+          if (_auth.state.status == AuthStatus.signedIn) {
+            unawaited(_router.push(Routes.campusIssue(issue)));
+          }
+        })
+        ..ensureVisualUpdate(); // nothing else may be drawing right now
+      return;
+    }
     unawaited(_classes.refresh());
     final group = note.groupId;
     if (group == null) return;

@@ -11,6 +11,7 @@ import '../../../app/env.dart';
 import '../../../app/router.dart';
 import '../../../app/settings/bloc/settings_cubit.dart';
 import '../../../app/version/app_version.dart';
+import '../../../app/version/version_gate_cubit.dart';
 import '../../auth/presentation/auth_error_text.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../reminders/presentation/bloc/reminders_cubit.dart';
@@ -53,6 +54,20 @@ class ProfilePage extends StatelessWidget {
           children: [
             const _ProfileHeader(),
             const SizedBox(height: CsSpace.lg),
+            if (context.select(
+              (VersionGateCubit g) => g.state.feature('campusVoice'),
+            )) ...[
+              CsSection(
+                children: [
+                  CsRow(
+                    icon: Icons.inventory_2_outlined,
+                    title: l10n.voiceMyIssues,
+                    onTap: () => context.push(Routes.campusMine),
+                  ),
+                ],
+              ),
+              const SizedBox(height: CsSpace.lg),
+            ],
             CsSection(
               title: l10n.preferences,
               children: [

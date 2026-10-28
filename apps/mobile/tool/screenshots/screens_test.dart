@@ -27,6 +27,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../test/helpers/fakes.dart';
+import '../../test/voice_fakes.dart';
 
 const _outDir = String.fromEnvironment('SHOTS_DIR');
 const _scale = 1.25; // output pixels per logical pixel
@@ -228,6 +229,7 @@ void main() {
     List<ClassGroup> groups = const [],
     Map<String, ClassGroup> others = const {},
     ReminderSettings reminders = const ReminderSettings(),
+    FakeVoiceRepository? voice,
   }) async {
     tester.view
       ..physicalSize = const Size(390 * 3, 844 * 3)
@@ -249,6 +251,12 @@ void main() {
         ),
       ),
       profile: FakeProfileRepository(),
+      voice: voice,
+      config: FakeAppConfigRepository()
+        ..config = AppConfig(
+          minSupportedBuild: 1,
+          features: {'myClass': true, 'campusVoice': voice != null},
+        ),
     );
     repo
       ..savedUser = user
@@ -620,6 +628,184 @@ void main() {
       unawaited(router.push(Routes.editProfile));
       await tester.pumpAndSettle();
       await capture(tester, 'profile-${look.name}');
+    });
+  }
+
+  // Campus Voice.
+  FakeVoiceRepository voiceData() {
+    final v = FakeVoiceRepository()
+      ..issues.addAll([
+        sampleIssue(
+          title: 'No water on the 3rd floor of Hall 2 since Sunday',
+          status: IssueStatus.inProgress,
+          meToo: 48,
+          images: const [
+            IssueImage(id: 'p1', width: 1600, height: 1200),
+            IssueImage(id: 'p2', width: 1600, height: 1200),
+          ],
+          timeline: [
+            TimelineEntry(
+              from: IssueStatus.open,
+              to: IssueStatus.acknowledged,
+              actor: TimelineActor.authority,
+              actorTitle: 'Hall Provost, Shaheed Minar Hall',
+              createdAt: DateTime(2026, 10, 26, 11),
+            ),
+            TimelineEntry(
+              from: IssueStatus.acknowledged,
+              to: IssueStatus.inProgress,
+              actor: TimelineActor.authority,
+              actorTitle: 'Hall Provost, Shaheed Minar Hall',
+              note: 'A new pump is ordered. Water tankers come at 7 AM and 6 PM until then.',
+              createdAt: DateTime(2026, 10, 27, 9),
+            ),
+          ],
+          createdAt: DateTime(2026, 10, 25, 20),
+        ),
+        sampleIssue(
+          id: 'i2',
+          title: 'Bus 4 leaves Mirpur 10 minutes early every morning',
+          category: IssueCategory.transport,
+          meToo: 31,
+          createdAt: DateTime(2026, 10, 27, 7, 40),
+        ),
+        sampleIssue(
+          id: 'i3',
+          title: 'Wi-Fi in the library drops every few minutes',
+          category: IssueCategory.it,
+          status: IssueStatus.solved,
+          meToo: 102,
+          author: const PostAuthor(name: 'Nabila Rahman', verified: true),
+          createdAt: DateTime(2026, 10, 20, 15),
+        ),
+        sampleIssue(
+          id: 'i4',
+          title: 'Canteen prices went up without notice',
+          category: IssueCategory.food,
+          status: IssueStatus.acknowledged,
+          meToo: 17,
+          createdAt: DateTime(2026, 10, 26, 13),
+        ),
+      ])
+      ..similarResult = [
+        sampleIssue(
+          id: 'i1',
+          title: 'No water on the 3rd floor of Hall 2 since Sunday',
+          status: IssueStatus.inProgress,
+          meToo: 48,
+        ).card,
+      ];
+    v.commentsByIssue['i1'] = [
+      IssueComment(
+        id: 'c1',
+        body: 'Same on the 2nd floor. We fill buckets from the ground floor.',
+        handle: 'B2XZ',
+        createdAt: DateTime(2026, 10, 26, 8),
+      ),
+      IssueComment(
+        id: 'c2',
+        body: 'Still dry this morning.',
+        isIssueAuthor: true,
+        createdAt: DateTime(2026, 10, 27, 7, 30),
+      ),
+      IssueComment(
+        id: 'c3',
+        kind: CommentKind.official,
+        officialTitle: 'Hall Provost, Shaheed Minar Hall',
+        author: const PostAuthor(name: 'Dr. Abdul Karim', verified: true),
+        body: 'The new pump arrives on Thursday. Tankers will keep coming twice a day.',
+        createdAt: DateTime(2026, 10, 27, 9, 5),
+      ),
+    ];
+    return v;
+  }
+
+  for (final look in _looks) {
+    shot('voice ${look.name}', (tester) async {
+      final voice = voiceData();
+      final router = await start(tester, look, user: _student, voice: voice);
+      router.go(Routes.campus);
+      await tester.pumpAndSettle();
+      await capture(tester, 'voice-${look.name}');
+      unawaited(router.push(Routes.campusIssue('i1')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'voice-${look.name}');
+      await tester.drag(find.byType(ListView).first, const Offset(0, -700));
+      await tester.pumpAndSettle();
+      await capture(tester, 'voice-${look.name}');
+      router.pop();
+      await tester.pumpAndSettle();
+      unawaited(router.push(Routes.campusNew));
+      await tester.pumpAndSettle();
+      await capture(tester, 'voice-new-${look.name}');
+      await tester.tap(find.byIcon(Icons.bed_outlined));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byType(TextField).at(0),
+        'No water on the 3rd floor of Hall 2',
+      );
+      await tester.enterText(
+        find.byType(TextField).at(1),
+        'The taps have been dry since Sunday morning. We carry water up from the ground floor.',
+      );
+      await tester.enterText(find.byType(TextField).at(2), 'Hall 2, 3rd floor');
+      await tester.pumpAndSettle();
+      await capture(tester, 'voice-new-${look.name}');
+      await tester.ensureVisible(find.byType(FilledButton).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(FilledButton).last);
+      await tester.pumpAndSettle();
+      await capture(tester, 'voice-new-${look.name}');
+      router.pop();
+      await tester.pumpAndSettle();
+      unawaited(router.push(Routes.campusAnonymity));
+      await tester.pumpAndSettle();
+      await capture(tester, 'voice-new-${look.name}');
+    });
+
+    shot('voice official ${look.name}', (tester) async {
+      final voice = voiceData();
+      voice.issues[0] = Issue(
+        card: voice.issues[0].card,
+        body: voice.issues[0].body,
+        images: voice.issues[0].images,
+        timeline: voice.issues[0].timeline,
+        can: const IssueCan(changeStatus: true, officialReply: true),
+      );
+      voice.issues.add(
+        sampleIssue(
+          id: 's1',
+          title: 'Street light broken on the path behind the girls’ hall',
+          category: IssueCategory.safety,
+          meToo: 0,
+        ),
+      );
+      final router = await start(
+        tester,
+        look,
+        user: const UserProfile(
+          id: 'o1',
+          email: 'provost@diu.edu.bd',
+          university: University(id: 'uni1', slug: 'diu', name: 'DIU'),
+          role: 'authority',
+          displayName: 'Dr. Abdul Karim',
+          department: 'Shaheed Minar Hall',
+          batch: '-',
+          verified: true,
+        ),
+        voice: voice,
+      );
+      router.go(Routes.campus);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.lock_outline).first);
+      await tester.pumpAndSettle();
+      await capture(tester, 'voice-official-${look.name}');
+      unawaited(router.push(Routes.campusIssue('i1')));
+      await tester.pumpAndSettle();
+      await capture(tester, 'voice-official-${look.name}');
+      await tester.tap(find.byIcon(Icons.swap_horiz));
+      await tester.pumpAndSettle();
+      await capture(tester, 'voice-official-${look.name}');
     });
   }
 }

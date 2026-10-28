@@ -10,6 +10,8 @@ import '../features/push/push_messaging.dart';
 import '../features/reminders/data/phone_info.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/data/reminder_store.dart';
+import '../features/voice/data/photo_picker.dart';
+import '../features/voice/data/voice_cache.dart';
 import 'crash/crash_reporter.dart';
 import 'env.dart';
 import 'settings/settings_storage.dart';
@@ -64,5 +66,10 @@ Future<void> configureDependencies({
     ..registerLazySingleton<PushMessaging>(FirebasePushMessaging.new)
     ..registerLazySingleton<PhoneInfo>(DevicePhoneInfo.new)
     ..registerLazySingleton<ReminderScheduler>(LocalNotificationScheduler.new)
-    ..registerLazySingleton<GoogleAuth>(platformGoogleAuth);
+    ..registerLazySingleton<GoogleAuth>(platformGoogleAuth)
+    ..registerLazySingleton<VoiceRepository>(
+      () => ApiVoiceRepository(getIt<ApiClient>()),
+    )
+    ..registerLazySingleton<VoiceCache>(PrefsVoiceCache.new)
+    ..registerLazySingleton<PhotoPicker>(ImagePickerPhotoPicker.new);
 }

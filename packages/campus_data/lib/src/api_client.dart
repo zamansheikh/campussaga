@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:campus_core/campus_core.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 /// Where the Campus Saga API lives, from the app's env file.
 class ApiConfig {
@@ -73,6 +75,37 @@ class ApiClient {
 
   Future<Object?> delete(String path) => send('DELETE', path);
 
+  /// Raw bytes (images). Errors still come back as typed failures.
+  Future<Uint8List> getBytes(String path) => _withRefresh(() async {
+    final request = http.Request('GET', _uri(path));
+    await _authorize(request);
+    final response = await _execute(request);
+    if (response.statusCode == 200) return response.bodyBytes;
+    throw _decodeFailure(response);
+  });
+
+  /// Uploads one file as multipart/form-data under [field].
+  Future<Object?> postMultipart(
+    String path, {
+    required String field,
+    required Uint8List bytes,
+    required String filename,
+    required String contentType,
+  }) => _withRefresh(() async {
+    final request = http.MultipartRequest('POST', _uri(path))
+      ..headers['Accept'] = 'application/json'
+      ..files.add(
+        http.MultipartFile.fromBytes(
+          field,
+          bytes,
+          filename: filename,
+          contentType: _mediaType(contentType),
+        ),
+      );
+    await _authorize(request);
+    return _envelope(await _execute(request));
+  });
+
   /// [authenticated] false sends no token (sign-in endpoints).
   Future<Object?> send(
     String method,
@@ -98,29 +131,49 @@ class ApiClient {
     Object? body,
     bool authenticated,
   ) async {
+    final request = http.Request(method, _uri(path))
+      ..headers['Accept'] = 'application/json';
+    if (body != null) {
+      request.headers['Content-Type'] = 'application/json';
+      request.body = jsonEncode(body);
+    }
+    if (authenticated) await _authorize(request);
+    return _envelope(await _execute(request));
+  }
+
+  /// Retries once with a fresh token after `TOKEN_EXPIRED`.
+  Future<T> _withRefresh<T>(Future<T> Function() call) async {
+    try {
+      return await call();
+    } on UnauthenticatedFailure catch (f) {
+      final refresh = _refresh;
+      if (f.code != 'TOKEN_EXPIRED' || refresh == null) rethrow;
+      if (!await refresh()) rethrow;
+      return call();
+    }
+  }
+
+  Uri _uri(String path) {
     if (!config.isConfigured) {
       throw UnexpectedFailure(
         code: 'API_NOT_CONFIGURED',
         message: 'API base URL is not set or invalid: "${config.baseUrl}"',
       );
     }
-    final request = http.Request(method, Uri.parse('${config.baseUrl}$path'))
-      ..headers['Accept'] = 'application/json';
-    if (body != null) {
-      request.headers['Content-Type'] = 'application/json';
-      request.body = jsonEncode(body);
-    }
-    if (authenticated) {
-      final token = await accessToken?.call();
-      if (token != null && token.isNotEmpty) {
-        request.headers['Authorization'] = 'Bearer $token';
-      }
-    }
+    return Uri.parse('${config.baseUrl}$path');
+  }
 
-    final http.Response response;
+  Future<void> _authorize(http.BaseRequest request) async {
+    final token = await accessToken?.call();
+    if (token != null && token.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+  }
+
+  Future<http.Response> _execute(http.BaseRequest request) async {
     try {
       final streamed = await _http.send(request).timeout(config.timeout);
-      response = await http.Response.fromStream(streamed);
+      return await http.Response.fromStream(streamed);
     } on TimeoutException {
       throw const NetworkFailure(message: 'Request timed out');
     } on http.ClientException catch (e) {
@@ -129,20 +182,27 @@ class ApiClient {
       // Socket, TLS and other transport errors not wrapped by package:http.
       throw NetworkFailure(message: e.toString());
     }
+  }
 
+  Object? _envelope(http.Response response) {
     if (response.statusCode == 204) return null;
+    final envelope = _decode(response);
+    if (envelope['success'] == true) return envelope['data'];
+    throw _failureFrom(response.statusCode, envelope['error']);
+  }
 
-    final Map<String, Object?> envelope;
+  Failure _decodeFailure(http.Response response) =>
+      _failureFrom(response.statusCode, _decode(response)['error']);
+
+  Map<String, Object?> _decode(http.Response response) {
     try {
-      envelope =
-          jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, Object?>;
+      return jsonDecode(utf8.decode(response.bodyBytes))
+          as Map<String, Object?>;
     } on Object {
       throw UnexpectedFailure(
         message: 'Invalid response (HTTP ${response.statusCode})',
       );
     }
-    if (envelope['success'] == true) return envelope['data'];
-    throw _failureFrom(response.statusCode, envelope['error']);
   }
 
   void close() => _http.close();
@@ -188,4 +248,10 @@ Failure _failureFrom(int status, Object? error) {
   // Business rules: CODE_INVALID, CODE_EXPIRED, UNIVERSITY_EMAIL_REQUIRED,
   // EMAIL_SEND_FAILED, GOOGLE_SIGN_IN_UNAVAILABLE, ...
   return RejectedFailure(code: code, message: message, details: details);
+}
+
+/// "image/jpeg" → its MediaType (http_parser comes with package:http).
+MediaType _mediaType(String contentType) {
+  final parts = contentType.split('/');
+  return MediaType(parts.first, parts.length > 1 ? parts[1] : 'octet-stream');
 }

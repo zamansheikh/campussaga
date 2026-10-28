@@ -1284,4 +1284,540 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get errorMoveDate => 'আজ থেকে ৬ মাসের মধ্যে একটি দিন বেছে নাও।';
+
+  @override
+  String get navCampus => 'ক্যাম্পাস';
+
+  @override
+  String get voiceTitle => 'ক্যাম্পাস ভয়েস';
+
+  @override
+  String get voiceSortTrending => 'আলোচিত';
+
+  @override
+  String get voiceSortNew => 'নতুন';
+
+  @override
+  String get voiceSortSolved => 'সমাধান হয়েছে';
+
+  @override
+  String get voiceAllCategories => 'সব';
+
+  @override
+  String get voiceSearchHint => 'ইস্যু খুঁজো';
+
+  @override
+  String get voiceRaiseIssue => 'ইস্যু তোলো';
+
+  @override
+  String get voiceMyIssues => 'আমার ইস্যু';
+
+  @override
+  String get voiceSafetyReports => 'নিরাপত্তা রিপোর্ট';
+
+  @override
+  String get voiceEmptyFeed => 'এখানে এখনো কোনো ইস্যু নেই';
+
+  @override
+  String get voiceEmptyFeedHint =>
+      'ক্যাম্পাসে কোনো সমস্যা? তুলে ধরো, তোমার নাম গোপন থাকবে।';
+
+  @override
+  String get voiceEmptySearch => 'এই খোঁজার সাথে কোনো ইস্যু মেলেনি';
+
+  @override
+  String get voiceEmptyMine => 'তুমি এখনো কোনো ইস্যু তোলোনি';
+
+  @override
+  String get voiceEmptyMineHint =>
+      'তোমার তোলা ইস্যু এখানে দেখাবে, যাচাইয়ে থাকাগুলোও।';
+
+  @override
+  String get voiceCatAcademic => 'একাডেমিক';
+
+  @override
+  String get voiceCatHostel => 'হল';
+
+  @override
+  String get voiceCatTransport => 'পরিবহন';
+
+  @override
+  String get voiceCatFacilities => 'সুযোগ-সুবিধা';
+
+  @override
+  String get voiceCatSafety => 'নিরাপত্তা';
+
+  @override
+  String get voiceCatAdministration => 'প্রশাসন';
+
+  @override
+  String get voiceCatFood => 'খাবার';
+
+  @override
+  String get voiceCatIt => 'আইটি / ওয়াই-ফাই';
+
+  @override
+  String get voiceCatOther => 'অন্যান্য';
+
+  @override
+  String get voiceStatusOpen => 'খোলা';
+
+  @override
+  String get voiceStatusAcknowledged => 'দেখা হয়েছে';
+
+  @override
+  String get voiceStatusInProgress => 'কাজ চলছে';
+
+  @override
+  String get voiceStatusSolved => 'সমাধান হয়েছে';
+
+  @override
+  String get voiceStatusRejected => 'বাতিল';
+
+  @override
+  String get voiceUnderReview => 'যাচাই হচ্ছে';
+
+  @override
+  String get voiceRemoved => 'সরানো হয়েছে';
+
+  @override
+  String get voiceHiddenBadge => 'যাচাইয়ের জন্য লুকানো';
+
+  @override
+  String get voicePrivate => 'গোপন';
+
+  @override
+  String get voiceAnonymous => 'বেনামি';
+
+  @override
+  String get voiceYou => 'তুমি';
+
+  @override
+  String voiceHandle(String handle) {
+    return 'শিক্ষার্থী $handle';
+  }
+
+  @override
+  String get voiceAuthorTag => 'লেখক';
+
+  @override
+  String get voiceDeletedAccount => 'মুছে ফেলা অ্যাকাউন্ট';
+
+  @override
+  String get voiceOfficial => 'অফিসিয়াল';
+
+  @override
+  String get voiceMeToo => 'আমারও';
+
+  @override
+  String voiceMeTooSemantics(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'আমারও, $countString জন শিক্ষার্থী';
+  }
+
+  @override
+  String get voiceFollow => 'ফলো করো';
+
+  @override
+  String get voiceFollowing => 'ফলো করছ';
+
+  @override
+  String get voiceComments => 'মন্তব্য';
+
+  @override
+  String get voiceStatusHistory => 'অবস্থা';
+
+  @override
+  String get voiceRaised => 'ইস্যু তোলা হয়েছে';
+
+  @override
+  String voiceStepBy(String who, String when) {
+    return '$who · $when';
+  }
+
+  @override
+  String get voiceActorAuthor => 'লেখক';
+
+  @override
+  String get voiceActorModerator => 'মডারেটর';
+
+  @override
+  String get voiceActorSystem => 'ক্যাম্পাস সাগা';
+
+  @override
+  String get voiceHeldNotice =>
+      'যাচাই শেষ না হওয়া পর্যন্ত এটা শুধু তুমি দেখছ। সাধারণত এক দিনের কম সময় লাগে।';
+
+  @override
+  String get voiceHeldPersonalInfo =>
+      'এতে হয়তো ফোন নম্বর, ইমেইল, লিংক বা আইডি নম্বর আছে।';
+
+  @override
+  String get voiceHeldLanguage => 'এতে হয়তো এমন শব্দ আছে যা অনুমোদিত নয়।';
+
+  @override
+  String get voiceHeldUnverified =>
+      'যাচাই করা বিশ্ববিদ্যালয় ইমেইল ছাড়া অ্যাকাউন্টের পোস্ট আগে যাচাই হয়।';
+
+  @override
+  String voiceRemovedNotice(String reason) {
+    return 'মডারেটররা সরিয়েছেন: $reason';
+  }
+
+  @override
+  String get voiceRemovedByYou => 'তুমি এই ইস্যুটি মুছে ফেলেছ।';
+
+  @override
+  String get voiceHiddenNotice =>
+      'রিপোর্ট দেখা শেষ না হওয়া পর্যন্ত লুকানো আছে।';
+
+  @override
+  String get voicePrivateNotice =>
+      'গোপন: শুধু তুমি, মডারেটর আর তোমার বিশ্ববিদ্যালয়ের কর্মকর্তারা এটা দেখতে পান।';
+
+  @override
+  String get voiceCommentHint => 'মন্তব্য লেখো';
+
+  @override
+  String voiceCommentAs(String who) {
+    return 'মন্তব্য করছ: $who';
+  }
+
+  @override
+  String get voiceCommentAnonymously => 'বেনামে';
+
+  @override
+  String get voiceCommentWithName => 'আমার নামে';
+
+  @override
+  String get voiceNoComments => 'এখনো কোনো মন্তব্য নেই';
+
+  @override
+  String get voiceCommentRemoved => 'মন্তব্যটি সরানো হয়েছে।';
+
+  @override
+  String get voiceCommentUnderReview =>
+      'যাচাই শেষ না হওয়া পর্যন্ত এই মন্তব্য শুধু তুমি দেখছ।';
+
+  @override
+  String get voiceLoadMore => 'আরও দেখো';
+
+  @override
+  String get voiceSend => 'পাঠাও';
+
+  @override
+  String get voiceReport => 'রিপোর্ট করো';
+
+  @override
+  String get voiceReopen => 'আবার খোলো';
+
+  @override
+  String get voiceReopenTitle => 'ইস্যুটি আবার খুলবে?';
+
+  @override
+  String get voiceReopenHint => 'কর্মকর্তাদের জানাও এখনো কী সমস্যা';
+
+  @override
+  String get voiceDeleteIssueTitle => 'ইস্যুটি মুছে ফেলবে?';
+
+  @override
+  String get voiceDeleteIssueBody =>
+      'এটা সবার কাছ থেকে সরে যাবে। আর ফেরানো যাবে না।';
+
+  @override
+  String get voiceDeleteCommentTitle => 'মন্তব্যটি মুছে ফেলবে?';
+
+  @override
+  String get voiceEditIssue => 'ইস্যু সম্পাদনা';
+
+  @override
+  String get voiceEditWindow =>
+      'পোস্ট করার ৬০ মিনিটের মধ্যে সম্পাদনা করা যায়।';
+
+  @override
+  String get voiceReportTitle => 'কেন রিপোর্ট করছ?';
+
+  @override
+  String get voiceReportSpam => 'স্প্যাম';
+
+  @override
+  String get voiceReportAbuse => 'অপমানজনক বা ঘৃণামূলক';
+
+  @override
+  String get voiceReportPersonalInfo => 'কারও ব্যক্তিগত তথ্য প্রকাশ করছে';
+
+  @override
+  String get voiceReportFalseInfo => 'ভুল তথ্য';
+
+  @override
+  String get voiceReportInappropriate => 'অনুপযুক্ত';
+
+  @override
+  String get voiceReportOther => 'অন্য কিছু';
+
+  @override
+  String get voiceReportDetails => 'বিস্তারিত (ঐচ্ছিক)';
+
+  @override
+  String get voiceReportSent => 'ধন্যবাদ। মডারেটররা দেখবেন।';
+
+  @override
+  String get voiceReportAnon => 'রিপোর্ট বেনামি থাকে।';
+
+  @override
+  String get voiceChangeStatus => 'অবস্থা বদলাও';
+
+  @override
+  String get voiceStatusNote => 'শিক্ষার্থীদের জন্য নোট';
+
+  @override
+  String get voiceStatusNoteHint => 'কী করা হচ্ছে, বা কেন';
+
+  @override
+  String get voiceNoteRequired => 'কেন বাতিল, তা লেখো।';
+
+  @override
+  String get voiceOfficialReply => 'অফিসিয়াল উত্তর';
+
+  @override
+  String get voiceOfficialReplyHint =>
+      'সবার জন্য উত্তর লেখো। তোমার পদবি আর নাম দেখানো হবে।';
+
+  @override
+  String get voiceStatusUpdated => 'অবস্থা বদলানো হয়েছে';
+
+  @override
+  String get voiceReplyPosted => 'উত্তর পোস্ট হয়েছে';
+
+  @override
+  String get voiceOfficialBadge => 'বিশ্ববিদ্যালয় কর্মকর্তা';
+
+  @override
+  String get voiceNewTitle => 'ইস্যু তোলো';
+
+  @override
+  String voiceStepOf(int step) {
+    final intl.NumberFormat stepNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String stepString = stepNumberFormat.format(step);
+
+    return 'ধাপ $stepString / ৩';
+  }
+
+  @override
+  String get voiceStepCategory => 'কোন বিষয়ে?';
+
+  @override
+  String get voiceSafetyNote =>
+      'নিরাপত্তা রিপোর্ট গোপন থাকে: শুধু মডারেটর আর তোমার বিশ্ববিদ্যালয়ের কর্মকর্তারা দেখেন।';
+
+  @override
+  String get voiceStepDetails => 'কী সমস্যা, লেখো';
+
+  @override
+  String get voiceTitleLabel => 'শিরোনাম';
+
+  @override
+  String get voiceTitleHint => 'যেমন: রবিবার থেকে ২ নম্বর হলে পানি নেই';
+
+  @override
+  String get voiceBodyLabel => 'বিস্তারিত';
+
+  @override
+  String get voiceBodyHint =>
+      'কী হচ্ছে, কোথায়, কবে থেকে। কারও নাম, ফোন নম্বর বা রোল নম্বর লিখো না।';
+
+  @override
+  String get voicePlaceLabel => 'জায়গা (ঐচ্ছিক)';
+
+  @override
+  String get voicePlaceHint => 'যেমন: লাইব্রেরি, ৩য় তলা';
+
+  @override
+  String get voicePhotosLabel => 'ছবি';
+
+  @override
+  String get voiceAddPhoto => 'ছবি যোগ করো';
+
+  @override
+  String get voicePhotosHint =>
+      'সর্বোচ্চ ৪টি। ছবি থেকে লোকেশন ও ফোনের তথ্য মুছে ফেলা হয়।';
+
+  @override
+  String voicePhoto(int n) {
+    final intl.NumberFormat nNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String nString = nNumberFormat.format(n);
+
+    return 'ছবি $nString';
+  }
+
+  @override
+  String get voiceRemovePhoto => 'ছবি সরাও';
+
+  @override
+  String voiceAtLeast(int n) {
+    final intl.NumberFormat nNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String nString = nNumberFormat.format(n);
+
+    return 'অন্তত $nString অক্ষর লেখো।';
+  }
+
+  @override
+  String get voiceStepReview => 'পোস্ট করার আগে';
+
+  @override
+  String get voiceSimilarTitle => 'একই রকম ইস্যু';
+
+  @override
+  String get voiceSimilarHint =>
+      'এর কোনোটি একই হলে, নতুন পোস্ট না করে সেখানে আমারও চাপো।';
+
+  @override
+  String get voiceNoSimilar => 'একই রকম কোনো ইস্যু পাওয়া যায়নি।';
+
+  @override
+  String get voicePostAnon => 'বেনামে পোস্ট করো';
+
+  @override
+  String get voicePostAnonHint =>
+      'তোমার নাম, ইমেইল বা ক্লাস কখনো দেখানো হয় না।';
+
+  @override
+  String get voicePostNamedHint => 'এই ইস্যুতে শিক্ষার্থীরা তোমার নাম দেখবে।';
+
+  @override
+  String get voiceHowAnonymity => 'বেনামি কীভাবে কাজ করে';
+
+  @override
+  String get voicePost => 'পোস্ট করো';
+
+  @override
+  String get voiceNext => 'পরের ধাপ';
+
+  @override
+  String get voiceBack => 'আগের ধাপ';
+
+  @override
+  String get voicePosted => 'ইস্যু পোস্ট হয়েছে';
+
+  @override
+  String get voicePostedHeld => 'পোস্ট হয়েছে। একটু যাচাইয়ের পর অন্যরা দেখবে।';
+
+  @override
+  String get voiceUploading => 'ছবি আপলোড হচ্ছে…';
+
+  @override
+  String get voiceDraftKept => 'তোমার খসড়া এই ফোনে রাখা আছে।';
+
+  @override
+  String get voiceOfflineAction =>
+      'তুমি অফলাইনে আছ। সংযোগ পেলে আবার চেষ্টা করো।';
+
+  @override
+  String get voiceAnonTitle => 'বেনামি কীভাবে কাজ করে';
+
+  @override
+  String get voiceAnonIntro =>
+      'ক্যাম্পাস ভয়েস এমনভাবে বানানো, যাতে তুমি নিরাপদে কথা বলতে পারো।';
+
+  @override
+  String get voiceAnon1 =>
+      'বেনামি পোস্টে তোমার নাম, ইমেইল বা ক্লাস কখনো দেখানো হয় না।';
+
+  @override
+  String get voiceAnon2 =>
+      'কে কী লিখেছে তা আলাদা করে রাখা হয়। অ্যাপে বা আমাদের অ্যাডমিন প্যানেলে কোনো স্ক্রিন, কর্মী বা বিশ্ববিদ্যালয়ের কর্মকর্তা তা দেখতে পারেন না।';
+
+  @override
+  String get voiceAnon3 =>
+      'তোমার হ্যান্ডেল (যেমন “শিক্ষার্থী 7KQF”) প্রতিটি ইস্যুতে আলাদা।';
+
+  @override
+  String get voiceAnon4 =>
+      'ছবি পরিষ্কার করা হয়: লোকেশন ও ফোনের তথ্য মুছে ফেলা হয়।';
+
+  @override
+  String get voiceAnon5 => 'সময় দেখানো হয় মোটামুটি, মিনিট ধরে নয়।';
+
+  @override
+  String get voiceAnon6 =>
+      'নিয়ম ভাঙলে (হুমকি, কারও নাম প্রকাশ, স্প্যাম) তোমার পোস্ট করা বন্ধ হতে পারে, কিন্তু কেউ জানবে না তুমি কে।';
+
+  @override
+  String get voiceAnon7 =>
+      'তুমি যা লেখো তা থেকেও তোমাকে চেনা যেতে পারে। নিজের নাম, রোল নম্বর বা শুধু তুমিই জানো এমন তথ্য লিখো না। সবার জন্য পোস্টের স্ক্রিনশট যে কেউ নিতে পারে।';
+
+  @override
+  String get voiceAnon8 =>
+      'নিরাপত্তা রিপোর্ট গোপন থাকে: শুধু মডারেটর আর তোমার বিশ্ববিদ্যালয়ের কর্মকর্তারা দেখেন।';
+
+  @override
+  String get errorFeatureDisabled => 'ক্যাম্পাস ভয়েস এখনো চালু হয়নি।';
+
+  @override
+  String get errorVoiceBanned =>
+      'নিয়ম ভাঙার কারণে এখন তুমি পোস্ট, মন্তব্য বা ভোট করতে পারবে না।';
+
+  @override
+  String errorVoiceBannedUntil(String date) {
+    return 'নিয়ম ভাঙার কারণে $date পর্যন্ত তুমি পোস্ট, মন্তব্য বা ভোট করতে পারবে না।';
+  }
+
+  @override
+  String get errorIssueNotFound => 'এই ইস্যুটি দেখা যাচ্ছে না।';
+
+  @override
+  String get errorCommentNotFound => 'এই মন্তব্যটি দেখা যাচ্ছে না।';
+
+  @override
+  String get errorUploadNotFound =>
+      'একটি ছবি পুরো আপলোড হয়নি। সেটি সরিয়ে আবার যোগ করো।';
+
+  @override
+  String get errorImageInvalid => 'এই ফাইলটি ব্যবহারযোগ্য ছবি নয়।';
+
+  @override
+  String get errorImageTooLarge => 'ছবিটি অনেক বড়।';
+
+  @override
+  String get errorEditWindowClosed =>
+      'পোস্ট করার প্রথম ৬০ মিনিটেই শুধু সম্পাদনা করা যায়।';
+
+  @override
+  String get errorReopenNotAllowed =>
+      'শুধু সমাধান হওয়া ইস্যু ৩০ দিনের মধ্যে আবার খোলা যায়।';
+
+  @override
+  String get errorIssueClosed =>
+      'ইস্যুটি সরানো হয়েছে, তাই নতুন মন্তব্য করা যাবে না।';
+
+  @override
+  String get errorCannotVoteOwn =>
+      'ইস্যুটি তুমিই তুলেছ, তাই তোমাকে আগেই গোনা হয়েছে।';
+
+  @override
+  String get errorAlreadyReported => 'তুমি আগেই এটা রিপোর্ট করেছ।';
+
+  @override
+  String get errorStatusChangeInvalid => 'এই অবস্থায় বদলানো যায় না।';
+
+  @override
+  String get errorNoteRequired => 'কেন, তা জানিয়ে একটি নোট দাও।';
+
+  @override
+  String get voiceFromGallery => 'গ্যালারি থেকে বেছে নাও';
+
+  @override
+  String get voiceTakePhoto => 'ছবি তোলো';
+
+  @override
+  String get voiceHeldModerator => 'মডারেটররা দেখার সময় এটা লুকিয়ে রেখেছেন।';
 }

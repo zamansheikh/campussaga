@@ -14,3 +14,5 @@ export 'src/config/app_config.dart';
 export 'src/failure.dart';
 export 'src/profile/profile_repository.dart';
 export 'src/push/device_repository.dart';
+export 'src/voice/voice_models.dart';
+export 'src/voice/voice_repository.dart';

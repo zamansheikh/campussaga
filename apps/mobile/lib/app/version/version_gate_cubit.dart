@@ -6,19 +6,34 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 enum VersionStatus { ok, updateRequired }
 
 final class VersionGateState extends Equatable {
-  const VersionGateState({this.status = VersionStatus.ok, this.storeUrl});
+  const VersionGateState({
+    this.status = VersionStatus.ok,
+    this.storeUrl,
+    this.features = const {},
+  });
 
   final VersionStatus status;
 
   /// Store page for this platform, when the server has one.
   final String? storeUrl;
 
+  /// Server feature flags from the same /config call (e.g. campusVoice).
+  final Map<String, bool> features;
+
+  bool feature(String name) => features[name] ?? false;
+
   @override
-  List<Object?> get props => [status, storeUrl];
+  List<Object?> get props => [
+    status,
+    storeUrl,
+    for (final e
+        in (features.entries.toList()..sort((a, b) => a.key.compareTo(b.key))))
+      '${e.key}=${e.value}',
+  ];
 }
 
 /// Blocks the app when this build is older than the server's
-/// minSupportedBuild. Fails open: if the server can't be reached the
+/// minSupportedBuild, and carries the server's feature flags. Fails open: if the server can't be reached the
 /// student keeps using the app.
 class VersionGateCubit extends Cubit<VersionGateState> {
   VersionGateCubit({
@@ -52,10 +67,11 @@ class VersionGateCubit extends Cubit<VersionGateState> {
     try {
       final cfg = await _appConfig.fetch();
       final next = cfg.isSupported(_build)
-          ? const VersionGateState()
+          ? VersionGateState(features: cfg.features)
           : VersionGateState(
               status: VersionStatus.updateRequired,
               storeUrl: cfg.storeUrls[_platform],
+              features: cfg.features,
             );
       if (next != state) emit(next); // nothing to rebuild when unchanged
     } on Failure {

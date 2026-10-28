@@ -14,8 +14,12 @@ import 'package:campussaga/features/push/push_messaging.dart';
 import 'package:campussaga/features/reminders/data/phone_info.dart';
 import 'package:campussaga/features/reminders/data/reminder_scheduler.dart';
 import 'package:campussaga/features/reminders/data/reminder_store.dart';
+import 'package:campussaga/features/voice/data/photo_picker.dart';
+import 'package:campussaga/features/voice/data/voice_cache.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../voice_fakes.dart';
 
 const testUser = UserProfile(
   id: 'u1',
@@ -303,6 +307,9 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   PushMessaging? push,
   FakeDeviceRepository? devices,
   PhoneInfo? phone,
+  FakeVoiceRepository? voice,
+  VoiceCache? voiceCache,
+  PhotoPicker? photos,
   int build = 1,
 }) async {
   await getIt.reset();
@@ -333,7 +340,10 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
     ..registerSingleton<SeenStore>(seenStore ?? MemorySeenStore())
     ..registerSingleton<PushMessaging>(push ?? MemoryPushMessaging())
     ..registerSingleton<DeviceRepository>(devices ?? FakeDeviceRepository())
-    ..registerSingleton<PhoneInfo>(phone ?? MemoryPhoneInfo());
+    ..registerSingleton<PhoneInfo>(phone ?? MemoryPhoneInfo())
+    ..registerSingleton<VoiceRepository>(voice ?? FakeVoiceRepository())
+    ..registerSingleton<VoiceCache>(voiceCache ?? MemoryVoiceCache())
+    ..registerSingleton<PhotoPicker>(photos ?? FakePhotoPicker());
   return (repo, google);
 }
 

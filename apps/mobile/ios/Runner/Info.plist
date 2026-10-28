@@ -14,6 +14,10 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>NSCameraUsageDescription</key>
+	<string>To take a photo for an issue you raise in Campus Voice.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To add photos to an issue you raise in Campus Voice. Location and phone details are removed.</string>
 	<key>CFBundleName</key>
 	<string>campussaga</string>
 	<key>CFBundlePackageType</key>

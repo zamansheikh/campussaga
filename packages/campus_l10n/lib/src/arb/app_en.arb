@@ -684,5 +684,231 @@
   "errorAssessmentLimit": "This group already has the most upcoming tests and deadlines allowed.",
   "errorAssessmentGone": "This was already deleted.",
   "errorNotAssessmentOwner": "Only who added it or a CR can change it.",
-  "errorMoveDate": "Pick a day from today, within 6 months."
+  "errorMoveDate": "Pick a day from today, within 6 months.",
+  "navCampus": "Campus",
+  "voiceTitle": "Campus Voice",
+  "voiceSortTrending": "Trending",
+  "voiceSortNew": "New",
+  "voiceSortSolved": "Solved",
+  "voiceAllCategories": "All",
+  "voiceSearchHint": "Search issues",
+  "voiceRaiseIssue": "Raise issue",
+  "voiceMyIssues": "My issues",
+  "voiceSafetyReports": "Safety reports",
+  "voiceEmptyFeed": "No issues here yet",
+  "voiceEmptyFeedHint": "Something wrong on campus? Raise it. You stay anonymous.",
+  "voiceEmptySearch": "No issues match your search",
+  "voiceEmptyMine": "You haven't raised an issue yet",
+  "voiceEmptyMineHint": "Issues you raise show here, including ones under review.",
+  "voiceCatAcademic": "Academic",
+  "voiceCatHostel": "Hostel",
+  "voiceCatTransport": "Transport",
+  "voiceCatFacilities": "Facilities",
+  "voiceCatSafety": "Safety",
+  "voiceCatAdministration": "Administration",
+  "voiceCatFood": "Food",
+  "voiceCatIt": "IT / Wi-Fi",
+  "voiceCatOther": "Other",
+  "voiceStatusOpen": "Open",
+  "voiceStatusAcknowledged": "Acknowledged",
+  "voiceStatusInProgress": "In progress",
+  "voiceStatusSolved": "Solved",
+  "voiceStatusRejected": "Rejected",
+  "voiceUnderReview": "Under review",
+  "voiceRemoved": "Removed",
+  "voiceHiddenBadge": "Hidden for review",
+  "voicePrivate": "Private",
+  "voiceAnonymous": "Anonymous",
+  "voiceYou": "You",
+  "voiceHandle": "Student {handle}",
+  "@voiceHandle": {
+    "placeholders": {
+      "handle": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceAuthorTag": "Author",
+  "voiceDeletedAccount": "Deleted account",
+  "voiceOfficial": "Official",
+  "voiceMeToo": "Me too",
+  "voiceMeTooSemantics": "Me too, {count} students",
+  "@voiceMeTooSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "voiceFollow": "Follow",
+  "voiceFollowing": "Following",
+  "voiceComments": "Comments",
+  "voiceStatusHistory": "Status",
+  "voiceRaised": "Raised",
+  "voiceStepBy": "{who} · {when}",
+  "@voiceStepBy": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceActorAuthor": "The author",
+  "voiceActorModerator": "Moderator",
+  "voiceActorSystem": "Campus Saga",
+  "voiceHeldNotice": "Only you can see this while it's checked. It usually takes less than a day.",
+  "voiceHeldPersonalInfo": "It may contain a phone number, email, link or ID number.",
+  "voiceHeldLanguage": "It may contain words that aren't allowed.",
+  "voiceHeldUnverified": "Posts from accounts without a verified university email are checked first.",
+  "voiceRemovedNotice": "Removed by moderators: {reason}",
+  "@voiceRemovedNotice": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceRemovedByYou": "You deleted this issue.",
+  "voiceHiddenNotice": "Hidden while moderators look at reports.",
+  "voicePrivateNotice": "Private: only you, moderators and your university's officials can see this.",
+  "voiceCommentHint": "Add a comment",
+  "voiceCommentAs": "Commenting as {who}",
+  "@voiceCommentAs": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceCommentAnonymously": "Anonymously",
+  "voiceCommentWithName": "With my name",
+  "voiceNoComments": "No comments yet",
+  "voiceCommentRemoved": "This comment was removed.",
+  "voiceCommentUnderReview": "Only you can see this comment while it's checked.",
+  "voiceLoadMore": "Load more",
+  "voiceSend": "Send",
+  "voiceReport": "Report",
+  "voiceReopen": "Reopen",
+  "voiceReopenTitle": "Reopen this issue?",
+  "voiceReopenHint": "Tell officials what's still wrong",
+  "voiceDeleteIssueTitle": "Delete this issue?",
+  "voiceDeleteIssueBody": "It disappears for everyone. This can't be undone.",
+  "voiceDeleteCommentTitle": "Delete this comment?",
+  "voiceEditIssue": "Edit issue",
+  "voiceEditWindow": "You can edit for 60 minutes after posting.",
+  "voiceReportTitle": "Why are you reporting this?",
+  "voiceReportSpam": "Spam",
+  "voiceReportAbuse": "Abusive or hateful",
+  "voiceReportPersonalInfo": "Shares someone's personal information",
+  "voiceReportFalseInfo": "False information",
+  "voiceReportInappropriate": "Inappropriate",
+  "voiceReportOther": "Something else",
+  "voiceReportDetails": "Details (optional)",
+  "voiceReportSent": "Thanks. Moderators will look at it.",
+  "voiceReportAnon": "Reports are anonymous.",
+  "voiceChangeStatus": "Change status",
+  "voiceStatusNote": "Note for students",
+  "voiceStatusNoteHint": "What's being done, or why",
+  "voiceNoteRequired": "Say why it's rejected.",
+  "voiceOfficialReply": "Official reply",
+  "voiceOfficialReplyHint": "Write a public reply. Your title and name are shown.",
+  "voiceStatusUpdated": "Status updated",
+  "voiceReplyPosted": "Reply posted",
+  "voiceOfficialBadge": "University official",
+  "voiceNewTitle": "Raise an issue",
+  "voiceStepOf": "Step {step} of 3",
+  "@voiceStepOf": {
+    "placeholders": {
+      "step": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "voiceStepCategory": "What is it about?",
+  "voiceSafetyNote": "Safety reports are private: only moderators and your university's officials see them.",
+  "voiceStepDetails": "Tell us what's wrong",
+  "voiceTitleLabel": "Title",
+  "voiceTitleHint": "e.g. No water in Hall 2 since Sunday",
+  "voiceBodyLabel": "Details",
+  "voiceBodyHint": "What happens, where and since when. Don't include names, phone numbers or roll numbers.",
+  "voicePlaceLabel": "Place (optional)",
+  "voicePlaceHint": "e.g. Library, 3rd floor",
+  "voicePhotosLabel": "Photos",
+  "voiceAddPhoto": "Add photo",
+  "voicePhotosHint": "Up to 4. Location and phone details are removed.",
+  "voicePhoto": "Photo {n}",
+  "@voicePhoto": {
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "voiceRemovePhoto": "Remove photo",
+  "voiceAtLeast": "Write at least {n} characters.",
+  "@voiceAtLeast": {
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "voiceStepReview": "Before you post",
+  "voiceSimilarTitle": "Similar issues",
+  "voiceSimilarHint": "If one of these is the same, tap Me too there instead of posting again.",
+  "voiceNoSimilar": "No similar issues found.",
+  "voicePostAnon": "Post anonymously",
+  "voicePostAnonHint": "Your name, email and class are never shown.",
+  "voicePostNamedHint": "Students will see your name on this issue.",
+  "voiceHowAnonymity": "How anonymity works",
+  "voicePost": "Post",
+  "voiceNext": "Next",
+  "voiceBack": "Back",
+  "voicePosted": "Issue posted",
+  "voicePostedHeld": "Posted. Others will see it after a quick check.",
+  "voiceUploading": "Uploading photos…",
+  "voiceDraftKept": "Your draft is kept on this phone.",
+  "voiceOfflineAction": "You're offline. Try again when you're connected.",
+  "voiceAnonTitle": "How anonymity works",
+  "voiceAnonIntro": "Campus Voice is built so you can speak up safely.",
+  "voiceAnon1": "Your name, email and class are never shown on anonymous posts.",
+  "voiceAnon2": "Who wrote what is stored separately. No screen, staff member or university official can see it, in the app or in our admin panel.",
+  "voiceAnon3": "Your handle (like “Student 7KQF”) is different on every issue.",
+  "voiceAnon4": "Photos are cleaned: location and phone details are removed.",
+  "voiceAnon5": "Times are shown roughly, not to the minute.",
+  "voiceAnon6": "Breaking the rules (threats, naming people, spam) can get your posting blocked, without anyone seeing who you are.",
+  "voiceAnon7": "What you write can still give you away. Don't include your name, roll number or details only you would know. Anyone can screenshot a public post.",
+  "voiceAnon8": "Safety reports are private: only moderators and your university's officials see them.",
+  "errorFeatureDisabled": "Campus Voice isn't open yet.",
+  "errorVoiceBanned": "You can't post, comment or vote right now because of a rules break.",
+  "errorVoiceBannedUntil": "You can't post, comment or vote until {date} because of a rules break.",
+  "@errorVoiceBannedUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "errorIssueNotFound": "This issue isn't available.",
+  "errorCommentNotFound": "This comment isn't available.",
+  "errorUploadNotFound": "A photo didn't finish uploading. Remove it and add it again.",
+  "errorImageInvalid": "That file isn't a photo we can use.",
+  "errorImageTooLarge": "That photo is too large.",
+  "errorEditWindowClosed": "Issues can only be edited in the first 60 minutes.",
+  "errorReopenNotAllowed": "Only solved issues can be reopened, within 30 days.",
+  "errorIssueClosed": "This issue was removed, so it can't get new comments.",
+  "errorCannotVoteOwn": "You raised this issue, so it already counts you.",
+  "errorAlreadyReported": "You already reported this.",
+  "errorStatusChangeInvalid": "That status change isn't possible.",
+  "errorNoteRequired": "Add a note saying why.",
+  "voiceFromGallery": "Choose from gallery",
+  "voiceTakePhoto": "Take a photo",
+  "voiceHeldModerator": "Moderators hid this while they look at it."
 }
