@@ -242,3 +242,78 @@ DELETE FROM assessments WHERE id = @id AND group_id = @group_id;
 
 -- name: UserName :one
 SELECT display_name FROM users WHERE id = @id;
+
+-- ---- find your class -----------------------------------------------------------
+
+-- Discoverable groups of a university whose details or courses contain
+-- every pattern (lower-case '%word%'); groups whose department, batch and
+-- section match come first, then the busiest.
+-- name: SearchGroups :many
+WITH g AS (
+    SELECT cg.id, cg.department, cg.batch, cg.section, cg.semester, cg.updated_at,
+           (SELECT count(*) FROM class_group_members m WHERE m.group_id = cg.id) AS member_count,
+           lower(cg.department || ' ' || cg.batch || ' ' || cg.section) AS head,
+           lower(cg.department || ' ' || cg.batch || ' ' || cg.section || ' ' || cg.semester || ' ' ||
+                 coalesce((SELECT string_agg(s.course_code || ' ' || replace(s.course_code, ' ', '') || ' ' ||
+                                             s.course_title || ' ' || s.teacher, ' ')
+                           FROM routine_slots s WHERE s.group_id = cg.id), '')) AS hay
+    FROM class_groups cg
+    WHERE cg.university_id = @university_id AND cg.discoverable
+)
+SELECT g.id, g.department, g.batch, g.section, g.semester, g.member_count::bigint AS member_count
+FROM g
+WHERE g.hay LIKE ALL (@patterns::text[])
+  AND (@department::text = '' OR lower(g.department) = lower(@department::text))
+  AND (@batch::text = '' OR lower(g.batch) = lower(@batch::text))
+ORDER BY (g.head LIKE ALL (@patterns::text[])) DESC, g.member_count DESC, g.updated_at DESC, g.id
+LIMIT @lim OFFSET @off;
+
+-- Possible duplicates of a group about to be created.
+-- name: SimilarGroups :many
+SELECT cg.id, cg.department, cg.batch, cg.section, cg.semester,
+       (SELECT count(*) FROM class_group_members m WHERE m.group_id = cg.id)::bigint AS member_count
+FROM class_groups cg
+WHERE cg.university_id = @university_id AND cg.discoverable
+  AND lower(cg.department) = lower(@department::text) AND lower(cg.batch) = lower(@batch::text)
+  AND (@section::text = '' OR cg.section = '' OR lower(cg.section) = lower(@section::text))
+ORDER BY (lower(cg.section) = lower(@section::text)) DESC, member_count DESC, cg.id
+LIMIT 5;
+
+-- name: GroupCourses :many
+SELECT DISTINCT ON (s.group_id, upper(replace(s.course_code, ' ', '')))
+       s.group_id, s.course_code, s.course_title, s.teacher
+FROM routine_slots s
+WHERE s.group_id = ANY(@group_ids::uuid[])
+ORDER BY s.group_id, upper(replace(s.course_code, ' ', '')), s.weekday, s.starts_min;
+
+-- The first CR's name (no email) for search results.
+-- name: GroupCRNames :many
+SELECT DISTINCT ON (m.group_id) m.group_id, u.display_name
+FROM class_group_members m
+JOIN users u ON u.id = m.user_id
+WHERE m.role = 'cr' AND m.group_id = ANY(@group_ids::uuid[])
+ORDER BY m.group_id, m.joined_at;
+
+-- name: MyMemberships :many
+SELECT group_id FROM class_group_members
+WHERE user_id = @user_id AND group_id = ANY(@group_ids::uuid[]);
+
+-- name: SetDiscoverable :exec
+UPDATE class_groups SET discoverable = @discoverable WHERE id = @id;
+
+-- name: SetCoursesOnly :exec
+UPDATE class_group_members SET courses_only = @courses_only
+WHERE group_id = @group_id AND user_id = @user_id;
+
+-- A course new to the group stays hidden for members who joined for some
+-- courses only (run after the slot is saved).
+-- name: HideNewCourseForSelective :exec
+INSERT INTO class_member_hidden_courses (group_id, user_id, course_key)
+SELECT m.group_id, m.user_id, @course_key::text
+FROM class_group_members m
+WHERE m.group_id = @group_id AND m.courses_only
+  AND NOT EXISTS (
+      SELECT 1 FROM routine_slots s
+      WHERE s.group_id = @group_id AND s.id <> @slot_id
+        AND upper(replace(s.course_code, ' ', '')) = @course_key::text)
+ON CONFLICT DO NOTHING;
