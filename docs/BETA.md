@@ -65,7 +65,7 @@ upload.
 
 ## 4. Play Console (internal testing first)
 
-1. Create the app (`com.silifton.campussaga`), accept **Play App Signing**.
+1. Create the app (`com.silifton.varsitykotha`), accept **Play App Signing**.
 2. Testing → Internal testing → create a release → upload the `.aab`.
 3. Testers: an email list (up to 100) or a Google Group. Share the opt-in link.
 4. **After the first upload:** Setup → App integrity → copy the *App signing

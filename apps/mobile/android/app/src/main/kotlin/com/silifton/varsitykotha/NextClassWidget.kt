@@ -1,4 +1,4 @@
-package com.silifton.campussaga
+package com.silifton.varsitykotha
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -75,7 +75,7 @@ class NextClassWidget : AppWidgetProvider() {
     companion object {
         private const val PREFS = "campus_widget"
         private const val KEY = "data"
-        private const val ACTION_REFRESH = "com.silifton.campussaga.WIDGET_REFRESH"
+        private const val ACTION_REFRESH = "com.silifton.varsitykotha.WIDGET_REFRESH"
         private const val MINUTE = 60_000L
         private const val DAY = 24 * 60 * MINUTE
 
@@ -119,7 +119,7 @@ class NextClassWidget : AppWidgetProvider() {
                 val text = data?.optJSONObject("labels")?.optString("signedOut")
                     ?.takeIf { it.isNotEmpty() } ?: context.getString(R.string.widget_open_app)
                 return Content(
-                    false, context.getString(R.string.widget_next_class), false, "", "Campus Saga",
+                    false, context.getString(R.string.widget_next_class), false, "", "VarsityKotha",
                     text, "", "", "", -1, "", "", "", "", nextRefresh,
                 )
             }

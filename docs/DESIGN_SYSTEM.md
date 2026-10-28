@@ -255,6 +255,6 @@ places so a rename takes an hour, not a refactor:
 | README / docs | `README.md`, `assets/icon/` |
 | Website + policy links | `site/` pages (name, contact), and `siteUrl` in `apps/mobile/lib/app/env.dart` once the domain changes |
 
-**Do not change** the app ID `com.silifton.campussaga` after the first store
+**Do not change** the app ID `com.silifton.varsitykotha` after the first store
 release: stores treat a new ID as a different app. The package names
 (`campus_*`) and the `Cs` component prefix are generic and can stay.

@@ -31,7 +31,7 @@ morning, and a safe, anonymous voice to get campus problems fixed.
 ## Project layout
 
 ```
-apps/mobile/            Flutter app (Android, iOS)  · com.silifton.campussaga
+apps/mobile/            Flutter app (Android, iOS)  · com.silifton.varsitykotha
 packages/campus_core/   Domain models, repository interfaces (pure Dart)
 packages/campus_ui/     Design system: tokens, theme, components
 packages/campus_data/   HTTP implementations of the repositories (talks to the Go API)
@@ -47,7 +47,7 @@ everything.
 
 `apps/mobile/android/app/google-services.json` is not in git. Download it
 from the Firebase console (project `bitlaabuzz` → Android app
-`com.silifton.campussaga`) or run `flutterfire configure` in `apps/mobile`.
+`com.silifton.varsitykotha`) or run `flutterfire configure` in `apps/mobile`.
 CI writes it from the `GOOGLE_SERVICES_JSON` repository secret.
 
 Requires Flutter 3.47+ (Dart 3.13+).

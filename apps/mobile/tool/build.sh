@@ -205,13 +205,13 @@ if [ "$install" != none ]; then
       warn "The phone has a build signed with another key (debug vs release)."
       printf 'Uninstall it first? This signs out and clears the app'\''s data on the phone. [y/N] '
       read -r ok
-      case "$ok" in y|Y|yes) adb -s "$install" uninstall com.silifton.campussaga </dev/null >/dev/null
+      case "$ok" in y|Y|yes) adb -s "$install" uninstall com.silifton.varsitykotha </dev/null >/dev/null
                               adb -s "$install" install "$out" </dev/null >/dev/null ;;
                      *) fail "Not installed." ;; esac
     else
       echo "$result"; fail "Install failed."
     fi
   fi
-  adb -s "$install" shell monkey -p com.silifton.campussaga -c android.intent.category.LAUNCHER 1 </dev/null >/dev/null 2>&1 || true
+  adb -s "$install" shell monkey -p com.silifton.varsitykotha -c android.intent.category.LAUNCHER 1 </dev/null >/dev/null 2>&1 || true
   bold "✓ Installed and opened on $install"
 fi
