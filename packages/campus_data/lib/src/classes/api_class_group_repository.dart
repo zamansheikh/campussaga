@@ -37,6 +37,68 @@ class ApiClassGroupRepository implements ClassGroupRepository {
   );
 
   @override
+  Future<GroupSearchPage> searchGroups(
+    String query, {
+    String department = '',
+    String batch = '',
+    int page = 1,
+  }) async {
+    final q = Uri(
+      queryParameters: {
+        'q': query.trim(),
+        if (department.trim().isNotEmpty) 'department': department.trim(),
+        if (batch.trim().isNotEmpty) 'batch': batch.trim(),
+        if (page > 1) 'page': '$page',
+      },
+    ).query;
+    return GroupSearchPage.fromJson(_map(await _api.get('/groups/search?$q')));
+  }
+
+  @override
+  Future<List<FoundGroup>> similarGroups({
+    required String department,
+    required String batch,
+    String section = '',
+  }) async {
+    final q = Uri(
+      queryParameters: {
+        'department': department.trim(),
+        'batch': batch.trim(),
+        if (section.trim().isNotEmpty) 'section': section.trim(),
+      },
+    ).query;
+    final data = _map(await _api.get('/groups/similar?$q'));
+    return [
+      for (final g in data['items'] as List<Object?>? ?? const [])
+        FoundGroup.fromJson(_map(g)),
+    ];
+  }
+
+  @override
+  Future<RoutinePreview> routinePreview(String groupId, {String? code}) async {
+    final c = code == null || code.isEmpty
+        ? ''
+        : '?code=${Uri.encodeQueryComponent(_code(code))}';
+    return RoutinePreview.fromJson(
+      _map(await _api.get('/groups/${_id(groupId)}/routine-preview$c')),
+    );
+  }
+
+  @override
+  Future<ClassGroup> joinCourses(
+    String groupId,
+    Set<String> courses, {
+    String? code,
+  }) async => ClassGroup.fromJson(
+    _map(
+      await _api.post('/groups/${_id(groupId)}/join-courses', {
+        'courses': courses.toList(),
+        if (code != null && code.isNotEmpty) 'code': _code(code),
+      }),
+    ),
+  );
+
+  @override
   Future<ClassGroup> update(String groupId, GroupDraft draft) async =>
       ClassGroup.fromJson(
         _map(await _api.put('/groups/${_id(groupId)}', draft.toJson())),

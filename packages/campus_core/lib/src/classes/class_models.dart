@@ -146,6 +146,7 @@ class ClassGroup {
     required this.joinCode,
     required this.role,
     required this.memberCount,
+    this.discoverable = true,
     this.slots = const [],
     this.changes = const [],
     this.announcements = const [],
@@ -174,6 +175,7 @@ class ClassGroup {
     joinCode: json['joinCode']! as String,
     role: GroupRole.parse(json['role'] as String?),
     memberCount: json['memberCount']! as int,
+    discoverable: json['discoverable'] as bool? ?? true,
     slots: [
       for (final s in json['slots'] as List<Object?>? ?? const [])
         ClassSlot.fromJson(s! as Map<String, Object?>),
@@ -204,6 +206,10 @@ class ClassGroup {
   final String joinCode;
   final GroupRole role;
   final int memberCount;
+
+  /// Findable in "Find your class" at the university (CR can turn it off:
+  /// then only the join code leads to it).
+  final bool discoverable;
   final List<ClassSlot> slots;
 
   /// One-date changes from yesterday on, earliest first.
@@ -247,6 +253,7 @@ class ClassGroup {
     'joinCode': joinCode,
     'role': role.name,
     'memberCount': memberCount,
+    'discoverable': discoverable,
     'slots': [for (final s in slots) s.toJson()],
     'changes': [for (final c in changes) c.toJson()],
     'announcements': [for (final a in announcements) a.toJson()],
@@ -272,6 +279,7 @@ class ClassGroup {
     joinCode: joinCode,
     role: role ?? this.role,
     memberCount: memberCount ?? this.memberCount,
+    discoverable: discoverable,
     slots: slots ?? this.slots,
     changes: changes ?? this.changes,
     announcements: announcements ?? this.announcements,
@@ -364,6 +372,7 @@ class GroupDraft {
     required this.batch,
     this.section = '',
     required this.semester,
+    this.discoverable,
   });
 
   final String department;
@@ -371,11 +380,15 @@ class GroupDraft {
   final String section;
   final String semester;
 
+  /// Findable at the university (null = leave as it is).
+  final bool? discoverable;
+
   Map<String, Object?> toJson() => {
     'department': department,
     'batch': batch,
     'section': section,
     'semester': semester,
+    'discoverable': ?discoverable,
   };
 }
 

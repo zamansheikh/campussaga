@@ -1,5 +1,6 @@
 import 'assessment_models.dart';
 import 'class_models.dart';
+import 'discovery_models.dart';
 
 /// Class groups and their routines. Every method throws a `Failure`.
 abstract interface class ClassGroupRepository {
@@ -13,6 +14,35 @@ abstract interface class ClassGroupRepository {
   Future<GroupPreview> preview(String code);
 
   Future<ClassGroup> join(String code);
+
+  /// "Find your class": findable groups of the student's university that
+  /// match [query] (department, batch, section, course code, title or
+  /// teacher; an exact join code too). Pages start at 1.
+  Future<GroupSearchPage> searchGroups(
+    String query, {
+    String department = '',
+    String batch = '',
+    int page = 1,
+  });
+
+  /// Groups that may already be the one a CR is about to create.
+  Future<List<FoundGroup>> similarGroups({
+    required String department,
+    required String batch,
+    String section = '',
+  });
+
+  /// A group's weekly routine before joining ([code] for a code-only one).
+  Future<RoutinePreview> routinePreview(String groupId, {String? code});
+
+  /// Joins for [courses] only (course codes): the group's other courses are
+  /// hidden, and ones added later too. Every course = the whole section. A
+  /// member calls it again to change their courses.
+  Future<ClassGroup> joinCourses(
+    String groupId,
+    Set<String> courses, {
+    String? code,
+  });
 
   Future<ClassGroup> update(String groupId, GroupDraft draft);
 
