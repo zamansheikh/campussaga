@@ -82,6 +82,10 @@ func (s *Service) Routes(r *httpx.Router) {
 		Post("/admin/push", httpx.Handle(s.handlePush))
 
 	a.Get("/admin/audit", httpx.Handle(s.handleAudit))
+
+	a.Get("/admin/staff", httpx.Handle(s.handleListStaff))
+	a.Post("/admin/staff", httpx.Handle(s.handleAddStaff, httpx.Status(http.StatusCreated)))
+	a.Delete("/admin/staff/{id}", httpx.Handle(s.handleRemoveStaff, httpx.NoContent()))
 }
 
 // ---- shared helpers -----------------------------------------------------------

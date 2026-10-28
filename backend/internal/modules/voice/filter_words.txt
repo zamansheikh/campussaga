@@ -1,0 +1,43 @@
+# Campus Voice language check: a post or comment containing one of these
+# words is held for a moderator (hold reason "language"). One word per line,
+# matched case-insensitively as a whole word. English, Banglish and Bangla.
+# Maintained by the Campus Saga team; keep it to clear abuse and slurs.
+fuck
+fucking
+fucker
+motherfucker
+shit
+bitch
+bastard
+asshole
+cunt
+dick
+slut
+whore
+retard
+khanki
+magi
+chudi
+choda
+chudir
+chodna
+bokachoda
+banchod
+bainchod
+madarchod
+haramjada
+haramzada
+shuorer
+kuttar
+khankir
+মাগি
+খানকি
+চুদি
+চোদা
+চুদির
+বোকাচোদা
+হারামজাদা
+হারামি
+কুত্তার
+শুয়োরের
+খানকির

@@ -8,6 +8,9 @@ import (
 
 type traceKey struct{}
 type loggerKey struct{}
+
+// baseLoggerKey: the request logger before any user id was added.
+type baseLoggerKey struct{}
 type clientKey struct{}
 
 // Client describes the calling device/network, filled by Base.
@@ -47,4 +50,16 @@ func WithClientInfo(ctx context.Context, c Client) context.Context {
 
 func clientFrom(r *http.Request, ip string) Client {
 	return Client{IP: ip, UserAgent: r.UserAgent()}
+}
+
+// Unlogged drops the signed-in user's id from this request's log lines
+// (Campus Voice: who wrote what must not reach the logs). Use it after the
+// token check.
+func Unlogged(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if l, ok := r.Context().Value(baseLoggerKey{}).(*slog.Logger); ok {
+			r = r.WithContext(withLogger(r.Context(), l))
+		}
+		next.ServeHTTP(w, r)
+	})
 }

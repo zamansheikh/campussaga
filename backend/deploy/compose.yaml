@@ -25,8 +25,9 @@ services:
     depends_on:
       postgres: {condition: service_healthy}
     ports: ["127.0.0.1:7030:8090"]
-    # Firebase service-account key for push (FCM_CREDENTIALS_FILE).
-    volumes: ["./secrets:/run/secrets:ro"]
+    # Firebase service-account key for push (FCM_CREDENTIALS_FILE), and the
+    # Campus Voice photos (MEDIA_DIR=/data/media), served only by the API.
+    volumes: ["./secrets:/run/secrets:ro", "media:/data/media"]
     # The privacy policy promises server logs are gone within 30 days:
     # cap them by size here, and the weekly cron in docs/DEPLOYMENT.md
     # (section "Log retention") wipes them by age.
@@ -58,3 +59,4 @@ services:
 
 volumes:
   pgdata:
+  media:

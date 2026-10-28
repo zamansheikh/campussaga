@@ -3,6 +3,7 @@ package httpx
 import (
 	"context"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -52,6 +53,24 @@ func (r *Router) Student() chi.Router { return r.root.With(r.requireUser) }
 // the database on every request (session check), so a demoted admin loses
 // access at once.
 func (r *Router) Admin() chi.Router { return r.root.With(r.requireUser, requireAdmin) }
+
+// Roles: a signed-in user whose role (fresh from the database) is one of
+// roles, e.g. Roles("moderator", "admin").
+func (r *Router) Roles(roles ...string) chi.Router {
+	return r.root.With(r.requireUser, func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			c, ok := auth.User(req.Context())
+			if !ok || !slices.Contains(roles, c.Role) {
+				WriteError(w, req, ErrForbiddenRole)
+				return
+			}
+			next.ServeHTTP(w, req)
+		})
+	})
+}
+
+// ErrForbiddenRole: signed in, but this needs another role.
+var ErrForbiddenRole = apperr.Forbidden("You can't do this")
 
 func requireAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {

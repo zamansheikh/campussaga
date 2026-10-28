@@ -39,6 +39,14 @@ type Stats struct {
 		Active int `json:"active"`
 		Total  int `json:"total"`
 	} `json:"universities"`
+	// Campus Voice: counts only.
+	Voice struct {
+		Open            int `json:"open"`
+		Solved          int `json:"solved"`
+		Held            int `json:"held"`
+		Reported        int `json:"reported"`
+		IssuesLast7Days int `json:"issuesLast7Days"`
+	} `json:"voice"`
 	SignupsByDay    []DayCount      `json:"signupsByDay"`
 	TopUniversities []UniversityUse `json:"topUniversities"`
 }
@@ -74,6 +82,13 @@ func (s *Service) handleStats(ctx context.Context, _ *httpx.Empty) (*Stats, erro
 	out.Groups.Slots, out.Groups.Announcements = int(o.Slots), int(o.Announcements)
 	out.Devices.Android, out.Devices.IOS = int(o.Android), int(o.Ios)
 	out.Universities.Active, out.Universities.Total = int(o.UniversitiesActive), int(o.UniversitiesTotal)
+
+	vc, err := q.VoiceCounts(ctx, now.Add(-7*24*time.Hour))
+	if err != nil {
+		return nil, err
+	}
+	out.Voice.Open, out.Voice.Solved, out.Voice.Held = int(vc.Open), int(vc.Solved), int(vc.Held)
+	out.Voice.Reported, out.Voice.IssuesLast7Days = int(vc.Reported), int(vc.IssuesLast7Days)
 
 	today := bdToday(now)
 	days, err := q.SignupsByDay(ctx, store.SignupsByDayParams{

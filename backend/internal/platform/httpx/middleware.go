@@ -40,7 +40,9 @@ func Base(log *slog.Logger) func(http.Handler) http.Handler {
 			w.Header().Set("X-Trace-Id", trace)
 			ip := RealIP(r)
 			ctx := context.WithValue(r.Context(), traceKey{}, trace)
-			ctx = context.WithValue(ctx, loggerKey{}, log.With("traceId", trace))
+			base := log.With("traceId", trace)
+			ctx = context.WithValue(ctx, loggerKey{}, base)
+			ctx = context.WithValue(ctx, baseLoggerKey{}, base)
 			ctx = context.WithValue(ctx, clientKey{}, clientFrom(r, ip))
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
@@ -171,12 +173,19 @@ func SecurityHeaders(next http.Handler) http.Handler {
 	})
 }
 
-// MaxBody caps request bodies.
-func MaxBody(limit int64) func(http.Handler) http.Handler {
+// MaxBody caps request bodies. larger raises the cap for exact paths
+// (photo uploads), e.g. {"/api/v1/uploads": 9 << 20}.
+func MaxBody(limit int64, larger ...map[string]int64) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Body != nil {
-				r.Body = http.MaxBytesReader(w, r.Body, limit)
+				l := limit
+				for _, m := range larger {
+					if v, ok := m[r.URL.Path]; ok {
+						l = v
+					}
+				}
+				r.Body = http.MaxBytesReader(w, r.Body, l)
 			}
 			next.ServeHTTP(w, r)
 		})

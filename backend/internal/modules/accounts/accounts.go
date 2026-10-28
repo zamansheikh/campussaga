@@ -250,7 +250,7 @@ func (s *Service) verifyCode(ctx context.Context, rawEmail, code string, adminOn
 		if err != nil {
 			return err
 		}
-		if adminOnly && user.Role != store.UserRoleAdmin {
+		if adminOnly && user.Role != store.UserRoleAdmin && user.Role != store.UserRoleModerator {
 			failure = ErrNotAdmin
 			return nil
 		}
@@ -590,9 +590,10 @@ func retryAfter(d time.Duration) httpx.RetryAfter {
 
 // ---- admin panel sign-in ----------------------------------------------------
 
-// RequestAdminCode emails a sign-in code to an admin account, whatever its
-// email domain. For any other email it sends nothing but answers the same,
-// so the sign-in page doesn't reveal who is an admin.
+// RequestAdminCode emails a sign-in code to an admin (or Campus Voice
+// moderator) account, whatever its email domain. For any other email it
+// sends nothing but answers the same, so the sign-in page doesn't reveal
+// who is an admin.
 func (s *Service) RequestAdminCode(ctx context.Context, rawEmail string) (*CodeSent, error) {
 	email, err := normalizeEmail(rawEmail)
 	if err != nil {
@@ -610,7 +611,7 @@ func (s *Service) RequestAdminCode(ctx context.Context, rawEmail string) (*CodeS
 	if err != nil {
 		return nil, err
 	}
-	if u.Role != store.UserRoleAdmin || u.BlockedAt != nil {
+	if (u.Role != store.UserRoleAdmin && u.Role != store.UserRoleModerator) || u.BlockedAt != nil {
 		return out, nil
 	}
 	if err := s.sendCode(ctx, email, nil); err != nil {

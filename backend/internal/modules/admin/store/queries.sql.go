@@ -105,6 +105,18 @@ func (q *Queries) DeleteGroup(ctx context.Context, id uuid.UUID) (int64, error) 
 	return result.RowsAffected(), nil
 }
 
+const deleteStaff = `-- name: DeleteStaff :execrows
+DELETE FROM staff WHERE user_id = $1
+`
+
+func (q *Queries) DeleteStaff(ctx context.Context, userID uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteStaff, userID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const deleteUniversityDomains = `-- name: DeleteUniversityDomains :exec
 DELETE FROM university_domains WHERE university_id = $1
 `
@@ -176,6 +188,44 @@ func (q *Queries) GetGroup(ctx context.Context, id uuid.UUID) (GetGroupRow, erro
 		&i.UniversityName,
 		&i.Members,
 		&i.Slots,
+	)
+	return i, err
+}
+
+const getStaff = `-- name: GetStaff :one
+SELECT s.user_id, u.email, u.display_name, s.kind, s.university_id,
+       un.slug AS university_slug, un.name AS university_name, s.title, s.created_at
+FROM staff s
+JOIN users u ON u.id = s.user_id
+LEFT JOIN universities un ON un.id = s.university_id
+WHERE s.user_id = $1
+`
+
+type GetStaffRow struct {
+	UserID         uuid.UUID
+	Email          string
+	DisplayName    *string
+	Kind           string
+	UniversityID   *uuid.UUID
+	UniversitySlug *string
+	UniversityName *string
+	Title          string
+	CreatedAt      time.Time
+}
+
+func (q *Queries) GetStaff(ctx context.Context, userID uuid.UUID) (GetStaffRow, error) {
+	row := q.db.QueryRow(ctx, getStaff, userID)
+	var i GetStaffRow
+	err := row.Scan(
+		&i.UserID,
+		&i.Email,
+		&i.DisplayName,
+		&i.Kind,
+		&i.UniversityID,
+		&i.UniversitySlug,
+		&i.UniversityName,
+		&i.Title,
+		&i.CreatedAt,
 	)
 	return i, err
 }
@@ -577,6 +627,59 @@ func (q *Queries) ListGroups(ctx context.Context, arg ListGroupsParams) ([]ListG
 			&i.UniversityName,
 			&i.Members,
 			&i.Slots,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listStaff = `-- name: ListStaff :many
+
+SELECT s.user_id, u.email, u.display_name, s.kind, s.university_id,
+       un.slug AS university_slug, un.name AS university_name, s.title, s.created_at
+FROM staff s
+JOIN users u ON u.id = s.user_id
+LEFT JOIN universities un ON un.id = s.university_id
+ORDER BY s.created_at DESC
+`
+
+type ListStaffRow struct {
+	UserID         uuid.UUID
+	Email          string
+	DisplayName    *string
+	Kind           string
+	UniversityID   *uuid.UUID
+	UniversitySlug *string
+	UniversityName *string
+	Title          string
+	CreatedAt      time.Time
+}
+
+// ---- Campus Voice staff ----------------------------------------------------------------
+func (q *Queries) ListStaff(ctx context.Context) ([]ListStaffRow, error) {
+	rows, err := q.db.Query(ctx, listStaff)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListStaffRow{}
+	for rows.Next() {
+		var i ListStaffRow
+		if err := rows.Scan(
+			&i.UserID,
+			&i.Email,
+			&i.DisplayName,
+			&i.Kind,
+			&i.UniversityID,
+			&i.UniversitySlug,
+			&i.UniversityName,
+			&i.Title,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -1128,6 +1231,30 @@ func (q *Queries) UpdateUniversity(ctx context.Context, arg UpdateUniversityPara
 	return result.RowsAffected(), nil
 }
 
+const upsertStaff = `-- name: UpsertStaff :exec
+INSERT INTO staff (user_id, kind, university_id, title)
+VALUES ($1, $2, $3, $4)
+ON CONFLICT (user_id) DO UPDATE SET kind = EXCLUDED.kind, university_id = EXCLUDED.university_id,
+    title = EXCLUDED.title
+`
+
+type UpsertStaffParams struct {
+	UserID       uuid.UUID
+	Kind         string
+	UniversityID *uuid.UUID
+	Title        string
+}
+
+func (q *Queries) UpsertStaff(ctx context.Context, arg UpsertStaffParams) error {
+	_, err := q.db.Exec(ctx, upsertStaff,
+		arg.UserID,
+		arg.Kind,
+		arg.UniversityID,
+		arg.Title,
+	)
+	return err
+}
+
 const userCounts = `-- name: UserCounts :one
 
 
@@ -1250,4 +1377,36 @@ type VerifyUserByHandParams struct {
 func (q *Queries) VerifyUserByHand(ctx context.Context, arg VerifyUserByHandParams) error {
 	_, err := q.db.Exec(ctx, verifyUserByHand, arg.Now, arg.ID)
 	return err
+}
+
+const voiceCounts = `-- name: VoiceCounts :one
+SELECT (SELECT count(*) FROM issues WHERE status IN ('open', 'acknowledged', 'in_progress') AND visibility <> 'removed')::int AS open,
+       (SELECT count(*) FROM issues WHERE status = 'solved' AND visibility <> 'removed')::int AS solved,
+       ((SELECT count(*) FROM issues WHERE visibility = 'held')
+        + (SELECT count(*) FROM comments WHERE visibility = 'held'))::int AS held,
+       ((SELECT count(*) FROM issues WHERE report_count > 0 AND visibility <> 'removed')
+        + (SELECT count(*) FROM comments WHERE report_count > 0 AND visibility <> 'removed'))::int AS reported,
+       (SELECT count(*) FROM issues x WHERE x.created_at > $1::timestamptz)::int AS issues_last_7_days
+`
+
+type VoiceCountsRow struct {
+	Open            int32
+	Solved          int32
+	Held            int32
+	Reported        int32
+	IssuesLast7Days int32
+}
+
+// Counts only: never who wrote anything.
+func (q *Queries) VoiceCounts(ctx context.Context, since time.Time) (VoiceCountsRow, error) {
+	row := q.db.QueryRow(ctx, voiceCounts, since)
+	var i VoiceCountsRow
+	err := row.Scan(
+		&i.Open,
+		&i.Solved,
+		&i.Held,
+		&i.Reported,
+		&i.IssuesLast7Days,
+	)
+	return i, err
 }

@@ -51,6 +51,11 @@ type Config struct {
 	// Never commit the file; keep it outside the repo or in a git-ignored path.
 	FCMCredentialsFile string
 
+	// Campus Voice. VoiceHMACSecret keys the per-issue anonymous handles
+	// (required in production); MediaDir holds issue photos.
+	VoiceHMACSecret []byte
+	MediaDir        string
+
 	ShutdownTimeout time.Duration
 }
 
@@ -82,6 +87,8 @@ func Load() (*Config, error) {
 		MailFrom:           get("MAIL_FROM", "Campus Saga <no-reply@campussaga.local>"),
 		FirebaseProjectID:  get("FIREBASE_PROJECT_ID", ""),
 		FCMCredentialsFile: get("FCM_CREDENTIALS_FILE", ""),
+		VoiceHMACSecret:    []byte(get("VOICE_HMAC_SECRET", devSecret+"-voice")),
+		MediaDir:           get("MEDIA_DIR", "tmp/media"),
 		ShutdownTimeout:    getDuration("SHUTDOWN_TIMEOUT", 15*time.Second),
 	}
 	return c, c.validate()
@@ -96,7 +103,7 @@ func (c *Config) validate() error {
 		errs = append(errs, errors.New("API_PREFIX must start with /"))
 	}
 	if c.IsProduction() {
-		for name, s := range map[string][]byte{"JWT_SECRET": c.JWTSecret, "CODE_HMAC_SECRET": c.CodeSecret} {
+		for name, s := range map[string][]byte{"JWT_SECRET": c.JWTSecret, "CODE_HMAC_SECRET": c.CodeSecret, "VOICE_HMAC_SECRET": c.VoiceHMACSecret} {
 			if len(s) < 32 || strings.HasPrefix(string(s), "dev-only") {
 				errs = append(errs, fmt.Errorf("%s must be set to at least 32 random characters in production", name))
 			}

@@ -267,3 +267,40 @@ LIMIT @lim OFFSET @off;
 
 -- name: CountAudit :one
 SELECT count(*)::int FROM audit_log;
+
+-- ---- Campus Voice staff ----------------------------------------------------------------
+
+-- name: ListStaff :many
+SELECT s.user_id, u.email, u.display_name, s.kind, s.university_id,
+       un.slug AS university_slug, un.name AS university_name, s.title, s.created_at
+FROM staff s
+JOIN users u ON u.id = s.user_id
+LEFT JOIN universities un ON un.id = s.university_id
+ORDER BY s.created_at DESC;
+
+-- name: GetStaff :one
+SELECT s.user_id, u.email, u.display_name, s.kind, s.university_id,
+       un.slug AS university_slug, un.name AS university_name, s.title, s.created_at
+FROM staff s
+JOIN users u ON u.id = s.user_id
+LEFT JOIN universities un ON un.id = s.university_id
+WHERE s.user_id = @user_id;
+
+-- name: UpsertStaff :exec
+INSERT INTO staff (user_id, kind, university_id, title)
+VALUES (@user_id, @kind, sqlc.narg(university_id), @title)
+ON CONFLICT (user_id) DO UPDATE SET kind = EXCLUDED.kind, university_id = EXCLUDED.university_id,
+    title = EXCLUDED.title;
+
+-- name: DeleteStaff :execrows
+DELETE FROM staff WHERE user_id = @user_id;
+
+-- Counts only: never who wrote anything.
+-- name: VoiceCounts :one
+SELECT (SELECT count(*) FROM issues WHERE status IN ('open', 'acknowledged', 'in_progress') AND visibility <> 'removed')::int AS open,
+       (SELECT count(*) FROM issues WHERE status = 'solved' AND visibility <> 'removed')::int AS solved,
+       ((SELECT count(*) FROM issues WHERE visibility = 'held')
+        + (SELECT count(*) FROM comments WHERE visibility = 'held'))::int AS held,
+       ((SELECT count(*) FROM issues WHERE report_count > 0 AND visibility <> 'removed')
+        + (SELECT count(*) FROM comments WHERE report_count > 0 AND visibility <> 'removed'))::int AS reported,
+       (SELECT count(*) FROM issues x WHERE x.created_at > @since::timestamptz)::int AS issues_last_7_days;

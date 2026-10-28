@@ -19,12 +19,14 @@ import (
 	"github.com/zamansheikh/campussaga/backend/internal/modules/classgroups"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/push"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/universities"
+	"github.com/zamansheikh/campussaga/backend/internal/modules/voice"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/config"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/mail"
+	"github.com/zamansheikh/campussaga/backend/internal/platform/media"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/ratelimit"
 )
 
@@ -39,6 +41,7 @@ type App struct {
 	Config       *appconfig.Service
 	ClassGroups  *classgroups.Service
 	Push         *push.Service
+	Voice        *voice.Service
 
 	handler http.Handler
 }
@@ -49,6 +52,7 @@ type Options struct {
 	Mailer mail.Sender             // nil = SMTP from config
 	Google accounts.GoogleVerifier // nil = Firebase verifier from config (if configured)
 	Push   push.Sender             // nil = FCM from config, or log only
+	Media  media.Store             // nil = a directory at cfg.MediaDir
 }
 
 // New assembles the app on an open, migrated database.
@@ -135,7 +139,25 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: map[string]string{"type": "admin"}})
 	}, now)
 
-	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc}
+	store := o.Media
+	if store == nil {
+		disk, err := media.NewDisk(cmp.Or(cfg.MediaDir, "tmp/media"))
+		if err != nil {
+			log.Error("media: can't open the photo directory", "err", err)
+		} else {
+			store = disk
+		}
+	}
+	voiceSvc := voice.NewService(d, store, cfg.VoiceHMACSecret, now, log)
+	voiceSvc.SetNotifier(func(userIDs []uuid.UUID, n voice.Notice) {
+		texts := make(map[string]push.Text, len(n.Texts))
+		for lang, t := range n.Texts {
+			texts[lang] = push.Text{Title: t.Title, Body: t.Body}
+		}
+		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
+	})
+
+	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc}
 
 	root := chi.NewRouter()
 	root.NotFound(httpx.NotFoundHandler)
@@ -151,10 +173,11 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		groupSvc.Routes(r)
 		pushSvc.Routes(r)
 		adminSvc.Routes(r)
+		voiceSvc.Routes(r)
 	})
 
 	var h http.Handler = root
-	h = httpx.MaxBody(64 << 10)(h)
+	h = httpx.MaxBody(64<<10, map[string]int64{cfg.APIPrefix + "/uploads": voice.UploadLimit})(h)
 	h = httpx.SecurityHeaders(h)
 	h = httpx.AccessLog(h)
 	h = httpx.Recover(h)
@@ -198,6 +221,7 @@ func (a *App) Serve(ctx context.Context) error {
 	bg, stopBG := context.WithCancel(ctx)
 	defer stopBG()
 	go a.Accounts.PurgeLoop(bg, time.Hour)
+	go a.Voice.CleanupLoop(bg, time.Hour)
 
 	errc := make(chan error, 1)
 	go func() {

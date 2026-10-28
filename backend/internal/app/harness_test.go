@@ -20,6 +20,7 @@ import (
 	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase/firebasetest"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/mail"
+	"github.com/zamansheikh/campussaga/backend/internal/platform/media"
 	"github.com/zamansheikh/campussaga/backend/internal/testkit"
 )
 
@@ -32,6 +33,7 @@ type harness struct {
 	app    *App
 	google *firebasetest.Signer
 	push   *push.MemorySender
+	media  *media.Disk
 
 	mu  sync.Mutex
 	now time.Time
@@ -48,9 +50,11 @@ func newHarness(t *testing.T) *harness {
 		AccessTTL:  15 * time.Minute, RefreshTTL: 60 * 24 * time.Hour,
 		CodeTTL: 10 * time.Minute, CodeResendAfter: 60 * time.Second,
 		CodeMaxPerHour: 5, CodeMaxAttempts: 5, ShutdownTimeout: time.Second,
+		VoiceHMACSecret: []byte("test-voice-secret-test-voice-secret"),
 	}
+	h.media, _ = media.NewDisk(t.TempDir())
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
-	h.app = New(cfg, log, d, Options{Now: h.Now, Mailer: h.mail, Google: firebase.NewVerifier("campus-test", h.google.Keys(), h.Now), Push: h.push})
+	h.app = New(cfg, log, d, Options{Now: h.Now, Mailer: h.mail, Google: firebase.NewVerifier("campus-test", h.google.Keys(), h.Now), Push: h.push, Media: h.media})
 	h.srv = httptest.NewServer(h.app.Handler())
 	t.Cleanup(h.srv.Close)
 
