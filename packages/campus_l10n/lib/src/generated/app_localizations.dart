@@ -2414,6 +2414,12 @@ abstract class AppLocalizations {
   /// **'Copy invite'**
   String get copyInvite;
 
+  /// No description provided for @shareInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Share invite'**
+  String get shareInvite;
+
   /// No description provided for @inviteCopied.
   ///
   /// In en, this message translates to:
@@ -2423,8 +2429,8 @@ abstract class AppLocalizations {
   /// No description provided for @inviteMessage.
   ///
   /// In en, this message translates to:
-  /// **'Join {group} on {app}: open the app, tap \"Join with a code\" and enter {code}'**
-  String inviteMessage(String group, String app, String code);
+  /// **'Join {group} on {app}: {link}\nOr open the app, tap \"Join with a code\" and enter {code}'**
+  String inviteMessage(String group, String app, String link, String code);
 
   /// No description provided for @weeklyRoutine.
   ///

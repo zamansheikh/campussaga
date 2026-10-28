@@ -6,12 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/clock.dart';
 import '../../../../app/router.dart';
 import '../../../announcements/presentation/announcement_widgets.dart';
 import '../../../announcements/presentation/seen_cubit.dart';
 import '../../../assessments/presentation/assessment_widgets.dart';
+import '../../data/invite_link.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
 import '../widgets/class_sheet.dart';
@@ -363,6 +365,15 @@ class _InviteBar extends StatelessWidget {
 
   final ClassGroup group;
 
+  /// The invite: the link (opens the app, or the page with Google Play),
+  /// and the code for anyone joining by hand.
+  String _message(AppLocalizations l10n) => l10n.inviteMessage(
+    group.title,
+    l10n.appName,
+    InviteLink.link(group.joinCode).toString(),
+    group.joinCode,
+  );
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -396,21 +407,29 @@ class _InviteBar extends StatelessWidget {
           IconButton(
             tooltip: l10n.copyInvite,
             onPressed: () async {
-              await Clipboard.setData(
-                ClipboardData(
-                  text: l10n.inviteMessage(
-                    group.title,
-                    l10n.appName,
-                    group.joinCode,
-                  ),
-                ),
-              );
+              await Clipboard.setData(ClipboardData(text: _message(l10n)));
               if (!context.mounted) return;
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
                 ..showSnackBar(SnackBar(content: Text(l10n.inviteCopied)));
             },
             icon: const Icon(CsIcons.copy, size: 20),
+          ),
+          IconButton(
+            tooltip: l10n.shareInvite,
+            onPressed: () {
+              final box = context.findRenderObject() as RenderBox?;
+              SharePlus.instance.share(
+                ShareParams(
+                  text: _message(l10n),
+                  subject: group.title,
+                  sharePositionOrigin: box == null
+                      ? null
+                      : box.localToGlobal(Offset.zero) & box.size,
+                ),
+              );
+            },
+            icon: const Icon(CsIcons.send, size: 20),
           ),
         ],
       ),

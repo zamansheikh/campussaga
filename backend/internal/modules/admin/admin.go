@@ -43,7 +43,12 @@ type Service struct {
 	signIn SignIn
 	push   Pusher
 	now    func() time.Time
+	// photoGone deletes a deleted user's profile photo file.
+	photoGone func(key *string)
 }
+
+// OnPhotoGone sets what deletes a deleted user's profile photo file.
+func (s *Service) OnPhotoGone(f func(key *string)) { s.photoGone = f }
 
 func NewService(d *db.DB, signIn SignIn, push Pusher, now func() time.Time) *Service {
 	return &Service{d: d, signIn: signIn, push: push, now: now}

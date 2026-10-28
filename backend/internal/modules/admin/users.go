@@ -283,6 +283,7 @@ func (s *Service) handleDeleteUser(ctx context.Context, in *userReq) (*httpx.Emp
 	if auth.MustUser(ctx).UserID == id {
 		return nil, ErrCannotChangeSelf
 	}
+	var photo *string
 	err := s.d.InTx(ctx, func(ctx context.Context) error {
 		q := store.New(s.d.Q(ctx))
 		u, err := q.GetUser(ctx, id)
@@ -292,10 +293,18 @@ func (s *Service) handleDeleteUser(ctx context.Context, in *userReq) (*httpx.Emp
 		if err != nil {
 			return err
 		}
+		if photo, err = q.UserPhotoKey(ctx, id); err != nil {
+			return err
+		}
 		if _, err := q.DeleteUser(ctx, id); err != nil {
 			return err
 		}
 		return s.audit(ctx, q, "user.delete", "user", id.String(), map[string]string{"email": u.Email})
 	})
+	// The photo file goes once the account is gone (not before: a failed
+	// delete keeps both).
+	if err == nil && s.photoGone != nil {
+		s.photoGone(photo)
+	}
 	return nil, err
 }

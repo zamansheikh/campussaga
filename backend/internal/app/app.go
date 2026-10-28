@@ -175,6 +175,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		Scorer: checker, Max: cmp.Or(cfg.NSFWHold, 0.70), Required: cfg.IsProduction(),
 	}, func(ctx context.Context) (any, error) { return accSvc.GetMe(ctx) }, log)
 	accSvc.OnPhotoGone(photoSvc.Remove)
+	adminSvc.OnPhotoGone(photoSvc.Remove)
 	voiceSvc.SetPhotoCheck(voice.PhotoCheck{
 		Checker: checker, Reject: cmp.Or(cfg.NSFWReject, 0.98), Hold: cmp.Or(cfg.NSFWHold, 0.70),
 		Required: cfg.IsProduction(),

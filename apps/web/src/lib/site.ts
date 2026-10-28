@@ -8,4 +8,13 @@ export const site = {
   company: { name: "Silifton", url: "https://silifton.com" },
   // live: the landing page links to the listing; false shows "Coming soon" instead.
   playStore: { url: "https://play.google.com/store/apps/details?id=com.silifton.varsitykotha", live: true },
+  androidPackage: "com.silifton.varsitykotha",
 } as const;
+
+/** The Play listing; [join] passes a group code through the install referrer. */
+export function playUrl(join?: string): string {
+  if (!join) return site.playStore.url;
+  const referrer = `utm_source=invite&utm_medium=link&join=${join}`;
+  return `${site.playStore.url}&referrer=${encodeURIComponent(referrer)}`;
+}
+

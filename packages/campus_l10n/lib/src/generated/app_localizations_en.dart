@@ -1384,11 +1384,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copyInvite => 'Copy invite';
 
   @override
+  String get shareInvite => 'Share invite';
+
+  @override
   String get inviteCopied => 'Invite copied. Paste it in your class group.';
 
   @override
-  String inviteMessage(String group, String app, String code) {
-    return 'Join $group on $app: open the app, tap \"Join with a code\" and enter $code';
+  String inviteMessage(String group, String app, String link, String code) {
+    return 'Join $group on $app: $link\nOr open the app, tap \"Join with a code\" and enter $code';
   }
 
   @override

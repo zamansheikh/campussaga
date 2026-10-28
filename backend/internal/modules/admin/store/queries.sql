@@ -127,6 +127,9 @@ UPDATE sessions SET revoked_at = @now WHERE user_id = @user_id AND revoked_at IS
 -- name: DeleteUserDevices :exec
 DELETE FROM device_tokens WHERE user_id = @user_id;
 
+-- name: UserPhotoKey :one
+SELECT photo_key FROM users WHERE id = @id;
+
 -- name: DeleteUser :execrows
 DELETE FROM users WHERE id = @id;
 

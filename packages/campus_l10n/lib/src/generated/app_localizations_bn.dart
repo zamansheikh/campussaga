@@ -1352,11 +1352,14 @@ class AppLocalizationsBn extends AppLocalizations {
   String get copyInvite => 'আমন্ত্রণ কপি করো';
 
   @override
+  String get shareInvite => 'আমন্ত্রণ শেয়ার করো';
+
+  @override
   String get inviteCopied => 'আমন্ত্রণ কপি হয়েছে। ক্লাস গ্রুপে পেস্ট করো।';
 
   @override
-  String inviteMessage(String group, String app, String code) {
-    return '$app-এ $group গ্রুপে যোগ দাও: অ্যাপ খুলে \"কোড দিয়ে যোগ দাও\" চেপে $code লেখো';
+  String inviteMessage(String group, String app, String link, String code) {
+    return '$app-এ $group গ্রুপে যোগ দাও: $link\nঅথবা অ্যাপ খুলে \"কোড দিয়ে যোগ দাও\" চেপে $code লেখো';
   }
 
   @override

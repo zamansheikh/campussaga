@@ -1366,6 +1366,17 @@ func (q *Queries) UserMemberships(ctx context.Context, userID uuid.UUID) ([]User
 	return items, nil
 }
 
+const userPhotoKey = `-- name: UserPhotoKey :one
+SELECT photo_key FROM users WHERE id = $1
+`
+
+func (q *Queries) UserPhotoKey(ctx context.Context, id uuid.UUID) (*string, error) {
+	row := q.db.QueryRow(ctx, userPhotoKey, id)
+	var photo_key *string
+	err := row.Scan(&photo_key)
+	return photo_key, err
+}
+
 const verifyUserByHand = `-- name: VerifyUserByHand :exec
 UPDATE users SET verified_at = $1 WHERE id = $2 AND university_id IS NOT NULL
 `

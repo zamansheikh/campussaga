@@ -501,21 +501,10 @@
   "inviteTitle": "Invite classmates",
   "inviteHint": "Share this code in your class Messenger group.",
   "copyInvite": "Copy invite",
+  "shareInvite": "Share invite",
   "inviteCopied": "Invite copied. Paste it in your class group.",
-  "inviteMessage": "Join {group} on {app}: open the app, tap \"Join with a code\" and enter {code}",
-  "@inviteMessage": {
-    "placeholders": {
-      "group": {
-        "type": "String"
-      },
-      "app": {
-        "type": "String"
-      },
-      "code": {
-        "type": "String"
-      }
-    }
-  },
+  "inviteMessage": "Join {group} on {app}: {link}\nOr open the app, tap \"Join with a code\" and enter {code}",
+  "@inviteMessage": {"placeholders": {"group": {"type": "String"}, "app": {"type": "String"}, "link": {"type": "String"}, "code": {"type": "String"}}},
   "weeklyRoutine": "Weekly routine",
   "addClass": "Add class",
   "editClass": "Edit class",

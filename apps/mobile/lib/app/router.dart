@@ -17,6 +17,7 @@ import '../features/cgpa/presentation/cgpa_cubit.dart';
 import '../features/cgpa/presentation/cgpa_page.dart';
 import '../features/cgpa/presentation/scale_page.dart';
 import '../features/cgpa/presentation/semester_page.dart';
+import '../features/classes/data/invite_link.dart';
 import '../features/classes/presentation/pages/change_editor_page.dart';
 import '../features/classes/presentation/pages/class_preview_page.dart';
 import '../features/classes/presentation/pages/find_class_page.dart';
@@ -71,6 +72,8 @@ abstract final class Routes {
   static const verifyEmail = '/profile/verify';
   static const groups = '/groups';
   static const joinGroup = '/groups/join';
+  static String joinWith(String code) => '$joinGroup?code=$code';
+  static String invite(String code) => '/join/$code';
   static const newGroup = '/groups/new';
   static const newPersonal = '/personal/new';
   static String editPersonal(String id) => '/personal/$id';
@@ -138,6 +141,18 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
     redirect: (context, state) {
       final status = auth.state.status;
       final at = state.matchedLocation;
+      // An invite link (https://varsitykotha.com/join/ABCDEF): keep the
+      // code until the student is signed in and set up, then join.
+      if (at.startsWith('/join/')) {
+        final code = InviteLink.code(state.pathParameters['code']);
+        if (code != null) PendingInvite.save(code);
+        if (status == AuthStatus.signedIn && !auth.state.needsProfileSetup) {
+          final c = PendingInvite.take();
+          return c == null ? Routes.today : Routes.joinWith(c);
+        }
+        // Otherwise on as usual (welcome, sign-in, profile setup); the code
+        // waits and is used right after.
+      }
       if (status == AuthStatus.unknown) {
         return at == Routes.splash ? null : Routes.splash;
       }
@@ -154,11 +169,17 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
         return at == Routes.setupProfile ? null : Routes.setupProfile;
       }
       if (atSignIn || at == Routes.splash || at == Routes.setupProfile) {
-        return Routes.today;
+        final c = PendingInvite.take();
+        return c == null ? Routes.today : Routes.joinWith(c);
       }
       return null;
     },
     routes: [
+      // Invite links; the redirect above sends them on (this never shows).
+      GoRoute(
+        path: '/join/:code',
+        builder: (context, state) => const SizedBox.shrink(),
+      ),
       GoRoute(
         path: Routes.splash,
         builder: (context, state) => const SplashPage(),
@@ -259,7 +280,8 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
         routes: [
           GoRoute(
             path: 'join',
-            builder: (context, state) => const JoinGroupPage(),
+            builder: (context, state) =>
+                JoinGroupPage(code: state.uri.queryParameters['code']),
           ),
           GoRoute(
             path: 'new',

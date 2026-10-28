@@ -7,12 +7,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router.dart';
 import '../../../auth/presentation/widgets/notice_banner.dart';
+import '../../data/invite_link.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
 
-/// Enter the CR's 6-letter code, see which group it is, then join.
+/// Enter the CR's 6-letter code, see which group it is, then join. From an
+/// invite link the code is filled in and looked up straight away.
 class JoinGroupPage extends StatefulWidget {
-  const JoinGroupPage({super.key});
+  const JoinGroupPage({super.key, this.code});
+
+  final String? code;
 
   @override
   State<JoinGroupPage> createState() => _JoinGroupPageState();
@@ -23,6 +27,18 @@ class _JoinGroupPageState extends State<JoinGroupPage> {
   GroupPreview? _preview;
   Failure? _failure;
   bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final c = InviteLink.code(widget.code);
+    if (c != null) {
+      _code.text = c;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _lookUp(c);
+      });
+    }
+  }
 
   @override
   void dispose() {

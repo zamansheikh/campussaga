@@ -130,3 +130,16 @@ func TestProfilePhoto(t *testing.T) {
 	require.Equal(t, http.StatusNoContent, h.do("DELETE", "/me", tok, nil).Status)
 	assert.Equal(t, 0, files())
 }
+
+// An admin deleting a user deletes their photo file too.
+func TestAdminDeleteRemovesPhoto(t *testing.T) {
+	h := newHarness(t)
+	admin := h.makeAdmin("admin@test.ac.bd")
+	u := h.signIn("gone@test.ac.bd")
+	require.Equal(t, http.StatusOK, h.putPhoto(u.Tokens.AccessToken, mediatest.JPEGWithExif(t, 600, 600, 1)).Status)
+	files, _ := os.ReadDir(h.media.Dir)
+	require.Len(t, files, 1)
+	require.Equal(t, http.StatusNoContent, h.do("DELETE", "/admin/users/"+u.User.ID, admin, nil).Status)
+	files, _ = os.ReadDir(h.media.Dir)
+	assert.Empty(t, files)
+}
