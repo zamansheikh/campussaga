@@ -412,7 +412,7 @@ class _OfficialActions extends StatelessWidget {
                       l10n.voiceStatusUpdated,
                     );
                   },
-                  icon: const Icon(Icons.swap_horiz),
+                  icon: const Icon(Icons.published_with_changes),
                   label: Text(l10n.voiceChangeStatus),
                 ),
               if (issue.can.officialReply)

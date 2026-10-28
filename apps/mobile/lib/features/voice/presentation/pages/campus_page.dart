@@ -101,12 +101,12 @@ class _CampusViewState extends State<_CampusView> {
         actions: [
           IconButton(
             tooltip: l10n.voiceHowAnonymity,
-            icon: const Icon(Icons.masks_outlined),
+            icon: const Icon(Icons.privacy_tip_outlined),
             onPressed: () => context.push(Routes.campusAnonymity),
           ),
           IconButton(
             tooltip: l10n.voiceMyIssues,
-            icon: const Icon(Icons.inventory_2_outlined),
+            icon: const Icon(Icons.assignment_ind_outlined),
             onPressed: () => context.push(Routes.campusMine),
           ),
         ],

@@ -81,7 +81,7 @@ class _MyIssuesViewState extends State<_MyIssuesView> {
           _ when s.items.isEmpty => ListView(
             children: [
               CsEmptyState(
-                icon: Icons.inventory_2_outlined,
+                icon: Icons.campaign_outlined,
                 title: l10n.voiceEmptyMine,
                 message: l10n.voiceEmptyMineHint,
                 actionLabel: l10n.voiceRaiseIssue,

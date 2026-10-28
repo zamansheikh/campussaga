@@ -33,7 +33,7 @@ class ExplorePage extends StatelessWidget {
       ),
       if (voice)
         _Feature(
-          icon: Icons.campaign_rounded,
+          icon: Icons.assignment_ind_rounded,
           title: l10n.voiceMyIssues,
           hint: l10n.exploreIssuesHint,
           onTap: () => context.push(Routes.campusMine),
