@@ -90,12 +90,10 @@ func (in *ChangeInput) clean(today time.Time) error {
 		in.ClassKind = "theory"
 	}
 	d, err := time.Parse("2006-01-02", in.Date)
-	switch {
-	case err != nil:
+	if err != nil {
 		return apperr.Validation(map[string]string{"date": "must be a date like 2026-10-28"})
-	case d.Before(today):
-		return apperr.Validation(map[string]string{"date": "must be today or later"})
-	case d.After(today.AddDate(0, 0, MaxChangeDays)):
+	}
+	if d.After(today.AddDate(0, 0, MaxChangeDays)) {
 		return apperr.Validation(map[string]string{"date": "is too far ahead"})
 	}
 	in.date = d
@@ -114,6 +112,11 @@ func (in *ChangeInput) clean(today time.Time) error {
 			return apperr.Validation(map[string]string{"newDate": "is too far ahead"})
 		}
 		in.newDate = &nd
+	}
+	// The class's own date may be past only for a class moved later whose
+	// new day is still ahead (the CR changes that move).
+	if d.Before(today) && (in.newDate == nil || d.Before(today.AddDate(0, 0, -MaxChangeDays))) {
+		return apperr.Validation(map[string]string{"date": "must be today or later"})
 	}
 
 	if in.Kind == ChangeExtra {

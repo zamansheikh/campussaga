@@ -62,6 +62,16 @@ func TestMoveClassToAnotherDay(t *testing.T) {
 	seen := h.changes(mate)
 	require.Len(t, seen, 1, "the class still happens on Monday")
 
+	// The CR can still change that move (its own Friday is past)…
+	move["newDate"] = "2026-11-03"
+	r = h.do("POST", changes, cr, move)
+	require.Equal(t, http.StatusCreated, r.Status, r.Raw)
+	r.into(t, &ch)
+	require.Len(t, h.changes(mate), 1)
+	// …but a past class can't be cancelled or changed on its own day.
+	assert.Equal(t, "VALIDATION_FAILED", h.do("POST", changes, cr, map[string]any{
+		"kind": "cancelled", "slotId": slot.ID, "date": "2026-10-30"}).code())
+
 	// Undo: one push, back on Friday.
 	h.sent()
 	require.Equal(t, http.StatusNoContent, h.do("DELETE", changes+"/"+ch.ID, cr, nil).Status)
