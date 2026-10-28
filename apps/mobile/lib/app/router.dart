@@ -12,6 +12,11 @@ import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/email_sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
+import '../features/cgpa/data/cgpa_store.dart';
+import '../features/cgpa/presentation/cgpa_cubit.dart';
+import '../features/cgpa/presentation/cgpa_page.dart';
+import '../features/cgpa/presentation/scale_page.dart';
+import '../features/cgpa/presentation/semester_page.dart';
 import '../features/classes/presentation/pages/change_editor_page.dart';
 import '../features/classes/presentation/pages/group_form_page.dart';
 import '../features/classes/presentation/pages/group_page.dart';
@@ -34,6 +39,7 @@ import '../features/voice/presentation/pages/campus_page.dart';
 import '../features/voice/presentation/pages/issue_page.dart';
 import '../features/voice/presentation/pages/my_issues_page.dart';
 import '../features/voice/presentation/pages/raise_issue_page.dart';
+import 'di.dart';
 import 'settings/bloc/settings_cubit.dart';
 import 'version/version_gate_cubit.dart';
 
@@ -47,6 +53,11 @@ abstract final class Routes {
   static const routine = '/routine';
   static const profile = '/profile';
   static const explore = '/explore';
+
+  /// CGPA calculator (on the phone only).
+  static const cgpa = '/cgpa';
+  static const cgpaScale = '/cgpa/scale';
+  static String cgpaSemester(String id) => '/cgpa/semester/$id';
   static const editProfile = '/profile/edit';
   static const reminders = '/profile/reminders';
   static const verifyEmail = '/profile/verify';
@@ -154,6 +165,35 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
             slotId: id == 'new' ? null : id,
           );
         },
+      ),
+      // CGPA calculator: one record shared by its pages.
+      ShellRoute(
+        builder: (context, state, child) => BlocProvider(
+          create: (context) => CgpaCubit(
+            getIt.isRegistered<CgpaStore>()
+                ? getIt<CgpaStore>()
+                : PrefsCgpaStore(),
+            context.read<AuthBloc>().state.user?.id ?? '',
+          )..load(),
+          child: child,
+        ),
+        routes: [
+          GoRoute(
+            path: Routes.cgpa,
+            builder: (context, state) => const CgpaPage(),
+            routes: [
+              GoRoute(
+                path: 'scale',
+                builder: (context, state) => const ScalePage(),
+              ),
+              GoRoute(
+                path: 'semester/:id',
+                builder: (context, state) =>
+                    SemesterPage(semesterId: state.pathParameters['id']!),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: Routes.campusNew,
