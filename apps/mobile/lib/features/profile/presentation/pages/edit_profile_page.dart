@@ -117,8 +117,10 @@ class _PhotoHeaderState extends State<_PhotoHeader> {
         messenger.showSnackBar(SnackBar(content: Text(l10n.photoRemoved)));
         return;
       }
-      final picked = await getIt<PhotoPicker>().pick(
+      final picked = await getIt<PhotoPicker>().pickSquare(
         camera: action == _PhotoAction.camera,
+        title: l10n.photoCrop,
+        color: context.cs.primary,
       );
       if (picked == null || !mounted) return;
       setState(() => _busy = true);

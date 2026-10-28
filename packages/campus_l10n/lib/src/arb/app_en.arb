@@ -347,6 +347,7 @@
   "deleteAccountUnderstand": "I understand this can't be undone",
   "photoAdd": "Add a photo",
   "photoChange": "Change photo",
+  "photoCrop": "Crop photo",
   "photoTake": "Take a photo",
   "photoGallery": "Choose from gallery",
   "photoRemove": "Remove photo",

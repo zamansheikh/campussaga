@@ -1814,6 +1814,12 @@ abstract class AppLocalizations {
   /// **'Change photo'**
   String get photoChange;
 
+  /// No description provided for @photoCrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop photo'**
+  String get photoCrop;
+
   /// No description provided for @photoTake.
   ///
   /// In en, this message translates to:

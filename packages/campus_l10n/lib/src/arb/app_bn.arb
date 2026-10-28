@@ -286,6 +286,7 @@
   "deleteAccountUnderstand": "আমি বুঝেছি, এটি আর ফেরানো যাবে না",
   "photoAdd": "ছবি যোগ করো",
   "photoChange": "ছবি বদলাও",
+  "photoCrop": "ছবি কাটো",
   "photoTake": "ছবি তোলো",
   "photoGallery": "গ্যালারি থেকে বেছে নাও",
   "photoRemove": "ছবি সরাও",

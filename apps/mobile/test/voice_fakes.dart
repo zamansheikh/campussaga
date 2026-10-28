@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:campus_core/campus_core.dart';
 import 'package:campussaga/features/voice/data/photo_picker.dart';
+import 'package:flutter/painting.dart' show Color;
 
 /// A 1×1 PNG, so Image.memory works in tests.
 final onePixelPng = base64Decode(
@@ -340,6 +341,16 @@ class FakePhotoPicker implements PhotoPicker {
 
   @override
   Future<PickedPhoto?> pick({required bool camera}) async {
+    picks++;
+    return next;
+  }
+
+  @override
+  Future<PickedPhoto?> pickSquare({
+    required bool camera,
+    required String title,
+    required Color color,
+  }) async {
     picks++;
     return next;
   }

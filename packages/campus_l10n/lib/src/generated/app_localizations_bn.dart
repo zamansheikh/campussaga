@@ -1000,6 +1000,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get photoChange => 'ছবি বদলাও';
 
   @override
+  String get photoCrop => 'ছবি কাটো';
+
+  @override
   String get photoTake => 'ছবি তোলো';
 
   @override
