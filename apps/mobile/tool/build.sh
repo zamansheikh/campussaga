@@ -192,7 +192,7 @@ esac
 
 mkdir -p build/out
 ext="${src##*.}"
-out="build/out/campussaga-${new_version/+/-}-$label-$mode.$ext"
+out="build/out/varsitykotha-${new_version/+/-}-$label-$mode.$ext"
 cp "$src" "$out"
 bold "✓ $(cd "$(dirname "$out")" && pwd)/$(basename "$out")"
 [ "$type" = split ] && note "Other CPUs: build/app/outputs/flutter-apk/app-*-release.apk"
