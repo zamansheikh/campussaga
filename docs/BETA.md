@@ -12,16 +12,16 @@ critical bugs**, Android first. iPhones follow once the Apple push key is set.
 | Upload key | `~/campussaga-secrets/upload-keystore.jks` (+ `key.properties.backup`). **Back both up to the password manager now.** Losing the upload key is recoverable with Play App Signing, but slow |
 | Upload key in Firebase | SHA-1 and SHA-256 registered (Google sign-in works in release builds) |
 | Privacy policy / account deletion page | Updated for groups, personal classes, announcements and pushes (`site/`; publishes on push to `main`) |
-| Backend on a public server | **Live (2026-10-28): https://api-campus.silifton.com** on the Tecsior VPS, `/opt/campussaga`, compose project `campussaga` (127.0.0.1:7030), nginx `fx-api-campus.silifton.com.conf`, Let's Encrypt (auto-renew), direct DNS. Redeploy: `backend/deploy/deploy.sh`. Nightly DB dump + weekly log wipe: `/etc/cron.d/campussaga` (from `backend/deploy/campussaga.cron`). Off-site backups still to set up |
-| Push delivery | **Live (2026-10-28)** on Android: FCM API enabled in `bitlaabuzz`, service-account key on the server (`deploy/secrets/fcm-service-account.json`; local copy in `~/campussaga-secrets/`, back it up with the upload key) |
+| Backend on a public server | **Live (2026-10-28): https://api.varsitykotha.com** on the Tecsior VPS, `/opt/campussaga`, compose project `campussaga` (127.0.0.1:7030), nginx `fx-api.varsitykotha.com.conf`, Let's Encrypt (auto-renew), DNS on Cloudflare (DNS only, not proxied). The old `api-campus.silifton.com` still serves older app builds. Redeploy: `backend/deploy/deploy.sh`. Nightly DB dump + weekly log wipe: `/etc/cron.d/campussaga` (from `backend/deploy/campussaga.cron`). Off-site backups still to set up |
+| Push delivery | **Live (2026-10-28)** on Android: Firebase project `varsitykotha` (moved from `bitlaabuzz` on 2026-10-28), service-account key on the server (`deploy/secrets/fcm-service-account.json`; local copy `~/campussaga-secrets/fcm-service-account.varsitykotha.json`, back it up with the upload key) |
 | iPhone | Builds; pushes need the APNs key; sign-in uses the browser sheet |
 
-## 1. Server address (decided: `api-campus.silifton.com`)
+## 1. Server address (`api.varsitykotha.com`)
 
 Students' phones need a public HTTPS address for the API. Either:
 
-- the final product domain (`api.<domain>`) if it is ready, or
-- a temporary beta address on silifton.com: **`api-campus.silifton.com`** (chosen).
+- the product domain: **`api.varsitykotha.com`** (since 2026-10-28), or
+- the first beta address, `api-campus.silifton.com`, kept running for older builds.
 
 The app reads it at build time, so switching later only means a new app
 build (the old one keeps pointing at the old address until updated; keep the
@@ -51,7 +51,7 @@ in its name. Without questions:
 By hand, `apps/mobile/env/beta.json` (git-ignored):
 
 ```json
-{ "APP_ENV": "production", "API_BASE_URL": "https://api-campus.silifton.com/api/v1" }
+{ "APP_ENV": "production", "API_BASE_URL": "https://api.varsitykotha.com/api/v1" }
 ```
 
 ```sh
@@ -72,7 +72,7 @@ upload.
    key* SHA-1 and SHA-256 and add them to Firebase, or Google sign-in fails
    for installs from Play:
    ```sh
-   firebase apps:android:sha:create 1:1001688697061:android:5fd623ec12432a0e4f2c0c <SHA> --project bitlaabuzz
+   firebase apps:android:sha:create 1:1058979568560:android:4cd9ab36c355f065ed5475 <SHA> --project varsitykotha
    ```
 5. Data safety form: answer from [site/privacy.html](../site/privacy.html)
    (email, name, app activity in groups, crash logs, device IDs = push token;

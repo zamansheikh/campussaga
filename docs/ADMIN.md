@@ -1,4 +1,4 @@
-# VarsityKotha — admin panel and web (campus.silifton.com)
+# VarsityKotha — admin panel and web (varsitykotha.com)
 
 One Next.js app (`apps/web`) serves the whole domain:
 
@@ -8,9 +8,11 @@ One Next.js app (`apps/web`) serves the whole domain:
 | `/privacy`, `/delete-account` | Public policy pages (linked from the app and Play Store) |
 | `/admin/...` | Superadmin panel (sign-in required, role `admin`) |
 
-nginx on the Tecsior VPS: `campus.silifton.com` → the web container
+nginx on the Tecsior VPS: `varsitykotha.com` → the web container
 (127.0.0.1:7031); `/api/` on the same host → the Go API (127.0.0.1:7030),
-so the browser never needs CORS.
+so the browser never needs CORS. `www.varsitykotha.com` and the old
+`campus.silifton.com` redirect to `https://varsitykotha.com` (path kept).
+vhosts: [backend/deploy/nginx/](../backend/deploy/nginx/).
 
 ## Admin sign-in
 
@@ -19,7 +21,7 @@ so the browser never needs CORS.
 - Sign-in is an emailed 6-digit code, allowed for **admin accounts only**,
   whatever the email domain (Gmail included).
 - The Next.js server calls the Go API; the access and refresh tokens live in
-  **httpOnly, Secure, SameSite=Lax cookies** on campus.silifton.com. Browser
+  **httpOnly, Secure, SameSite=Lax cookies** on varsitykotha.com. Browser
   JavaScript never sees them. Next.js refreshes the access token with
   `POST /auth/refresh` when it expires.
 - Every admin request is checked against the database (role and session),

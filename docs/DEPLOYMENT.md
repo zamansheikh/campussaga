@@ -88,11 +88,11 @@ Template: [backend/deploy/env.example](../backend/deploy/env.example).
 | `DATABASE_URL` | `postgres://campus:<POSTGRES_PASSWORD>@postgres:5432/campus?sslmode=disable` |
 | `JWT_SECRET` | 64 random bytes (`openssl rand -base64 64`); signs access tokens |
 | `CODE_HMAC_SECRET` | 64 random bytes; hashes sign-in codes |
-| `FIREBASE_PROJECT_ID` | `bitlaabuzz` (enables Google sign-in; not a secret) |
+| `FIREBASE_PROJECT_ID` | `varsitykotha` (enables Google sign-in; not a secret) |
 | `SMTP_HOST` / `SMTP_PORT` | `smtp.resend.com` / `587` |
 | `SMTP_USERNAME` | `resend` |
 | `SMTP_PASSWORD` | the Resend API key |
-| `MAIL_FROM` | `VarsityKotha <no-reply@silifton.com>`. `silifton.com` is already verified in Resend (DKIM on the root domain; its DMARC is strict, so mail must be DKIM-signed for `silifton.com`, which Resend does). Switch to the product domain once it is chosen and verified |
+| `MAIL_FROM` | `VarsityKotha <no-reply@silifton.com>`. `silifton.com` is already verified in Resend (DKIM on the root domain; its DMARC is strict, so mail must be DKIM-signed for `silifton.com`, which Resend does). Switch to `varsitykotha.com` once that domain is verified in Resend |
 
 Changing `JWT_SECRET` signs everyone out. Changing `CODE_HMAC_SECRET` only
 invalidates codes that are waiting to be used.
@@ -100,7 +100,7 @@ invalidates codes that are waiting to be used.
 **Push notifications key** (`FCM_CREDENTIALS_FILE`): a Firebase
 service-account key, a file, not a variable.
 
-1. Firebase console → project `bitlaabuzz` → ⚙ Project settings → Service
+1. Firebase console → project `varsitykotha` → ⚙ Project settings → Service
    accounts → **Generate new private key**. A JSON file downloads.
 2. Copy it to the server, never into the repo:
    `/opt/campussaga/deploy/secrets/fcm-service-account.json`
