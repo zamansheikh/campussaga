@@ -1,10 +1,13 @@
 package transport
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/transport/store"
 )
 
 func m(v int16) *int16 { return &v }
@@ -32,4 +35,41 @@ func TestCheckTrips(t *testing.T) {
 	for _, bad := range []string{"7:05", "24:00", "07:60", "x"} {
 		assert.Error(t, checkTrips([]TripInput{{Direction: ToCampus, Departs: bad, Weekdays: []int{1}}}), bad)
 	}
+}
+
+func f(v float64) *float64 { return &v }
+
+func TestStopLocation(t *testing.T) {
+	var in struct {
+		Stops []StopInput `json:"stops"`
+	}
+	require.NoError(t, json.Unmarshal([]byte(`{"stops":[
+		{"name":"A","location":{"lat":23.81,"lng":90.41}},
+		{"name":"B","location":null},
+		{"name":"C"}]}`), &in))
+	assert.True(t, in.Stops[0].Location.Set)
+	assert.Equal(t, &LatLng{Lat: 23.81, Lng: 90.41}, in.Stops[0].Location.Value)
+	assert.True(t, in.Stops[1].Location.Set)
+	assert.Nil(t, in.Stops[1].Location.Value)
+	assert.False(t, in.Stops[2].Location.Set)
+	require.NoError(t, checkStops(in.Stops))
+
+	bad := []StopInput{{Name: "A", Location: OptLocation{Set: true, Value: &LatLng{Lat: 91, Lng: 0}}}}
+	assert.Error(t, checkStops(bad))
+}
+
+func TestKeptLocations(t *testing.T) {
+	old := []store.BusStop{
+		{Name: "A", Lat: f(1), Lng: f(2)},
+		{Name: "B", Lat: f(3), Lng: f(4)},
+		{Name: "B", Lat: f(5), Lng: f(6)},
+	}
+	got := keptLocations(old, []StopInput{
+		{Name: "B"}, // an older app: keeps B's first location
+		{Name: "B"}, // and the second B gets the second one
+		{Name: "A", Location: OptLocation{Set: true}}, // removed on purpose
+		{Name: "New"},
+		{Name: "B", Location: OptLocation{Set: true, Value: &LatLng{Lat: 7, Lng: 8}}},
+	})
+	assert.Equal(t, []*LatLng{{Lat: 3, Lng: 4}, {Lat: 5, Lng: 6}, nil, nil, {Lat: 7, Lng: 8}}, got)
 }

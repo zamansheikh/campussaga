@@ -60,6 +60,8 @@ class ApiTransportRepository implements TransportRepository {
             'landmark': s.landmark,
             'toCampusMin': s.toCampusMin,
             'fromCampusMin': s.fromCampusMin,
+            // Always sent: null removes the stop's place on the map.
+            'location': s.locationJson,
           },
       ],
     }),

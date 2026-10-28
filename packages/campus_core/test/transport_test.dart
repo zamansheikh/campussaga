@@ -104,4 +104,19 @@ void main() {
     expect(back.routes.single.trips.first.weekdays, {6, 7, 1, 2, 3, 4});
     expect(back.routes.single.trips.first.departsMin, 450);
   });
+
+  test('stop location: JSON and copyWith', () {
+    final s = BusStop.fromJson({
+      'id': 'a',
+      'name': 'Mirpur 10',
+      'location': {'lat': 23.8069, 'lng': 90.3687},
+    });
+    expect(s.hasLocation, isTrue);
+    expect(s.toJson()['location'], {'lat': 23.8069, 'lng': 90.3687});
+    final none = s.copyWith(location: () => null);
+    expect(none.hasLocation, isFalse);
+    expect(none.toJson()['location'], isNull);
+    expect(s.copyWith(name: 'X').lat, 23.8069);
+    expect(BusStop.fromJson({'id': 'b', 'name': 'B'}).hasLocation, isFalse);
+  });
 }

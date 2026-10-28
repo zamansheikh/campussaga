@@ -219,6 +219,254 @@ class AppLocalizationsEn extends AppLocalizations {
   String get busPickDay => 'Pick at least one day.';
 
   @override
+  String get busEdit => 'Edit';
+
+  @override
+  String get busSetupTitle => 'Finish setting up this route';
+
+  @override
+  String get busSetupBody =>
+      'Students can use the route once it has stops and departure times.';
+
+  @override
+  String get busSetupStops => 'Add the stops';
+
+  @override
+  String get busSetupTimes => 'Add departure times';
+
+  @override
+  String get busSetupMap => 'Place the stops on the map';
+
+  @override
+  String get busStart => 'Start';
+
+  @override
+  String busLegFrom(String stop) {
+    return 'Minutes from $stop';
+  }
+
+  @override
+  String busLegBackFrom(String stop) {
+    return 'On the way back: minutes from $stop';
+  }
+
+  @override
+  String get busFirstStopNote => 'The trip to campus starts here.';
+
+  @override
+  String get busLastStopNote => 'The trip back starts here.';
+
+  @override
+  String get busNoTime => 'No time';
+
+  @override
+  String busLegValue(int minutes) {
+    return '+$minutes min';
+  }
+
+  @override
+  String busTotalTrip(int minutes) {
+    return '$minutes min to campus';
+  }
+
+  @override
+  String get busLegHint =>
+      'Leave empty if you don\'t know. Students then see “—” for this stop.';
+
+  @override
+  String get busSameWayBack => 'Same times on the way back';
+
+  @override
+  String get busSameWayBackHint =>
+      'The way back takes the same time between stops, in reverse.';
+
+  @override
+  String get busQuickAddHint => 'Type a stop and press Enter';
+
+  @override
+  String get busPasteList => 'Paste a list';
+
+  @override
+  String get busPasteTitle => 'Paste stops';
+
+  @override
+  String get busPasteBody =>
+      'One per line, or separated by commas, like in a transport notice. Text in brackets becomes the landmark.';
+
+  @override
+  String get busPasteFromClipboard => 'Paste';
+
+  @override
+  String busPasteAdd(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Add $count stops',
+      one: 'Add 1 stop',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get busPasteNone => 'No stops found in this text yet.';
+
+  @override
+  String busTooManyStops(int max) {
+    return 'A route can have at most $max stops.';
+  }
+
+  @override
+  String busStopRemoved(String name) {
+    return '$name removed';
+  }
+
+  @override
+  String get busDepartureRemoved => 'Departure removed';
+
+  @override
+  String get busUndo => 'Undo';
+
+  @override
+  String get busRemoveStop => 'Remove stop';
+
+  @override
+  String get busEditStop => 'Edit stop';
+
+  @override
+  String get busDiscardTitle => 'Discard your changes?';
+
+  @override
+  String get busDiscardBody => 'You haven\'t saved them yet.';
+
+  @override
+  String get busDiscard => 'Discard';
+
+  @override
+  String get busKeepEditing => 'Keep editing';
+
+  @override
+  String get busTripTooLong =>
+      'A trip can\'t be longer than 10 hours. Check the minutes.';
+
+  @override
+  String get busLocationNone => 'Not on the map yet';
+
+  @override
+  String get busLocationSet => 'On the map';
+
+  @override
+  String get busSetOnMap => 'Set on map';
+
+  @override
+  String get busChangeLocation => 'Change';
+
+  @override
+  String get busRemoveLocation => 'Remove from the map';
+
+  @override
+  String busPickerTitle(String stop) {
+    return 'Place $stop';
+  }
+
+  @override
+  String get busPickerHint => 'Move the map until the pin is on the stop.';
+
+  @override
+  String get busUseThisPlace => 'Use this place';
+
+  @override
+  String get busSearchPlace => 'Search for a place';
+
+  @override
+  String get busSearchNoResults =>
+      'No places found. Try another name, or move the map.';
+
+  @override
+  String get busSearchFailed =>
+      'Search isn\'t working right now. Move the map instead.';
+
+  @override
+  String get busMapTitle => 'Route map';
+
+  @override
+  String get busOpenMap => 'Open map';
+
+  @override
+  String busNotOnMap(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stops aren\'t on the map yet',
+      one: '1 stop isn\'t on the map yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get busDirections => 'Directions';
+
+  @override
+  String get busSetMyStop => 'Set as my stop';
+
+  @override
+  String busStopNoTime(String stop) {
+    return '$stop has no time listed.';
+  }
+
+  @override
+  String busRouteLeaves(String stop, String time) {
+    return 'The bus leaves $stop at $time.';
+  }
+
+  @override
+  String get busNoTripsToCampus => 'No buses to campus on this route.';
+
+  @override
+  String get busNoTripsFromCampus => 'No buses from campus on this route.';
+
+  @override
+  String busLeavesFrom(String stop) {
+    return 'When it leaves $stop';
+  }
+
+  @override
+  String get busAddTimes => 'Add times';
+
+  @override
+  String get busAddAnotherTime => 'Add another time';
+
+  @override
+  String busAddDepartures(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Add $count departures',
+      one: 'Add 1 departure',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get busPickTime => 'Add at least one time.';
+
+  @override
+  String busStopsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stops',
+      one: '1 stop',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get busTimetableTitle => 'Timetable';
+
+  @override
+  String get busNoTimesYet => 'No times yet';
+
+  @override
   String get teacherReviewsTitle => 'Teacher evaluations';
 
   @override

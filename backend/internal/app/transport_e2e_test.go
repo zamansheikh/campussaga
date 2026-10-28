@@ -17,6 +17,10 @@ type busRouteJSON struct {
 		Name          string `json:"name"`
 		ToCampusMin   *int   `json:"toCampusMin"`
 		FromCampusMin *int   `json:"fromCampusMin"`
+		Location      *struct {
+			Lat float64 `json:"lat"`
+			Lng float64 `json:"lng"`
+		} `json:"location"`
 	} `json:"stops"`
 	Trips []struct {
 		Direction string `json:"direction"`
@@ -70,14 +74,28 @@ func TestBusRoutes(t *testing.T) {
 	base := "/transport/routes/" + route.ID
 
 	r = h.do("PUT", base+"/stops", repTok, map[string]any{"stops": []map[string]any{
-		{"name": "Mirpur 10", "toCampusMin": 0, "fromCampusMin": 50},
-		{"name": "Agargaon", "landmark": "near the metro", "toCampusMin": 20, "fromCampusMin": 30},
+		{"name": "Mirpur 10", "toCampusMin": 0, "fromCampusMin": 50, "location": map[string]float64{"lat": 23.8069, "lng": 90.3687}},
+		{"name": "Agargaon", "landmark": "near the metro", "toCampusMin": 20, "fromCampusMin": 30, "location": nil},
 		{"name": "Campus", "toCampusMin": 50, "fromCampusMin": 0},
 	}})
 	require.Equal(t, http.StatusOK, r.Status, r.Raw)
 	r.into(t, &route)
 	require.Len(t, route.Stops, 3)
 	assert.Equal(t, "Agargaon", route.Stops[1].Name)
+	require.NotNil(t, route.Stops[0].Location)
+	assert.InDelta(t, 23.8069, route.Stops[0].Location.Lat, 1e-9)
+	assert.Nil(t, route.Stops[1].Location)
+
+	// An app from before the map sends no location: Mirpur 10 keeps its place.
+	r = h.do("PUT", base+"/stops", repTok, map[string]any{"stops": []map[string]any{
+		{"name": "Mirpur 10", "toCampusMin": 0, "fromCampusMin": 50},
+		{"name": "Agargaon", "landmark": "near the metro", "toCampusMin": 20, "fromCampusMin": 30},
+		{"name": "Campus", "toCampusMin": 50, "fromCampusMin": 0},
+	}})
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	r.into(t, &route)
+	require.NotNil(t, route.Stops[0].Location)
+	assert.InDelta(t, 90.3687, route.Stops[0].Location.Lng, 1e-9)
 
 	r = h.do("PUT", base+"/trips", repTok, map[string]any{"trips": []map[string]any{
 		{"direction": "to_campus", "departs": "07:30", "weekdays": []int{6, 7, 1, 2, 3, 4, 6}},
@@ -99,6 +117,9 @@ func TestBusRoutes(t *testing.T) {
 	assert.Equal(t, "VALIDATION_FAILED", bad(base+"/stops", map[string]any{"stops": []map[string]any{
 		{"name": "A", "toCampusMin": 20}, {"name": "B", "toCampusMin": 10},
 	}}), "to campus times must not go back")
+	assert.Equal(t, "VALIDATION_FAILED", bad(base+"/stops", map[string]any{"stops": []map[string]any{
+		{"name": "A", "location": map[string]float64{"lat": 95, "lng": 90}},
+	}}), "a point on the map")
 	assert.Equal(t, "VALIDATION_FAILED", bad(base+"/trips", map[string]any{"trips": []map[string]any{
 		{"direction": "to_campus", "departs": "7:30", "weekdays": []int{1}},
 	}}), "HH:MM")

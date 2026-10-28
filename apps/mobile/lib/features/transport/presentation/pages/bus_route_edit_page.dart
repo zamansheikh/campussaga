@@ -62,7 +62,8 @@ class _BusRouteEditPageState extends State<BusRouteEditPage> {
       if (!mounted) return;
       messenger.showSnackBar(SnackBar(content: Text(l10n.busSaved)));
       if (widget.routeId == null) {
-        context.pushReplacement(Routes.busRoute(r.id));
+        // Straight on to the stops, then the times.
+        context.pushReplacement(Routes.busRoute(r.id), extra: Routes.busSetup);
       } else {
         context.pop();
       }

@@ -218,6 +218,250 @@ class AppLocalizationsBn extends AppLocalizations {
   String get busPickDay => 'অন্তত একটা দিন বেছে নাও।';
 
   @override
+  String get busEdit => 'এডিট';
+
+  @override
+  String get busSetupTitle => 'রুটটি সাজানো শেষ করো';
+
+  @override
+  String get busSetupBody =>
+      'স্টপ আর ছাড়ার সময় যোগ করলেই শিক্ষার্থীরা রুটটি ব্যবহার করতে পারবে।';
+
+  @override
+  String get busSetupStops => 'স্টপগুলো যোগ করো';
+
+  @override
+  String get busSetupTimes => 'ছাড়ার সময় যোগ করো';
+
+  @override
+  String get busSetupMap => 'স্টপগুলো ম্যাপে বসাও';
+
+  @override
+  String get busStart => 'শুরু';
+
+  @override
+  String busLegFrom(String stop) {
+    return '$stop থেকে কত মিনিট';
+  }
+
+  @override
+  String busLegBackFrom(String stop) {
+    return 'ফেরার পথে: $stop থেকে কত মিনিট';
+  }
+
+  @override
+  String get busFirstStopNote => 'ক্যাম্পাসে যাওয়ার যাত্রা এখান থেকে শুরু।';
+
+  @override
+  String get busLastStopNote => 'ফেরার যাত্রা এখান থেকে শুরু।';
+
+  @override
+  String get busNoTime => 'সময় নেই';
+
+  @override
+  String busLegValue(int minutes) {
+    return '+$minutes মিনিট';
+  }
+
+  @override
+  String busTotalTrip(int minutes) {
+    return 'ক্যাম্পাসে $minutes মিনিট';
+  }
+
+  @override
+  String get busLegHint =>
+      'না জানলে খালি রাখো। শিক্ষার্থীরা তখন এই স্টপে “—” দেখবে।';
+
+  @override
+  String get busSameWayBack => 'ফেরার পথেও একই সময়';
+
+  @override
+  String get busSameWayBackHint =>
+      'ফেরার পথে স্টপগুলোর মাঝে একই সময় লাগে, উল্টো দিকে।';
+
+  @override
+  String get busQuickAddHint => 'স্টপের নাম লিখে Enter চাপো';
+
+  @override
+  String get busPasteList => 'তালিকা পেস্ট করো';
+
+  @override
+  String get busPasteTitle => 'স্টপ পেস্ট করো';
+
+  @override
+  String get busPasteBody =>
+      'প্রতি লাইনে একটা, বা কমা দিয়ে আলাদা করে, যেমন পরিবহন নোটিশে থাকে। বন্ধনীর লেখা চেনার জায়গা হবে।';
+
+  @override
+  String get busPasteFromClipboard => 'পেস্ট';
+
+  @override
+  String busPasteAdd(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countটি স্টপ যোগ করো',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get busPasteNone => 'এই লেখায় এখনো কোনো স্টপ পাওয়া যায়নি।';
+
+  @override
+  String busTooManyStops(int max) {
+    return 'একটা রুটে সর্বোচ্চ $maxটি স্টপ থাকতে পারে।';
+  }
+
+  @override
+  String busStopRemoved(String name) {
+    return '$name সরানো হয়েছে';
+  }
+
+  @override
+  String get busDepartureRemoved => 'ছাড়ার সময় সরানো হয়েছে';
+
+  @override
+  String get busUndo => 'ফিরিয়ে আনো';
+
+  @override
+  String get busRemoveStop => 'স্টপ সরাও';
+
+  @override
+  String get busEditStop => 'স্টপ এডিট করো';
+
+  @override
+  String get busDiscardTitle => 'পরিবর্তনগুলো বাদ দেবে?';
+
+  @override
+  String get busDiscardBody => 'এগুলো এখনো সংরক্ষণ করা হয়নি।';
+
+  @override
+  String get busDiscard => 'বাদ দাও';
+
+  @override
+  String get busKeepEditing => 'এডিট চালিয়ে যাও';
+
+  @override
+  String get busTripTooLong =>
+      'একটা যাত্রা ১০ ঘণ্টার বেশি হতে পারে না। মিনিটগুলো দেখে নাও।';
+
+  @override
+  String get busLocationNone => 'এখনো ম্যাপে নেই';
+
+  @override
+  String get busLocationSet => 'ম্যাপে আছে';
+
+  @override
+  String get busSetOnMap => 'ম্যাপে বসাও';
+
+  @override
+  String get busChangeLocation => 'বদলাও';
+
+  @override
+  String get busRemoveLocation => 'ম্যাপ থেকে সরাও';
+
+  @override
+  String busPickerTitle(String stop) {
+    return '$stop বসাও';
+  }
+
+  @override
+  String get busPickerHint => 'পিনটি স্টপের ওপর না আসা পর্যন্ত ম্যাপ সরাও।';
+
+  @override
+  String get busUseThisPlace => 'এই জায়গাটা নাও';
+
+  @override
+  String get busSearchPlace => 'জায়গা খোঁজো';
+
+  @override
+  String get busSearchNoResults =>
+      'কোনো জায়গা পাওয়া যায়নি। অন্য নাম দিয়ে খোঁজো, বা ম্যাপ সরাও।';
+
+  @override
+  String get busSearchFailed => 'এখন খোঁজা যাচ্ছে না। ম্যাপ সরিয়ে বসাও।';
+
+  @override
+  String get busMapTitle => 'রুটের ম্যাপ';
+
+  @override
+  String get busOpenMap => 'ম্যাপ খোলো';
+
+  @override
+  String busNotOnMap(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countটি স্টপ এখনো ম্যাপে নেই',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get busDirections => 'পথ দেখাও';
+
+  @override
+  String get busSetMyStop => 'আমার স্টপ করো';
+
+  @override
+  String busStopNoTime(String stop) {
+    return '$stop-এর সময় দেওয়া নেই।';
+  }
+
+  @override
+  String busRouteLeaves(String stop, String time) {
+    return 'বাস $stop থেকে $time-এ ছাড়ে।';
+  }
+
+  @override
+  String get busNoTripsToCampus => 'এই রুটে ক্যাম্পাসে যাওয়ার কোনো বাস নেই।';
+
+  @override
+  String get busNoTripsFromCampus =>
+      'এই রুটে ক্যাম্পাস থেকে ফেরার কোনো বাস নেই।';
+
+  @override
+  String busLeavesFrom(String stop) {
+    return '$stop থেকে কখন ছাড়ে';
+  }
+
+  @override
+  String get busAddTimes => 'সময় যোগ করো';
+
+  @override
+  String get busAddAnotherTime => 'আরেকটা সময়';
+
+  @override
+  String busAddDepartures(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countটি ছাড়ার সময় যোগ করো',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get busPickTime => 'অন্তত একটা সময় দাও।';
+
+  @override
+  String busStopsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countটি স্টপ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get busTimetableTitle => 'সময়সূচি';
+
+  @override
+  String get busNoTimesYet => 'এখনো সময় দেওয়া হয়নি';
+
+  @override
   String get teacherReviewsTitle => 'শিক্ষক মূল্যায়ন';
 
   @override

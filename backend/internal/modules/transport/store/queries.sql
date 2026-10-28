@@ -33,12 +33,15 @@ SELECT * FROM bus_stops WHERE route_id = ANY(@route_ids::uuid[]) ORDER BY route_
 -- name: TripsForRoutes :many
 SELECT * FROM bus_trips WHERE route_id = ANY(@route_ids::uuid[]) ORDER BY route_id, direction, departs_min, id;
 
+-- name: StopsOfRoute :many
+SELECT * FROM bus_stops WHERE route_id = @route_id ORDER BY position;
+
 -- name: DeleteStops :exec
 DELETE FROM bus_stops WHERE route_id = @route_id;
 
 -- name: InsertStop :exec
-INSERT INTO bus_stops (route_id, position, name, landmark, to_campus_min, from_campus_min)
-VALUES (@route_id, @position, @name, @landmark, @to_campus_min, @from_campus_min);
+INSERT INTO bus_stops (route_id, position, name, landmark, to_campus_min, from_campus_min, lat, lng)
+VALUES (@route_id, @position, @name, @landmark, @to_campus_min, @from_campus_min, sqlc.narg(lat), sqlc.narg(lng));
 
 -- name: DeleteTrips :exec
 DELETE FROM bus_trips WHERE route_id = @route_id;

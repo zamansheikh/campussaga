@@ -147,8 +147,8 @@ func (q *Queries) InsertAudit(ctx context.Context, arg InsertAuditParams) error 
 }
 
 const insertStop = `-- name: InsertStop :exec
-INSERT INTO bus_stops (route_id, position, name, landmark, to_campus_min, from_campus_min)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO bus_stops (route_id, position, name, landmark, to_campus_min, from_campus_min, lat, lng)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 `
 
 type InsertStopParams struct {
@@ -158,6 +158,8 @@ type InsertStopParams struct {
 	Landmark      string
 	ToCampusMin   *int16
 	FromCampusMin *int16
+	Lat           *float64
+	Lng           *float64
 }
 
 func (q *Queries) InsertStop(ctx context.Context, arg InsertStopParams) error {
@@ -168,6 +170,8 @@ func (q *Queries) InsertStop(ctx context.Context, arg InsertStopParams) error {
 		arg.Landmark,
 		arg.ToCampusMin,
 		arg.FromCampusMin,
+		arg.Lat,
+		arg.Lng,
 	)
 	return err
 }
@@ -298,7 +302,7 @@ func (q *Queries) RepUniversity(ctx context.Context, userID uuid.UUID) (uuid.UUI
 }
 
 const stopsForRoutes = `-- name: StopsForRoutes :many
-SELECT id, route_id, position, name, landmark, to_campus_min, from_campus_min FROM bus_stops WHERE route_id = ANY($1::uuid[]) ORDER BY route_id, position
+SELECT id, route_id, position, name, landmark, to_campus_min, from_campus_min, lat, lng FROM bus_stops WHERE route_id = ANY($1::uuid[]) ORDER BY route_id, position
 `
 
 func (q *Queries) StopsForRoutes(ctx context.Context, routeIds []uuid.UUID) ([]BusStop, error) {
@@ -318,6 +322,42 @@ func (q *Queries) StopsForRoutes(ctx context.Context, routeIds []uuid.UUID) ([]B
 			&i.Landmark,
 			&i.ToCampusMin,
 			&i.FromCampusMin,
+			&i.Lat,
+			&i.Lng,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const stopsOfRoute = `-- name: StopsOfRoute :many
+SELECT id, route_id, position, name, landmark, to_campus_min, from_campus_min, lat, lng FROM bus_stops WHERE route_id = $1 ORDER BY position
+`
+
+func (q *Queries) StopsOfRoute(ctx context.Context, routeID uuid.UUID) ([]BusStop, error) {
+	rows, err := q.db.Query(ctx, stopsOfRoute, routeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BusStop{}
+	for rows.Next() {
+		var i BusStop
+		if err := rows.Scan(
+			&i.ID,
+			&i.RouteID,
+			&i.Position,
+			&i.Name,
+			&i.Landmark,
+			&i.ToCampusMin,
+			&i.FromCampusMin,
+			&i.Lat,
+			&i.Lng,
 		); err != nil {
 			return nil, err
 		}

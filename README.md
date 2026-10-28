@@ -28,7 +28,7 @@ Android app ID `com.silifton.varsitykotha`
   group or just the courses you take.
 - **Campus Voice:** anonymous campus issues with photos, checked by an
   on-server photo filter and a word list, and moderated from the admin panel.
-- **Explore:** bus routes and a CGPA calculator, with more on the way.
+- **Explore:** bus routes on an OpenStreetMap map, with the next bus from your stop, and a CGPA calculator.
 - **Admin panel** at [varsitykotha.com/admin](https://varsitykotha.com/admin):
   users, universities, groups, moderation, bus routes, pushes and app settings.
 

@@ -195,6 +195,11 @@ export default function PrivacyPage() {
             ],
             ["Resend", "Delivers the email with your sign-in code.", "Your email address and the email's content."],
             [
+              "OpenStreetMap Foundation",
+              "Serves the map images on bus route maps, and finds places by name when a transport rep places a stop.",
+              "Your IP address and the map area your phone loads (as with any website), and the place name a rep searches for. No account details and no location from your phone.",
+            ],
+            [
               "Server and storage providers",
               "Run our server, database, photo storage and encrypted backups.",
               "The information stored in our database.",
@@ -204,7 +209,8 @@ export default function PrivacyPage() {
         <p>
           Google&apos;s privacy policy: <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>.
           Resend&apos;s privacy policy:{" "}
-          <a href="https://resend.com/legal/privacy-policy">resend.com/legal/privacy-policy</a>.
+          <a href="https://resend.com/legal/privacy-policy">resend.com/legal/privacy-policy</a>. OpenStreetMap&apos;s
+          privacy policy: <a href="https://osmfoundation.org/wiki/Privacy_Policy">osmfoundation.org/wiki/Privacy_Policy</a>.
         </p>
         <p>
           We do not sell, rent or trade your information, and we do not share it with advertisers. We may disclose
@@ -425,6 +431,11 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Resend:</strong> সাইন-ইন কোডসহ ইমেইল পাঠায় (তোমার ইমেইল ঠিকানা ও ইমেইলের লেখা)।
+          </li>
+          <li>
+            <strong>OpenStreetMap Foundation:</strong> বাসের রুটের ম্যাপের ছবি দেখায়, আর ট্রান্সপোর্ট প্রতিনিধি স্টপ বসানোর
+            সময় নাম দিয়ে জায়গা খুঁজে দেয় (যেকোনো ওয়েবসাইটের মতো তোমার IP ঠিকানা ও ফোন যে ম্যাপের অংশ লোড করে, আর খোঁজা
+            জায়গার নাম; কোনো অ্যাকাউন্টের তথ্য বা ফোনের লোকেশন নয়)।
           </li>
           <li>
             <strong>সার্ভার ও স্টোরেজ প্রদানকারী:</strong> আমাদের সার্ভার, ডাটাবেস, ছবির স্টোরেজ ও এনক্রিপ্টেড ব্যাকআপ

@@ -11,6 +11,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"regexp"
 	"slices"
 	"strconv"
@@ -84,12 +85,27 @@ type Route struct {
 
 // Stop: offsets are minutes after a trip starts, per direction (null: the
 // bus doesn't stop here that way). Stops run from the far end to campus.
+// Location is where the stop is, for the map (null: not placed yet).
 type Stop struct {
 	ID            uuid.UUID `json:"id"`
 	Name          string    `json:"name"`
 	Landmark      string    `json:"landmark"`
 	ToCampusMin   *int16    `json:"toCampusMin"`
 	FromCampusMin *int16    `json:"fromCampusMin"`
+	Location      *LatLng   `json:"location"`
+}
+
+// LatLng is a point in WGS 84 degrees.
+type LatLng struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
+}
+
+func latLng(lat, lng *float64) *LatLng {
+	if lat == nil || lng == nil {
+		return nil
+	}
+	return &LatLng{Lat: *lat, Lng: *lng}
 }
 
 // Trip: departs "HH:MM" from the first stop (to_campus) or from campus
@@ -125,7 +141,10 @@ func routesView(ctx context.Context, q *store.Queries, rows []store.BusRoute) ([
 	}
 	for _, st := range stops {
 		r := &out[at[st.RouteID]]
-		r.Stops = append(r.Stops, Stop{ID: st.ID, Name: st.Name, Landmark: st.Landmark, ToCampusMin: st.ToCampusMin, FromCampusMin: st.FromCampusMin})
+		r.Stops = append(r.Stops, Stop{
+			ID: st.ID, Name: st.Name, Landmark: st.Landmark,
+			ToCampusMin: st.ToCampusMin, FromCampusMin: st.FromCampusMin, Location: latLng(st.Lat, st.Lng),
+		})
 	}
 	trips, err := q.TripsForRoutes(ctx, ids)
 	if err != nil {
@@ -384,10 +403,33 @@ func (s *Service) handleDelete(ctx context.Context, in *routeReq) (*httpx.Empty,
 // ---- stops and trips ----------------------------------------------------------
 
 type StopInput struct {
-	Name          string `json:"name" validate:"required,max=60"`
-	Landmark      string `json:"landmark" validate:"max=100"`
-	ToCampusMin   *int16 `json:"toCampusMin" validate:"omitempty,min=0,max=600"`
-	FromCampusMin *int16 `json:"fromCampusMin" validate:"omitempty,min=0,max=600"`
+	Name          string      `json:"name" validate:"required,max=60"`
+	Landmark      string      `json:"landmark" validate:"max=100"`
+	ToCampusMin   *int16      `json:"toCampusMin" validate:"omitempty,min=0,max=600"`
+	FromCampusMin *int16      `json:"fromCampusMin" validate:"omitempty,min=0,max=600"`
+	Location      OptLocation `json:"location"`
+}
+
+// OptLocation tells "location": null (remove it) from no "location" key at
+// all: app versions from before the map send no key, and their edits keep
+// the stop's saved location (matched by name).
+type OptLocation struct {
+	Set   bool
+	Value *LatLng
+}
+
+func (o *OptLocation) UnmarshalJSON(b []byte) error {
+	o.Set = true
+	if string(b) == "null" {
+		o.Value = nil
+		return nil
+	}
+	var v LatLng
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	o.Value = &v
+	return nil
 }
 
 type stopsReq struct {
@@ -406,6 +448,11 @@ func checkStops(stops []StopInput) error {
 		if st.Name == "" {
 			return apperr.Validation(map[string]string{field + ".name": "is required"})
 		}
+		if l := st.Location.Value; l != nil {
+			if math.IsNaN(l.Lat) || math.IsNaN(l.Lng) || l.Lat < -90 || l.Lat > 90 || l.Lng < -180 || l.Lng > 180 {
+				return apperr.Validation(map[string]string{field + ".location": "must be a point on the map"})
+			}
+		}
 		if st.ToCampusMin != nil {
 			if lastTo != nil && *st.ToCampusMin < *lastTo {
 				return apperr.Validation(map[string]string{field + ".toCampusMin": "must not be earlier than the stop before"})
@@ -422,6 +469,29 @@ func checkStops(stops []StopInput) error {
 	return nil
 }
 
+// keptLocations: each new stop's location. A stop sent without a location
+// key keeps the location of a saved stop with the same name (each saved stop
+// used once), so older apps don't wipe the map.
+func keptLocations(old []store.BusStop, stops []StopInput) []*LatLng {
+	byName := map[string][]*LatLng{}
+	for _, o := range old {
+		if l := latLng(o.Lat, o.Lng); l != nil {
+			byName[o.Name] = append(byName[o.Name], l)
+		}
+	}
+	out := make([]*LatLng, len(stops))
+	for i, st := range stops {
+		if st.Location.Set {
+			out[i] = st.Location.Value
+			continue
+		}
+		if ls := byName[st.Name]; len(ls) > 0 {
+			out[i], byName[st.Name] = ls[0], ls[1:]
+		}
+	}
+	return out
+}
+
 func (s *Service) handleStops(ctx context.Context, in *stopsReq) (*Route, error) {
 	if err := checkStops(in.Stops); err != nil {
 		return nil, err
@@ -433,14 +503,23 @@ func (s *Service) handleStops(ctx context.Context, in *stopsReq) (*Route, error)
 		if err != nil {
 			return err
 		}
+		old, err := q.StopsOfRoute(ctx, r.ID)
+		if err != nil {
+			return err
+		}
+		locs := keptLocations(old, in.Stops)
 		if err := q.DeleteStops(ctx, r.ID); err != nil {
 			return err
 		}
 		for i, st := range in.Stops {
-			if err := q.InsertStop(ctx, store.InsertStopParams{
+			p := store.InsertStopParams{
 				RouteID: r.ID, Position: int16(i), Name: st.Name, Landmark: st.Landmark,
 				ToCampusMin: st.ToCampusMin, FromCampusMin: st.FromCampusMin,
-			}); err != nil {
+			}
+			if l := locs[i]; l != nil {
+				p.Lat, p.Lng = &l.Lat, &l.Lng
+			}
+			if err := q.InsertStop(ctx, p); err != nil {
 				return err
 			}
 		}

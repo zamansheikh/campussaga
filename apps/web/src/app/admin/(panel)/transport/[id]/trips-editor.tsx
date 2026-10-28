@@ -15,6 +15,15 @@ type Row = { key: number; direction: BusDirection; departs: string; weekdays: nu
 
 const SAT_TO_THU = [6, 7, 1, 2, 3, 4];
 
+/** Day patterns reps pick most often. */
+const PRESETS: { label: string; days: number[] }[] = [
+  { label: "Sat–Thu", days: SAT_TO_THU },
+  { label: "Fri, Sat", days: [5, 6] },
+  { label: "Every day", days: [1, 2, 3, 4, 5, 6, 7] },
+];
+
+const sameDays = (a: number[], b: number[]) => a.length === b.length && a.every((d) => b.includes(d));
+
 const sections: { direction: BusDirection; title: string; hint: string }[] = [
   { direction: "to_campus", title: "To campus", hint: "Time it leaves the first stop." },
   { direction: "from_campus", title: "From campus", hint: "Time it leaves campus." },
@@ -122,6 +131,19 @@ export function TripsEditor({ routeId, trips }: { routeId: string; trips: BusTri
                             </button>
                           );
                         })}
+                        <span className="mx-1 hidden w-px self-stretch bg-border lg:block" aria-hidden />
+                        {PRESETS.map((p) => (
+                          <Button
+                            key={p.label}
+                            type="button"
+                            variant={sameDays(r.weekdays, p.days) ? "secondary" : "ghost"}
+                            size="sm"
+                            className="h-8 text-xs"
+                            onClick={() => edit(r.key, { weekdays: [...p.days] })}
+                          >
+                            {p.label}
+                          </Button>
+                        ))}
                       </div>
                       <Input
                         aria-label="Note"

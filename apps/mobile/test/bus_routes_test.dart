@@ -97,6 +97,8 @@ class FakeTransportRepository implements TransportRepository {
               landmark: s.landmark,
               toCampusMin: s.toCampusMin,
               fromCampusMin: s.fromCampusMin,
+              lat: s.lat,
+              lng: s.lng,
             ),
         ],
         trips: r.trips,
@@ -205,7 +207,7 @@ void main() {
 
     // The list: each route with its next bus.
     expect(find.text('Mirpur'), findsOneWidget);
-    expect(find.text('Mirpur 10 → Campus'), findsOneWidget);
+    expect(find.text('Mirpur 10 → Campus · 3 stops'), findsOneWidget);
     expect(find.textContaining('Next: 8:30'), findsOneWidget);
     expect(find.text('Add route'), findsNothing); // not a transport rep
 
@@ -249,7 +251,7 @@ void main() {
     expect(find.text('Offline. Showing saved bus routes.'), findsOneWidget);
   });
 
-  testWidgets('a transport rep adds a route, its stops and a departure', (
+  testWidgets('a transport rep sets up a route: stops, then times', (
     tester,
   ) async {
     usePhoneScreen(tester);
@@ -269,50 +271,151 @@ void main() {
     await tester.pumpAndSettle();
     expect(repo.list.single.name, 'Uttara');
 
-    // Lands on the new route; add two stops.
-    expect(find.text('Uttara'), findsOneWidget);
-    await tester.tap(find.byTooltip('Show menu'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Edit stops'));
-    await tester.pumpAndSettle();
-    for (final (name, mins) in [('House Building', '0'), ('Campus', '35')]) {
-      await tester.tap(find.text('Add stop'));
-      await tester.pumpAndSettle();
-      final fields = find.descendant(
-        of: find.byType(AlertDialog),
-        matching: find.byType(TextField),
-      );
-      await tester.enterText(fields.at(0), name);
-      await tester.enterText(fields.at(2), mins);
-      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    // Straight into the stops: type one, press Enter, type the next.
+    expect(find.text('Edit stops'), findsOneWidget);
+    final quick = find.widgetWithText(TextField, 'Type a stop and press Enter');
+    for (final name in ['House Building', 'Campus']) {
+      await tester.enterText(quick, name);
+      await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pumpAndSettle();
     }
     expect(find.text('House Building'), findsOneWidget);
-    await tester.tap(find.widgetWithText(TextButton, 'Save'));
-    await tester.pumpAndSettle();
-    expect(repo.list.single.stops.map((s) => s.name), [
-      'House Building',
-      'Campus',
-    ]);
+    expect(find.text('Start'), findsOneWidget);
 
-    // Add a departure (7:30 AM, Sat–Thu by default).
-    await tester.tap(find.byTooltip('Show menu'));
+    // Campus is 35 minutes from House Building.
+    await tester.tap(find.text('Campus'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Edit timetable'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Add departure'));
-    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Minutes from House Building'),
+      '35',
+    );
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await tester.pumpAndSettle();
-    expect(find.text('Sat–Thu'), findsOneWidget);
+    expect(find.text('+35 min'), findsOneWidget);
+    expect(find.text('35 min to campus'), findsOneWidget);
     await tester.tap(find.widgetWithText(TextButton, 'Save'));
     await tester.pumpAndSettle();
-    final trip = repo.list.single.trips.single;
-    expect(trip.departsMin, 7 * 60 + 30);
-    expect(trip.weekdays, _satToThu);
+    final stops = repo.list.single.stops;
+    expect(stops.map((s) => s.name), ['House Building', 'Campus']);
+    expect(stops.map((s) => s.toCampusMin), [0, 35]);
+    expect(stops.map((s) => s.fromCampusMin), [35, 0], reason: 'mirrored');
 
-    // Back on the route: the departure is listed.
+    // Then on to the times: two at once (7:30 and 8:00), Sat–Thu.
+    expect(find.text('Edit timetable'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Add times').first);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('7:30'), findsOneWidget);
+    await tester.tap(find.text('Add another time'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK')); // the time picker's suggestion: 8:00
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Add 2 departures'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'Save'));
+    await tester.pumpAndSettle();
+    final trips = repo.list.single.trips;
+    expect(trips.map((t) => t.departsMin), [7 * 60 + 30, 8 * 60]);
+    expect(trips.first.weekdays, _satToThu);
+
+    // Back on the route: set up, so no guide; the departures are listed.
+    expect(find.text('Finish setting up this route'), findsNothing);
     await tester.scrollUntilVisible(find.text('DEPARTURES'), 200);
-    expect(find.text('Sat–Thu · From House Building'), findsOneWidget);
+    expect(find.text('Sat–Thu · From House Building'), findsNWidgets(2));
+  });
+
+  testWidgets('a rep pastes a notice\'s stops, and undoes a removal', (
+    tester,
+  ) async {
+    usePhoneScreen(tester);
+    final (repo, _) = await _setUp(
+      canEdit: true,
+      routes: [const BusRoute(id: 'r', name: 'PMSCS')],
+    );
+    await _openBus(tester);
+    await tester.tap(find.text('PMSCS'));
+    await tester.pumpAndSettle();
+
+    // A route with nothing yet shows the setup guide.
+    expect(find.text('Finish setting up this route'), findsOneWidget);
+    await tester.tap(find.text('Add the stops'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Paste a list'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.byType(TextField),
+      ),
+      'Mohakhali (under the flyover), Agargaon, Gabtoli--- Campus.',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Add 4 stops'));
+    await tester.pumpAndSettle();
+    expect(find.text('under the flyover'), findsOneWidget);
+
+    // Swipe one away, then undo.
+    await tester.drag(find.text('Agargaon'), const Offset(-500, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('Agargaon removed'), findsOneWidget);
+    await tester.tap(find.text('Undo'));
+    await tester.pumpAndSettle();
+    expect(find.text('Agargaon'), findsOneWidget);
+
+    // Leaving without saving asks first.
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Discard your changes?'), findsOneWidget);
+    await tester.tap(find.text('Keep editing'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(TextButton, 'Save'));
+    await tester.pumpAndSettle();
+    final stops = repo.list.single.stops;
+    expect(stops.map((s) => s.name), [
+      'Mohakhali',
+      'Agargaon',
+      'Gabtoli',
+      'Campus',
+    ]);
+    expect(stops.first.landmark, 'under the flyover');
+    // Only the first stop has a time going (no minutes given yet).
+    expect(stops.map((s) => s.toCampusMin), [0, null, null, null]);
+  });
+
+  testWidgets('a stop with no time listed says when the bus leaves', (
+    tester,
+  ) async {
+    usePhoneScreen(tester);
+    const route = BusRoute(
+      id: 'p',
+      name: 'PMSCS 1',
+      stops: [
+        BusStop(id: 'a', name: 'Abdullahpur', toCampusMin: 0),
+        BusStop(id: 'b', name: 'Banani'),
+        BusStop(id: 'c', name: 'Campus', fromCampusMin: 0),
+      ],
+      trips: [
+        BusTrip(
+          direction: BusDirection.toCampus,
+          departsMin: 8 * 60 + 40,
+          weekdays: _satToThu,
+        ),
+      ],
+    );
+    final (_, store) = await _setUp(routes: [route]);
+    store.stops['u1'] = {'p': 'b'};
+    await _openBus(tester);
+    await tester.tap(find.text('PMSCS 1'));
+    await tester.pumpAndSettle();
+
+    final card = find.textContaining('Banani has no time listed.');
+    expect(card, findsOneWidget);
+    final text = tester.widget<Text>(card).data!;
+    expect(text, contains('The bus leaves Abdullahpur at 8:40'));
+    expect(text, endsWith('(in 35 min)'));
+    await tester.tap(find.text('From campus'));
+    await tester.pumpAndSettle();
+    expect(find.text('No buses from campus on this route.'), findsOneWidget);
   });
 }

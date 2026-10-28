@@ -5,11 +5,22 @@ import 'package:flutter/widgets.dart';
 import '../../auth/presentation/auth_error_text.dart';
 import '../../classes/presentation/class_format.dart';
 
-/// "Sat–Thu", "Sat, Mon, Wed" or "Every day": runs of days in the
-/// Saturday-first week are shortened.
+/// "Sat–Thu", "Fri, Sat", "Sat, Mon, Wed" or "Every day": runs of days
+/// are shortened. The Saturday-first week wraps round, so a weekend run
+/// reads "Fri, Sat" rather than "Sat, Fri".
 String weekdaysText(BuildContext context, Set<int> days) {
   if (days.length == 7) return AppLocalizations.of(context).busEveryDay;
-  final order = [for (final d in weekOrder) d];
+  final week = [for (final d in weekOrder) d];
+  // Start at the first day of a run (the day before it is off).
+  final start =
+      week.indexed
+          .where(
+            (e) => days.contains(e.$2) && !days.contains(week[(e.$1 + 6) % 7]),
+          )
+          .map((e) => e.$1)
+          .firstOrNull ??
+      0;
+  final order = [...week.skip(start), ...week.take(start)];
   final parts = <String>[];
   var i = 0;
   while (i < order.length) {

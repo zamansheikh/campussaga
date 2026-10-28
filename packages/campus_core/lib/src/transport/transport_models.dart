@@ -13,7 +13,8 @@ enum BusDirection {
 }
 
 /// A stop on a route. Stops run from the far end to campus; the offsets are
-/// minutes after a trip starts, per direction (null: no stop that way).
+/// minutes after a trip starts, per direction (null: no time that way).
+/// [lat]/[lng] place it on the map (both null: not placed yet).
 class BusStop {
   const BusStop({
     required this.id,
@@ -21,24 +22,63 @@ class BusStop {
     this.landmark = '',
     this.toCampusMin,
     this.fromCampusMin,
+    this.lat,
+    this.lng,
   });
 
-  factory BusStop.fromJson(Map<String, Object?> j) => BusStop(
-    id: j['id'] as String? ?? '',
-    name: j['name']! as String,
-    landmark: j['landmark'] as String? ?? '',
-    toCampusMin: (j['toCampusMin'] as num?)?.toInt(),
-    fromCampusMin: (j['fromCampusMin'] as num?)?.toInt(),
-  );
+  factory BusStop.fromJson(Map<String, Object?> j) {
+    final loc = (j['location'] as Map?)?.cast<String, Object?>();
+    return BusStop(
+      id: j['id'] as String? ?? '',
+      name: j['name']! as String,
+      landmark: j['landmark'] as String? ?? '',
+      toCampusMin: (j['toCampusMin'] as num?)?.toInt(),
+      fromCampusMin: (j['fromCampusMin'] as num?)?.toInt(),
+      lat: (loc?['lat'] as num?)?.toDouble(),
+      lng: (loc?['lng'] as num?)?.toDouble(),
+    );
+  }
 
   final String id;
   final String name;
   final String landmark;
   final int? toCampusMin;
   final int? fromCampusMin;
+  final double? lat;
+  final double? lng;
+
+  bool get hasLocation => lat != null && lng != null;
 
   int? offset(BusDirection d) =>
       d == BusDirection.toCampus ? toCampusMin : fromCampusMin;
+
+  /// A copy; pass `() => null` to clear a time or the location.
+  BusStop copyWith({
+    String? name,
+    String? landmark,
+    int? Function()? toCampusMin,
+    int? Function()? fromCampusMin,
+    ({double lat, double lng})? Function()? location,
+  }) {
+    final loc = location == null
+        ? (hasLocation ? (lat: lat!, lng: lng!) : null)
+        : location();
+    return BusStop(
+      id: id,
+      name: name ?? this.name,
+      landmark: landmark ?? this.landmark,
+      toCampusMin: toCampusMin == null ? this.toCampusMin : toCampusMin(),
+      fromCampusMin: fromCampusMin == null
+          ? this.fromCampusMin
+          : fromCampusMin(),
+      lat: loc?.lat,
+      lng: loc?.lng,
+    );
+  }
+
+  /// The location as the API sends it: {lat, lng} or null.
+  Map<String, Object?>? get locationJson =>
+      hasLocation ? {'lat': lat, 'lng': lng} : null;
 
   Map<String, Object?> toJson() => {
     'id': id,
@@ -46,6 +86,7 @@ class BusStop {
     'landmark': landmark,
     'toCampusMin': toCampusMin,
     'fromCampusMin': fromCampusMin,
+    'location': locationJson,
   };
 }
 

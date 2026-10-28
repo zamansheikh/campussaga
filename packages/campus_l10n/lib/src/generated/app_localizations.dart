@@ -476,6 +476,384 @@ abstract class AppLocalizations {
   /// **'Pick at least one day.'**
   String get busPickDay;
 
+  /// No description provided for @busEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get busEdit;
+
+  /// No description provided for @busSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish setting up this route'**
+  String get busSetupTitle;
+
+  /// No description provided for @busSetupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Students can use the route once it has stops and departure times.'**
+  String get busSetupBody;
+
+  /// No description provided for @busSetupStops.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the stops'**
+  String get busSetupStops;
+
+  /// No description provided for @busSetupTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Add departure times'**
+  String get busSetupTimes;
+
+  /// No description provided for @busSetupMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Place the stops on the map'**
+  String get busSetupMap;
+
+  /// No description provided for @busStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get busStart;
+
+  /// No description provided for @busLegFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes from {stop}'**
+  String busLegFrom(String stop);
+
+  /// No description provided for @busLegBackFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'On the way back: minutes from {stop}'**
+  String busLegBackFrom(String stop);
+
+  /// No description provided for @busFirstStopNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The trip to campus starts here.'**
+  String get busFirstStopNote;
+
+  /// No description provided for @busLastStopNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The trip back starts here.'**
+  String get busLastStopNote;
+
+  /// No description provided for @busNoTime.
+  ///
+  /// In en, this message translates to:
+  /// **'No time'**
+  String get busNoTime;
+
+  /// No description provided for @busLegValue.
+  ///
+  /// In en, this message translates to:
+  /// **'+{minutes} min'**
+  String busLegValue(int minutes);
+
+  /// No description provided for @busTotalTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min to campus'**
+  String busTotalTrip(int minutes);
+
+  /// No description provided for @busLegHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty if you don\'t know. Students then see “—” for this stop.'**
+  String get busLegHint;
+
+  /// No description provided for @busSameWayBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Same times on the way back'**
+  String get busSameWayBack;
+
+  /// No description provided for @busSameWayBackHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The way back takes the same time between stops, in reverse.'**
+  String get busSameWayBackHint;
+
+  /// No description provided for @busQuickAddHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a stop and press Enter'**
+  String get busQuickAddHint;
+
+  /// No description provided for @busPasteList.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a list'**
+  String get busPasteList;
+
+  /// No description provided for @busPasteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste stops'**
+  String get busPasteTitle;
+
+  /// No description provided for @busPasteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'One per line, or separated by commas, like in a transport notice. Text in brackets becomes the landmark.'**
+  String get busPasteBody;
+
+  /// No description provided for @busPasteFromClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get busPasteFromClipboard;
+
+  /// No description provided for @busPasteAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Add 1 stop} other{Add {count} stops}}'**
+  String busPasteAdd(int count);
+
+  /// No description provided for @busPasteNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No stops found in this text yet.'**
+  String get busPasteNone;
+
+  /// No description provided for @busTooManyStops.
+  ///
+  /// In en, this message translates to:
+  /// **'A route can have at most {max} stops.'**
+  String busTooManyStops(int max);
+
+  /// No description provided for @busStopRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} removed'**
+  String busStopRemoved(String name);
+
+  /// No description provided for @busDepartureRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Departure removed'**
+  String get busDepartureRemoved;
+
+  /// No description provided for @busUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get busUndo;
+
+  /// No description provided for @busRemoveStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove stop'**
+  String get busRemoveStop;
+
+  /// No description provided for @busEditStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit stop'**
+  String get busEditStop;
+
+  /// No description provided for @busDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard your changes?'**
+  String get busDiscardTitle;
+
+  /// No description provided for @busDiscardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t saved them yet.'**
+  String get busDiscardBody;
+
+  /// No description provided for @busDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get busDiscard;
+
+  /// No description provided for @busKeepEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get busKeepEditing;
+
+  /// No description provided for @busTripTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'A trip can\'t be longer than 10 hours. Check the minutes.'**
+  String get busTripTooLong;
+
+  /// No description provided for @busLocationNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not on the map yet'**
+  String get busLocationNone;
+
+  /// No description provided for @busLocationSet.
+  ///
+  /// In en, this message translates to:
+  /// **'On the map'**
+  String get busLocationSet;
+
+  /// No description provided for @busSetOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Set on map'**
+  String get busSetOnMap;
+
+  /// No description provided for @busChangeLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get busChangeLocation;
+
+  /// No description provided for @busRemoveLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from the map'**
+  String get busRemoveLocation;
+
+  /// No description provided for @busPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Place {stop}'**
+  String busPickerTitle(String stop);
+
+  /// No description provided for @busPickerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Move the map until the pin is on the stop.'**
+  String get busPickerHint;
+
+  /// No description provided for @busUseThisPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this place'**
+  String get busUseThisPlace;
+
+  /// No description provided for @busSearchPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a place'**
+  String get busSearchPlace;
+
+  /// No description provided for @busSearchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No places found. Try another name, or move the map.'**
+  String get busSearchNoResults;
+
+  /// No description provided for @busSearchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Search isn\'t working right now. Move the map instead.'**
+  String get busSearchFailed;
+
+  /// No description provided for @busMapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Route map'**
+  String get busMapTitle;
+
+  /// No description provided for @busOpenMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Open map'**
+  String get busOpenMap;
+
+  /// No description provided for @busNotOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 stop isn\'t on the map yet} other{{count} stops aren\'t on the map yet}}'**
+  String busNotOnMap(int count);
+
+  /// No description provided for @busDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'Directions'**
+  String get busDirections;
+
+  /// No description provided for @busSetMyStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as my stop'**
+  String get busSetMyStop;
+
+  /// No description provided for @busStopNoTime.
+  ///
+  /// In en, this message translates to:
+  /// **'{stop} has no time listed.'**
+  String busStopNoTime(String stop);
+
+  /// No description provided for @busRouteLeaves.
+  ///
+  /// In en, this message translates to:
+  /// **'The bus leaves {stop} at {time}.'**
+  String busRouteLeaves(String stop, String time);
+
+  /// No description provided for @busNoTripsToCampus.
+  ///
+  /// In en, this message translates to:
+  /// **'No buses to campus on this route.'**
+  String get busNoTripsToCampus;
+
+  /// No description provided for @busNoTripsFromCampus.
+  ///
+  /// In en, this message translates to:
+  /// **'No buses from campus on this route.'**
+  String get busNoTripsFromCampus;
+
+  /// No description provided for @busLeavesFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'When it leaves {stop}'**
+  String busLeavesFrom(String stop);
+
+  /// No description provided for @busAddTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Add times'**
+  String get busAddTimes;
+
+  /// No description provided for @busAddAnotherTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another time'**
+  String get busAddAnotherTime;
+
+  /// No description provided for @busAddDepartures.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Add 1 departure} other{Add {count} departures}}'**
+  String busAddDepartures(int count);
+
+  /// No description provided for @busPickTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one time.'**
+  String get busPickTime;
+
+  /// No description provided for @busStopsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 stop} other{{count} stops}}'**
+  String busStopsCount(int count);
+
+  /// No description provided for @busTimetableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Timetable'**
+  String get busTimetableTitle;
+
+  /// No description provided for @busNoTimesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No times yet'**
+  String get busNoTimesYet;
+
   /// No description provided for @teacherReviewsTitle.
   ///
   /// In en, this message translates to:

@@ -29,6 +29,8 @@ type BusStop struct {
 	Landmark      string
 	ToCampusMin   *int16
 	FromCampusMin *int16
+	Lat           *float64
+	Lng           *float64
 }
 
 type BusTrip struct {

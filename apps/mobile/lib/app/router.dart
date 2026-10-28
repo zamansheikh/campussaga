@@ -37,6 +37,7 @@ import '../features/reminders/presentation/reminders_page.dart';
 import '../features/routine/presentation/routine_page.dart';
 import '../features/today/presentation/today_page.dart';
 import '../features/transport/presentation/pages/bus_route_edit_page.dart';
+import '../features/transport/presentation/pages/bus_route_map_page.dart';
 import '../features/transport/presentation/pages/bus_route_page.dart';
 import '../features/transport/presentation/pages/bus_routes_page.dart';
 import '../features/transport/presentation/pages/bus_stops_edit_page.dart';
@@ -122,6 +123,10 @@ abstract final class Routes {
   static String busEdit(String id) => '/bus/$id/edit';
   static String busStops(String id) => '/bus/$id/stops';
   static String busTrips(String id) => '/bus/$id/trips';
+  static String busMap(String id) => '/bus/$id/map';
+
+  /// `extra` for [busRoute] right after creating it: start the setup.
+  static const busSetup = 'setup';
 }
 
 /// App routes. Signed-out students see the welcome slides once, then only
@@ -393,9 +398,16 @@ final _busRoutes = GoRoute(
     GoRoute(path: 'new', builder: (context, state) => const BusRouteEditPage()),
     GoRoute(
       path: ':routeId',
-      builder: (context, state) =>
-          BusRoutePage(routeId: state.pathParameters['routeId']!),
+      builder: (context, state) => BusRoutePage(
+        routeId: state.pathParameters['routeId']!,
+        setup: state.extra == Routes.busSetup,
+      ),
       routes: [
+        GoRoute(
+          path: 'map',
+          builder: (context, state) =>
+              BusRouteMapPage(routeId: state.pathParameters['routeId']!),
+        ),
         GoRoute(
           path: 'edit',
           builder: (context, state) =>

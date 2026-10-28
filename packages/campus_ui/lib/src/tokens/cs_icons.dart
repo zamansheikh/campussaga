@@ -46,7 +46,9 @@ abstract final class CsIcons {
   static const IconData delete = PhosphorIconsRegular.trash;
   static const IconData department = PhosphorIconsRegular.buildings;
   static const IconData details = PhosphorIconsRegular.textAlignLeft;
+  static const IconData directions = PhosphorIconsRegular.navigationArrow;
   static const IconData doneForToday = PhosphorIconsRegular.coffee;
+  static const IconData dragHandle = PhosphorIconsRegular.dotsSixVertical;
   static const IconData edit = PhosphorIconsRegular.pencilSimple;
   static const IconData editNote = PhosphorIconsRegular.notePencil;
   static const IconData email = PhosphorIconsRegular.envelopeSimple;
@@ -77,6 +79,7 @@ abstract final class CsIcons {
   static const IconData maintenance = PhosphorIconsRegular.wrench;
 
   /// Three-dot menus (Flutter's default is a Material icon).
+  static const IconData map = PhosphorIconsRegular.mapTrifold;
   static const IconData more = PhosphorIconsBold.dotsThreeVertical;
   static const IconData members = PhosphorIconsRegular.users;
   static const IconData meToo = PhosphorIconsRegular.handPalm;
@@ -87,10 +90,13 @@ abstract final class CsIcons {
   static const IconData note = PhosphorIconsRegular.note;
   static const IconData offline = PhosphorIconsRegular.cloudSlash;
   static const IconData openExternal = PhosphorIconsRegular.arrowSquareOut;
+  static const IconData paste = PhosphorIconsRegular.clipboard;
   static const IconData pending = PhosphorIconsRegular.hourglassMedium;
   static const IconData phone = PhosphorIconsRegular.deviceMobile;
   static const IconData pin = PhosphorIconsFill.pushPin;
   static const IconData place = PhosphorIconsRegular.mapPin;
+  static const IconData placeAdd = PhosphorIconsRegular.mapPinPlus;
+  static const IconData placeFill = PhosphorIconsFill.mapPin;
   static const IconData presentation = PhosphorIconsRegular.presentationChart;
   static const IconData privacy = PhosphorIconsRegular.shieldCheck;
   static const IconData profile = PhosphorIconsRegular.user;

@@ -161,7 +161,7 @@ class _RouteCard extends StatelessWidget {
     final mine = myNext(route, myStop, now);
     final next = mine ?? nextRouteDeparture(route, now);
     final nextText = next == null
-        ? l10n.busNoMoreBuses
+        ? (route.trips.isEmpty ? l10n.busNoTimesYet : l10n.busNoMoreBuses)
         : mine != null
         ? '${l10n.busNextFrom(mine.stop.name)}: ${timeOf(context, mine.at)} · ${whenText(context, mine.at, now)}'
         : '${l10n.busNextAt(timeOf(context, next.at))} · ${whenText(context, next.at, now)}';
@@ -207,7 +207,7 @@ class _RouteCard extends StatelessWidget {
                       if (route.span.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
-                          route.span,
+                          '${route.span} · ${l10n.busStopsCount(route.stops.length)}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: context.text.bodySmall?.copyWith(

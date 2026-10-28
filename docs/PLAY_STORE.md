@@ -102,6 +102,11 @@ Google's reviewers have no university email. The API has a reviewer sign-in
 Not collected: location, contacts, phone number, financial info, health,
 messages, audio, files, web history, installed apps.
 
+Bus route maps don't change this: the app never reads the phone's location
+(no location permission). Stop locations are places transport reps put on
+the map. Map images and place search come from OpenStreetMap, which sees
+the phone's IP address like any website (listed in the privacy policy).
+
 ### Permissions to explain if asked
 - `SCHEDULE_EXACT_ALARM`: class reminders at the exact time (the student
   turns it on; not `USE_EXACT_ALARM`, so no declaration form).

@@ -25,6 +25,8 @@ const stopsSchema = z
       landmark: z.string().trim().max(100),
       toCampusMin: minutes,
       fromCampusMin: minutes,
+      // Always sent: null removes the stop from the map.
+      location: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }).nullable(),
     }),
   )
   .max(60, "A route can have at most 60 stops.");

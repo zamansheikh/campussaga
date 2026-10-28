@@ -12,15 +12,21 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../classes/presentation/class_format.dart';
 import '../bus_cubit.dart';
 import '../bus_format.dart';
+import '../bus_map.dart';
+import '../widgets/bus_route_map_card.dart';
 
 enum _Edit { route, stops, trips, delete }
 
-/// One route: the next buses from my stop, the stops with this trip's
-/// times, and every departure. Reps get the edit menu.
+/// One route: the next buses from my stop, the map, the stops with this
+/// trip's times, and every departure. Reps get edit buttons, and a setup
+/// guide while the route has no stops or times.
 class BusRoutePage extends StatefulWidget {
-  const BusRoutePage({super.key, required this.routeId});
+  const BusRoutePage({super.key, required this.routeId, this.setup = false});
 
   final String routeId;
+
+  /// Just created: go straight to adding stops, then departure times.
+  final bool setup;
 
   @override
   State<BusRoutePage> createState() => _BusRoutePageState();
@@ -38,16 +44,32 @@ class _BusRoutePageState extends State<BusRoutePage> {
     // Opened straight from a link: load the routes first.
     final user = context.read<AuthBloc>().state.user;
     if (_cubit.state.routes == null && user != null) _cubit.open(user.id);
+    if (widget.setup) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _editStops());
+    }
   }
+
+  /// Stops first; a route saved with stops but no times goes on to them.
+  Future<void> _editStops() async {
+    final saved = await context.push<bool>(Routes.busStops(widget.routeId));
+    if (saved != true || !mounted) return;
+    final r = _cubit.state.route(widget.routeId);
+    if (r != null && r.stops.isNotEmpty && r.trips.isEmpty) {
+      await context.push<bool>(Routes.busTrips(widget.routeId));
+    }
+  }
+
+  Future<void> _editTrips() =>
+      context.push<bool>(Routes.busTrips(widget.routeId));
 
   Future<void> _edit(BusRoute r, _Edit e) async {
     switch (e) {
       case _Edit.route:
         await context.push(Routes.busEdit(r.id));
       case _Edit.stops:
-        await context.push(Routes.busStops(r.id));
+        await _editStops();
       case _Edit.trips:
-        await context.push(Routes.busTrips(r.id));
+        await _editTrips();
       case _Edit.delete:
         final l10n = AppLocalizations.of(context);
         final ok = await showDialog<bool>(
@@ -216,6 +238,14 @@ class _BusRoutePageState extends State<BusRoutePage> {
                   onSelectionChanged: (v) => setState(() => _dir = v.first),
                 ),
                 const SizedBox(height: CsSpace.md),
+                if (canEdit && (r.stops.isEmpty || r.trips.isEmpty)) ...[
+                  _SetupCard(
+                    route: r,
+                    onStops: _editStops,
+                    onTimes: _editTrips,
+                  ),
+                  const SizedBox(height: CsSpace.md),
+                ],
                 _MyStopCard(
                   route: r,
                   stop: myStop,
@@ -223,15 +253,35 @@ class _BusRoutePageState extends State<BusRoutePage> {
                   now: now,
                   onPick: () => _pickStop(r, myStopId),
                 ),
+                if (routePoints(r).isNotEmpty) ...[
+                  const SizedBox(height: CsSpace.lg),
+                  BusRouteMapCard(
+                    route: r,
+                    myStopId: myStopId,
+                    onOpen: () => context.push(Routes.busMap(r.id)),
+                  ),
+                ] else if (canEdit && r.stops.isNotEmpty) ...[
+                  const SizedBox(height: CsSpace.md),
+                  OutlinedButton.icon(
+                    onPressed: _editStops,
+                    icon: const Icon(CsIcons.placeAdd),
+                    label: Text(l10n.busSetupMap),
+                  ),
+                ],
                 const SizedBox(height: CsSpace.lg),
                 _StopsTimeline(
                   route: r,
                   direction: _dir,
                   now: now,
                   myStopId: myStopId,
+                  onEdit: canEdit ? _editStops : null,
                 ),
                 const SizedBox(height: CsSpace.lg),
-                _Departures(route: r, direction: _dir),
+                _Departures(
+                  route: r,
+                  direction: _dir,
+                  onEdit: canEdit ? _editTrips : null,
+                ),
               ],
             ),
           ),
@@ -256,6 +306,36 @@ class _MyStopCard extends StatelessWidget {
   final DateTime now;
   final VoidCallback onPick;
 
+  /// Why there's no time for [s]: no buses this way, no time listed for
+  /// this stop (then when the bus leaves its first timed stop), or none
+  /// left this week.
+  String _noBusText(BuildContext context, BusStop s) {
+    final l10n = AppLocalizations.of(context);
+    if (!route.trips.any((t) => t.direction == direction)) {
+      return direction == BusDirection.toCampus
+          ? l10n.busNoTripsToCampus
+          : l10n.busNoTripsFromCampus;
+    }
+    if (s.offset(direction) != null) return l10n.busNoMoreBuses;
+    final ordered = direction == BusDirection.toCampus
+        ? route.stops
+        : route.stops.reversed;
+    final first = ordered.where((x) => x.offset(direction) != null).firstOrNull;
+    final at = first == null
+        ? null
+        : nextDepartures(
+            route,
+            stopId: first.id,
+            direction: direction,
+            now: now,
+            limit: 1,
+          ).firstOrNull;
+    if (first == null || at == null) return l10n.busStopNoTime(s.name);
+    return '${l10n.busStopNoTime(s.name)} '
+        '${l10n.busRouteLeaves(first.name, timeOf(context, at.at))} '
+        '(${whenText(context, at.at, now)})';
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -275,6 +355,7 @@ class _MyStopCard extends StatelessWidget {
       now: now,
       limit: 3,
     );
+    final why = next.isEmpty ? _noBusText(context, s) : null;
     return Container(
       padding: const EdgeInsets.all(CsSpace.md),
       decoration: BoxDecoration(
@@ -299,8 +380,8 @@ class _MyStopCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: CsSpace.sm),
-          if (next.isEmpty)
-            Text(l10n.busNoMoreBuses, style: context.text.bodyMedium)
+          if (why != null)
+            Text(why, style: context.text.bodyMedium)
           else ...[
             Text(
               timeOf(context, next.first.at),
@@ -346,12 +427,14 @@ class _StopsTimeline extends StatelessWidget {
     required this.direction,
     required this.now,
     required this.myStopId,
+    this.onEdit,
   });
 
   final BusRoute route;
   final BusDirection direction;
   final DateTime now;
   final String? myStopId;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -360,9 +443,11 @@ class _StopsTimeline extends StatelessWidget {
     final stops = direction == BusDirection.toCampus
         ? route.stops
         : route.stops.reversed.toList();
+    final action = onEdit == null ? null : _EditButton(onPressed: onEdit!);
     if (stops.isEmpty) {
       return CsSection(
         title: l10n.busStopsTitle,
+        action: action,
         children: [
           CsRow(
             icon: CsIcons.place,
@@ -390,17 +475,8 @@ class _StopsTimeline extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: CsSpace.xs, bottom: CsSpace.sm),
-          child: Text(
-            l10n.busStopsTitle.toUpperCase(),
-            style: context.text.labelMedium?.copyWith(
-              letterSpacing: 0.8,
-              fontWeight: FontWeight.w600,
-              color: cs.textSecondary,
-            ),
-          ),
-        ),
+        CsSectionTitle(title: l10n.busStopsTitle, action: action),
+        if (action != null) const SizedBox(height: CsSpace.xs),
         for (var i = 0; i < stops.length; i++)
           IntrinsicHeight(
             child: Row(
@@ -486,10 +562,15 @@ class _StopsTimeline extends StatelessWidget {
 }
 
 class _Departures extends StatelessWidget {
-  const _Departures({required this.route, required this.direction});
+  const _Departures({
+    required this.route,
+    required this.direction,
+    this.onEdit,
+  });
 
   final BusRoute route;
   final BusDirection direction;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -501,6 +582,7 @@ class _Departures extends StatelessWidget {
         : route.stops.lastOrNull?.name;
     return CsSection(
       title: l10n.busDepartures,
+      action: onEdit == null ? null : _EditButton(onPressed: onEdit!),
       children: [
         if (trips.isEmpty)
           CsRow(icon: CsIcons.time, title: l10n.busNoTrips, showChevron: false)
@@ -517,6 +599,103 @@ class _Departures extends StatelessWidget {
               showChevron: false,
             ),
       ],
+    );
+  }
+}
+
+class _EditButton extends StatelessWidget {
+  const _EditButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) => TextButton.icon(
+    onPressed: onPressed,
+    icon: const Icon(CsIcons.edit, size: 16),
+    label: Text(AppLocalizations.of(context).busEdit),
+  );
+}
+
+/// For transport reps while a route has no stops or no times yet.
+class _SetupCard extends StatelessWidget {
+  const _SetupCard({
+    required this.route,
+    required this.onStops,
+    required this.onTimes,
+  });
+
+  final BusRoute route;
+  final VoidCallback onStops;
+  final VoidCallback onTimes;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cs = context.cs;
+    Widget step(int n, String title, bool done, VoidCallback? onTap) =>
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          enabled: onTap != null || done,
+          leading: done
+              ? Icon(CsIcons.checkCircle, color: cs.primary)
+              : CircleAvatar(
+                  radius: 12,
+                  backgroundColor: onTap == null ? cs.border : cs.primary,
+                  foregroundColor: cs.onPrimary,
+                  child: Text(
+                    '$n',
+                    style: context.text.labelMedium?.copyWith(
+                      color: cs.onPrimary,
+                    ),
+                  ),
+                ),
+          title: Text(
+            title,
+            style: done
+                ? context.text.bodyLarge?.copyWith(
+                    color: cs.textSecondary,
+                    decoration: TextDecoration.lineThrough,
+                  )
+                : context.text.bodyLarge,
+          ),
+          trailing: done || onTap == null
+              ? null
+              : Icon(CsIcons.chevronRight, color: cs.textSecondary),
+          onTap: done ? null : onTap,
+        );
+    final hasStops = route.stops.isNotEmpty;
+    return Material(
+      color: cs.primaryContainer.withValues(alpha: 0.5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(CsRadius.lg),
+        side: BorderSide(color: cs.primary.withValues(alpha: 0.3)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          CsSpace.md,
+          CsSpace.md,
+          CsSpace.md,
+          CsSpace.xs,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.busSetupTitle, style: context.text.titleSmall),
+            const SizedBox(height: 2),
+            Text(
+              l10n.busSetupBody,
+              style: context.text.bodySmall?.copyWith(color: cs.textSecondary),
+            ),
+            step(1, l10n.busSetupStops, hasStops, onStops),
+            step(
+              2,
+              l10n.busSetupTimes,
+              route.trips.isNotEmpty,
+              hasStops ? onTimes : null,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

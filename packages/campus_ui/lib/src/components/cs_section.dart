@@ -6,9 +6,17 @@ import '../tokens/dimensions.dart';
 
 /// A titled group of rows on one rounded card, like a settings section.
 class CsSection extends StatelessWidget {
-  const CsSection({super.key, this.title, required this.children});
+  const CsSection({
+    super.key,
+    this.title,
+    this.action,
+    required this.children,
+  });
 
   final String? title;
+
+  /// A small button at the end of the title row (e.g. "Edit").
+  final Widget? action;
   final List<Widget> children;
 
   @override
@@ -22,23 +30,7 @@ class CsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (title != null)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              CsSpace.xs,
-              0,
-              CsSpace.xs,
-              CsSpace.sm,
-            ),
-            child: Text(
-              title!.toUpperCase(),
-              style: context.text.labelMedium?.copyWith(
-                letterSpacing: 0.8,
-                color: cs.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
+        if (title != null) CsSectionTitle(title: title!, action: action),
         Material(
           color: cs.surface,
           shape: RoundedRectangleBorder(
@@ -142,6 +134,37 @@ class CsRow extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A section's small uppercase title, with an optional [action] at the end.
+class CsSectionTitle extends StatelessWidget {
+  const CsSectionTitle({super.key, required this.title, this.action});
+
+  final String title;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Text(
+      title.toUpperCase(),
+      style: context.text.labelMedium?.copyWith(
+        letterSpacing: 0.8,
+        color: context.cs.textSecondary,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        CsSpace.xs,
+        0,
+        CsSpace.xs,
+        action == null ? CsSpace.sm : 0,
+      ),
+      child: action == null
+          ? text
+          : Row(children: [Expanded(child: text), action!]),
     );
   }
 }
