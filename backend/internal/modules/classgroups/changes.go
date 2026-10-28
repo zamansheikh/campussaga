@@ -51,6 +51,8 @@ type Change struct {
 	Start       *string    `json:"start"`
 	End         *string    `json:"end"`
 	Note        string     `json:"note"`
+	// NewDate: a moved class happens on this day instead (null = same day).
+	NewDate *string `json:"newDate"`
 }
 
 // ChangeInput creates a change (CR).
@@ -66,8 +68,11 @@ type ChangeInput struct {
 	Teacher     string `json:"teacher" validate:"max=60"`
 	ClassKind   string `json:"classKind" validate:"omitempty,oneof=theory lab"`
 	Note        string `json:"note" validate:"max=200"`
+	// NewDate moves the class to another day (moved only; "" = same day).
+	NewDate string `json:"newDate"`
 
 	date             time.Time
+	newDate          *time.Time
 	slot             *uuid.UUID
 	startMin, endMin *int16
 }
@@ -94,6 +99,22 @@ func (in *ChangeInput) clean(today time.Time) error {
 		return apperr.Validation(map[string]string{"date": "is too far ahead"})
 	}
 	in.date = d
+
+	if in.NewDate != "" && in.NewDate != in.Date {
+		if in.Kind != ChangeMoved {
+			return apperr.Validation(map[string]string{"newDate": "only a moved class has a new day"})
+		}
+		nd, err := time.Parse("2006-01-02", in.NewDate)
+		switch {
+		case err != nil:
+			return apperr.Validation(map[string]string{"newDate": "must be a date like 2026-10-28"})
+		case nd.Before(today):
+			return apperr.Validation(map[string]string{"newDate": "must be today or later"})
+		case nd.After(today.AddDate(0, 0, MaxChangeDays)):
+			return apperr.Validation(map[string]string{"newDate": "is too far ahead"})
+		}
+		in.newDate = &nd
+	}
 
 	if in.Kind == ChangeExtra {
 		if in.SlotID != "" {
@@ -169,7 +190,7 @@ func (s *Service) AddChange(ctx context.Context, groupID uuid.UUID, in *ChangeIn
 			GroupID: groupID, SlotID: in.slot, Date: in.date, Kind: in.Kind,
 			CourseCode: in.CourseCode, CourseTitle: in.CourseTitle, Teacher: in.Teacher,
 			ClassKind: in.ClassKind, Room: in.Room, StartsMin: in.startMin, EndsMin: in.endMin,
-			Note: in.Note, CreatedBy: &c.UserID,
+			Note: in.Note, CreatedBy: &c.UserID, NewDate: in.newDate,
 		})
 		if err != nil {
 			return err
@@ -209,7 +230,11 @@ func (s *Service) DeleteChange(ctx context.Context, groupID, changeID uuid.UUID)
 		if err := q.TouchGroup(ctx, groupID); err != nil {
 			return err
 		}
-		if ch.Date.Before(s.today()) {
+		last := ch.Date
+		if ch.NewDate != nil && ch.NewDate.After(last) {
+			last = *ch.NewDate
+		}
+		if last.Before(s.today()) {
 			return nil // a past change: nothing to tell
 		}
 		var slot *store.RoutineSlot
@@ -240,8 +265,16 @@ func changeView(c store.RoutineChange) Change {
 		ID: c.ID, Kind: c.Kind, SlotID: c.SlotID, Date: c.Date.Format("2006-01-02"),
 		CourseCode: c.CourseCode, CourseTitle: c.CourseTitle, Teacher: c.Teacher,
 		ClassKind: c.ClassKind, Room: c.Room, Start: clock(c.StartsMin), End: clock(c.EndsMin),
-		Note: c.Note,
+		Note: c.Note, NewDate: dateText(c.NewDate),
 	}
+}
+
+func dateText(d *time.Time) *string {
+	if d == nil {
+		return nil
+	}
+	v := d.Format("2006-01-02")
+	return &v
 }
 
 // isoWeekday: 1 = Monday ... 7 = Sunday.

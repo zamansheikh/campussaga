@@ -34,6 +34,10 @@ func (s *Service) Routes(r *httpx.Router) {
 		Post("/groups/{id}/announcements", httpx.Handle(s.handlePost, httpx.Status(http.StatusCreated)))
 	r.Student().Patch("/groups/{id}/announcements/{a}", httpx.Handle(s.handlePin))
 	r.Student().Delete("/groups/{id}/announcements/{a}", httpx.Handle(s.handleDeleteAnnouncement, httpx.NoContent()))
+	r.Student().With(r.LimitUser("assessment-add", 30, 24*time.Hour)).
+		Post("/groups/{id}/assessments", httpx.Handle(s.handleAddAssessment, httpx.Status(http.StatusCreated)))
+	r.Student().Put("/groups/{id}/assessments/{a}", httpx.Handle(s.handleUpdateAssessment))
+	r.Student().Delete("/groups/{id}/assessments/{a}", httpx.Handle(s.handleDeleteAssessment, httpx.NoContent()))
 	r.Student().Get("/groups/{id}/members", httpx.Handle(s.handleMembers))
 	r.Student().Put("/groups/{id}/members/{user}", httpx.Handle(s.handleSetRole, httpx.NoContent()))
 	r.Student().Delete("/groups/{id}/members/{user}", httpx.Handle(s.handleRemoveMember, httpx.NoContent()))
@@ -249,4 +253,31 @@ func (s *Service) handleUpdatePersonal(ctx context.Context, in *updatePersonalRe
 
 func (s *Service) handleDeletePersonal(ctx context.Context, in *personalPath) (*httpx.Empty, error) {
 	return nil, s.DeletePersonal(ctx, uuid.MustParse(in.ID))
+}
+
+type addAssessmentReq struct {
+	groupPath
+	AssessmentInput
+}
+
+func (s *Service) handleAddAssessment(ctx context.Context, in *addAssessmentReq) (*Assessment, error) {
+	return s.AddAssessment(ctx, uuid.MustParse(in.ID), &in.AssessmentInput)
+}
+
+type assessmentPath struct {
+	ID string `json:"-" path:"id" validate:"required,uuid"`
+	A  string `json:"-" path:"a" validate:"required,uuid"`
+}
+
+type updateAssessmentReq struct {
+	assessmentPath
+	AssessmentInput
+}
+
+func (s *Service) handleUpdateAssessment(ctx context.Context, in *updateAssessmentReq) (*Assessment, error) {
+	return s.UpdateAssessment(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.A), &in.AssessmentInput)
+}
+
+func (s *Service) handleDeleteAssessment(ctx context.Context, in *assessmentPath) (*httpx.Empty, error) {
+	return nil, s.DeleteAssessment(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.A))
 }

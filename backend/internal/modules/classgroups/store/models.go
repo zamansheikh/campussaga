@@ -20,6 +20,22 @@ type Announcement struct {
 	UpdatedAt time.Time
 }
 
+type Assessment struct {
+	ID          uuid.UUID
+	GroupID     uuid.UUID
+	Kind        string
+	CourseCode  string
+	CourseTitle string
+	Date        time.Time
+	StartsMin   *int16
+	EndsMin     *int16
+	Room        string
+	Topics      string
+	CreatedBy   *uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
 type ClassGroup struct {
 	ID           uuid.UUID
 	UniversityID uuid.UUID
@@ -63,6 +79,7 @@ type RoutineChange struct {
 	CreatedBy   *uuid.UUID
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	NewDate     *time.Time
 }
 
 type RoutineSlot struct {

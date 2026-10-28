@@ -88,6 +88,8 @@ type Group struct {
 	Changes []Change `json:"changes"`
 	// The pinned one first, then the last 30 days' newest first.
 	Announcements []Announcement `json:"announcements"`
+	// Tests and deadlines from yesterday on, earliest first.
+	Assessments []Assessment `json:"assessments"`
 	// Course keys the caller doesn't take here (hidden from their routine).
 	HiddenCourses []string  `json:"hiddenCourses"`
 	UpdatedAt     time.Time `json:"updatedAt"`
@@ -189,6 +191,14 @@ func (s *Service) MyGroups(ctx context.Context) ([]Group, error) {
 	if err != nil {
 		return nil, err
 	}
+	roles := make(map[uuid.UUID]string, len(rows))
+	for _, r := range rows {
+		roles[r.ClassGroup.ID] = r.Role
+	}
+	tests, err := s.assessmentsByGroup(ctx, q, c.UserID, roles)
+	if err != nil {
+		return nil, err
+	}
 	hiddenRows, err := q.ListHiddenForUser(ctx, c.UserID)
 	if err != nil {
 		return nil, err
@@ -205,6 +215,9 @@ func (s *Service) MyGroups(ctx context.Context) ([]Group, error) {
 		}
 		if as := news[r.ClassGroup.ID]; as != nil {
 			g.Announcements = as
+		}
+		if ts := tests[r.ClassGroup.ID]; ts != nil {
+			g.Assessments = ts
 		}
 		if hs := hidden[r.ClassGroup.ID]; hs != nil {
 			g.HiddenCourses = hs
@@ -567,7 +580,7 @@ func groupView(g store.ClassGroup, role string, members int64, slots []Slot) Gro
 	return Group{
 		ID: g.ID, Department: g.Department, Batch: g.Batch, Section: g.Section, Semester: g.Semester,
 		JoinCode: g.JoinCode, Role: role, MemberCount: members, Slots: slots, Changes: []Change{},
-		Announcements: []Announcement{}, HiddenCourses: []string{}, UpdatedAt: g.UpdatedAt,
+		Announcements: []Announcement{}, Assessments: []Assessment{}, HiddenCourses: []string{}, UpdatedAt: g.UpdatedAt,
 	}
 }
 

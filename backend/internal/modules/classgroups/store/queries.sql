@@ -88,11 +88,12 @@ DELETE FROM routine_slots WHERE id = @id AND group_id = @group_id;
 -- name: ListChangesForUser :many
 SELECT c.* FROM routine_changes c
 JOIN class_group_members m ON m.group_id = c.group_id
-WHERE m.user_id = @user_id AND c.date >= @from_date
+WHERE m.user_id = @user_id AND (c.date >= @from_date OR c.new_date >= @from_date)
 ORDER BY c.date, c.starts_min NULLS FIRST, c.id;
 
 -- name: CountUpcomingChanges :one
-SELECT count(*) FROM routine_changes WHERE group_id = @group_id AND date >= @from_date;
+SELECT count(*) FROM routine_changes
+WHERE group_id = @group_id AND (date >= @from_date OR new_date >= @from_date);
 
 -- name: GetSlot :one
 SELECT * FROM routine_slots WHERE id = @id AND group_id = @group_id;
@@ -106,9 +107,9 @@ DELETE FROM routine_changes WHERE slot_id = @slot_id;
 
 -- name: CreateChange :one
 INSERT INTO routine_changes (group_id, slot_id, date, kind, course_code, course_title, teacher,
-                             class_kind, room, starts_min, ends_min, note, created_by)
+                             class_kind, room, starts_min, ends_min, note, created_by, new_date)
 VALUES (@group_id, @slot_id, @date, @kind, @course_code, @course_title, @teacher,
-        @class_kind, @room, @starts_min, @ends_min, @note, @created_by)
+        @class_kind, @room, @starts_min, @ends_min, @note, @created_by, sqlc.narg(new_date))
 RETURNING *;
 
 -- name: DeleteChange :execrows
@@ -206,3 +207,38 @@ RETURNING *;
 
 -- name: DeletePersonal :execrows
 DELETE FROM personal_slots WHERE id = @id AND user_id = @user_id;
+
+-- ---- tests and deadlines ------------------------------------------------------
+
+-- name: ListAssessmentsForUser :many
+SELECT a.*, u.display_name AS author_name
+FROM assessments a
+JOIN class_group_members m ON m.group_id = a.group_id
+LEFT JOIN users u ON u.id = a.created_by
+WHERE m.user_id = @user_id AND a.date >= @from_date
+ORDER BY a.date, a.starts_min NULLS LAST, a.id;
+
+-- name: CountUpcomingAssessments :one
+SELECT count(*) FROM assessments WHERE group_id = @group_id AND date >= @from_date;
+
+-- name: CreateAssessment :one
+INSERT INTO assessments (group_id, kind, course_code, course_title, date, starts_min, ends_min,
+                         room, topics, created_by)
+VALUES (@group_id, @kind, @course_code, @course_title, @date, @starts_min, @ends_min,
+        @room, @topics, @created_by)
+RETURNING *;
+
+-- name: GetAssessment :one
+SELECT * FROM assessments WHERE id = @id AND group_id = @group_id FOR UPDATE;
+
+-- name: UpdateAssessment :one
+UPDATE assessments SET kind = @kind, course_code = @course_code, course_title = @course_title,
+    date = @date, starts_min = @starts_min, ends_min = @ends_min, room = @room, topics = @topics
+WHERE id = @id AND group_id = @group_id
+RETURNING *;
+
+-- name: DeleteAssessment :execrows
+DELETE FROM assessments WHERE id = @id AND group_id = @group_id;
+
+-- name: UserName :one
+SELECT display_name FROM users WHERE id = @id;

@@ -81,6 +81,14 @@ func (s *Service) changeNotice(g store.ClassGroup, ch store.RoutineChange, slot 
 		body := join(" · ", time, roomText, ch.Note)
 		var title string
 		switch {
+		case ch.NewDate != nil && undo:
+			back := s.dayText(lang, ch.Date)
+			title = pick(lang, fmt.Sprintf("%s is back on %s", course, back), fmt.Sprintf("%s আবার %s", course, back))
+			body = gt
+		case ch.NewDate != nil:
+			to, was := s.dayText(lang, *ch.NewDate), s.dayText(lang, ch.Date)
+			title = pick(lang, fmt.Sprintf("%s moved to %s", course, to), fmt.Sprintf("%s সরে %s", course, to))
+			body = join(" · ", time, roomText, pick(lang, "was "+was, "আগে ছিল "+was), ch.Note)
 		case undo && ch.Kind == ChangeCancelled:
 			title = pick(lang, fmt.Sprintf("%s %s is on again", course, when), fmt.Sprintf("%s %s আবার হবে", when, course))
 			body = gt
@@ -134,6 +142,11 @@ func (s *Service) whenText(lang string, d time.Time) string {
 	default:
 		return "on " + d.Format("Mon 2 Jan")
 	}
+}
+
+// dayText: "today", "tomorrow" or "Wed 30 Oct" (no "on"; Bangla too).
+func (s *Service) dayText(lang string, d time.Time) string {
+	return strings.TrimPrefix(s.whenText(lang, d), "on ")
 }
 
 // clockText: "10:30 AM" (Bangla digits in Bangla).

@@ -104,8 +104,25 @@ func (q *Queries) CountSlots(ctx context.Context, groupID uuid.UUID) (int64, err
 	return count, err
 }
 
+const countUpcomingAssessments = `-- name: CountUpcomingAssessments :one
+SELECT count(*) FROM assessments WHERE group_id = $1 AND date >= $2
+`
+
+type CountUpcomingAssessmentsParams struct {
+	GroupID  uuid.UUID
+	FromDate time.Time
+}
+
+func (q *Queries) CountUpcomingAssessments(ctx context.Context, arg CountUpcomingAssessmentsParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countUpcomingAssessments, arg.GroupID, arg.FromDate)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countUpcomingChanges = `-- name: CountUpcomingChanges :one
-SELECT count(*) FROM routine_changes WHERE group_id = $1 AND date >= $2
+SELECT count(*) FROM routine_changes
+WHERE group_id = $1 AND (date >= $2 OR new_date >= $2)
 `
 
 type CountUpcomingChangesParams struct {
@@ -164,12 +181,65 @@ func (q *Queries) CreateAnnouncement(ctx context.Context, arg CreateAnnouncement
 	return i, err
 }
 
+const createAssessment = `-- name: CreateAssessment :one
+INSERT INTO assessments (group_id, kind, course_code, course_title, date, starts_min, ends_min,
+                         room, topics, created_by)
+VALUES ($1, $2, $3, $4, $5, $6, $7,
+        $8, $9, $10)
+RETURNING id, group_id, kind, course_code, course_title, date, starts_min, ends_min, room, topics, created_by, created_at, updated_at
+`
+
+type CreateAssessmentParams struct {
+	GroupID     uuid.UUID
+	Kind        string
+	CourseCode  string
+	CourseTitle string
+	Date        time.Time
+	StartsMin   *int16
+	EndsMin     *int16
+	Room        string
+	Topics      string
+	CreatedBy   *uuid.UUID
+}
+
+func (q *Queries) CreateAssessment(ctx context.Context, arg CreateAssessmentParams) (Assessment, error) {
+	row := q.db.QueryRow(ctx, createAssessment,
+		arg.GroupID,
+		arg.Kind,
+		arg.CourseCode,
+		arg.CourseTitle,
+		arg.Date,
+		arg.StartsMin,
+		arg.EndsMin,
+		arg.Room,
+		arg.Topics,
+		arg.CreatedBy,
+	)
+	var i Assessment
+	err := row.Scan(
+		&i.ID,
+		&i.GroupID,
+		&i.Kind,
+		&i.CourseCode,
+		&i.CourseTitle,
+		&i.Date,
+		&i.StartsMin,
+		&i.EndsMin,
+		&i.Room,
+		&i.Topics,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const createChange = `-- name: CreateChange :one
 INSERT INTO routine_changes (group_id, slot_id, date, kind, course_code, course_title, teacher,
-                             class_kind, room, starts_min, ends_min, note, created_by)
+                             class_kind, room, starts_min, ends_min, note, created_by, new_date)
 VALUES ($1, $2, $3, $4, $5, $6, $7,
-        $8, $9, $10, $11, $12, $13)
-RETURNING id, group_id, slot_id, date, kind, course_code, course_title, teacher, class_kind, room, starts_min, ends_min, note, created_by, created_at, updated_at
+        $8, $9, $10, $11, $12, $13, $14)
+RETURNING id, group_id, slot_id, date, kind, course_code, course_title, teacher, class_kind, room, starts_min, ends_min, note, created_by, created_at, updated_at, new_date
 `
 
 type CreateChangeParams struct {
@@ -186,6 +256,7 @@ type CreateChangeParams struct {
 	EndsMin     *int16
 	Note        string
 	CreatedBy   *uuid.UUID
+	NewDate     *time.Time
 }
 
 func (q *Queries) CreateChange(ctx context.Context, arg CreateChangeParams) (RoutineChange, error) {
@@ -203,6 +274,7 @@ func (q *Queries) CreateChange(ctx context.Context, arg CreateChangeParams) (Rou
 		arg.EndsMin,
 		arg.Note,
 		arg.CreatedBy,
+		arg.NewDate,
 	)
 	var i RoutineChange
 	err := row.Scan(
@@ -222,6 +294,7 @@ func (q *Queries) CreateChange(ctx context.Context, arg CreateChangeParams) (Rou
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.NewDate,
 	)
 	return i, err
 }
@@ -377,6 +450,23 @@ func (q *Queries) DeleteAnnouncement(ctx context.Context, arg DeleteAnnouncement
 	return result.RowsAffected(), nil
 }
 
+const deleteAssessment = `-- name: DeleteAssessment :execrows
+DELETE FROM assessments WHERE id = $1 AND group_id = $2
+`
+
+type DeleteAssessmentParams struct {
+	ID      uuid.UUID
+	GroupID uuid.UUID
+}
+
+func (q *Queries) DeleteAssessment(ctx context.Context, arg DeleteAssessmentParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteAssessment, arg.ID, arg.GroupID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const deleteChange = `-- name: DeleteChange :execrows
 DELETE FROM routine_changes WHERE id = $1 AND group_id = $2
 `
@@ -472,8 +562,38 @@ func (q *Queries) DeleteSlotChanges(ctx context.Context, slotID *uuid.UUID) erro
 	return err
 }
 
+const getAssessment = `-- name: GetAssessment :one
+SELECT id, group_id, kind, course_code, course_title, date, starts_min, ends_min, room, topics, created_by, created_at, updated_at FROM assessments WHERE id = $1 AND group_id = $2 FOR UPDATE
+`
+
+type GetAssessmentParams struct {
+	ID      uuid.UUID
+	GroupID uuid.UUID
+}
+
+func (q *Queries) GetAssessment(ctx context.Context, arg GetAssessmentParams) (Assessment, error) {
+	row := q.db.QueryRow(ctx, getAssessment, arg.ID, arg.GroupID)
+	var i Assessment
+	err := row.Scan(
+		&i.ID,
+		&i.GroupID,
+		&i.Kind,
+		&i.CourseCode,
+		&i.CourseTitle,
+		&i.Date,
+		&i.StartsMin,
+		&i.EndsMin,
+		&i.Room,
+		&i.Topics,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getChange = `-- name: GetChange :one
-SELECT id, group_id, slot_id, date, kind, course_code, course_title, teacher, class_kind, room, starts_min, ends_min, note, created_by, created_at, updated_at FROM routine_changes WHERE id = $1 AND group_id = $2
+SELECT id, group_id, slot_id, date, kind, course_code, course_title, teacher, class_kind, room, starts_min, ends_min, note, created_by, created_at, updated_at, new_date FROM routine_changes WHERE id = $1 AND group_id = $2
 `
 
 type GetChangeParams struct {
@@ -501,6 +621,7 @@ func (q *Queries) GetChange(ctx context.Context, arg GetChangeParams) (RoutineCh
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.NewDate,
 	)
 	return i, err
 }
@@ -659,11 +780,79 @@ func (q *Queries) ListAnnouncementsForUser(ctx context.Context, arg ListAnnounce
 	return items, nil
 }
 
+const listAssessmentsForUser = `-- name: ListAssessmentsForUser :many
+
+SELECT a.id, a.group_id, a.kind, a.course_code, a.course_title, a.date, a.starts_min, a.ends_min, a.room, a.topics, a.created_by, a.created_at, a.updated_at, u.display_name AS author_name
+FROM assessments a
+JOIN class_group_members m ON m.group_id = a.group_id
+LEFT JOIN users u ON u.id = a.created_by
+WHERE m.user_id = $1 AND a.date >= $2
+ORDER BY a.date, a.starts_min NULLS LAST, a.id
+`
+
+type ListAssessmentsForUserParams struct {
+	UserID   uuid.UUID
+	FromDate time.Time
+}
+
+type ListAssessmentsForUserRow struct {
+	ID          uuid.UUID
+	GroupID     uuid.UUID
+	Kind        string
+	CourseCode  string
+	CourseTitle string
+	Date        time.Time
+	StartsMin   *int16
+	EndsMin     *int16
+	Room        string
+	Topics      string
+	CreatedBy   *uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	AuthorName  *string
+}
+
+// ---- tests and deadlines ------------------------------------------------------
+func (q *Queries) ListAssessmentsForUser(ctx context.Context, arg ListAssessmentsForUserParams) ([]ListAssessmentsForUserRow, error) {
+	rows, err := q.db.Query(ctx, listAssessmentsForUser, arg.UserID, arg.FromDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListAssessmentsForUserRow{}
+	for rows.Next() {
+		var i ListAssessmentsForUserRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.GroupID,
+			&i.Kind,
+			&i.CourseCode,
+			&i.CourseTitle,
+			&i.Date,
+			&i.StartsMin,
+			&i.EndsMin,
+			&i.Room,
+			&i.Topics,
+			&i.CreatedBy,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.AuthorName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listChangesForUser = `-- name: ListChangesForUser :many
 
-SELECT c.id, c.group_id, c.slot_id, c.date, c.kind, c.course_code, c.course_title, c.teacher, c.class_kind, c.room, c.starts_min, c.ends_min, c.note, c.created_by, c.created_at, c.updated_at FROM routine_changes c
+SELECT c.id, c.group_id, c.slot_id, c.date, c.kind, c.course_code, c.course_title, c.teacher, c.class_kind, c.room, c.starts_min, c.ends_min, c.note, c.created_by, c.created_at, c.updated_at, c.new_date FROM routine_changes c
 JOIN class_group_members m ON m.group_id = c.group_id
-WHERE m.user_id = $1 AND c.date >= $2
+WHERE m.user_id = $1 AND (c.date >= $2 OR c.new_date >= $2)
 ORDER BY c.date, c.starts_min NULLS FIRST, c.id
 `
 
@@ -699,6 +888,7 @@ func (q *Queries) ListChangesForUser(ctx context.Context, arg ListChangesForUser
 			&i.CreatedBy,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.NewDate,
 		); err != nil {
 			return nil, err
 		}
@@ -1070,6 +1260,58 @@ func (q *Queries) UnpinAnnouncements(ctx context.Context, groupID uuid.UUID) err
 	return err
 }
 
+const updateAssessment = `-- name: UpdateAssessment :one
+UPDATE assessments SET kind = $1, course_code = $2, course_title = $3,
+    date = $4, starts_min = $5, ends_min = $6, room = $7, topics = $8
+WHERE id = $9 AND group_id = $10
+RETURNING id, group_id, kind, course_code, course_title, date, starts_min, ends_min, room, topics, created_by, created_at, updated_at
+`
+
+type UpdateAssessmentParams struct {
+	Kind        string
+	CourseCode  string
+	CourseTitle string
+	Date        time.Time
+	StartsMin   *int16
+	EndsMin     *int16
+	Room        string
+	Topics      string
+	ID          uuid.UUID
+	GroupID     uuid.UUID
+}
+
+func (q *Queries) UpdateAssessment(ctx context.Context, arg UpdateAssessmentParams) (Assessment, error) {
+	row := q.db.QueryRow(ctx, updateAssessment,
+		arg.Kind,
+		arg.CourseCode,
+		arg.CourseTitle,
+		arg.Date,
+		arg.StartsMin,
+		arg.EndsMin,
+		arg.Room,
+		arg.Topics,
+		arg.ID,
+		arg.GroupID,
+	)
+	var i Assessment
+	err := row.Scan(
+		&i.ID,
+		&i.GroupID,
+		&i.Kind,
+		&i.CourseCode,
+		&i.CourseTitle,
+		&i.Date,
+		&i.StartsMin,
+		&i.EndsMin,
+		&i.Room,
+		&i.Topics,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const updateGroup = `-- name: UpdateGroup :one
 UPDATE class_groups
 SET department = $1, batch = $2, section = $3, semester = $4
@@ -1205,4 +1447,15 @@ func (q *Queries) UpdateSlot(ctx context.Context, arg UpdateSlotParams) (Routine
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const userName = `-- name: UserName :one
+SELECT display_name FROM users WHERE id = $1
+`
+
+func (q *Queries) UserName(ctx context.Context, id uuid.UUID) (*string, error) {
+	row := q.db.QueryRow(ctx, userName, id)
+	var display_name *string
+	err := row.Scan(&display_name)
+	return display_name, err
 }
