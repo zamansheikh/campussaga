@@ -35,11 +35,11 @@ export default async function LoginPage({
       <div className="w-full max-w-sm">
         <Link href="/" className="mb-8 flex items-center justify-center gap-2.5 font-semibold">
           <BrandMark className="size-10 rounded-xl" />
-          <span className="text-xl tracking-tight">Campus Saga</span>
+          <span className="text-xl tracking-tight">VarsityKotha</span>
         </Link>
         <LoginForm next={next ?? ""} notice={notice} />
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          For Campus Saga staff only. Every action is recorded.
+          For VarsityKotha staff only. Every action is recorded.
         </p>
       </div>
     </div>

@@ -58,7 +58,7 @@ const messages: Record<string, string> = {
   ROLE_CONFLICT: "Admins can't also be staff. Make them a student first.",
   NOT_FOUND: "Not found.",
   FORBIDDEN: "You don't have access to this.",
-  NETWORK: "Can't reach the Campus Saga server. Is it running?",
+  NETWORK: "Can't reach the VarsityKotha server. Is it running?",
   INTERNAL_ERROR: "Something went wrong on the server. Try again.",
 };
 

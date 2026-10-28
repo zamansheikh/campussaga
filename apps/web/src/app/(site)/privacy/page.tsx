@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How Campus Saga collects, uses and protects your information.",
+  description: "How VarsityKotha collects, uses and protects your information.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
         </p>
 
         <p>
-          Campus Saga (&quot;the app&quot;, &quot;we&quot;) is a student app for universities in Bangladesh, made by{" "}
+          VarsityKotha (&quot;the app&quot;, &quot;we&quot;) is a student app for universities in Bangladesh, made by{" "}
           <a href="https://silifton.com">Silifton</a>. This policy explains what information the app and its server
           collect, why, who else handles it, how long we keep it, and the choices you have. We wrote it to match what
           the app actually does today. When we add features that use your information in a new way, we will update this
@@ -247,7 +247,7 @@ export default function PrivacyPage() {
 
         <h2>Children</h2>
         <p>
-          Campus Saga is for university students. It is not intended for children under 13, and we do not knowingly
+          VarsityKotha is for university students. It is not intended for children under 13, and we do not knowingly
           collect their information.
         </p>
 
@@ -268,7 +268,7 @@ export default function PrivacyPage() {
         <h1>গোপনীয়তা নীতি</h1>
         <p className="text-muted-foreground">কার্যকর: ২৮ অক্টোবর ২০২৬</p>
         <p>
-          ক্যাম্পাস সাগা (&quot;অ্যাপ&quot;, &quot;আমরা&quot;) বাংলাদেশের বিশ্ববিদ্যালয়ের শিক্ষার্থীদের জন্য একটি অ্যাপ,
+          ভার্সিটি কথা (&quot;অ্যাপ&quot;, &quot;আমরা&quot;) বাংলাদেশের বিশ্ববিদ্যালয়ের শিক্ষার্থীদের জন্য একটি অ্যাপ,
           তৈরি করেছে <a href="https://silifton.com">সিলিফটন</a>। এই নীতিতে বলা হয়েছে অ্যাপ ও এর সার্ভার কী তথ্য নেয়, কেন
           নেয়, আর কে কে তা ব্যবহার করে, কতদিন রাখা হয় এবং তোমার কী কী সুযোগ আছে। ইংরেজি ও বাংলা সংস্করণের মধ্যে কোনো
           অমিল থাকলে ইংরেজি সংস্করণ প্রযোজ্য হবে।
@@ -434,7 +434,7 @@ export default function PrivacyPage() {
 
         <h2>শিশু</h2>
         <p>
-          ক্যাম্পাস সাগা বিশ্ববিদ্যালয়ের শিক্ষার্থীদের জন্য। ১৩ বছরের কম বয়সীদের জন্য নয় এবং আমরা জেনেশুনে তাদের তথ্য
+          ভার্সিটি কথা বিশ্ববিদ্যালয়ের শিক্ষার্থীদের জন্য। ১৩ বছরের কম বয়সীদের জন্য নয় এবং আমরা জেনেশুনে তাদের তথ্য
           নিই না।
         </p>
 

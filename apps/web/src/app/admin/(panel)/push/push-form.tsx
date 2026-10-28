@@ -160,7 +160,7 @@ function Preview({ title, body }: { title: string; body: string }) {
           <span className="inline-flex size-5 items-center justify-center rounded-full bg-teal-700">
             <Bell className="size-3 text-white" />
           </span>
-          Campus Saga · now
+          VarsityKotha · now
         </div>
         <p className="mt-2 text-sm font-semibold">{title || "Title"}</p>
         <p className="mt-0.5 text-sm whitespace-pre-line text-slate-300">{body || "Your message appears here."}</p>

@@ -156,7 +156,7 @@ export function AddStaffDialog({ universities }: { universities: UniversityOptio
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={80}
-              placeholder={kind === "authority" ? "e.g. Proctor Office" : "e.g. Campus Saga team"}
+              placeholder={kind === "authority" ? "e.g. Proctor Office" : "e.g. VarsityKotha team"}
               autoComplete="off"
             />
             {kind === "authority" ? (

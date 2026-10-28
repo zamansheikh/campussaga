@@ -21,7 +21,7 @@ export function MobileNav({ role }: { role: PanelRole }) {
       <SheetContent side="left" className="w-72 bg-sidebar p-4">
         <SheetHeader className="mb-2 p-0">
           <SheetTitle className="flex items-center gap-2">
-            <BrandMark /> Campus Saga admin
+            <BrandMark /> VarsityKotha admin
           </SheetTitle>
         </SheetHeader>
         <SidebarNav role={role} onNavigate={() => setOpen(false)} />

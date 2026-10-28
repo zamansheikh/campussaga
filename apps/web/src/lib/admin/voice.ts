@@ -71,7 +71,7 @@ export const actorLabel: Record<string, string> = {
   authority: "University official",
   moderator: "Moderator",
   author: "Author",
-  system: "Campus Saga",
+  system: "VarsityKotha",
 };
 
 export const queueTabs: { kind: QueueKind; label: string; hint: string }[] = [

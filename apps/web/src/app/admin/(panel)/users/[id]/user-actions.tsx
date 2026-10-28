@@ -105,7 +105,7 @@ export function UserActions({
           description={
             <p>
               Admins can see and change every account, university, class group and setting, and send pushes to
-              everyone. Only give this to Campus Saga staff.
+              everyone. Only give this to VarsityKotha staff.
             </p>
           }
           confirmLabel="Make admin"

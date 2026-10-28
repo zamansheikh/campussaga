@@ -41,7 +41,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
     <>
       <PageHeader
         title="Users"
-        description={users.data ? `${formatNumber(users.data.total)} accounts match` : "Every Campus Saga account."}
+        description={users.data ? `${formatNumber(users.data.total)} accounts match` : "Every VarsityKotha account."}
       />
       <ListFilters
         searchPlaceholder="Email or name"

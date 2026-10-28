@@ -10,7 +10,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { getAdmin } from "@/lib/admin/session";
 
 export const metadata: Metadata = {
-  title: { default: "Admin", template: "%s · Admin — Campus Saga" },
+  title: { default: "Admin", template: "%s · Admin — VarsityKotha" },
   robots: { index: false, follow: false },
 };
 
@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Link href={homeFor(me.role)} className="mb-6 flex items-center gap-2.5 px-2 font-semibold">
           <BrandMark />
           <span>
-            Campus Saga
+            VarsityKotha
             <span className="block text-xs font-normal text-muted-foreground">
               {me.role === "admin" ? "Superadmin" : "Moderator"}
             </span>

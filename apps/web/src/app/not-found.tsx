@@ -8,7 +8,7 @@ export default function NotFound() {
       <p className="text-sm font-medium text-primary">404</p>
       <h1 className="text-2xl font-semibold tracking-tight">This page doesn&apos;t exist</h1>
       <Button asChild variant="outline">
-        <Link href="/">Go to Campus Saga</Link>
+        <Link href="/">Go to VarsityKotha</Link>
       </Button>
     </div>
   );

@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   const { data: s, error } = await load(() => api<Stats>("/admin/stats"));
   return (
     <>
-      <PageHeader title="Dashboard" description="How Campus Saga is doing right now." />
+      <PageHeader title="Dashboard" description="How VarsityKotha is doing right now." />
       {error || !s ? (
         <ErrorPanel message={error ?? "No data."} />
       ) : (
