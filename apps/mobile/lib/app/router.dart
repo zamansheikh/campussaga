@@ -29,6 +29,11 @@ import '../features/profile/presentation/profile_page.dart';
 import '../features/reminders/presentation/reminders_page.dart';
 import '../features/routine/presentation/routine_page.dart';
 import '../features/today/presentation/today_page.dart';
+import '../features/transport/presentation/pages/bus_route_edit_page.dart';
+import '../features/transport/presentation/pages/bus_route_page.dart';
+import '../features/transport/presentation/pages/bus_routes_page.dart';
+import '../features/transport/presentation/pages/bus_stops_edit_page.dart';
+import '../features/transport/presentation/pages/bus_trips_edit_page.dart';
 import '../features/voice/presentation/pages/anonymity_page.dart';
 import '../features/voice/presentation/pages/campus_page.dart';
 import '../features/voice/presentation/pages/issue_page.dart';
@@ -90,6 +95,14 @@ abstract final class Routes {
   static const campusMine = '/campus/mine';
   static const campusAnonymity = '/campus/anonymity';
   static String campusIssue(String id) => '/campus/issues/$id';
+
+  // Bus routes (transport).
+  static const bus = '/bus';
+  static const busNew = '/bus/new';
+  static String busRoute(String id) => '/bus/$id';
+  static String busEdit(String id) => '/bus/$id/edit';
+  static String busStops(String id) => '/bus/$id/stops';
+  static String busTrips(String id) => '/bus/$id/trips';
 }
 
 /// App routes. Signed-out students see the welcome slides once, then only
@@ -145,6 +158,7 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
         builder: (context, state) => const ProfileSetupPage(),
       ),
       // Full-screen pages over the tabs.
+      _busRoutes,
       GoRoute(
         path: '/personal/:slotId',
         builder: (context, state) {
@@ -308,6 +322,37 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
     ],
   );
 }
+
+/// Bus routes: the list, one route, and the transport reps' editors.
+final _busRoutes = GoRoute(
+  path: Routes.bus,
+  builder: (context, state) => const BusRoutesPage(),
+  routes: [
+    GoRoute(path: 'new', builder: (context, state) => const BusRouteEditPage()),
+    GoRoute(
+      path: ':routeId',
+      builder: (context, state) =>
+          BusRoutePage(routeId: state.pathParameters['routeId']!),
+      routes: [
+        GoRoute(
+          path: 'edit',
+          builder: (context, state) =>
+              BusRouteEditPage(routeId: state.pathParameters['routeId']),
+        ),
+        GoRoute(
+          path: 'stops',
+          builder: (context, state) =>
+              BusStopsEditPage(routeId: state.pathParameters['routeId']!),
+        ),
+        GoRoute(
+          path: 'trips',
+          builder: (context, state) =>
+              BusTripsEditPage(routeId: state.pathParameters['routeId']!),
+        ),
+      ],
+    ),
+  ],
+);
 
 /// Re-runs the router's redirect whenever auth or settings change.
 class _StreamListenable extends ChangeNotifier {

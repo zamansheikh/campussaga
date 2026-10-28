@@ -10,6 +10,8 @@ import '../features/push/push_messaging.dart';
 import '../features/reminders/data/phone_info.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/data/reminder_store.dart';
+import '../features/transport/data/transport_store.dart';
+import '../features/transport/presentation/bus_cubit.dart';
 import '../features/voice/data/photo_picker.dart';
 import '../features/voice/data/voice_cache.dart';
 import 'crash/crash_reporter.dart';
@@ -72,4 +74,17 @@ Future<void> configureDependencies({
     )
     ..registerLazySingleton<VoiceCache>(PrefsVoiceCache.new)
     ..registerLazySingleton<PhotoPicker>(ImagePickerPhotoPicker.new);
+  registerTransport();
 }
+
+/// Bus routes. Unlike other blocs, [BusCubit] lives here: the list, route
+/// and editor pages are separate routes that share it. It starts over when
+/// another account opens it.
+void registerTransport() => getIt
+  ..registerLazySingleton<TransportRepository>(
+    () => ApiTransportRepository(getIt<ApiClient>()),
+  )
+  ..registerLazySingleton<TransportStore>(PrefsTransportStore.new)
+  ..registerLazySingleton<BusCubit>(
+    () => BusCubit(getIt<TransportRepository>(), getIt<TransportStore>()),
+  );

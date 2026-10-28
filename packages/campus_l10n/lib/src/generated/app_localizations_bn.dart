@@ -53,6 +53,171 @@ class AppLocalizationsBn extends AppLocalizations {
       'তোমার বিশ্ববিদ্যালয়ের বাসের রুট, স্টপ আর ছাড়ার সময়, তোমার স্টপ থেকে পরের বাসসহ।';
 
   @override
+  String get busRoutesEmptyTitle => 'এখনো কোনো বাসের রুট নেই';
+
+  @override
+  String get busRoutesEmptyBody =>
+      'তোমার ট্রান্সপোর্ট প্রতিনিধি রুট যোগ করলে এখানে দেখাবে।';
+
+  @override
+  String get busAddRoute => 'রুট যোগ করো';
+
+  @override
+  String get busToCampus => 'ক্যাম্পাসে';
+
+  @override
+  String get busFromCampus => 'ক্যাম্পাস থেকে';
+
+  @override
+  String busNextFrom(String stop) {
+    return '$stop থেকে পরের বাস';
+  }
+
+  @override
+  String busNextAt(String time) {
+    return 'পরের: $time';
+  }
+
+  @override
+  String get busNoMoreBuses => 'এই সপ্তাহে আর বাস নেই';
+
+  @override
+  String get busMyStop => 'আমার স্টপ';
+
+  @override
+  String get busPickStop => 'পরের বাস দেখতে তোমার স্টপ বেছে নাও';
+
+  @override
+  String get busChangeStop => 'স্টপ বদলাও';
+
+  @override
+  String get busStopsTitle => 'স্টপ';
+
+  @override
+  String get busDepartures => 'ছাড়ার সময়';
+
+  @override
+  String get busNoStops => 'এখনো কোনো স্টপ নেই';
+
+  @override
+  String get busNoTrips => 'এদিকে এখনো কোনো বাস নেই';
+
+  @override
+  String get busHidden => 'লুকানো';
+
+  @override
+  String get busEditRoute => 'রুট এডিট করো';
+
+  @override
+  String get busEditStops => 'স্টপ এডিট করো';
+
+  @override
+  String get busEditTimetable => 'সময়সূচি এডিট করো';
+
+  @override
+  String get busDeleteRoute => 'রুট মুছে ফেলো';
+
+  @override
+  String busDeleteRouteTitle(String name) {
+    return 'সবার জন্য $name মুছে ফেলবে?';
+  }
+
+  @override
+  String get busRouteName => 'রুটের নাম';
+
+  @override
+  String get busRouteNameHint => 'যেমন: রুট ৪ · মিরপুর';
+
+  @override
+  String get busColor => 'রং';
+
+  @override
+  String get busNotes => 'নোট (ঐচ্ছিক)';
+
+  @override
+  String get busNotesHint => 'যেমন: পরীক্ষার সময় বাস চলে না';
+
+  @override
+  String get busShowRoute => 'রুটটি দেখাও';
+
+  @override
+  String get busShowRouteHint =>
+      'লুকানো রুট শুধু ট্রান্সপোর্ট প্রতিনিধিরা দেখে।';
+
+  @override
+  String get busAddStop => 'স্টপ যোগ করো';
+
+  @override
+  String get busStopName => 'স্টপের নাম';
+
+  @override
+  String get busLandmark => 'চেনার জায়গা (ঐচ্ছিক)';
+
+  @override
+  String get busToCampusMinutes => 'ক্যাম্পাসে যেতে শুরু থেকে কত মিনিট';
+
+  @override
+  String get busFromCampusMinutes => 'ক্যাম্পাস ছাড়ার কত মিনিট পর';
+
+  @override
+  String get busMinutesHint => 'এদিকে বাস এখানে না থামলে খালি রাখো।';
+
+  @override
+  String get busStopsHint =>
+      'দূরের প্রান্ত থেকে ক্যাম্পাস পর্যন্ত। টেনে ক্রম বদলাও।';
+
+  @override
+  String get busAddDeparture => 'ছাড়ার সময় যোগ করো';
+
+  @override
+  String get busDepartsAt => 'ছাড়ে';
+
+  @override
+  String get busWeekdays => 'দিন';
+
+  @override
+  String get busTripNote => 'নোট (ঐচ্ছিক)';
+
+  @override
+  String get busSaved => 'সেভ হয়েছে';
+
+  @override
+  String busMinutesValue(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString মিনিট';
+  }
+
+  @override
+  String get busEveryDay => 'প্রতিদিন';
+
+  @override
+  String get busNotRep =>
+      'শুধু তোমার বিশ্ববিদ্যালয়ের ট্রান্সপোর্ট প্রতিনিধি বাসের রুট বদলাতে পারে।';
+
+  @override
+  String get busRouteNotFound => 'এই বাসের রুটটি সরানো হয়েছে।';
+
+  @override
+  String get busOffline => 'অফলাইন। সেভ করা বাসের রুট দেখাচ্ছে।';
+
+  @override
+  String busTripFirstStop(String stop) {
+    return '$stop থেকে';
+  }
+
+  @override
+  String get busSave => 'সংরক্ষণ করো';
+
+  @override
+  String get busNameRequired => 'একটা নাম দাও।';
+
+  @override
+  String get busPickDay => 'অন্তত একটা দিন বেছে নাও।';
+
+  @override
   String get teacherReviewsTitle => 'শিক্ষক মূল্যায়ন';
 
   @override

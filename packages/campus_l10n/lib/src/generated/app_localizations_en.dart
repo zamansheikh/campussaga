@@ -54,6 +54,171 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your university\'s bus routes, stops and departure times, with the next bus from your stop.';
 
   @override
+  String get busRoutesEmptyTitle => 'No bus routes yet';
+
+  @override
+  String get busRoutesEmptyBody =>
+      'Your university\'s routes show here once your transport rep adds them.';
+
+  @override
+  String get busAddRoute => 'Add route';
+
+  @override
+  String get busToCampus => 'To campus';
+
+  @override
+  String get busFromCampus => 'From campus';
+
+  @override
+  String busNextFrom(String stop) {
+    return 'Next bus from $stop';
+  }
+
+  @override
+  String busNextAt(String time) {
+    return 'Next: $time';
+  }
+
+  @override
+  String get busNoMoreBuses => 'No more buses this week';
+
+  @override
+  String get busMyStop => 'My stop';
+
+  @override
+  String get busPickStop => 'Pick your stop to see your next bus';
+
+  @override
+  String get busChangeStop => 'Change my stop';
+
+  @override
+  String get busStopsTitle => 'Stops';
+
+  @override
+  String get busDepartures => 'Departures';
+
+  @override
+  String get busNoStops => 'No stops yet';
+
+  @override
+  String get busNoTrips => 'No departures this way yet';
+
+  @override
+  String get busHidden => 'Hidden';
+
+  @override
+  String get busEditRoute => 'Edit route';
+
+  @override
+  String get busEditStops => 'Edit stops';
+
+  @override
+  String get busEditTimetable => 'Edit timetable';
+
+  @override
+  String get busDeleteRoute => 'Delete route';
+
+  @override
+  String busDeleteRouteTitle(String name) {
+    return 'Delete $name for everyone?';
+  }
+
+  @override
+  String get busRouteName => 'Route name';
+
+  @override
+  String get busRouteNameHint => 'e.g. Route 4 · Mirpur';
+
+  @override
+  String get busColor => 'Color';
+
+  @override
+  String get busNotes => 'Notes (optional)';
+
+  @override
+  String get busNotesHint => 'e.g. No bus during exams';
+
+  @override
+  String get busShowRoute => 'Show this route';
+
+  @override
+  String get busShowRouteHint =>
+      'Hidden routes are visible only to transport reps.';
+
+  @override
+  String get busAddStop => 'Add stop';
+
+  @override
+  String get busStopName => 'Stop name';
+
+  @override
+  String get busLandmark => 'Landmark (optional)';
+
+  @override
+  String get busToCampusMinutes => 'Minutes from the start, to campus';
+
+  @override
+  String get busFromCampusMinutes => 'Minutes after leaving campus';
+
+  @override
+  String get busMinutesHint =>
+      'Leave empty if the bus doesn\'t stop here that way.';
+
+  @override
+  String get busStopsHint => 'From the far end to campus. Drag to reorder.';
+
+  @override
+  String get busAddDeparture => 'Add departure';
+
+  @override
+  String get busDepartsAt => 'Leaves at';
+
+  @override
+  String get busWeekdays => 'Days';
+
+  @override
+  String get busTripNote => 'Note (optional)';
+
+  @override
+  String get busSaved => 'Saved';
+
+  @override
+  String busMinutesValue(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString min';
+  }
+
+  @override
+  String get busEveryDay => 'Every day';
+
+  @override
+  String get busNotRep =>
+      'Only your university\'s transport rep can change bus routes.';
+
+  @override
+  String get busRouteNotFound => 'This bus route was removed.';
+
+  @override
+  String get busOffline => 'Offline. Showing saved bus routes.';
+
+  @override
+  String busTripFirstStop(String stop) {
+    return 'From $stop';
+  }
+
+  @override
+  String get busSave => 'Save';
+
+  @override
+  String get busNameRequired => 'Give it a name.';
+
+  @override
+  String get busPickDay => 'Pick at least one day.';
+
+  @override
   String get teacherReviewsTitle => 'Teacher evaluations';
 
   @override
