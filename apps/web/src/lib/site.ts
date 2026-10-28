@@ -6,4 +6,6 @@ export const site = {
     "VarsityKotha is a student app for Bangladeshi universities: class routine, reminders, and a safe, anonymous voice to get campus problems fixed.",
   supportEmail: "hello@silifton.com",
   company: { name: "Silifton", url: "https://silifton.com" },
+  // live: the landing page links to the listing; false shows "Coming soon" instead.
+  playStore: { url: "https://play.google.com/store/apps/details?id=com.silifton.varsitykotha", live: true },
 } as const;

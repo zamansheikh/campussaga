@@ -7,7 +7,7 @@ import { site } from "@/lib/site";
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-2 px-4">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4">
         <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold tracking-tight whitespace-nowrap">
           <BrandMark />
           <span className="text-base sm:text-lg">{site.name}</span>
