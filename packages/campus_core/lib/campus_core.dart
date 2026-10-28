@@ -10,6 +10,7 @@ export 'src/cgpa/cgpa.dart';
 export 'src/classes/assessment_models.dart';
 export 'src/classes/class_group_repository.dart';
 export 'src/classes/class_models.dart';
+export 'src/classes/discovery_models.dart';
 export 'src/classes/reminders.dart';
 export 'src/config/app_config.dart';
 export 'src/failure.dart';

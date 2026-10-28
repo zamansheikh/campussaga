@@ -303,7 +303,7 @@ const createGroup = `-- name: CreateGroup :one
 
 INSERT INTO class_groups (university_id, department, batch, section, semester, join_code, created_by)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at
+RETURNING id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable
 `
 
 type CreateGroupParams struct {
@@ -339,6 +339,7 @@ func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Class
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Discoverable,
 	)
 	return i, err
 }
@@ -627,7 +628,7 @@ func (q *Queries) GetChange(ctx context.Context, arg GetChangeParams) (RoutineCh
 }
 
 const getGroup = `-- name: GetGroup :one
-SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at FROM class_groups WHERE id = $1
+SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable FROM class_groups WHERE id = $1
 `
 
 func (q *Queries) GetGroup(ctx context.Context, id uuid.UUID) (ClassGroup, error) {
@@ -644,12 +645,13 @@ func (q *Queries) GetGroup(ctx context.Context, id uuid.UUID) (ClassGroup, error
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Discoverable,
 	)
 	return i, err
 }
 
 const getGroupByCode = `-- name: GetGroupByCode :one
-SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at FROM class_groups WHERE join_code = $1
+SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable FROM class_groups WHERE join_code = $1
 `
 
 func (q *Queries) GetGroupByCode(ctx context.Context, joinCode string) (ClassGroup, error) {
@@ -666,12 +668,13 @@ func (q *Queries) GetGroupByCode(ctx context.Context, joinCode string) (ClassGro
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Discoverable,
 	)
 	return i, err
 }
 
 const getGroupForUpdate = `-- name: GetGroupForUpdate :one
-SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at FROM class_groups WHERE id = $1 FOR UPDATE
+SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable FROM class_groups WHERE id = $1 FOR UPDATE
 `
 
 func (q *Queries) GetGroupForUpdate(ctx context.Context, id uuid.UUID) (ClassGroup, error) {
@@ -688,6 +691,7 @@ func (q *Queries) GetGroupForUpdate(ctx context.Context, id uuid.UUID) (ClassGro
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Discoverable,
 	)
 	return i, err
 }
@@ -735,6 +739,105 @@ func (q *Queries) GetSlot(ctx context.Context, arg GetSlotParams) (RoutineSlot, 
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const groupCRNames = `-- name: GroupCRNames :many
+SELECT DISTINCT ON (m.group_id) m.group_id, u.display_name
+FROM class_group_members m
+JOIN users u ON u.id = m.user_id
+WHERE m.role = 'cr' AND m.group_id = ANY($1::uuid[])
+ORDER BY m.group_id, m.joined_at
+`
+
+type GroupCRNamesRow struct {
+	GroupID     uuid.UUID
+	DisplayName *string
+}
+
+// The first CR's name (no email) for search results.
+func (q *Queries) GroupCRNames(ctx context.Context, groupIds []uuid.UUID) ([]GroupCRNamesRow, error) {
+	rows, err := q.db.Query(ctx, groupCRNames, groupIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GroupCRNamesRow{}
+	for rows.Next() {
+		var i GroupCRNamesRow
+		if err := rows.Scan(&i.GroupID, &i.DisplayName); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const groupCourses = `-- name: GroupCourses :many
+SELECT DISTINCT ON (s.group_id, upper(replace(s.course_code, ' ', '')))
+       s.group_id, s.course_code, s.course_title, s.teacher
+FROM routine_slots s
+WHERE s.group_id = ANY($1::uuid[])
+ORDER BY s.group_id, upper(replace(s.course_code, ' ', '')), s.weekday, s.starts_min
+`
+
+type GroupCoursesRow struct {
+	GroupID     uuid.UUID
+	CourseCode  string
+	CourseTitle string
+	Teacher     string
+}
+
+func (q *Queries) GroupCourses(ctx context.Context, groupIds []uuid.UUID) ([]GroupCoursesRow, error) {
+	rows, err := q.db.Query(ctx, groupCourses, groupIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GroupCoursesRow{}
+	for rows.Next() {
+		var i GroupCoursesRow
+		if err := rows.Scan(
+			&i.GroupID,
+			&i.CourseCode,
+			&i.CourseTitle,
+			&i.Teacher,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const hideNewCourseForSelective = `-- name: HideNewCourseForSelective :exec
+INSERT INTO class_member_hidden_courses (group_id, user_id, course_key)
+SELECT m.group_id, m.user_id, $1::text
+FROM class_group_members m
+WHERE m.group_id = $2 AND m.courses_only
+  AND NOT EXISTS (
+      SELECT 1 FROM routine_slots s
+      WHERE s.group_id = $2 AND s.id <> $3
+        AND upper(replace(s.course_code, ' ', '')) = $1::text)
+ON CONFLICT DO NOTHING
+`
+
+type HideNewCourseForSelectiveParams struct {
+	CourseKey string
+	GroupID   uuid.UUID
+	SlotID    uuid.UUID
+}
+
+// A course new to the group stays hidden for members who joined for some
+// courses only (run after the slot is saved).
+func (q *Queries) HideNewCourseForSelective(ctx context.Context, arg HideNewCourseForSelectiveParams) error {
+	_, err := q.db.Exec(ctx, hideNewCourseForSelective, arg.CourseKey, arg.GroupID, arg.SlotID)
+	return err
 }
 
 const listAnnouncementsForUser = `-- name: ListAnnouncementsForUser :many
@@ -1005,7 +1108,7 @@ func (q *Queries) ListMembers(ctx context.Context, groupID uuid.UUID) ([]ListMem
 }
 
 const listMyGroups = `-- name: ListMyGroups :many
-SELECT g.id, g.university_id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_by, g.created_at, g.updated_at, m.role,
+SELECT g.id, g.university_id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_by, g.created_at, g.updated_at, g.discoverable, m.role,
        (SELECT count(*) FROM class_group_members x WHERE x.group_id = g.id) AS member_count
 FROM class_groups g
 JOIN class_group_members m ON m.group_id = g.id
@@ -1039,6 +1142,7 @@ func (q *Queries) ListMyGroups(ctx context.Context, userID uuid.UUID) ([]ListMyG
 			&i.ClassGroup.CreatedBy,
 			&i.ClassGroup.CreatedAt,
 			&i.ClassGroup.UpdatedAt,
+			&i.ClassGroup.Discoverable,
 			&i.Role,
 			&i.MemberCount,
 		); err != nil {
@@ -1169,6 +1273,36 @@ func (q *Queries) ListSlotsForUser(ctx context.Context, userID uuid.UUID) ([]Rou
 	return items, nil
 }
 
+const myMemberships = `-- name: MyMemberships :many
+SELECT group_id FROM class_group_members
+WHERE user_id = $1 AND group_id = ANY($2::uuid[])
+`
+
+type MyMembershipsParams struct {
+	UserID   uuid.UUID
+	GroupIds []uuid.UUID
+}
+
+func (q *Queries) MyMemberships(ctx context.Context, arg MyMembershipsParams) ([]uuid.UUID, error) {
+	rows, err := q.db.Query(ctx, myMemberships, arg.UserID, arg.GroupIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []uuid.UUID{}
+	for rows.Next() {
+		var group_id uuid.UUID
+		if err := rows.Scan(&group_id); err != nil {
+			return nil, err
+		}
+		items = append(items, group_id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const removeMember = `-- name: RemoveMember :exec
 DELETE FROM class_group_members WHERE group_id = $1 AND user_id = $2
 `
@@ -1181,6 +1315,84 @@ type RemoveMemberParams struct {
 func (q *Queries) RemoveMember(ctx context.Context, arg RemoveMemberParams) error {
 	_, err := q.db.Exec(ctx, removeMember, arg.GroupID, arg.UserID)
 	return err
+}
+
+const searchGroups = `-- name: SearchGroups :many
+
+WITH g AS (
+    SELECT cg.id, cg.department, cg.batch, cg.section, cg.semester, cg.updated_at,
+           (SELECT count(*) FROM class_group_members m WHERE m.group_id = cg.id) AS member_count,
+           lower(cg.department || ' ' || cg.batch || ' ' || cg.section) AS head,
+           lower(cg.department || ' ' || cg.batch || ' ' || cg.section || ' ' || cg.semester || ' ' ||
+                 coalesce((SELECT string_agg(s.course_code || ' ' || replace(s.course_code, ' ', '') || ' ' ||
+                                             s.course_title || ' ' || s.teacher, ' ')
+                           FROM routine_slots s WHERE s.group_id = cg.id), '')) AS hay
+    FROM class_groups cg
+    WHERE cg.university_id = $6 AND cg.discoverable
+)
+SELECT g.id, g.department, g.batch, g.section, g.semester, g.member_count::bigint AS member_count
+FROM g
+WHERE g.hay LIKE ALL ($1::text[])
+  AND ($2::text = '' OR lower(g.department) = lower($2::text))
+  AND ($3::text = '' OR lower(g.batch) = lower($3::text))
+ORDER BY (g.head LIKE ALL ($1::text[])) DESC, g.member_count DESC, g.updated_at DESC, g.id
+LIMIT $5 OFFSET $4
+`
+
+type SearchGroupsParams struct {
+	Patterns     []string
+	Department   string
+	Batch        string
+	Off          int32
+	Lim          int32
+	UniversityID uuid.UUID
+}
+
+type SearchGroupsRow struct {
+	ID          uuid.UUID
+	Department  string
+	Batch       string
+	Section     string
+	Semester    string
+	MemberCount int64
+}
+
+// ---- find your class -----------------------------------------------------------
+// Discoverable groups of a university whose details or courses contain
+// every pattern (lower-case '%word%'); groups whose department, batch and
+// section match come first, then the busiest.
+func (q *Queries) SearchGroups(ctx context.Context, arg SearchGroupsParams) ([]SearchGroupsRow, error) {
+	rows, err := q.db.Query(ctx, searchGroups,
+		arg.Patterns,
+		arg.Department,
+		arg.Batch,
+		arg.Off,
+		arg.Lim,
+		arg.UniversityID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchGroupsRow{}
+	for rows.Next() {
+		var i SearchGroupsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Department,
+			&i.Batch,
+			&i.Section,
+			&i.Semester,
+			&i.MemberCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const setAnnouncementPinned = `-- name: SetAnnouncementPinned :one
@@ -1207,6 +1419,36 @@ func (q *Queries) SetAnnouncementPinned(ctx context.Context, arg SetAnnouncement
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const setCoursesOnly = `-- name: SetCoursesOnly :exec
+UPDATE class_group_members SET courses_only = $1
+WHERE group_id = $2 AND user_id = $3
+`
+
+type SetCoursesOnlyParams struct {
+	CoursesOnly bool
+	GroupID     uuid.UUID
+	UserID      uuid.UUID
+}
+
+func (q *Queries) SetCoursesOnly(ctx context.Context, arg SetCoursesOnlyParams) error {
+	_, err := q.db.Exec(ctx, setCoursesOnly, arg.CoursesOnly, arg.GroupID, arg.UserID)
+	return err
+}
+
+const setDiscoverable = `-- name: SetDiscoverable :exec
+UPDATE class_groups SET discoverable = $1 WHERE id = $2
+`
+
+type SetDiscoverableParams struct {
+	Discoverable bool
+	ID           uuid.UUID
+}
+
+func (q *Queries) SetDiscoverable(ctx context.Context, arg SetDiscoverableParams) error {
+	_, err := q.db.Exec(ctx, setDiscoverable, arg.Discoverable, arg.ID)
+	return err
 }
 
 const setRole = `-- name: SetRole :execrows
@@ -1239,6 +1481,66 @@ type SetSemesterParams struct {
 func (q *Queries) SetSemester(ctx context.Context, arg SetSemesterParams) error {
 	_, err := q.db.Exec(ctx, setSemester, arg.Semester, arg.ID)
 	return err
+}
+
+const similarGroups = `-- name: SimilarGroups :many
+SELECT cg.id, cg.department, cg.batch, cg.section, cg.semester,
+       (SELECT count(*) FROM class_group_members m WHERE m.group_id = cg.id)::bigint AS member_count
+FROM class_groups cg
+WHERE cg.university_id = $1 AND cg.discoverable
+  AND lower(cg.department) = lower($2::text) AND lower(cg.batch) = lower($3::text)
+  AND ($4::text = '' OR cg.section = '' OR lower(cg.section) = lower($4::text))
+ORDER BY (lower(cg.section) = lower($4::text)) DESC, member_count DESC, cg.id
+LIMIT 5
+`
+
+type SimilarGroupsParams struct {
+	UniversityID uuid.UUID
+	Department   string
+	Batch        string
+	Section      string
+}
+
+type SimilarGroupsRow struct {
+	ID          uuid.UUID
+	Department  string
+	Batch       string
+	Section     string
+	Semester    string
+	MemberCount int64
+}
+
+// Possible duplicates of a group about to be created.
+func (q *Queries) SimilarGroups(ctx context.Context, arg SimilarGroupsParams) ([]SimilarGroupsRow, error) {
+	rows, err := q.db.Query(ctx, similarGroups,
+		arg.UniversityID,
+		arg.Department,
+		arg.Batch,
+		arg.Section,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SimilarGroupsRow{}
+	for rows.Next() {
+		var i SimilarGroupsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Department,
+			&i.Batch,
+			&i.Section,
+			&i.Semester,
+			&i.MemberCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const touchGroup = `-- name: TouchGroup :exec
@@ -1316,7 +1618,7 @@ const updateGroup = `-- name: UpdateGroup :one
 UPDATE class_groups
 SET department = $1, batch = $2, section = $3, semester = $4
 WHERE id = $5
-RETURNING id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at
+RETURNING id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable
 `
 
 type UpdateGroupParams struct {
@@ -1347,6 +1649,7 @@ func (q *Queries) UpdateGroup(ctx context.Context, arg UpdateGroupParams) (Class
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Discoverable,
 	)
 	return i, err
 }

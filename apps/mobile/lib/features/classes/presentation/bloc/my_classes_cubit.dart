@@ -88,6 +88,36 @@ class MyClassesCubit extends Cubit<MyClassesState> {
     return g;
   }
 
+  /// Find your class: search the university's findable groups.
+  Future<GroupSearchPage> searchGroups(String query, {int page = 1}) =>
+      _repo.searchGroups(query, page: page);
+
+  /// Groups a CR might be about to create again.
+  Future<List<FoundGroup>> similarGroups({
+    required String department,
+    required String batch,
+    String section = '',
+  }) => _repo.similarGroups(
+    department: department,
+    batch: batch,
+    section: section,
+  );
+
+  Future<RoutinePreview> routinePreview(String groupId, {String? code}) =>
+      _repo.routinePreview(groupId, code: code);
+
+  /// Joins a group taking only [courses] (every course: the whole section).
+  /// A member uses it to change which courses they keep.
+  Future<ClassGroup> joinCourses(
+    String groupId,
+    Set<String> courses, {
+    String? code,
+  }) async {
+    final g = await _repo.joinCourses(groupId, courses, code: code);
+    _set([...state.groups.where((x) => x.id != g.id), g]);
+    return g;
+  }
+
   Future<void> updateGroup(String id, GroupDraft draft) async {
     final g = await _repo.update(id, draft);
     _replace(g);

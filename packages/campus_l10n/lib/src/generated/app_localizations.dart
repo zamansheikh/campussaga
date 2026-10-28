@@ -1346,6 +1346,132 @@ abstract class AppLocalizations {
   /// **'Join code'**
   String get joinCodeLabel;
 
+  /// No description provided for @findClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Find your class'**
+  String get findClass;
+
+  /// No description provided for @findClassHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Department, batch, course code or teacher'**
+  String get findClassHint;
+
+  /// No description provided for @findClassIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Search your university\'s class routines. Join a whole section, or just the courses you take.'**
+  String get findClassIntro;
+
+  /// No description provided for @findClassEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No class found'**
+  String get findClassEmptyTitle;
+
+  /// No description provided for @findClassEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a course code (CSE 311), or department and batch. Or ask your CR for the join code.'**
+  String get findClassEmptyBody;
+
+  /// No description provided for @findClassOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching needs an internet connection.'**
+  String get findClassOffline;
+
+  /// No description provided for @findClassJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get findClassJoined;
+
+  /// No description provided for @findClassCr.
+  ///
+  /// In en, this message translates to:
+  /// **'CR: {name}'**
+  String findClassCr(String name);
+
+  /// No description provided for @findClassMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get findClassMore;
+
+  /// No description provided for @findClassHaveCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Have a join code?'**
+  String get findClassHaveCode;
+
+  /// No description provided for @previewPickHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Untick the courses you don\'t take. You\'ll only see the ones you keep.'**
+  String get previewPickHint;
+
+  /// No description provided for @previewNoClasses.
+  ///
+  /// In en, this message translates to:
+  /// **'No classes in this routine yet.'**
+  String get previewNoClasses;
+
+  /// No description provided for @joinWholeSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Join whole section'**
+  String get joinWholeSection;
+
+  /// No description provided for @addSelectedCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Add 1 course} other{Add {count} courses}}'**
+  String addSelectedCourses(int count);
+
+  /// No description provided for @saveMyCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'Save my courses'**
+  String get saveMyCourses;
+
+  /// No description provided for @addedToRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to your routine'**
+  String get addedToRoutine;
+
+  /// No description provided for @similarGroupsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This class may already exist'**
+  String get similarGroupsTitle;
+
+  /// No description provided for @similarGroupsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Join it instead, so your class keeps one routine.'**
+  String get similarGroupsBody;
+
+  /// No description provided for @joinInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Join instead'**
+  String get joinInstead;
+
+  /// No description provided for @findableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Findable at {university}'**
+  String findableTitle(String university);
+
+  /// No description provided for @findableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Students of your university can find this class by search. Off: only people with the join code can join.'**
+  String get findableBody;
+
   /// No description provided for @joinAction.
   ///
   /// In en, this message translates to:

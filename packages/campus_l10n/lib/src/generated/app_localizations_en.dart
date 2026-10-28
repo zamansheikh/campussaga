@@ -739,6 +739,90 @@ class AppLocalizationsEn extends AppLocalizations {
   String get joinCodeLabel => 'Join code';
 
   @override
+  String get findClass => 'Find your class';
+
+  @override
+  String get findClassHint => 'Department, batch, course code or teacher';
+
+  @override
+  String get findClassIntro =>
+      'Search your university\'s class routines. Join a whole section, or just the courses you take.';
+
+  @override
+  String get findClassEmptyTitle => 'No class found';
+
+  @override
+  String get findClassEmptyBody =>
+      'Try a course code (CSE 311), or department and batch. Or ask your CR for the join code.';
+
+  @override
+  String get findClassOffline => 'Searching needs an internet connection.';
+
+  @override
+  String get findClassJoined => 'Joined';
+
+  @override
+  String findClassCr(String name) {
+    return 'CR: $name';
+  }
+
+  @override
+  String get findClassMore => 'Show more';
+
+  @override
+  String get findClassHaveCode => 'Have a join code?';
+
+  @override
+  String get previewPickHint =>
+      'Untick the courses you don\'t take. You\'ll only see the ones you keep.';
+
+  @override
+  String get previewNoClasses => 'No classes in this routine yet.';
+
+  @override
+  String get joinWholeSection => 'Join whole section';
+
+  @override
+  String addSelectedCourses(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Add $countString courses',
+      one: 'Add 1 course',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get saveMyCourses => 'Save my courses';
+
+  @override
+  String get addedToRoutine => 'Added to your routine';
+
+  @override
+  String get similarGroupsTitle => 'This class may already exist';
+
+  @override
+  String get similarGroupsBody =>
+      'Join it instead, so your class keeps one routine.';
+
+  @override
+  String get joinInstead => 'Join instead';
+
+  @override
+  String findableTitle(String university) {
+    return 'Findable at $university';
+  }
+
+  @override
+  String get findableBody =>
+      'Students of your university can find this class by search. Off: only people with the join code can join.';
+
+  @override
   String get joinAction => 'Join group';
 
   @override

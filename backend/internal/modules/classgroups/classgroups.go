@@ -83,7 +83,9 @@ type Group struct {
 	JoinCode    string    `json:"joinCode"`
 	Role        string    `json:"role"`
 	MemberCount int64     `json:"memberCount"`
-	Slots       []Slot    `json:"slots"`
+	// Discoverable: findable in "Find your class" at the university.
+	Discoverable bool   `json:"discoverable"`
+	Slots        []Slot `json:"slots"`
 	// Changes from yesterday on (Bangladesh dates), earliest first.
 	Changes []Change `json:"changes"`
 	// The pinned one first, then the last 30 days' newest first.
@@ -115,6 +117,9 @@ type GroupInput struct {
 	Batch      string `json:"batch" validate:"required,max=20"`
 	Section    string `json:"section" validate:"max=20"`
 	Semester   string `json:"semester" validate:"required,max=30"`
+	// Discoverable: findable by students of the same university (default
+	// on); off = joinable with the code only. Nil keeps it as it is.
+	Discoverable *bool `json:"discoverable"`
 }
 
 func (in *GroupInput) clean() error {
@@ -272,6 +277,12 @@ func (s *Service) create(ctx context.Context, in *GroupInput) (*Group, error) {
 		if err := q.AddMember(ctx, store.AddMemberParams{GroupID: g.ID, UserID: c.UserID, Role: RoleCR}); err != nil {
 			return err
 		}
+		if in.Discoverable != nil && !*in.Discoverable {
+			if err := q.SetDiscoverable(ctx, store.SetDiscoverableParams{ID: g.ID, Discoverable: false}); err != nil {
+				return err
+			}
+			g.Discoverable = false
+		}
 		v := groupView(g, RoleCR, 1, nil)
 		out = &v
 		return nil
@@ -370,10 +381,15 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, in *GroupInput) (*Gr
 		if err := s.requireCR(ctx, q, id, c.UserID); err != nil {
 			return err
 		}
-		_, err := q.UpdateGroup(ctx, store.UpdateGroupParams{
+		if _, err := q.UpdateGroup(ctx, store.UpdateGroupParams{
 			ID: id, Department: in.Department, Batch: in.Batch, Section: in.Section, Semester: in.Semester,
-		})
-		return err
+		}); err != nil {
+			return err
+		}
+		if in.Discoverable != nil {
+			return q.SetDiscoverable(ctx, store.SetDiscoverableParams{ID: id, Discoverable: *in.Discoverable})
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, err
@@ -461,6 +477,9 @@ func (s *Service) AddSlot(ctx context.Context, groupID uuid.UUID, in *SlotInput)
 		if err != nil {
 			return err
 		}
+		if err := hideNewCourse(ctx, q, groupID, sl); err != nil {
+			return err
+		}
 		v := slotView(sl)
 		out = &v
 		return q.TouchGroup(ctx, groupID)
@@ -501,6 +520,9 @@ func (s *Service) UpdateSlot(ctx context.Context, groupID, slotID uuid.UUID, in 
 			return ErrSlotNotFound
 		}
 		if err != nil {
+			return err
+		}
+		if err := hideNewCourse(ctx, q, groupID, sl); err != nil {
 			return err
 		}
 		v := slotView(sl)
@@ -579,7 +601,7 @@ func groupView(g store.ClassGroup, role string, members int64, slots []Slot) Gro
 	}
 	return Group{
 		ID: g.ID, Department: g.Department, Batch: g.Batch, Section: g.Section, Semester: g.Semester,
-		JoinCode: g.JoinCode, Role: role, MemberCount: members, Slots: slots, Changes: []Change{},
+		JoinCode: g.JoinCode, Role: role, MemberCount: members, Discoverable: g.Discoverable, Slots: slots, Changes: []Change{},
 		Announcements: []Announcement{}, Assessments: []Assessment{}, HiddenCourses: []string{}, UpdatedAt: g.UpdatedAt,
 	}
 }

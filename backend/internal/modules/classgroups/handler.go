@@ -18,6 +18,13 @@ func (s *Service) Routes(r *httpx.Router) {
 		r.Limit("group-code-ip", 120, time.Hour),
 	}
 	r.Student().Get("/groups", httpx.Handle(s.handleList))
+	// Find your class: search, look before joining, join some courses.
+	find := r.LimitUser("group-find", 600, time.Hour)
+	r.Student().With(find).Get("/groups/search", httpx.Handle(s.handleSearch))
+	r.Student().With(find).Get("/groups/similar", httpx.Handle(s.handleSimilar))
+	r.Student().With(find).Get("/groups/{id}/routine-preview", httpx.Handle(s.handleRoutinePreview))
+	r.Student().With(r.LimitUser("group-join-courses", 60, time.Hour)).
+		Post("/groups/{id}/join-courses", httpx.Handle(s.handleJoinCourses))
 	r.Student().With(r.LimitUser("group-create", 10, 24*time.Hour)).
 		Post("/groups", httpx.Handle(s.handleCreate, httpx.Status(http.StatusCreated)))
 	r.Student().With(codes...).Get("/groups/preview", httpx.Handle(s.handlePreview))

@@ -47,6 +47,7 @@ type ClassGroup struct {
 	CreatedBy    *uuid.UUID
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+	Discoverable bool
 }
 
 type PersonalSlot struct {

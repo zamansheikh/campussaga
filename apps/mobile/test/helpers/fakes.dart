@@ -444,9 +444,141 @@ class FakeClassGroupRepository implements ClassGroupRepository {
     return joined;
   }
 
+  // Find your class: [others] are the university's groups; search shows the
+  // findable ones, plus one whose join code is typed exactly.
+  final searches = <String>[];
+
+  FoundGroup _found(ClassGroup g) {
+    final courses = <String, FoundCourse>{};
+    for (final s in g.slots) {
+      courses.putIfAbsent(
+        courseKey(s.courseCode),
+        () => FoundCourse(
+          key: courseKey(s.courseCode),
+          code: s.courseCode,
+          title: s.courseTitle,
+          teacher: s.teacher,
+        ),
+      );
+    }
+    return FoundGroup(
+      id: g.id,
+      department: g.department,
+      batch: g.batch,
+      section: g.section,
+      semester: g.semester,
+      memberCount: g.memberCount,
+      crName: 'Rafi',
+      courses: courses.values.toList()
+        ..sort((a, b) => a.code.compareTo(b.code)),
+      isMember: mine.any((x) => x.id == g.id),
+    );
+  }
+
+  ClassGroup _anyGroup(String id) =>
+      mine.where((g) => g.id == id).firstOrNull ??
+      others.values.firstWhere(
+        (g) => g.id == id,
+        orElse: () => throw const NotFoundFailure(code: 'GROUP_NOT_FOUND'),
+      );
+
+  @override
+  Future<GroupSearchPage> searchGroups(
+    String query, {
+    String department = '',
+    String batch = '',
+    int page = 1,
+  }) async {
+    searches.add(query);
+    _check();
+    final words = query.toLowerCase().split(RegExp(r'\s+'))
+      ..removeWhere((w) => w.isEmpty);
+    final hits = [
+      for (final g in [...mine, ...others.values])
+        if (!g.isPersonal &&
+            (g.discoverable || g.joinCode == query.trim().toUpperCase()))
+          if (words.every(
+            [
+              g.department,
+              g.batch,
+              g.section,
+              for (final s in g.slots) ...[
+                s.courseCode,
+                courseKey(s.courseCode),
+                s.courseTitle,
+                s.teacher,
+              ],
+            ].join(' ').toLowerCase().contains,
+          ))
+            _found(g),
+    ];
+    return GroupSearchPage(items: hits);
+  }
+
+  @override
+  Future<List<FoundGroup>> similarGroups({
+    required String department,
+    required String batch,
+    String section = '',
+  }) async {
+    _check();
+    bool same(String a, String b) => a.toLowerCase() == b.toLowerCase();
+    return [
+      for (final g in others.values)
+        if (g.discoverable &&
+            same(g.department, department) &&
+            same(g.batch, batch) &&
+            (section.isEmpty || g.section.isEmpty || same(g.section, section)))
+          _found(g),
+    ];
+  }
+
+  @override
+  Future<RoutinePreview> routinePreview(String groupId, {String? code}) async {
+    _check();
+    final g = _anyGroup(groupId);
+    final member = mine.any((x) => x.id == g.id);
+    return RoutinePreview(
+      group: _found(g),
+      slots: g.slots,
+      hiddenCourses: member ? g.hiddenCourses : const {},
+    );
+  }
+
+  /// The draft of the last [update] call.
+  GroupDraft? lastUpdate;
+
+  /// The courses of the last [joinCourses] call.
+  Set<String>? joinedCourses;
+
+  @override
+  Future<ClassGroup> joinCourses(
+    String groupId,
+    Set<String> courses, {
+    String? code,
+  }) async {
+    _check();
+    joinedCourses = courses;
+    final g = _anyGroup(groupId);
+    final picked = {for (final c in courses) courseKey(c)};
+    final hidden = {
+      for (final s in g.slots)
+        if (!picked.contains(courseKey(s.courseCode))) courseKey(s.courseCode),
+    };
+    final member = mine.any((x) => x.id == g.id);
+    if (!member) others.removeWhere((_, x) => x.id == g.id);
+    final joined = g.copyWith(
+      memberCount: member ? g.memberCount : g.memberCount + 1,
+      hiddenCourses: hidden,
+    );
+    _put(joined);
+    return joined;
+  }
+
   @override
   Future<ClassGroup> update(String id, GroupDraft d) async {
     _check();
+    lastUpdate = d;
     final old = _mine(id);
     final g = ClassGroup(
       id: id,
@@ -457,6 +589,7 @@ class FakeClassGroupRepository implements ClassGroupRepository {
       joinCode: old.joinCode,
       role: old.role,
       memberCount: old.memberCount,
+      discoverable: d.discoverable ?? old.discoverable,
       slots: old.slots,
     );
     _put(g);

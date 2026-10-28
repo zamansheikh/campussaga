@@ -113,3 +113,7 @@ String assessmentTimeText(BuildContext context, Assessment a) {
       ? clockText(context, start)
       : '${clockText(context, start)} – ${clockText(context, end)}';
 }
+
+/// A count in the app language ("১২" in Bangla).
+String numberText(BuildContext context, int n) =>
+    NumberFormat.decimalPattern(_locale(context)).format(n);

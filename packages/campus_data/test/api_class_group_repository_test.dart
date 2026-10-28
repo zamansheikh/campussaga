@@ -138,4 +138,100 @@ void main() {
       'DELETE /api/v1/groups/g1/assessments/a1 ',
     ]);
   });
+
+  test('find your class endpoints', () async {
+    final seen = <String>[];
+    const found = {
+      'id': 'g1',
+      'department': 'CSE',
+      'batch': '61',
+      'section': 'A',
+      'semester': 'Fall 2026',
+      'memberCount': 42,
+      'crName': 'Rafi',
+      'courses': [
+        {
+          'key': 'CSE311',
+          'code': 'CSE 311',
+          'title': 'Databases',
+          'teacher': 'Dr. Rahman',
+        },
+      ],
+      'isMember': false,
+    };
+    final client = MockClient((r) async {
+      seen.add(
+        '${r.method} ${r.url.path}${r.url.hasQuery ? '?${r.url.query}' : ''} ${r.body}',
+      );
+      return switch (r.url.path) {
+        '/api/v1/groups/search' => ok({
+          'items': [found],
+          'more': true,
+        }),
+        '/api/v1/groups/similar' => ok({
+          'items': [found],
+        }),
+        '/api/v1/groups/g1/routine-preview' => ok({
+          ...found,
+          'slots': [
+            {
+              'id': 's1',
+              'courseCode': 'CSE 311',
+              'weekday': 2,
+              'start': '09:00',
+              'end': '10:30',
+              'kind': 'theory',
+            },
+          ],
+          'hiddenCourses': ['MAT201'],
+        }),
+        '/api/v1/groups/g1/join-courses' => ok({
+          ...group,
+          'discoverable': false,
+        }),
+        _ => http.Response('', 404),
+      };
+    });
+    final api = ApiClient(
+      const ApiConfig(baseUrl: 'https://api.test/api/v1'),
+      httpClient: client,
+      accessToken: () => 't',
+    );
+    final repo = ApiClassGroupRepository(api);
+
+    final page = await repo.searchGroups(' cse 311 ', batch: '61', page: 2);
+    expect(page.more, isTrue);
+    final g = page.items.single;
+    expect(g.title, 'CSE 61 · A');
+    expect(g.crName, 'Rafi');
+    expect(g.courses.single.key, 'CSE311');
+    expect(
+      await repo.similarGroups(department: 'CSE', batch: '61'),
+      hasLength(1),
+    );
+    final prev = await repo.routinePreview('g1', code: 'kqwzrt');
+    expect(prev.slots.single.weekday, 2);
+    expect(prev.hiddenCourses, {'MAT201'});
+    final joined = await repo.joinCourses('g1', {'CSE 311'});
+    expect(joined.discoverable, isFalse);
+
+    expect(seen, [
+      'GET /api/v1/groups/search?q=cse+311&batch=61&page=2 ',
+      'GET /api/v1/groups/similar?department=CSE&batch=61 ',
+      'GET /api/v1/groups/g1/routine-preview?code=KQWZRT ',
+      'POST /api/v1/groups/g1/join-courses {"courses":["CSE 311"]}',
+    ]);
+  });
+
+  test('a group draft sends discoverable only when set', () {
+    const d = GroupDraft(department: 'CSE', batch: '61', semester: 'F');
+    expect(d.toJson().containsKey('discoverable'), isFalse);
+    const off = GroupDraft(
+      department: 'CSE',
+      batch: '61',
+      semester: 'F',
+      discoverable: false,
+    );
+    expect(off.toJson()['discoverable'], isFalse);
+  });
 }
