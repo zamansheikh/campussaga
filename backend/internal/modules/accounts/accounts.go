@@ -31,13 +31,13 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/accounts/store"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
-	mailer "github.com/zamansheikh/campussaga/backend/internal/platform/mail"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/accounts/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/auth"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/firebase"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
+	mailer "github.com/zamansheikh/varsitykotha/backend/internal/platform/mail"
 )
 
 // University is what accounts needs to know about a university.

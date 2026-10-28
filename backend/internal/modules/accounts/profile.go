@@ -7,9 +7,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/accounts/store"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/accounts/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/auth"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
 )
 
 // Me is the signed-in student's own profile. It is the only place an

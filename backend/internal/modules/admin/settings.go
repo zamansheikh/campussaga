@@ -9,9 +9,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/admin/store"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/admin/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
 )
 
 // ---- dashboard ----------------------------------------------------------------

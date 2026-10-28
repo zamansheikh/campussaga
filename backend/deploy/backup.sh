@@ -1,9 +1,9 @@
 #!/bin/sh
-# Nightly database dump on the VPS (cron: /etc/cron.d/campussaga), kept 14
-# days in /opt/campussaga/deploy/backups. Off-site copies (age + rclone to
+# Nightly database dump on the VPS (cron: /etc/cron.d/varsitykotha), kept 14
+# days in /opt/varsitykotha/deploy/backups. Off-site copies (age + rclone to
 # R2, docs/DEPLOYMENT.md section 4) are still to be set up.
 set -eu
-cd /opt/campussaga/deploy
+cd /opt/varsitykotha/deploy
 mkdir -p backups
 chmod 700 backups
 f="backups/campus-$(date +%F-%H%M).dump"

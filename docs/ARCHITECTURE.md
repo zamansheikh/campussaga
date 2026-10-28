@@ -1,9 +1,11 @@
 # VarsityKotha — Architecture
 
 > The product was renamed from "Campus Saga" to VarsityKotha (ভার্সিটি কথা) on
-> 2026-10-28. Internal identifiers keep the old name: the Dart package
-> `campussaga`, the Go module, the repo, `/opt/campussaga`, the compose
-> project and database names.
+> 2026-10-28. The repo, Go module, app ID, domain, Firebase project, server
+> directory (`/opt/varsitykotha`), cron file, compose project, containers,
+> images and volumes use the new name. Still the old name: the Dart package
+> `campussaga`, the `campus_*` packages, the `campusapi` binary and the
+> database (`campus`).
 
 Goal: ship each release properly with a small team, without painting
 ourselves into a corner. Every choice below can be replaced later without
@@ -302,7 +304,7 @@ presentation ─▶ application ─▶ campus_core (interfaces, models)
 Same conventions as our `gamebackend` service.
 
 ```
-backend/                          module github.com/zamansheikh/campussaga/backend
+backend/                          module github.com/zamansheikh/varsitykotha/backend
 ├─ cmd/campusapi/                 main: `campusapi serve` | `campusapi migrate`
 ├─ internal/
 │  ├─ platform/

@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/voice/store"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/voice/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
 )
 
 // pending is a push to send once its transaction committed.

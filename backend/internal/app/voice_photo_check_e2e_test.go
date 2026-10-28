@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/media/mediatest"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/media/mediatest"
 )
 
 // queueChecker answers the photo check with the next queued score.

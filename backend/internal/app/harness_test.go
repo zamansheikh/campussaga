@@ -15,13 +15,13 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/push"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/config"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase/firebasetest"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/mail"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/media"
-	"github.com/zamansheikh/campussaga/backend/internal/testkit"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/push"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/config"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/firebase"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/firebase/firebasetest"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/mail"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/media"
+	"github.com/zamansheikh/varsitykotha/backend/internal/testkit"
 )
 
 // harness runs the real HTTP API on a fresh database with a fake clock and

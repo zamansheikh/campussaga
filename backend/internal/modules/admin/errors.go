@@ -3,7 +3,7 @@ package admin
 import (
 	"net/http"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
 )
 
 // Error codes are the wire contract with the admin panel.

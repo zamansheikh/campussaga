@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
 )
 
 // Photo check: every photo is scored by an NSFW classifier running on our

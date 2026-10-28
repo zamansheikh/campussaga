@@ -16,10 +16,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/admin/store"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/admin/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/auth"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
 )
 
 // SignIn is the port to the accounts module (admin sign-in by email code).

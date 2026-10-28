@@ -19,9 +19,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/push/store"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/push/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/auth"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
 )
 
 // Text is one notification in one language.

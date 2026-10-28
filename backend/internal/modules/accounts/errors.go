@@ -3,8 +3,8 @@ package accounts
 import (
 	"net/http"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/auth"
 )
 
 // Error codes are the wire contract with the app; never rename a shipped one.

@@ -8,9 +8,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/admin/store"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/admin/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
 )
 
 // University is a university as the panel sees it.

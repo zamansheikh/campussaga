@@ -1,4 +1,4 @@
-# Production compose file. Copy to /opt/campussaga/deploy/compose.yaml on the
+# Production compose file. Copy to /opt/varsitykotha/deploy/compose.yaml on the
 # VPS (docs/DEPLOYMENT.md). Secrets come from deploy/.env next to it.
 
 # Containers: varsitykotha-postgres-1, -api-1, -nsfw-1, -web-1 (the project
@@ -21,7 +21,7 @@ services:
 
   api:
     build: ../backend
-    image: campusapi:latest
+    image: varsitykotha-api:latest
     restart: unless-stopped
     env_file: .env
     environment:
@@ -45,7 +45,7 @@ services:
   # API reaches it. If it is down, the API holds photos for moderators.
   nsfw:
     build: ../backend/nsfw
-    image: campusnsfw:latest
+    image: varsitykotha-nsfw:latest
     restart: unless-stopped
     mem_limit: 600m
     logging:
@@ -57,7 +57,7 @@ services:
   # API over the compose network. Deploy with deploy/deploy-web.sh.
   web:
     build: ../web
-    image: campusweb:latest
+    image: varsitykotha-web:latest
     restart: unless-stopped
     environment:
       NODE_ENV: production

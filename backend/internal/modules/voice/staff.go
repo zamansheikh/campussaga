@@ -7,9 +7,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/voice/store"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/voice/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
 )
 
 // audit records a staff action. meta never names an author (§2.3).

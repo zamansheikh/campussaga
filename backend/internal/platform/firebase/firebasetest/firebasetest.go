@@ -8,7 +8,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/firebase"
 )
 
 // Signer holds a test key pair standing in for Google's.

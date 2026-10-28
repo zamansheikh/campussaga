@@ -12,7 +12,7 @@ critical bugs**, Android first. iPhones follow once the Apple push key is set.
 | Upload key | `~/campussaga-secrets/upload-keystore.jks` (+ `key.properties.backup`). **Back both up to the password manager now.** Losing the upload key is recoverable with Play App Signing, but slow |
 | Upload key in Firebase | SHA-1 and SHA-256 registered (Google sign-in works in release builds) |
 | Privacy policy / account deletion page | Updated for groups, personal classes, announcements and pushes (`site/`; publishes on push to `main`) |
-| Backend on a public server | **Live (2026-10-28): https://api.varsitykotha.com** on the Tecsior VPS, `/opt/campussaga`, compose project `varsitykotha` (containers `varsitykotha-*-1`, volumes `varsitykotha_pgdata` / `varsitykotha_media`; renamed from `campussaga` on 2026-10-28) (127.0.0.1:7030), nginx `fx-api.varsitykotha.com.conf`, Let's Encrypt (auto-renew), DNS on Cloudflare (DNS only, not proxied). The old `api-campus.silifton.com` still serves older app builds. Redeploy: `backend/deploy/deploy.sh`. Nightly DB dump + weekly log wipe: `/etc/cron.d/campussaga` (from `backend/deploy/campussaga.cron`). Off-site backups still to set up |
+| Backend on a public server | **Live (2026-10-28): https://api.varsitykotha.com** on the Tecsior VPS, `/opt/varsitykotha`, compose project `varsitykotha` (containers `varsitykotha-*-1`, volumes `varsitykotha_pgdata` / `varsitykotha_media`; renamed from `campussaga` on 2026-10-28) (127.0.0.1:7030), nginx `fx-api.varsitykotha.com.conf`, Let's Encrypt (auto-renew), DNS on Cloudflare (DNS only, not proxied). The old `api-campus.silifton.com` still serves older app builds. Redeploy: `backend/deploy/deploy.sh`. Nightly DB dump + weekly log wipe: `/etc/cron.d/varsitykotha` (from `backend/deploy/varsitykotha.cron`). Off-site backups still to set up |
 | Push delivery | **Live (2026-10-28)** on Android: Firebase project `varsitykotha` (moved from `bitlaabuzz` on 2026-10-28), service-account key on the server (`deploy/secrets/fcm-service-account.json`; local copy `~/campussaga-secrets/fcm-service-account.varsitykotha.json`, back it up with the upload key) |
 | iPhone | Builds; pushes need the APNs key; sign-in uses the browser sheet |
 
@@ -30,7 +30,7 @@ old address running for a while, or use the force-update minimum build).
 ## 2. Deploy the backend
 
 Follow [DEPLOYMENT.md](DEPLOYMENT.md) §3 on the VPS (Tecsior conventions):
-port 7030 on 127.0.0.1, nginx vhost, certbot, `/opt/campussaga`, `.env`
+port 7030 on 127.0.0.1, nginx vhost, certbot, `/opt/varsitykotha`, `.env`
 secrets, the **FCM key file** in `deploy/secrets/`, backups and the log
 cron. Then check:
 

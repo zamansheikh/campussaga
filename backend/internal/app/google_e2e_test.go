@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/firebase/firebasetest"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/firebase/firebasetest"
 )
 
 func (h *harness) googleToken(email string, verified bool) string {

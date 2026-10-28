@@ -108,4 +108,4 @@ jobs:
           TEST_DATABASE_URL: postgres://campus:campus@localhost:55632/campus?sslmode=disable
         run: go test -race -count=1 ./...
       - name: Docker image builds
-        run: docker build -t campusapi:ci .
+        run: docker build -t varsitykotha-api:ci .

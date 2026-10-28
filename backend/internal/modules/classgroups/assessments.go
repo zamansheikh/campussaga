@@ -7,10 +7,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/classgroups/store"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/classgroups/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/auth"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
 )
 
 // MaxUpcomingAssessments caps the tests and deadlines ahead in one group.

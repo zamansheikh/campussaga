@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
 )
 
 func (s *Service) Routes(r *httpx.Router) {

@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
-	"github.com/zamansheikh/campussaga/backend/internal/testkit"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/testkit"
 )
 
 func TestSharedDomainsAreRefusedByTheDatabase(t *testing.T) {

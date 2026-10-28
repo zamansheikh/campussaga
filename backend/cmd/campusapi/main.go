@@ -13,10 +13,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/zamansheikh/campussaga/backend/internal/app"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/config"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
-	"github.com/zamansheikh/campussaga/backend/migrations"
+	"github.com/zamansheikh/varsitykotha/backend/internal/app"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/config"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/migrations"
 )
 
 func main() {

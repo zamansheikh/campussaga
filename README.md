@@ -10,8 +10,8 @@ morning, and a safe, anonymous voice to get campus problems fixed.
 </div>
 
 > Renamed from "Campus Saga" to VarsityKotha (ভার্সিটি কথা) on 2026-10-28.
-> Internal names (the `campussaga` Dart package, the repo, server paths) are
-> unchanged.
+> The repo, server and Firebase project use the new name; the Dart packages
+> (`campussaga`, `campus_*`) and the `campusapi` binary keep the old one.
 
 > v2 is a fresh start. The old v1 app is kept at the git tag `v1-archive`.
 > The name and logo are placeholders and will change.

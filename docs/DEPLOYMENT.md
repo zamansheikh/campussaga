@@ -19,7 +19,7 @@ other services**:
 |---|---|
 | nginx on the host fronts every site | We add one vhost for `api.<domain>`; no own reverse proxy container |
 | Containers bind to `127.0.0.1` only | Our API listens on `127.0.0.1:7030` (**check the port is free first**: `ss -ltnp \| grep 7030`) |
-| Apps live under `/opt/<name>` | Everything in `/opt/campussaga` |
+| Apps live under `/opt/<name>` | Everything in `/opt/varsitykotha` |
 | vhosts: `/etc/nginx/sites-available/fx-<domain>.conf`, symlinked into `sites-enabled` | Same for ours |
 | Certificates via `certbot --webroot -w /var/www/html` | Same for ours |
 | `ufw` allows 22, 80, 443 only | Postgres and the API are never exposed publicly |
@@ -46,7 +46,7 @@ Cloudflare (DNS, optional proxy / DDoS protection)
 ┌──────────────────────── VPS ────────────────────────┐
 │  nginx (TLS)   api.<domain> ─▶ 127.0.0.1:7030       │
 │                                                     │
-│  /opt/campussaga/deploy  (docker compose project    │
+│  /opt/varsitykotha/deploy  (docker compose project    │
 │                           "varsitykotha")           │
 │    api       campusapi serve   127.0.0.1:7030       │
 │    postgres  postgres:18       internal network only│
@@ -56,7 +56,7 @@ Cloudflare (DNS, optional proxy / DDoS protection)
 ```
 
 ```
-/opt/campussaga/
+/opt/varsitykotha/
 ├─ backend/              # copy of the repo's backend/ (rsync)
 └─ deploy/
    ├─ compose.yaml       # api + postgres
@@ -71,11 +71,11 @@ Cloudflare (DNS, optional proxy / DDoS protection)
 ### 3.1 First-time setup
 
 - [ ] Confirm `127.0.0.1:7030` is free and pick another port if not
-- [ ] `mkdir -p /opt/campussaga/deploy && chmod 700 /opt/campussaga/deploy`
-- [ ] Copy the backend: `rsync -a --delete --exclude .git backend/ <vps>:/opt/campussaga/backend/`
+- [ ] `mkdir -p /opt/varsitykotha/deploy && chmod 700 /opt/varsitykotha/deploy`
+- [ ] Copy the backend: `rsync -a --delete --exclude .git backend/ <vps>:/opt/varsitykotha/backend/`
 - [ ] Create `deploy/.env` (section 3.2) and `deploy/compose.yaml` (section 3.3)
 
-### 3.2 Secrets: `/opt/campussaga/deploy/.env`
+### 3.2 Secrets: `/opt/varsitykotha/deploy/.env`
 
 Template: [backend/deploy/env.example](../backend/deploy/env.example).
 
@@ -103,7 +103,7 @@ service-account key, a file, not a variable.
 1. Firebase console → project `varsitykotha` → ⚙ Project settings → Service
    accounts → **Generate new private key**. A JSON file downloads.
 2. Copy it to the server, never into the repo:
-   `/opt/campussaga/deploy/secrets/fcm-service-account.json`
+   `/opt/varsitykotha/deploy/secrets/fcm-service-account.json`
 3. `chown root:65532` and `chmod 640` (the API container runs as user 65532
    and mounts `secrets/` read-only at `/run/secrets`).
 4. `.env`: `FCM_CREDENTIALS_FILE=/run/secrets/fcm-service-account.json`.
@@ -121,7 +121,7 @@ capabilities in Xcode.
 
 ### 3.3 `compose.yaml`
 
-In the repo: [backend/deploy/compose.yaml](../backend/deploy/compose.yaml). Copy it to `/opt/campussaga/deploy/`.
+In the repo: [backend/deploy/compose.yaml](../backend/deploy/compose.yaml). Copy it to `/opt/varsitykotha/deploy/`.
 
 ```yaml
 name: campussaga
@@ -142,7 +142,7 @@ services:
 
   api:
     build: ../backend
-    image: campusapi:latest
+    image: varsitykotha-api:latest
     restart: unless-stopped
     env_file: .env
     depends_on:
@@ -203,10 +203,10 @@ site on the box.
 
 ```bash
 # from the Mac
-rsync -a --delete --exclude .git backend/ <vps>:/opt/campussaga/backend/
+rsync -a --delete --exclude .git backend/ <vps>:/opt/varsitykotha/backend/
 
 # on the VPS
-cd /opt/campussaga/deploy
+cd /opt/varsitykotha/deploy
 docker compose build api
 docker compose run --rm api migrate        # apply new migrations first
 docker compose up -d api                   # start the new version
@@ -214,7 +214,7 @@ curl -fsS http://127.0.0.1:7030/api/v1/health
 ```
 
 - Take a manual backup (section 4) before any release with a migration.
-- Tag the previous image before building (`docker tag campusapi:latest campusapi:rollback`) so a rollback is one `docker compose up -d` away.
+- Tag the previous image before building (`docker tag varsitykotha-api:latest varsitykotha-api:rollback`) so a rollback is one `docker compose up -d` away.
 - Never change the production schema by hand. Every change is a migration in git.
 
 ---
@@ -226,7 +226,7 @@ within 6 months. `compose.yaml` caps the API's logs at 3 × 10 MB; add this
 weekly cron on the VPS so they are also wiped by age:
 
 ```cron
-# /etc/cron.d/campussaga-logs: empty the API container's log every Sunday 03:30
+# /etc/cron.d/varsitykotha-logs: empty the API container's log every Sunday 03:30
 30 3 * * 0 root truncate -s 0 "$(docker inspect --format '{{.LogPath}}' varsitykotha-api-1)"
 ```
 
@@ -245,7 +245,7 @@ these change, update `site/privacy.html` first.
 ```bash
 docker compose exec -T postgres pg_dump -U campus -Fc campus \
   | age -r <public-key> > backups/campus-$(date +%F).dump.age
-rclone copy backups/ r2:campussaga-backups/
+rclone copy backups/ r2:varsitykotha-backups/
 ```
 
 Rules:
@@ -292,7 +292,7 @@ Rules:
 ## 8. If the server dies (runbook)
 
 1. Create a new VPS (Ubuntu 24.04, Docker, nginx, certbot).
-2. Restore `/opt/campussaga/deploy` (`.env`, `compose.yaml`) and the nginx vhost from the encrypted config backup. Keep the **same `JWT_SECRET`** so existing app logins keep working.
+2. Restore `/opt/varsitykotha/deploy` (`.env`, `compose.yaml`) and the nginx vhost from the encrypted config backup. Keep the **same `JWT_SECRET`** so existing app logins keep working.
 3. Copy the backend, `docker compose up -d postgres`, restore the latest dump with `pg_restore`, then `docker compose up -d api`.
 4. Issue the certificate, point the `api.<domain>` DNS record to the new server (Cloudflare: change is instant).
 5. Check `/api/v1/health`, sign in from the app, post a status update to students.

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/push"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/push"
 )
 
 func (h *harness) register(token, device, platform, lang string) {

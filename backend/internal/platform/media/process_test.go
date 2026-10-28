@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/media/mediatest"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/media/mediatest"
 )
 
 func TestProcessStripsMetadataAndOrients(t *testing.T) {

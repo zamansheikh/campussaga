@@ -7,9 +7,9 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/appconfig/store"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/db"
-	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/appconfig/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
 )
 
 type Service struct {

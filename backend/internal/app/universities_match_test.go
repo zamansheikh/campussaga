@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/universities"
-	"github.com/zamansheikh/campussaga/backend/internal/testkit"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/universities"
+	"github.com/zamansheikh/varsitykotha/backend/internal/testkit"
 )
 
 // Real student addresses must reach the right university (seeded by the

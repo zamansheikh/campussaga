@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
 )
 
 // Routes mounts the module's endpoints. Sign-in endpoints are limited per

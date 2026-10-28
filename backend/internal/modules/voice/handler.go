@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/httpx"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
 )
 
 // Routes mounts Campus Voice. Every route drops the user id from its log

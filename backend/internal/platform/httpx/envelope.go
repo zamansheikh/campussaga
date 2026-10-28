@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/apperr"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
 )
 
 type successEnvelope struct {

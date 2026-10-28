@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/zamansheikh/campussaga/backend/internal/modules/voice/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/voice/store"
 )
 
 // Author is shown only for named posts and official replies: a display

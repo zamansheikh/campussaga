@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zamansheikh/campussaga/backend/internal/platform/media/mediatest"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/media/mediatest"
 )
 
 // Test 7: the auto check holds personal info, bad language and posts by

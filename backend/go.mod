@@ -1,4 +1,4 @@
-module github.com/zamansheikh/campussaga/backend
+module github.com/zamansheikh/varsitykotha/backend
 
 go 1.26.0
 
