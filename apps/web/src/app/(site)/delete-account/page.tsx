@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 };
 
 const mailto = "mailto:hello@silifton.com?subject=Delete%20my%20VarsityKotha%20account";
+const mailtoData = "mailto:hello@silifton.com?subject=Delete%20some%20of%20my%20VarsityKotha%20data";
 
 export default function DeleteAccountPage() {
   return (
@@ -79,6 +80,38 @@ export default function DeleteAccountPage() {
             Google account. Ask us to remove it as part of your deletion request.
           </li>
         </ul>
+        <h2 id="data">Delete some of your data and keep your account</h2>
+        <p>You can delete these yourself in the app at any time:</p>
+        <ul>
+          <li>
+            <strong>A Campus Voice issue or comment you wrote:</strong> open it, tap the <strong>⋮</strong> menu, then{" "}
+            <strong>Delete</strong>. It disappears for everyone at once and is kept hidden, for moderation only.
+          </li>
+          <li>
+            <strong>A &quot;Me too&quot; vote or a follow:</strong> tap <strong>Me too</strong> or{" "}
+            <strong>Follow</strong> again. The vote or follow is deleted.
+          </li>
+          <li>
+            <strong>A personal class:</strong> open it and tap <strong>Delete</strong>.
+          </li>
+          <li>
+            <strong>A class group:</strong> open the group, tap the <strong>⋮</strong> menu, then{" "}
+            <strong>Leave group</strong>. A CR can also <strong>Delete group</strong>, which removes its routine for
+            everyone.
+          </li>
+          <li>
+            <strong>Your name, department and batch:</strong> Profile → <strong>Edit profile</strong>.
+          </li>
+          <li>
+            <strong>CGPA calculator entries:</strong> these are only on your phone. Delete a semester, or clear them
+            all, in the CGPA calculator.
+          </li>
+        </ul>
+        <p>
+          For anything else, email <a href={mailtoData}>hello@silifton.com</a> from the address you sign in with, with
+          the subject &quot;Delete some of my VarsityKotha data&quot; and what you want deleted. We do it within 7 days
+          and confirm by email.
+        </p>
         <p>
           More details: <Link href="/privacy">Privacy Policy</Link>.
         </p>
@@ -144,6 +177,37 @@ export default function DeleteAccountPage() {
             ফেলার অনুরোধে এটিও মুছতে বলো।
           </li>
         </ul>
+        <h2 id="data-bn">অ্যাকাউন্ট রেখে কিছু তথ্য মুছে ফেলো</h2>
+        <p>এগুলো যেকোনো সময় নিজেই অ্যাপ থেকে মুছতে পারো:</p>
+        <ul>
+          <li>
+            <strong>তোমার লেখা ক্যাম্পাস ভয়েস ইস্যু বা মন্তব্য:</strong> খুলে <strong>⋮</strong> মেনুতে{" "}
+            <strong>মুছে ফেলো</strong> চাপো। সাথে সাথে সবার কাছ থেকে সরে যায়, শুধু মডারেশনের জন্য লুকানো থাকে।
+          </li>
+          <li>
+            <strong>&quot;আমারও&quot; ভোট বা ফলো:</strong> আবার <strong>আমারও</strong> বা <strong>ফলো করো</strong>{" "}
+            চাপো। ভোট বা ফলো মুছে যায়।
+          </li>
+          <li>
+            <strong>ব্যক্তিগত ক্লাস:</strong> খুলে <strong>মুছে ফেলো</strong> চাপো।
+          </li>
+          <li>
+            <strong>ক্লাস গ্রুপ:</strong> গ্রুপ খুলে <strong>⋮</strong> মেনুতে <strong>গ্রুপ ছেড়ে দাও</strong>। সিআর
+            চাইলে <strong>গ্রুপ মুছে ফেলো</strong> দিয়ে সবার জন্য রুটিন সরাতে পারে।
+          </li>
+          <li>
+            <strong>নাম, বিভাগ ও ব্যাচ:</strong> প্রোফাইল → <strong>প্রোফাইল সম্পাদনা</strong>।
+          </li>
+          <li>
+            <strong>সিজিপিএ ক্যালকুলেটরের তথ্য:</strong> শুধু তোমার ফোনে থাকে; ক্যালকুলেটর থেকেই সেমিস্টার বা সব তথ্য
+            মুছতে পারো।
+          </li>
+        </ul>
+        <p>
+          অন্য কিছু মুছতে চাইলে যে ঠিকানা দিয়ে সাইন ইন করো সেখান থেকে <a href={mailtoData}>hello@silifton.com</a>{" "}
+          ঠিকানায় &quot;Delete some of my VarsityKotha data&quot; বিষয়ে লিখে জানাও কী মুছতে চাও। ৭ দিনের মধ্যে মুছে
+          ইমেইলে জানানো হবে।
+        </p>
         <p>
           বিস্তারিত: <Link href="/privacy#bn">গোপনীয়তা নীতি</Link>।
         </p>
