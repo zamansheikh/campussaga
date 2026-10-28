@@ -48,6 +48,8 @@ type University struct {
 	NameBn  *string   `json:"nameBn"`
 	City    *string   `json:"city,omitempty"`
 	Domains []string  `json:"domains,omitempty"`
+	// IsDemo: the reviewer-only demo university (never sent to the app).
+	IsDemo bool `json:"-"`
 }
 
 // Universities is the port to the universities module (wired in app).
@@ -71,6 +73,11 @@ type Config struct {
 	RefreshTTL  time.Duration
 	// LogCodes writes codes to the log (development only).
 	LogCodes bool
+	// ReviewEmail / ReviewCode: app-store reviewer sign-in. That one email
+	// signs in with that fixed 6-digit code and no email is sent. Both
+	// empty = off. ReviewEmail must already be lowercase and trimmed.
+	ReviewEmail string
+	ReviewCode  string
 }
 
 // Service is the accounts module.
@@ -115,7 +122,12 @@ func (s *Service) RequestCode(ctx context.Context, rawEmail string) (*CodeSent, 
 	if uni == nil {
 		return nil, ErrUniversityEmailRequired
 	}
-	if err := s.sendCode(ctx, email, uni); err != nil {
+	review := s.isReview(email)
+	if uni.IsDemo && !review {
+		// Only the reviewer belongs to the demo university.
+		return nil, ErrUniversityEmailRequired
+	}
+	if err := s.sendCode(ctx, email, uni, review); err != nil {
 		return nil, err
 	}
 	return &CodeSent{
@@ -125,10 +137,19 @@ func (s *Service) RequestCode(ctx context.Context, rawEmail string) (*CodeSent, 
 	}, nil
 }
 
+// isReview reports whether email is the configured app-store reviewer (email
+// already normalised). False whenever review sign-in is off.
+func (s *Service) isReview(email string) bool {
+	return s.cfg.ReviewEmail != "" && s.cfg.ReviewCode != "" && email == s.cfg.ReviewEmail
+}
+
 // sendCode emails a fresh 6-digit code, with the resend and hourly limits.
 // Used by sign-in, by verifying a university email later, and by admin
 // sign-in (uni nil: the code can only sign in an existing account).
-func (s *Service) sendCode(ctx context.Context, email string, uni *University) error {
+// review (plain sign-in of the reviewer email only): the stored code is the
+// fixed review code and nothing is emailed; limits, expiry and the attempt
+// counter are the normal ones.
+func (s *Service) sendCode(ctx context.Context, email string, uni *University, review bool) error {
 	now := s.now()
 	return s.d.InTx(ctx, func(ctx context.Context) error {
 		q := store.New(s.d.Q(ctx))
@@ -152,9 +173,12 @@ func (s *Service) sendCode(ctx context.Context, email string, uni *University) e
 			return err
 		}
 
-		code, err := newCode()
-		if err != nil {
-			return err
+		code := s.cfg.ReviewCode
+		if !review {
+			var err error
+			if code, err = newCode(); err != nil {
+				return err
+			}
 		}
 		var uniID *uuid.UUID
 		if uni != nil {
@@ -165,6 +189,9 @@ func (s *Service) sendCode(ctx context.Context, email string, uni *University) e
 			Sends: sends, WindowStart: windowStart, LastSentAt: now, ExpiresAt: now.Add(s.cfg.CodeTTL),
 		}); err != nil {
 			return err
+		}
+		if review {
+			return nil // no email for the reviewer
 		}
 		if s.cfg.LogCodes {
 			httpx.Logger(ctx).Info("DEV ONLY: sign-in code", "email", email, "code", code)
@@ -210,6 +237,9 @@ func (s *Service) verifyCode(ctx context.Context, rawEmail, code string, adminOn
 	email, err := normalizeEmail(rawEmail)
 	if err != nil {
 		return nil, err
+	}
+	if adminOnly && s.isReview(email) {
+		return nil, ErrNotAdmin // the review code never opens the admin panel
 	}
 	now := s.now()
 	var (
@@ -263,6 +293,9 @@ func (s *Service) verifyCode(ctx context.Context, rawEmail, code string, adminOn
 			return err
 		}
 		out = &SignedIn{Tokens: *tokens, User: me, IsNewUser: isNew}
+		if s.isReview(email) {
+			httpx.Logger(ctx).Info("review sign-in", "email", email, "user", user.ID)
+		}
 		return nil
 	})
 	if err != nil {
@@ -340,6 +373,9 @@ func (s *Service) SignInWithGoogle(ctx context.Context, idToken, nameHint string
 	uni, err := s.unis.ForEmail(ctx, email)
 	if err != nil {
 		return nil, err
+	}
+	if uni != nil && uni.IsDemo && !s.isReview(email) {
+		uni = nil // only the reviewer belongs to the demo university
 	}
 	now := s.now()
 	params := store.InsertUserParams{Email: email} // not verified
@@ -614,7 +650,7 @@ func (s *Service) RequestAdminCode(ctx context.Context, rawEmail string) (*CodeS
 	if (u.Role != store.UserRoleAdmin && u.Role != store.UserRoleModerator) || u.BlockedAt != nil {
 		return out, nil
 	}
-	if err := s.sendCode(ctx, email, nil); err != nil {
+	if err := s.sendCode(ctx, email, nil, false); err != nil {
 		return nil, err
 	}
 	return out, nil

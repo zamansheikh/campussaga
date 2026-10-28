@@ -35,6 +35,11 @@ type Config struct {
 	CodeMaxPerHour  int
 	CodeMaxAttempts int
 
+	// Review sign-in for app-store reviewers: this one email signs in with
+	// this fixed 6-digit code and no email is sent. Both empty = off.
+	ReviewEmail string
+	ReviewCode  string
+
 	// SMTP. Development defaults point at Mailpit from docker-compose.
 	SMTPHost     string
 	SMTPPort     int
@@ -90,6 +95,8 @@ func Load() (*Config, error) {
 		CodeResendAfter:    getDuration("CODE_RESEND_AFTER", 60*time.Second),
 		CodeMaxPerHour:     getInt("CODE_MAX_PER_HOUR", 5),
 		CodeMaxAttempts:    getInt("CODE_MAX_ATTEMPTS", 5),
+		ReviewEmail:        strings.ToLower(strings.TrimSpace(get("REVIEW_EMAIL", ""))),
+		ReviewCode:         strings.TrimSpace(get("REVIEW_CODE", "")),
 		SMTPHost:           get("SMTP_HOST", "localhost"),
 		SMTPPort:           getInt("SMTP_PORT", 55625),
 		SMTPUsername:       get("SMTP_USERNAME", ""),
@@ -137,10 +144,28 @@ func (c *Config) validate() error {
 			errs = append(errs, errors.New("DATABASE_URL must be set in production"))
 		}
 	}
+	if (c.ReviewEmail == "") != (c.ReviewCode == "") {
+		errs = append(errs, errors.New("REVIEW_EMAIL and REVIEW_CODE must be set together (or both left empty)"))
+	}
+	if c.ReviewCode != "" && !isSixDigits(c.ReviewCode) {
+		errs = append(errs, errors.New("REVIEW_CODE must be exactly 6 digits"))
+	}
 	if c.CodeMaxAttempts < 1 || c.CodeMaxPerHour < 1 {
 		errs = append(errs, errors.New("CODE_MAX_ATTEMPTS and CODE_MAX_PER_HOUR must be at least 1"))
 	}
 	return errors.Join(errs...)
+}
+
+func isSixDigits(s string) bool {
+	if len(s) != 6 {
+		return false
+	}
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 func get(key, def string) string {

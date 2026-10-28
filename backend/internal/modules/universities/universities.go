@@ -47,6 +47,8 @@ type Summary struct {
 	NameBn  *string   `json:"nameBn"`
 	City    *string   `json:"city,omitempty"`
 	Domains []string  `json:"domains,omitempty"`
+	// IsDemo: the reviewer-only demo university. Never sent to the app.
+	IsDemo bool `json:"-"`
 }
 
 type listRes struct {
@@ -82,7 +84,7 @@ func (s *Service) ForEmail(ctx context.Context, email string) (*Summary, error) 
 	if err != nil {
 		return nil, err
 	}
-	return &Summary{ID: r.ID, Slug: r.Slug, Name: r.Name, NameBn: r.NameBn}, nil
+	return &Summary{ID: r.ID, Slug: r.Slug, Name: r.Name, NameBn: r.NameBn, IsDemo: r.IsDemo}, nil
 }
 
 // Get returns one university's summary (also inactive ones: existing
@@ -92,7 +94,7 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Summary, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Summary{ID: r.ID, Slug: r.Slug, Name: r.Name, NameBn: r.NameBn, City: r.City, Domains: r.Domains}, nil
+	return &Summary{ID: r.ID, Slug: r.Slug, Name: r.Name, NameBn: r.NameBn, City: r.City, Domains: r.Domains, IsDemo: r.IsDemo}, nil
 }
 
 // DomainCandidates returns the email's host and each parent domain with at

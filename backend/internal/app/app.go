@@ -84,7 +84,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		if u == nil {
 			return nil
 		}
-		return &accounts.University{ID: u.ID, Slug: u.Slug, Name: u.Name, NameBn: u.NameBn, City: u.City, Domains: u.Domains}
+		return &accounts.University{ID: u.ID, Slug: u.Slug, Name: u.Name, NameBn: u.NameBn, City: u.City, Domains: u.Domains, IsDemo: u.IsDemo}
 	}
 	accSvc := accounts.NewService(d, tokens, mailer, accounts.Universities{
 		ForEmail: func(ctx context.Context, email string) (*accounts.University, error) {
@@ -98,7 +98,8 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 	}, google, accounts.Config{
 		CodeSecret: cfg.CodeSecret, CodeTTL: cfg.CodeTTL, ResendAfter: cfg.CodeResendAfter,
 		MaxPerHour: cfg.CodeMaxPerHour, MaxAttempts: cfg.CodeMaxAttempts, RefreshTTL: cfg.RefreshTTL,
-		LogCodes: !cfg.IsProduction(),
+		LogCodes:    !cfg.IsProduction(),
+		ReviewEmail: cfg.ReviewEmail, ReviewCode: cfg.ReviewCode,
 	}, now, log)
 	cfgSvc := appconfig.NewService(d)
 	groupSvc := classgroups.NewService(d, now)
