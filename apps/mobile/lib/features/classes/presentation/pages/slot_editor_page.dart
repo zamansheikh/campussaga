@@ -237,11 +237,7 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
             if (_personal && !_editing) ...[
               Row(
                 children: [
-                  Icon(
-                    Icons.lock_outline_rounded,
-                    size: 16,
-                    color: context.cs.textSecondary,
-                  ),
+                  Icon(CsIcons.lock, size: 16, color: context.cs.textSecondary),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -283,7 +279,7 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                           ? l10n.personalNameHint
                           : l10n.courseCodeHint,
                       prefixIcon: Icon(
-                        _personal ? Icons.edit_note_rounded : Icons.tag_rounded,
+                        _personal ? CsIcons.editNote : CsIcons.code,
                       ),
                       errorText: _codeMissing ? l10n.errorFieldRequired : null,
                     ),
@@ -301,7 +297,7 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                 labelText: _personal
                     ? l10n.personalDetailsLabel
                     : l10n.courseTitleLabel,
-                prefixIcon: const Icon(Icons.menu_book_outlined),
+                prefixIcon: const Icon(CsIcons.course),
               ),
             ),
             const SizedBox(height: CsSpace.md),
@@ -311,7 +307,7 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                 enabled: !_busy,
                 decoration: InputDecoration(
                   labelText: l10n.placeLabel,
-                  prefixIcon: const Icon(Icons.place_outlined),
+                  prefixIcon: const Icon(CsIcons.place),
                 ),
               )
             else
@@ -326,7 +322,7 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         labelText: l10n.teacherLabel,
-                        prefixIcon: const Icon(Icons.person_outline_rounded),
+                        prefixIcon: const Icon(CsIcons.profile),
                       ),
                     ),
                   ),
@@ -410,12 +406,12 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
                   ButtonSegment(
                     value: ClassKind.theory,
                     label: Text(l10n.classTheory),
-                    icon: const Icon(Icons.menu_book_outlined),
+                    icon: const Icon(CsIcons.course),
                   ),
                   ButtonSegment(
                     value: ClassKind.lab,
                     label: Text(l10n.classLab),
-                    icon: const Icon(Icons.science_outlined),
+                    icon: const Icon(CsIcons.lab),
                   ),
                 ],
                 selected: {_kind},
@@ -443,7 +439,7 @@ class _SlotEditorPageState extends State<SlotEditorPage> {
               TextButton.icon(
                 style: TextButton.styleFrom(foregroundColor: context.cs.error),
                 onPressed: _busy ? null : _delete,
-                icon: const Icon(Icons.delete_outline_rounded),
+                icon: const Icon(CsIcons.delete),
                 label: Text(l10n.deleteClass),
               )
             else

@@ -116,10 +116,10 @@ class _ClassSheet extends StatelessWidget {
               ],
             ),
             const SizedBox(height: CsSpace.md),
-            _Line(Icons.event_outlined, dateText(context, item.date)),
+            _Line(CsIcons.date, dateText(context, item.date)),
             if (movedTo != null)
               _Line(
-                Icons.east_rounded,
+                CsIcons.arrowRight,
                 l10n.movedToDay(
                   '${dateText(context, movedTo)}, '
                   '${rangeText(context, ClassSlot(id: s.id, courseCode: s.courseCode, weekday: movedTo.weekday, startMin: item.change!.startMin!, endMin: item.change!.endMin!))}',
@@ -128,26 +128,25 @@ class _ClassSheet extends StatelessWidget {
               ),
             if (item.movedFrom != null)
               _Line(
-                Icons.west_rounded,
+                CsIcons.arrowLeft,
                 l10n.movedFromDay(dateText(context, item.movedFrom!)),
                 strong: true,
               ),
             _Line(
-              Icons.access_time_rounded,
+              CsIcons.time,
               item.timeChanged
                   ? '$timeText  (${l10n.wasTime(clockText(context, s.startMin))})'
                   : timeText,
             ),
             if (item.room.isNotEmpty)
               _Line(
-                Icons.meeting_room_outlined,
+                CsIcons.room,
                 item.roomChanged && s.room.isNotEmpty
                     ? '${l10n.roomShort(item.room)}  (${l10n.wasTime(s.room)})'
                     : l10n.roomShort(item.room),
               ),
-            if (s.teacher.isNotEmpty)
-              _Line(Icons.person_outline_rounded, s.teacher),
-            if (!personal) _Line(Icons.groups_outlined, item.group.title),
+            if (s.teacher.isNotEmpty) _Line(CsIcons.profile, s.teacher),
+            if (!personal) _Line(CsIcons.groups, item.group.title),
             if ((item.change?.note ?? '').isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: CsSpace.sm),
@@ -175,7 +174,7 @@ class _ClassSheet extends StatelessWidget {
                     Routes.changeClass(item.group.id, s.id, ownDate),
                   ),
                 ),
-                icon: const Icon(Icons.edit_calendar_outlined),
+                icon: const Icon(CsIcons.changeDay),
                 label: Text(l10n.changeTimeOrRoom),
               ),
               const SizedBox(height: CsSpace.sm),
@@ -183,7 +182,7 @@ class _ClassSheet extends StatelessWidget {
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(foregroundColor: cs.error),
                   onPressed: () => close(() => confirmCancel(host, item)),
-                  icon: const Icon(Icons.event_busy_outlined),
+                  icon: const Icon(CsIcons.cancelClass),
                   label: Text(l10n.cancelThisClass),
                 ),
                 const SizedBox(height: CsSpace.sm),
@@ -192,7 +191,7 @@ class _ClassSheet extends StatelessWidget {
             if (canChange && item.change != null) ...[
               OutlinedButton.icon(
                 onPressed: () => close(() => _undo(host, item)),
-                icon: const Icon(Icons.undo_rounded),
+                icon: const Icon(CsIcons.undo),
                 label: Text(
                   item.extra ? l10n.removeExtraClass : l10n.undoChange,
                 ),
@@ -206,7 +205,7 @@ class _ClassSheet extends StatelessWidget {
                     child: TextButton.icon(
                       onPressed: () =>
                           close(() => host.push(Routes.editPersonal(s.id))),
-                      icon: const Icon(Icons.edit_outlined),
+                      icon: const Icon(CsIcons.edit),
                       label: Text(l10n.editAction),
                     ),
                   ),
@@ -214,7 +213,7 @@ class _ClassSheet extends StatelessWidget {
                     child: TextButton.icon(
                       style: TextButton.styleFrom(foregroundColor: cs.error),
                       onPressed: () => close(() => _deletePersonal(host, s)),
-                      icon: const Icon(Icons.delete_outline_rounded),
+                      icon: const Icon(CsIcons.delete),
                       label: Text(l10n.deleteAction),
                     ),
                   ),
@@ -373,7 +372,7 @@ class _TestChip extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(Icons.chevron_right_rounded, color: cs.statusRejected.fg),
+                Icon(CsIcons.chevronRight, color: cs.statusRejected.fg),
               ],
             ),
           ),

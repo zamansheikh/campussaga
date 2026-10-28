@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../../theme/cs_tokens.dart';
 import '../../tokens/color_tokens.dart';
+import '../../tokens/cs_icons.dart';
 
 /// An issue's state, styled per DESIGN_SYSTEM.md §2: icon + text + colour,
 /// never colour alone.
 enum CsIssueTone {
-  open(Icons.radio_button_unchecked),
-  acknowledged(Icons.visibility_outlined),
-  inProgress(Icons.autorenew),
-  solved(Icons.check_circle),
-  rejected(Icons.block),
-  removed(Icons.delete_outline),
-  review(Icons.hourglass_top);
+  open(CsIcons.circle),
+  acknowledged(CsIcons.visible),
+  inProgress(CsIcons.sync),
+  solved(CsIcons.checkCircle),
+  rejected(CsIcons.blocked),
+  removed(CsIcons.delete),
+  review(CsIcons.pending);
 
   const CsIssueTone(this.icon);
 

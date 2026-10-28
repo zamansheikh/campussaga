@@ -67,7 +67,7 @@ class _UniversityFieldState extends State<UniversityField> {
               child: Row(
                 children: [
                   if (uni == null)
-                    Icon(Icons.account_balance_outlined, color: cs.primary)
+                    Icon(CsIcons.university, color: cs.primary)
                   else
                     UniversityBadge(university: uni, size: 40),
                   const SizedBox(width: 12),
@@ -108,7 +108,7 @@ class _UniversityFieldState extends State<UniversityField> {
                       ),
                     ),
                   if (!_busy && uni == null)
-                    Icon(Icons.chevron_right_rounded, color: cs.primary),
+                    Icon(CsIcons.chevronRight, color: cs.primary),
                 ],
               ),
             ),
@@ -227,7 +227,7 @@ class _UniversityPickerState extends State<_UniversityPicker> {
                   IconButton(
                     tooltip: l10n.cancel,
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: const Icon(CsIcons.close),
                   ),
                 ],
               ),
@@ -256,13 +256,13 @@ class _UniversityPickerState extends State<_UniversityPicker> {
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
                     hintText: l10n.searchUniversity,
-                    prefixIcon: const Icon(Icons.search_rounded),
+                    prefixIcon: const Icon(CsIcons.search),
                     suffixIcon: value.text.isEmpty
                         ? null
                         : IconButton(
                             tooltip: l10n.cancel,
                             onPressed: () => setState(_search.clear),
-                            icon: const Icon(Icons.cancel_rounded),
+                            icon: const Icon(CsIcons.clear),
                           ),
                   ),
                 ),
@@ -276,7 +276,7 @@ class _UniversityPickerState extends State<_UniversityPicker> {
                   if (snap.hasError) {
                     final e = snap.error;
                     return CsEmptyState(
-                      icon: Icons.cloud_off_rounded,
+                      icon: CsIcons.offline,
                       title: e is Failure
                           ? authErrorText(l10n, e)
                           : l10n.errorGeneric,
@@ -290,7 +290,7 @@ class _UniversityPickerState extends State<_UniversityPicker> {
                   if (entries.isEmpty) {
                     return SingleChildScrollView(
                       child: CsEmptyState(
-                        icon: Icons.search_off_rounded,
+                        icon: CsIcons.searchEmpty,
                         title: l10n.noUniversityFound,
                         message: l10n.noUniversityFoundHint,
                         actionLabel: l10n.askToAddUniversity,
@@ -419,7 +419,7 @@ class _UniversityRow extends StatelessWidget {
               ),
               if (selected) ...[
                 const SizedBox(width: CsSpace.sm),
-                Icon(Icons.check_circle_rounded, color: cs.primary),
+                Icon(CsIcons.checkCircle, color: cs.primary),
               ],
             ],
           ),

@@ -52,7 +52,7 @@ class _GroupRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return CsRow(
-      icon: Icons.groups_rounded,
+      icon: CsIcons.groups,
       title: group.title,
       subtitle: [
         group.semester,
@@ -78,13 +78,13 @@ class JoinOrCreate extends StatelessWidget {
       children: [
         FilledButton.icon(
           onPressed: () => context.push(Routes.joinGroup),
-          icon: const Icon(Icons.vpn_key_outlined),
+          icon: const Icon(CsIcons.key),
           label: Text(l10n.joinWithCode),
         ),
         const SizedBox(height: CsSpace.sm),
         OutlinedButton.icon(
           onPressed: () => context.push(Routes.newGroup),
-          icon: const Icon(Icons.add_rounded),
+          icon: const Icon(CsIcons.add),
           label: Text(l10n.imTheCr),
         ),
         const SizedBox(height: CsSpace.sm),

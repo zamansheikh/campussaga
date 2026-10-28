@@ -164,7 +164,7 @@ class ClassTile extends StatelessWidget {
                       if (movedTo != null)
                         CsBadge(
                           label: l10n.movedToDay(shortDate(context, movedTo)),
-                          icon: Icons.east_rounded,
+                          icon: CsIcons.arrowRight,
                           tone: CsBadgeTone.accent,
                         )
                       else if (movedFrom != null)
@@ -182,7 +182,7 @@ class ClassTile extends StatelessWidget {
                       for (final t in tests)
                         CsBadge(
                           label: assessmentKindText(l10n, t.kind),
-                          icon: Icons.quiz_outlined,
+                          icon: CsIcons.test,
                           tone: CsBadgeTone.danger,
                         ),
                       if (it != null && it.extra)
@@ -224,11 +224,7 @@ class ClassTile extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.sticky_note_2_outlined,
-                            size: 14,
-                            color: cs.textSecondary,
-                          ),
+                          Icon(CsIcons.note, size: 14, color: cs.textSecondary),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
@@ -245,7 +241,7 @@ class ClassTile extends StatelessWidget {
               ),
             ),
             if (onTap != null)
-              Icon(Icons.chevron_right_rounded, color: cs.textSecondary),
+              Icon(CsIcons.chevronRight, color: cs.textSecondary),
           ],
         ),
       ),

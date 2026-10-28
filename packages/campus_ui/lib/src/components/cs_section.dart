@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/cs_tokens.dart';
+import '../tokens/cs_icons.dart';
 import '../tokens/dimensions.dart';
 
 /// A titled group of rows on one rounded card, like a settings section.
@@ -135,7 +136,7 @@ class CsRow extends StatelessWidget {
                 trailing!,
               ] else if (showChevron && onTap != null) ...[
                 const SizedBox(width: CsSpace.xs),
-                Icon(Icons.chevron_right_rounded, color: cs.textSecondary),
+                Icon(CsIcons.chevronRight, color: cs.textSecondary),
               ],
             ],
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/cs_tokens.dart';
+import '../../tokens/cs_icons.dart';
 import '../../tokens/dimensions.dart';
 
 /// "Post anonymously": the mask icon, a one-line explanation and an
@@ -35,7 +36,7 @@ class CsAnonToggle extends StatelessWidget {
       child: Row(
         children: [
           Icon(
-            value ? Icons.masks : Icons.person_outline,
+            value ? CsIcons.anonymousFill : CsIcons.profile,
             color: value ? cs.onPrimaryContainer : cs.textSecondary,
           ),
           const SizedBox(width: 12),

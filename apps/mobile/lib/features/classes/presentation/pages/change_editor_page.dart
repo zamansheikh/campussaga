@@ -201,9 +201,7 @@ class _ChangeEditorPageState extends State<ChangeEditorPage> {
               const SizedBox(height: CsSpace.sm),
             ],
             NoticeCard(
-              icon: _date == widget.date
-                  ? Icons.event_outlined
-                  : Icons.event_repeat_outlined,
+              icon: _date == widget.date ? CsIcons.date : CsIcons.newSemester,
               text: _extra || _date == widget.date
                   ? l10n.onlyThisDay(dateText(context, _date))
                   : l10n.movedDayNotice(
@@ -241,7 +239,7 @@ class _ChangeEditorPageState extends State<ChangeEditorPage> {
                       decoration: InputDecoration(
                         labelText: l10n.courseCodeLabel,
                         hintText: l10n.courseCodeHint,
-                        prefixIcon: const Icon(Icons.tag_rounded),
+                        prefixIcon: const Icon(CsIcons.code),
                         errorText: _codeMissing
                             ? l10n.errorFieldRequired
                             : null,
@@ -256,7 +254,7 @@ class _ChangeEditorPageState extends State<ChangeEditorPage> {
                 enabled: !_busy,
                 decoration: InputDecoration(
                   labelText: l10n.courseTitleLabel,
-                  prefixIcon: const Icon(Icons.menu_book_outlined),
+                  prefixIcon: const Icon(CsIcons.course),
                 ),
               ),
               const SizedBox(height: CsSpace.md),
@@ -265,7 +263,7 @@ class _ChangeEditorPageState extends State<ChangeEditorPage> {
                 enabled: !_busy,
                 decoration: InputDecoration(
                   labelText: l10n.teacherLabel,
-                  prefixIcon: const Icon(Icons.person_outline_rounded),
+                  prefixIcon: const Icon(CsIcons.profile),
                 ),
               ),
               const SizedBox(height: CsSpace.md),
@@ -306,7 +304,7 @@ class _ChangeEditorPageState extends State<ChangeEditorPage> {
               enabled: !_busy,
               decoration: InputDecoration(
                 labelText: l10n.roomLabel,
-                prefixIcon: const Icon(Icons.meeting_room_outlined),
+                prefixIcon: const Icon(CsIcons.room),
               ),
             ),
             if (_extra) ...[
@@ -338,7 +336,7 @@ class _ChangeEditorPageState extends State<ChangeEditorPage> {
               decoration: InputDecoration(
                 labelText: l10n.noteLabel,
                 hintText: l10n.noteHint,
-                prefixIcon: const Icon(Icons.sticky_note_2_outlined),
+                prefixIcon: const Icon(CsIcons.note),
               ),
             ),
             if (_failure != null) ...[
@@ -399,11 +397,7 @@ class NoticeCard extends StatelessWidget {
                 ),
               ),
               if (onTap != null)
-                Icon(
-                  Icons.edit_outlined,
-                  size: 18,
-                  color: cs.onPrimaryContainer,
-                ),
+                Icon(CsIcons.edit, size: 18, color: cs.onPrimaryContainer),
             ],
           ),
         ),

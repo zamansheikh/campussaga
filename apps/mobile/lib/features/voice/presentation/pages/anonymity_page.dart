@@ -11,14 +11,14 @@ class AnonymityPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final cs = context.cs;
     final points = [
-      (Icons.badge_outlined, l10n.voiceAnon1),
-      (Icons.lock_outline, l10n.voiceAnon2),
-      (Icons.masks_outlined, l10n.voiceAnon3),
-      (Icons.photo_outlined, l10n.voiceAnon4),
-      (Icons.schedule, l10n.voiceAnon5),
-      (Icons.gavel_outlined, l10n.voiceAnon6),
-      (Icons.warning_amber_outlined, l10n.voiceAnon7),
-      (Icons.health_and_safety_outlined, l10n.voiceAnon8),
+      (CsIcons.idCard, l10n.voiceAnon1),
+      (CsIcons.lock, l10n.voiceAnon2),
+      (CsIcons.anonymous, l10n.voiceAnon3),
+      (CsIcons.image, l10n.voiceAnon4),
+      (CsIcons.time, l10n.voiceAnon5),
+      (CsIcons.rules, l10n.voiceAnon6),
+      (CsIcons.warning, l10n.voiceAnon7),
+      (CsIcons.safety, l10n.voiceAnon8),
     ];
     return Scaffold(
       appBar: AppBar(title: Text(l10n.voiceAnonTitle)),
@@ -32,7 +32,11 @@ class AnonymityPage extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.masks, size: 36, color: cs.onPrimaryContainer),
+                Icon(
+                  CsIcons.anonymousFill,
+                  size: 36,
+                  color: cs.onPrimaryContainer,
+                ),
                 const SizedBox(width: CsSpace.md),
                 Expanded(
                   child: Text(

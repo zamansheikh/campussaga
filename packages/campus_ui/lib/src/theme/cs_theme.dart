@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../tokens/color_tokens.dart';
+import '../tokens/cs_icons.dart';
 import '../tokens/dimensions.dart';
 import '../tokens/typography.dart';
 import 'cs_tokens.dart';
@@ -63,6 +64,11 @@ abstract final class CsTheme {
       fontFamilyFallback: CsTypography.fontFamilyFallback,
       splashFactory: InkSparkle.splashFactory,
       extensions: [CsTokens(colors: c)],
+      // Back and close arrows in the Phosphor style too.
+      actionIconTheme: ActionIconThemeData(
+        backButtonIconBuilder: (_) => const Icon(CsIcons.arrowLeft),
+        closeButtonIconBuilder: (_) => const Icon(CsIcons.close),
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: c.background,
         foregroundColor: c.textPrimary,

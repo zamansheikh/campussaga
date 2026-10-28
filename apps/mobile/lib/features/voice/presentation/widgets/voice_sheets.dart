@@ -53,7 +53,7 @@ class _ReportSheetState extends State<_ReportSheet> {
             Row(
               children: [
                 Icon(
-                  Icons.masks_outlined,
+                  CsIcons.anonymous,
                   size: 16,
                   color: context.cs.textSecondary,
                 ),

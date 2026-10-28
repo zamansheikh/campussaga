@@ -40,7 +40,7 @@ class RemindersPage extends StatelessWidget {
           CsSection(
             children: [
               CsRow(
-                icon: Icons.notifications_active_outlined,
+                icon: CsIcons.reminders,
                 title: l10n.remindersSwitch,
                 subtitle: l10n.remindersSwitchHint,
                 showChevron: false,
@@ -69,7 +69,7 @@ class RemindersPage extends StatelessWidget {
             CsSection(
               children: [
                 CsRow(
-                  icon: Icons.alarm_on_outlined,
+                  icon: CsIcons.alarm,
                   title: l10n.exactAlarmTitle,
                   subtitle: l10n.exactAlarmHint,
                   showChevron: false,
@@ -117,7 +117,7 @@ class RemindersPage extends StatelessWidget {
                               (a, b) => a.courseCode.compareTo(b.courseCode),
                             ))
                           CsRow(
-                            icon: Icons.menu_book_outlined,
+                            icon: CsIcons.course,
                             title: c.courseCode,
                             subtitle: c.courseTitle.isEmpty
                                 ? null
@@ -175,10 +175,7 @@ class _BatteryGuide extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.battery_alert_rounded,
-                      color: cs.statusInProgress.fg,
-                    ),
+                    Icon(CsIcons.battery, color: cs.statusInProgress.fg),
                     const SizedBox(width: CsSpace.sm),
                     Expanded(
                       child: Text(
@@ -198,7 +195,7 @@ class _BatteryGuide extends StatelessWidget {
                 const SizedBox(height: CsSpace.sm),
                 OutlinedButton.icon(
                   onPressed: phone.openBatterySettings,
-                  icon: const Icon(Icons.settings_outlined),
+                  icon: const Icon(CsIcons.settings),
                   label: Text(l10n.openSettings),
                 ),
               ],

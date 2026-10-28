@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/cs_tokens.dart';
+import '../../tokens/cs_icons.dart';
 
 /// "Me too" toggle with its count; a light haptic on tap.
 class CsMeTooButton extends StatelessWidget {
@@ -46,7 +47,7 @@ class CsMeTooButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  selected ? Icons.front_hand : Icons.front_hand_outlined,
+                  selected ? CsIcons.meTooFill : CsIcons.meToo,
                   size: 18,
                   color: fg,
                 ),

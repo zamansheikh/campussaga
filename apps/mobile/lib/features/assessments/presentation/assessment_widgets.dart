@@ -14,12 +14,12 @@ import '../../classes/presentation/widgets/class_tile.dart';
 
 /// The icon of a kind of test or deadline.
 IconData assessmentIcon(AssessmentKind k) => switch (k) {
-  AssessmentKind.classTest || AssessmentKind.quiz => Icons.quiz_outlined,
-  AssessmentKind.assignment => Icons.assignment_outlined,
-  AssessmentKind.labReport => Icons.science_outlined,
-  AssessmentKind.presentation => Icons.co_present_outlined,
-  AssessmentKind.midterm || AssessmentKind.finalExam => Icons.edit_document,
-  AssessmentKind.other => Icons.event_note_outlined,
+  AssessmentKind.classTest || AssessmentKind.quiz => CsIcons.test,
+  AssessmentKind.assignment => CsIcons.assignment,
+  AssessmentKind.labReport => CsIcons.lab,
+  AssessmentKind.presentation => CsIcons.presentation,
+  AssessmentKind.midterm || AssessmentKind.finalExam => CsIcons.editNote,
+  AssessmentKind.other => CsIcons.routineNote,
 };
 
 /// "Class test · CSE 101".
@@ -227,16 +227,12 @@ class _AssessmentSheet extends StatelessWidget {
             if (a.courseTitle.isNotEmpty)
               Text(a.courseTitle, style: context.text.bodyMedium),
             const SizedBox(height: CsSpace.md),
-            _Line(Icons.event_outlined, dateText(context, a.date)),
-            if (time.isNotEmpty) _Line(Icons.access_time_rounded, time),
-            if (a.room.isNotEmpty)
-              _Line(Icons.meeting_room_outlined, l10n.roomShort(a.room)),
-            _Line(Icons.groups_outlined, group.title),
+            _Line(CsIcons.date, dateText(context, a.date)),
+            if (time.isNotEmpty) _Line(CsIcons.time, time),
+            if (a.room.isNotEmpty) _Line(CsIcons.room, l10n.roomShort(a.room)),
+            _Line(CsIcons.groups, group.title),
             if ((a.createdByName ?? '').isNotEmpty)
-              _Line(
-                Icons.person_outline_rounded,
-                l10n.addedBy(a.createdByName!),
-              ),
+              _Line(CsIcons.profile, l10n.addedBy(a.createdByName!)),
             if (a.topics.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: CsSpace.sm),
@@ -256,7 +252,7 @@ class _AssessmentSheet extends StatelessWidget {
                       onPressed: () => close(
                         () => host.push(Routes.editTest(group.id, a.id)),
                       ),
-                      icon: const Icon(Icons.edit_outlined),
+                      icon: const Icon(CsIcons.edit),
                       label: Text(l10n.editAction),
                     ),
                   ),
@@ -265,7 +261,7 @@ class _AssessmentSheet extends StatelessWidget {
                       style: TextButton.styleFrom(foregroundColor: cs.error),
                       onPressed: () =>
                           close(() => deleteAssessment(host, a, group.id)),
-                      icon: const Icon(Icons.delete_outline_rounded),
+                      icon: const Icon(CsIcons.delete),
                       label: Text(l10n.deleteAction),
                     ),
                   ),
@@ -347,7 +343,7 @@ class GroupAssessments extends StatelessWidget {
         for (final a in list)
           AssessmentTile(assessment: a, group: group, now: now),
         CsRow(
-          icon: Icons.add_rounded,
+          icon: CsIcons.add,
           title: l10n.addTest,
           onTap: () => context.push(Routes.newTest(group.id)),
         ),

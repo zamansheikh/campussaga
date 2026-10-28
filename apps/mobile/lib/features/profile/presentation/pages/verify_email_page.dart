@@ -116,7 +116,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                   borderRadius: BorderRadius.circular(CsRadius.md + 2),
                 ),
                 child: Icon(
-                  Icons.verified_outlined,
+                  CsIcons.verifiedOutline,
                   color: cs.onPrimaryContainer,
                 ),
               ),
@@ -135,7 +135,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
               Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: CsBadge(
-                  icon: Icons.school_rounded,
+                  icon: CsIcons.academic,
                   label: uni.localName(lang),
                 ),
               ),
@@ -153,7 +153,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                 decoration: InputDecoration(
                   labelText: l10n.emailLabel,
                   hintText: l10n.emailHint,
-                  prefixIcon: const Icon(Icons.mail_outline_rounded),
+                  prefixIcon: const Icon(CsIcons.email),
                 ),
               ),
             ] else

@@ -1,4 +1,5 @@
 import 'package:campus_core/campus_core.dart';
+import 'package:campus_ui/campus_ui.dart';
 import 'package:campussaga/app/app.dart';
 import 'package:campussaga/app/clock.dart';
 import 'package:campussaga/features/announcements/data/seen_store.dart';
@@ -59,7 +60,7 @@ void main() {
     // Unpin, then delete (asks first).
     final cardMenu = find.descendant(
       of: find.byType(Card),
-      matching: find.byIcon(Icons.more_vert),
+      matching: find.byIcon(CsIcons.more),
     );
     await tester.tap(cardMenu);
     await tester.pumpAndSettle();
@@ -106,11 +107,7 @@ void main() {
     await scrollAndTap(tester, find.text('Quiz on Sunday, chapters 3-4'));
     await tester.pumpAndSettle();
     expect(find.text('Old news'), findsOneWidget);
-    expect(
-      find.byIcon(Icons.more_vert),
-      findsOneWidget,
-      reason: 'app bar only',
-    );
+    expect(find.byIcon(CsIcons.more), findsOneWidget, reason: 'app bar only');
     expect(find.text('Post'), findsNothing);
     await tester.pageBack();
     await tester.pumpAndSettle();

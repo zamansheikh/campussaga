@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:campus_core/campus_core.dart';
+import 'package:campus_ui/campus_ui.dart';
 import 'package:campussaga/app/app.dart';
 import 'package:campussaga/app/clock.dart';
 import 'package:campussaga/features/classes/data/routine_cache.dart';
@@ -301,7 +302,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('CSE 61 · A'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.tap(find.byIcon(CsIcons.more));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Leave group'));
     await tester.pumpAndSettle();

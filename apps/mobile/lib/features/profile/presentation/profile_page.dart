@@ -60,7 +60,7 @@ class ProfilePage extends StatelessWidget {
               CsSection(
                 children: [
                   CsRow(
-                    icon: Icons.inventory_2_outlined,
+                    icon: CsIcons.myIssues,
                     title: l10n.voiceMyIssues,
                     onTap: () => context.push(Routes.campusMine),
                   ),
@@ -72,7 +72,7 @@ class ProfilePage extends StatelessWidget {
               title: l10n.preferences,
               children: [
                 CsRow(
-                  icon: Icons.notifications_none_rounded,
+                  icon: CsIcons.bell,
                   title: l10n.reminders,
                   value: reminders.active
                       ? l10n.remindersOnValue(reminders.settings.minutesBefore)
@@ -80,13 +80,13 @@ class ProfilePage extends StatelessWidget {
                   onTap: () => context.push(Routes.reminders),
                 ),
                 CsRow(
-                  icon: Icons.palette_outlined,
+                  icon: CsIcons.theme,
                   title: l10n.theme,
                   value: themeLabel,
                   onTap: () => _pickTheme(context, settings.themeMode),
                 ),
                 CsRow(
-                  icon: Icons.translate_rounded,
+                  icon: CsIcons.language,
                   title: l10n.language,
                   value: languageLabel,
                   onTap: () => _pickLanguage(context, settings.locale),
@@ -100,18 +100,18 @@ class ProfilePage extends StatelessWidget {
                 if (!(context.select((AuthBloc b) => b.state.user?.verified) ??
                     true))
                   CsRow(
-                    icon: Icons.verified_outlined,
+                    icon: CsIcons.verifiedOutline,
                     title: l10n.verifyWithUniEmail,
                     subtitle: l10n.verifyHint,
                     onTap: () => context.push(Routes.verifyEmail),
                   ),
                 CsRow(
-                  icon: Icons.edit_outlined,
+                  icon: CsIcons.edit,
                   title: l10n.editProfile,
                   onTap: () => context.push(Routes.editProfile),
                 ),
                 CsRow(
-                  icon: Icons.logout_rounded,
+                  icon: CsIcons.signOut,
                   title: l10n.signOut,
                   onTap: () => context.read<AuthBloc>().add(
                     const AuthSignOutRequested(),
@@ -125,16 +125,16 @@ class ProfilePage extends StatelessWidget {
               title: l10n.about,
               children: [
                 CsRow(
-                  icon: Icons.chat_bubble_outline_rounded,
+                  icon: CsIcons.comment,
                   title: l10n.sendFeedback,
                   subtitle: l10n.sendFeedbackHint,
                   onTap: () => _sendFeedback(context),
                 ),
                 CsRow(
-                  icon: Icons.privacy_tip_outlined,
+                  icon: CsIcons.privacy,
                   title: l10n.privacyPolicy,
                   trailing: Icon(
-                    Icons.open_in_new_rounded,
+                    CsIcons.openExternal,
                     size: 18,
                     color: context.cs.textSecondary,
                   ),
@@ -189,18 +189,10 @@ class ProfilePage extends StatelessWidget {
           ThemeMode.system,
           l10n.themeSystem,
           subtitle: l10n.themeSystemHint,
-          icon: Icons.brightness_auto_outlined,
+          icon: CsIcons.themeSystem,
         ),
-        CsOption(
-          ThemeMode.light,
-          l10n.themeLight,
-          icon: Icons.light_mode_outlined,
-        ),
-        CsOption(
-          ThemeMode.dark,
-          l10n.themeDark,
-          icon: Icons.dark_mode_outlined,
-        ),
+        CsOption(ThemeMode.light, l10n.themeLight, icon: CsIcons.light),
+        CsOption(ThemeMode.dark, l10n.themeDark, icon: CsIcons.dark),
       ],
     );
     if (picked != null) cubit.setThemeMode(picked);
@@ -214,11 +206,7 @@ class ProfilePage extends StatelessWidget {
       title: l10n.language,
       selected: current?.languageCode ?? 'system',
       options: [
-        CsOption(
-          'system',
-          l10n.languageSystem,
-          icon: Icons.phone_android_rounded,
-        ),
+        CsOption('system', l10n.languageSystem, icon: CsIcons.phone),
         const CsOption('en', 'English', subtitle: 'English'),
         const CsOption('bn', 'বাংলা', subtitle: 'Bangla'),
       ],
@@ -281,13 +269,13 @@ class _ProfileHeader extends StatelessWidget {
                       if (user.verified)
                         CsBadge(
                           label: l10n.verifiedStudent,
-                          icon: Icons.verified_rounded,
+                          icon: CsIcons.verified,
                           tone: CsBadgeTone.success,
                         )
                       else
                         CsBadge(
                           label: l10n.notVerified,
-                          icon: Icons.help_outline_rounded,
+                          icon: CsIcons.help,
                           tone: CsBadgeTone.accent,
                         ),
                     ],
@@ -306,7 +294,7 @@ class _ProfileHeader extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _InfoLine(
-                        icon: Icons.account_balance_outlined,
+                        icon: CsIcons.university,
                         text: user.university?.localName(lang) ?? '',
                       ),
                     ),
@@ -323,13 +311,13 @@ class _ProfileHeader extends StatelessWidget {
               const UniversityField(),
             const SizedBox(height: CsSpace.sm),
             if (classLine.isNotEmpty)
-              _InfoLine(icon: Icons.school_outlined, text: classLine)
+              _InfoLine(icon: CsIcons.academic, text: classLine)
             else
               InkWell(
                 borderRadius: BorderRadius.circular(CsRadius.sm),
                 onTap: () => context.push(Routes.editProfile),
                 child: _InfoLine(
-                  icon: Icons.add_circle_outline_rounded,
+                  icon: CsIcons.addCircle,
                   text: l10n.completeProfile,
                   highlight: true,
                 ),
@@ -355,13 +343,13 @@ Future<void> _changeUniversity(BuildContext context) async {
         'email',
         l10n.changeWithEmail,
         subtitle: l10n.changeWithEmailHint,
-        icon: Icons.verified_outlined,
+        icon: CsIcons.verifiedOutline,
       ),
       CsOption(
         'pick',
         l10n.changeWithoutEmail,
         subtitle: l10n.changeWithoutEmailHint,
-        icon: Icons.account_balance_outlined,
+        icon: CsIcons.university,
       ),
     ],
   );
@@ -454,7 +442,7 @@ class _DeleteAccountRow extends StatelessWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: Icon(Icons.delete_forever_rounded, color: context.cs.error),
+        icon: Icon(CsIcons.delete, color: context.cs.error),
         title: Text(l10n.deleteAccountTitle),
         content: Text(l10n.deleteAccountBody),
         actions: [
@@ -478,7 +466,7 @@ class _DeleteAccountRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final deleting = context.select((AuthBloc b) => b.state.deleting);
     return CsRow(
-      icon: Icons.delete_outline_rounded,
+      icon: CsIcons.delete,
       title: l10n.deleteAccount,
       subtitle: l10n.deleteAccountHint,
       destructive: true,

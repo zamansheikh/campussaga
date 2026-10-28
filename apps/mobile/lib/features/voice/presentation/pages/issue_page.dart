@@ -131,6 +131,7 @@ class _IssueViewState extends State<_IssueView> {
         actions: [
           if (issue != null && !s.offline)
             PopupMenuButton<String>(
+              icon: const Icon(CsIcons.more),
               onSelected: (a) => _menu(a, issue),
               itemBuilder: (_) => [
                 if (!issue.card.mine)
@@ -151,7 +152,7 @@ class _IssueViewState extends State<_IssueView> {
       body: switch (issue) {
         null when s.loading => const Center(child: CircularProgressIndicator()),
         null => CsEmptyState(
-          icon: Icons.search_off_outlined,
+          icon: CsIcons.searchEmpty,
           title: voiceErrorText(
             context,
             s.failure ?? const UnexpectedFailure(),
@@ -199,7 +200,7 @@ class _Body extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(CsSpace.md, 0, CsSpace.md, CsSpace.xl),
       children: [
         if (state.offline)
-          _Note(icon: Icons.cloud_off_outlined, text: l10n.errorNetwork),
+          _Note(icon: CsIcons.offline, text: l10n.errorNetwork),
         ..._notices(l10n, issue),
         Row(
           children: [
@@ -228,7 +229,7 @@ class _Body extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  c.anonymous ? Icons.masks_outlined : Icons.person_outline,
+                  c.anonymous ? CsIcons.anonymous : CsIcons.profile,
                   size: 16,
                   color: cs.textSecondary,
                 ),
@@ -242,7 +243,7 @@ class _Body extends StatelessWidget {
             if (c.locationLabel.isNotEmpty)
               CsBadge(
                 label: c.locationLabel,
-                icon: Icons.place_outlined,
+                icon: CsIcons.place,
                 tone: CsBadgeTone.neutral,
               ),
           ],
@@ -277,18 +278,14 @@ class _Body extends StatelessWidget {
               CsBadge(
                 label:
                     '${l10n.voiceMeToo} · ${countText(context, c.meTooCount)}',
-                icon: Icons.front_hand_outlined,
+                icon: CsIcons.meToo,
                 tone: CsBadgeTone.neutral,
               ),
             OutlinedButton.icon(
               onPressed: state.offline
                   ? null
                   : () async => onResult(await cubit.toggleFollow()),
-              icon: Icon(
-                c.following
-                    ? Icons.notifications_active
-                    : Icons.notifications_none,
-              ),
+              icon: Icon(c.following ? CsIcons.bellActive : CsIcons.bell),
               label: Text(c.following ? l10n.voiceFollowing : l10n.voiceFollow),
             ),
           ],
@@ -327,14 +324,14 @@ class _Body extends StatelessWidget {
     return [
       if (c.visibility == ContentVisibility.removed)
         _Note(
-          icon: Icons.delete_outline,
+          icon: CsIcons.delete,
           text: issue.removedReason.isEmpty
               ? l10n.voiceRemovedByYou
               : l10n.voiceRemovedNotice(issue.removedReason),
         ),
       if (c.visibility == ContentVisibility.held)
         _Note(
-          icon: Icons.hourglass_top,
+          icon: CsIcons.pending,
           text: [
             l10n.voiceHeldNotice,
             holdReasonText(l10n, issue.holdReason),
@@ -342,13 +339,12 @@ class _Body extends StatelessWidget {
         ),
       if (c.visibility == ContentVisibility.hidden)
         _Note(
-          icon: Icons.visibility_off_outlined,
+          icon: CsIcons.hidden,
           text: issue.holdReason == 'moderator'
               ? l10n.voiceHeldModerator
               : l10n.voiceHiddenNotice,
         ),
-      if (c.private)
-        _Note(icon: Icons.lock_outline, text: l10n.voicePrivateNotice),
+      if (c.private) _Note(icon: CsIcons.lock, text: l10n.voicePrivateNotice),
     ];
   }
 
@@ -395,7 +391,7 @@ class _OfficialActions extends StatelessWidget {
         children: [
           CsBadge(
             label: l10n.voiceOfficialBadge,
-            icon: Icons.verified_outlined,
+            icon: CsIcons.verifiedOutline,
           ),
           const SizedBox(height: CsSpace.sm),
           Wrap(
@@ -412,7 +408,7 @@ class _OfficialActions extends StatelessWidget {
                       l10n.voiceStatusUpdated,
                     );
                   },
-                  icon: const Icon(Icons.published_with_changes),
+                  icon: const Icon(CsIcons.changeStatus),
                   label: Text(l10n.voiceChangeStatus),
                 ),
               if (issue.can.officialReply)
@@ -432,7 +428,7 @@ class _OfficialActions extends StatelessWidget {
                       l10n.voiceReplyPosted,
                     );
                   },
-                  icon: const Icon(Icons.campaign_outlined),
+                  icon: const Icon(CsIcons.raiseIssue),
                   label: Text(l10n.voiceOfficialReply),
                 ),
             ],
@@ -458,10 +454,10 @@ class _CommentTile extends StatelessWidget {
     final removed = c.visibility == ContentVisibility.removed;
     final official = c.official;
     final avatar = official
-        ? Icons.verified
+        ? CsIcons.verified
         : c.author != null
-        ? Icons.person
-        : Icons.masks;
+        ? CsIcons.profileFill
+        : CsIcons.anonymousFill;
     return Container(
       margin: const EdgeInsets.only(bottom: CsSpace.sm),
       padding: const EdgeInsets.all(CsSpace.sm + 4),
@@ -519,6 +515,7 @@ class _CommentTile extends StatelessWidget {
               ),
               if (!removed)
                 PopupMenuButton<String>(
+                  icon: const Icon(CsIcons.more),
                   iconSize: 20,
                   onSelected: (a) async {
                     if (a == 'delete') {
@@ -647,8 +644,8 @@ class _ComposerState extends State<_Composer> {
                         ? l10n.voiceCommentAnonymously
                         : l10n.voiceCommentWithName,
                     isSelected: _anonymous,
-                    icon: const Icon(Icons.person_outline),
-                    selectedIcon: const Icon(Icons.masks),
+                    icon: const Icon(CsIcons.profile),
+                    selectedIcon: const Icon(CsIcons.anonymousFill),
                     onPressed: () => setState(() => _anonymous = !_anonymous),
                   ),
                   Expanded(
@@ -673,7 +670,7 @@ class _ComposerState extends State<_Composer> {
                             dimension: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Icon(Icons.send),
+                        : const Icon(CsIcons.send),
                   ),
                 ],
               ),

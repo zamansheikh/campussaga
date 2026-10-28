@@ -177,7 +177,7 @@ class _Slide extends StatelessWidget {
           if (badge != null) ...[
             CsBadge(
               label: badge!,
-              icon: Icons.auto_awesome_rounded,
+              icon: CsIcons.sparkle,
               tone: CsBadgeTone.accent,
             ),
             const SizedBox(height: CsSpace.md),

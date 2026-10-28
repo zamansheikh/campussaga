@@ -44,7 +44,7 @@ class AnnouncementsSection extends StatelessWidget {
             if (group.isCr)
               TextButton.icon(
                 onPressed: () => showComposer(context, group),
-                icon: const Icon(Icons.campaign_outlined, size: 20),
+                icon: const Icon(CsIcons.raiseIssue, size: 20),
                 label: Text(l10n.postAction),
               ),
           ],
@@ -160,7 +160,7 @@ class AnnouncementCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
-                  a.pinned ? Icons.push_pin_rounded : Icons.campaign_outlined,
+                  a.pinned ? CsIcons.pin : CsIcons.raiseIssue,
                   size: 19,
                   color: cs.onPrimaryContainer,
                 ),
@@ -198,6 +198,7 @@ class AnnouncementCard extends StatelessWidget {
               ),
               if (group.isCr && onTap == null)
                 PopupMenuButton<_Action>(
+                  icon: const Icon(CsIcons.more),
                   onSelected: (x) => _act(context, x),
                   itemBuilder: (context) => [
                     if (a.pinned)
@@ -357,7 +358,7 @@ class _ComposerState extends State<_Composer> {
                         dimension: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.send_rounded),
+                    : const Icon(CsIcons.send),
                 label: Text(l10n.postAction),
               ),
             ],

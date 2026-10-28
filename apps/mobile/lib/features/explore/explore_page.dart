@@ -20,20 +20,20 @@ class ExplorePage extends StatelessWidget {
     );
     final tools = [
       _Feature(
-        icon: Icons.groups_rounded,
+        icon: CsIcons.groups,
         title: l10n.classGroups,
         hint: l10n.exploreGroupsHint,
         onTap: () => context.push(Routes.groups),
       ),
       _Feature(
-        icon: Icons.notifications_active_rounded,
+        icon: CsIcons.reminders,
         title: l10n.reminders,
         hint: l10n.exploreRemindersHint,
         onTap: () => context.push(Routes.reminders),
       ),
       if (voice)
         _Feature(
-          icon: Icons.assignment_ind_rounded,
+          icon: CsIcons.myIssues,
           title: l10n.voiceMyIssues,
           hint: l10n.exploreIssuesHint,
           onTap: () => context.push(Routes.campusMine),
@@ -41,25 +41,25 @@ class ExplorePage extends StatelessWidget {
     ];
     final soon = [
       _Feature(
-        icon: Icons.directions_bus_rounded,
+        icon: CsIcons.bus,
         title: l10n.busRoutesTitle,
         hint: l10n.busRoutesBody,
         soon: true,
       ),
       _Feature(
-        icon: Icons.reviews_rounded,
+        icon: CsIcons.teacherReviews,
         title: l10n.teacherReviewsTitle,
         hint: l10n.teacherReviewsBody,
         soon: true,
       ),
       _Feature(
-        icon: Icons.leaderboard_rounded,
+        icon: CsIcons.rankings,
         title: l10n.rankingsTitle,
         hint: l10n.rankingsBody,
         soon: true,
       ),
       _Feature(
-        icon: Icons.travel_explore_rounded,
+        icon: CsIcons.visitCampus,
         title: l10n.visitCampusTitle,
         hint: l10n.visitCampusBody,
         soon: true,

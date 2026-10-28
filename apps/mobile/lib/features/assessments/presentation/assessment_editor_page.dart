@@ -247,7 +247,7 @@ class _AssessmentEditorPageState extends State<AssessmentEditorPage> {
                     decoration: InputDecoration(
                       labelText: l10n.courseCodeLabel,
                       hintText: l10n.courseCodeHint,
-                      prefixIcon: const Icon(Icons.tag_rounded),
+                      prefixIcon: const Icon(CsIcons.code),
                       errorText: _codeMissing ? l10n.errorFieldRequired : null,
                     ),
                   ),
@@ -260,7 +260,7 @@ class _AssessmentEditorPageState extends State<AssessmentEditorPage> {
               enabled: !_busy,
               decoration: InputDecoration(
                 labelText: l10n.courseTitleLabel,
-                prefixIcon: const Icon(Icons.menu_book_outlined),
+                prefixIcon: const Icon(CsIcons.course),
               ),
             ),
             const SizedBox(height: CsSpace.md),
@@ -275,7 +275,7 @@ class _AssessmentEditorPageState extends State<AssessmentEditorPage> {
                 alignment: AlignmentDirectional.centerStart,
                 child: TextButton.icon(
                   onPressed: _busy ? null : () => _pickTime(start: true),
-                  icon: const Icon(Icons.schedule_rounded),
+                  icon: const Icon(CsIcons.time),
                   label: Text(l10n.testAddTime),
                 ),
               )
@@ -338,7 +338,7 @@ class _AssessmentEditorPageState extends State<AssessmentEditorPage> {
               enabled: !_busy,
               decoration: InputDecoration(
                 labelText: l10n.roomLabel,
-                prefixIcon: const Icon(Icons.meeting_room_outlined),
+                prefixIcon: const Icon(CsIcons.room),
               ),
             ),
             const SizedBox(height: CsSpace.md),
@@ -352,7 +352,7 @@ class _AssessmentEditorPageState extends State<AssessmentEditorPage> {
               decoration: InputDecoration(
                 labelText: l10n.topicsLabel,
                 hintText: l10n.topicsHint,
-                prefixIcon: const Icon(Icons.notes_rounded),
+                prefixIcon: const Icon(CsIcons.details),
               ),
             ),
             if (_failure != null) ...[
@@ -400,7 +400,7 @@ class _DateBox extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Row(
             children: [
-              Icon(Icons.event_outlined, color: cs.textSecondary, size: 20),
+              Icon(CsIcons.date, color: cs.textSecondary, size: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -411,7 +411,7 @@ class _DateBox extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.edit_outlined, size: 18, color: cs.textSecondary),
+              Icon(CsIcons.edit, size: 18, color: cs.textSecondary),
             ],
           ),
         ),

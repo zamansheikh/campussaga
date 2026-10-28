@@ -136,7 +136,7 @@ class _GroupFormPageState extends State<GroupFormPage> {
               decoration: InputDecoration(
                 labelText: l10n.departmentLabel,
                 hintText: l10n.departmentHint,
-                prefixIcon: const Icon(Icons.apartment_rounded),
+                prefixIcon: const Icon(CsIcons.department),
                 errorText: err('department'),
               ),
             ),
@@ -150,7 +150,7 @@ class _GroupFormPageState extends State<GroupFormPage> {
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                       labelText: l10n.batchLabel,
-                      prefixIcon: const Icon(Icons.groups_outlined),
+                      prefixIcon: const Icon(CsIcons.groups),
                       errorText: err('batch'),
                     ),
                   ),
@@ -178,7 +178,7 @@ class _GroupFormPageState extends State<GroupFormPage> {
               decoration: InputDecoration(
                 labelText: l10n.semesterLabel,
                 hintText: l10n.semesterHint,
-                prefixIcon: const Icon(Icons.date_range_outlined),
+                prefixIcon: const Icon(CsIcons.date),
                 errorText: err('semester'),
               ),
             ),

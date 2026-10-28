@@ -29,10 +29,7 @@ class ReminderPrompt extends StatelessWidget {
                     color: cs.statusInProgress.bg,
                     borderRadius: BorderRadius.circular(CsRadius.md),
                   ),
-                  child: Icon(
-                    Icons.notifications_active_rounded,
-                    color: cs.statusInProgress.fg,
-                  ),
+                  child: Icon(CsIcons.reminders, color: cs.statusInProgress.fg),
                 ),
                 const SizedBox(width: CsSpace.md),
                 Expanded(

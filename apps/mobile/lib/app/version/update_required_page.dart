@@ -34,7 +34,7 @@ class UpdateRequiredPage extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        Icons.system_update_rounded,
+                        CsIcons.update,
                         size: 42,
                         color: context.cs.onPrimaryContainer,
                       ),

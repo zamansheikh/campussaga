@@ -60,7 +60,7 @@ class ClassIllustration extends StatelessWidget {
                     Flexible(
                       child: CsBadge(
                         label: l10n.illusNextClass,
-                        icon: Icons.schedule_rounded,
+                        icon: CsIcons.time,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -83,9 +83,9 @@ class ClassIllustration extends StatelessWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    _Meta(icon: Icons.meeting_room_outlined, text: '504'),
+                    _Meta(icon: CsIcons.room, text: '504'),
                     const SizedBox(width: 16),
-                    _Meta(icon: Icons.access_time_rounded, text: '10:00'),
+                    _Meta(icon: CsIcons.time, text: '10:00'),
                   ],
                 ),
               ],
@@ -95,16 +95,13 @@ class ClassIllustration extends StatelessWidget {
         Positioned(
           right: 6,
           top: 10,
-          child: _Chip(
-            icon: Icons.notifications_active_rounded,
-            label: l10n.illusReminder,
-          ),
+          child: _Chip(icon: CsIcons.reminders, label: l10n.illusReminder),
         ),
         Positioned(
           right: 4,
           bottom: 0,
           child: _Chip(
-            icon: Icons.swap_horiz_rounded,
+            icon: CsIcons.swap,
             label: l10n.illusRoomChanged,
             accent: true,
           ),
@@ -145,7 +142,7 @@ class VoiceIllustration extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        Icons.visibility_off_outlined,
+                        CsIcons.hidden,
                         size: 16,
                         color: cs.textSecondary,
                       ),
@@ -173,7 +170,7 @@ class VoiceIllustration extends StatelessWidget {
                     Flexible(
                       child: CsBadge(
                         label: l10n.illusInProgress,
-                        icon: Icons.construction_rounded,
+                        icon: CsIcons.construction,
                         tone: CsBadgeTone.accent,
                       ),
                     ),
@@ -191,7 +188,7 @@ class VoiceIllustration extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.front_hand_rounded,
+                            CsIcons.meTooFill,
                             size: 15,
                             color: cs.onPrimary,
                           ),
@@ -217,7 +214,7 @@ class VoiceIllustration extends StatelessWidget {
           left: 10,
           bottom: 48,
           child: _Chip(
-            icon: Icons.trending_up_rounded,
+            icon: CsIcons.trending,
             label: '+24 ${l10n.illusMeToo}',
             accent: true,
           ),
@@ -266,34 +263,24 @@ class PrivacyIllustration extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.verified_user_rounded,
-              size: 52,
-              color: Colors.white,
-            ),
+            child: const Icon(CsIcons.verified, size: 52, color: Colors.white),
           ),
         ),
         Positioned(
           left: 6,
           top: 24,
-          child: _Chip(
-            icon: Icons.verified_rounded,
-            label: l10n.verifiedStudent,
-          ),
+          child: _Chip(icon: CsIcons.verified, label: l10n.verifiedStudent),
         ),
         Positioned(
           right: 0,
           bottom: 62,
-          child: _Chip(
-            icon: Icons.visibility_off_outlined,
-            label: l10n.illusAnonymous,
-          ),
+          child: _Chip(icon: CsIcons.hidden, label: l10n.illusAnonymous),
         ),
         Positioned(
           left: 6,
           bottom: 12,
           child: _Chip(
-            icon: Icons.alternate_email_rounded,
+            icon: CsIcons.emailAt,
             label: 'you@university.edu.bd',
             accent: true,
           ),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
+import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -358,29 +359,29 @@ class _HomeShell extends StatelessWidget {
         },
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.today_outlined),
-            selectedIcon: const Icon(Icons.today),
+            icon: const Icon(CsIcons.today),
+            selectedIcon: const Icon(CsIcons.todayFill),
             label: l10n.navToday,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.calendar_view_week_outlined),
-            selectedIcon: const Icon(Icons.calendar_view_week),
+            icon: const Icon(CsIcons.routine),
+            selectedIcon: const Icon(CsIcons.routineFill),
             label: l10n.navRoutine,
           ),
           if (voice)
             NavigationDestination(
-              icon: const Icon(Icons.forum_outlined),
-              selectedIcon: const Icon(Icons.forum),
+              icon: const Icon(CsIcons.campus),
+              selectedIcon: const Icon(CsIcons.campusFill),
               label: l10n.navCampus,
             ),
           NavigationDestination(
-            icon: const Icon(Icons.grid_view_outlined),
-            selectedIcon: const Icon(Icons.grid_view_rounded),
+            icon: const Icon(CsIcons.explore),
+            selectedIcon: const Icon(CsIcons.exploreFill),
             label: l10n.navExplore,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.person_outline),
-            selectedIcon: const Icon(Icons.person),
+            icon: const Icon(CsIcons.profile),
+            selectedIcon: const Icon(CsIcons.profileFill),
             label: l10n.navProfile,
           ),
         ],

@@ -7,10 +7,12 @@
 //
 // Needs the Flutter SDK's bundled Material fonts (bin/cache/artifacts).
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:campus_core/campus_core.dart';
+import 'package:campus_ui/campus_ui.dart';
 import 'package:campussaga/app/app.dart';
 import 'package:campussaga/app/clock.dart';
 import 'package:campussaga/app/di.dart';
@@ -177,6 +179,23 @@ Future<void> _loadFonts() async {
     ]);
   }
   await family('MaterialIcons', ['$material/MaterialIcons-Regular.otf']);
+  // App icons: Phosphor (CsIcons), from the package in the pub cache.
+  final config = jsonDecode(
+    File('../../.dart_tool/package_config.json').readAsStringSync(),
+  ) as Map<String, dynamic>;
+  final phosphor = (config['packages'] as List)
+      .cast<Map<String, dynamic>>()
+      .firstWhere((p) => p['name'] == 'phosphoricons_flutter');
+  final root = Uri.parse(phosphor['rootUri'] as String).toFilePath();
+  for (final (style, file) in [
+    ('Regular', 'Phosphor'),
+    ('Fill', 'Phosphor-Fill'),
+    ('Bold', 'Phosphor-Bold'),
+  ]) {
+    await family('packages/phosphoricons_flutter/Phosphor$style', [
+      '$root/lib/fonts/$file.ttf',
+    ]);
+  }
   const bn = '../../packages/campus_ui/fonts/NotoSansBengali';
   await family('packages/campus_ui/NotoSansBengali', [
     for (final w in ['Regular', 'Medium', 'SemiBold', 'Bold'])
@@ -460,7 +479,7 @@ void main() {
       unawaited(router.push(Routes.group('g1')));
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
-        find.byIcon(Icons.add_rounded).last,
+        find.byIcon(CsIcons.add).last,
         200,
         scrollable: find.byType(Scrollable).last,
       );
@@ -506,7 +525,7 @@ void main() {
       await tester.drag(find.byType(Scrollable).last, const Offset(0, -260));
       await tester.pumpAndSettle();
       await capture(tester, 'news-${look.name}');
-      await tester.tap(find.byIcon(Icons.campaign_outlined).first);
+      await tester.tap(find.byIcon(CsIcons.raiseIssue).first);
       await tester.pumpAndSettle();
       await tester.enterText(
         find.byType(TextField).last,
@@ -620,7 +639,7 @@ void main() {
       await capture(tester, 'profile-${look.name}');
       await tester.drag(find.byType(Scrollable).last, const Offset(0, 600));
       await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(Icons.palette_outlined));
+      await tester.tap(find.byIcon(CsIcons.theme));
       await tester.pumpAndSettle();
       await capture(tester, 'profile-${look.name}');
       await tester.tapAt(const Offset(200, 100));
@@ -738,7 +757,7 @@ void main() {
       unawaited(router.push(Routes.campusNew));
       await tester.pumpAndSettle();
       await capture(tester, 'voice-new-${look.name}');
-      await tester.tap(find.byIcon(Icons.bed_outlined));
+      await tester.tap(find.byIcon(CsIcons.hostel));
       await tester.pumpAndSettle();
       await tester.enterText(
         find.byType(TextField).at(0),
@@ -797,13 +816,13 @@ void main() {
       );
       router.go(Routes.campus);
       await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(Icons.lock_outline).first);
+      await tester.tap(find.byIcon(CsIcons.lock).first);
       await tester.pumpAndSettle();
       await capture(tester, 'voice-official-${look.name}');
       unawaited(router.push(Routes.campusIssue('i1')));
       await tester.pumpAndSettle();
       await capture(tester, 'voice-official-${look.name}');
-      await tester.tap(find.byIcon(Icons.swap_horiz));
+      await tester.tap(find.byIcon(CsIcons.changeStatus));
       await tester.pumpAndSettle();
       await capture(tester, 'voice-official-${look.name}');
     });

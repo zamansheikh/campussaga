@@ -71,7 +71,7 @@ class _MyIssuesViewState extends State<_MyIssuesView> {
           _ when s.failure != null && s.items.isEmpty => ListView(
             children: [
               CsEmptyState(
-                icon: Icons.cloud_off_outlined,
+                icon: CsIcons.offline,
                 title: voiceErrorText(context, s.failure!),
                 actionLabel: l10n.tryAgain,
                 onAction: cubit.load,
@@ -81,7 +81,7 @@ class _MyIssuesViewState extends State<_MyIssuesView> {
           _ when s.items.isEmpty => ListView(
             children: [
               CsEmptyState(
-                icon: Icons.campaign_outlined,
+                icon: CsIcons.raiseIssue,
                 title: l10n.voiceEmptyMine,
                 message: l10n.voiceEmptyMineHint,
                 actionLabel: l10n.voiceRaiseIssue,

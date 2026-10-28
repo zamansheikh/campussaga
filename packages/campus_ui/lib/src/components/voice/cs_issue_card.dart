@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/cs_tokens.dart';
+import '../../tokens/cs_icons.dart';
 import '../../tokens/dimensions.dart';
 import 'cs_category.dart';
 
@@ -129,23 +130,19 @@ class CsIssueCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    voted ? Icons.front_hand : Icons.front_hand_outlined,
+                    voted ? CsIcons.meTooFill : CsIcons.meToo,
                     size: 16,
                     color: voted ? cs.primary : cs.textSecondary,
                   ),
                   const SizedBox(width: 4),
                   Text(meTooCount, style: muted),
                   const SizedBox(width: CsSpace.md),
-                  Icon(
-                    Icons.chat_bubble_outline,
-                    size: 16,
-                    color: cs.textSecondary,
-                  ),
+                  Icon(CsIcons.comment, size: 16, color: cs.textSecondary),
                   const SizedBox(width: 4),
                   Text(commentCount, style: muted),
                   const SizedBox(width: CsSpace.md),
                   Icon(
-                    anonymous ? Icons.masks_outlined : Icons.person_outline,
+                    anonymous ? CsIcons.anonymous : CsIcons.profile,
                     size: 16,
                     color: cs.textSecondary,
                   ),

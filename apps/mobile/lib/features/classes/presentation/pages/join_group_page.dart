@@ -89,10 +89,7 @@ class _JoinGroupPageState extends State<JoinGroupPage> {
                   color: cs.primaryContainer,
                   borderRadius: BorderRadius.circular(CsRadius.md + 2),
                 ),
-                child: Icon(
-                  Icons.vpn_key_outlined,
-                  color: cs.onPrimaryContainer,
-                ),
+                child: Icon(CsIcons.key, color: cs.onPrimaryContainer),
               ),
             ),
             const SizedBox(height: CsSpace.lg),
@@ -136,12 +133,12 @@ class _JoinGroupPageState extends State<JoinGroupPage> {
                         runSpacing: CsSpace.sm,
                         children: [
                           CsBadge(
-                            icon: Icons.people_alt_outlined,
+                            icon: CsIcons.members,
                             label: l10n.membersCount(p.memberCount),
                             tone: CsBadgeTone.neutral,
                           ),
                           CsBadge(
-                            icon: Icons.event_note_outlined,
+                            icon: CsIcons.routineNote,
                             label: l10n.classesCount(p.classCount),
                             tone: CsBadgeTone.neutral,
                           ),
@@ -150,7 +147,7 @@ class _JoinGroupPageState extends State<JoinGroupPage> {
                       if (p.isMember) ...[
                         const SizedBox(height: CsSpace.md),
                         CsBadge(
-                          icon: Icons.check_circle_rounded,
+                          icon: CsIcons.checkCircle,
                           label: l10n.alreadyMember,
                           tone: CsBadgeTone.success,
                         ),

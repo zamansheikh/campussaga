@@ -174,6 +174,7 @@ class _MemberRow extends StatelessWidget {
             const SizedBox(width: 48)
           else
             PopupMenuButton<_Action>(
+              icon: const Icon(CsIcons.more),
               onSelected: onAction,
               itemBuilder: (context) => [
                 for (final a in actions)

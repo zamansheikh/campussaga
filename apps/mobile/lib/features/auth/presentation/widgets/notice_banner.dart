@@ -22,7 +22,7 @@ class NoticeBanner extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.error_outline_rounded, color: cs.error, size: 20),
+            Icon(CsIcons.error, color: cs.error, size: 20),
             const SizedBox(width: 10),
             Expanded(child: Text(text, style: context.text.bodyMedium)),
           ],

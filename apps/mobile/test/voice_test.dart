@@ -1,4 +1,5 @@
 import 'package:campus_core/campus_core.dart';
+import 'package:campus_ui/campus_ui.dart';
 import 'package:campussaga/app/app.dart';
 import 'package:campussaga/app/clock.dart';
 import 'package:campussaga/app/settings/bloc/settings_state.dart';
@@ -154,7 +155,7 @@ void main() {
       findsOneWidget,
       reason: 'picking is not moving on',
     );
-    expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+    expect(find.byIcon(CsIcons.checkCircle), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Next'));
     await tester.pumpAndSettle();
     expect(find.text('Step 2 of 3'), findsOneWidget);
@@ -466,7 +467,7 @@ void main() {
       findsOneWidget,
       reason: 'never jumps ahead',
     );
-    expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+    expect(find.byIcon(CsIcons.checkCircle), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Next'));
     await tester.pumpAndSettle();
     expect(find.text('Step 2 of 3'), findsOneWidget);
@@ -484,6 +485,6 @@ void main() {
     await tester.tap(find.text('Raise issue'));
     await tester.pumpAndSettle();
     expect(find.text('Step 1 of 3'), findsOneWidget);
-    expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+    expect(find.byIcon(CsIcons.checkCircle), findsNothing);
   });
 }

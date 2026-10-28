@@ -147,11 +147,7 @@ class _CategoryStep extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.lock_outline,
-                    size: 18,
-                    color: context.cs.textSecondary,
-                  ),
+                  Icon(CsIcons.lock, size: 18, color: context.cs.textSecondary),
                   const SizedBox(width: CsSpace.sm),
                   Expanded(
                     child: Text(
@@ -221,7 +217,7 @@ class _CategoryTile extends StatelessWidget {
                       top: -6,
                       end: -10,
                       child: Icon(
-                        Icons.check_circle_rounded,
+                        CsIcons.checkCircle,
                         size: 20,
                         color: cs.primary,
                       ),
@@ -276,12 +272,12 @@ class _DetailsStepState extends State<_DetailsStep> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
+              leading: const Icon(CsIcons.gallery),
               title: Text(l10n.voiceFromGallery),
               onTap: () => Navigator.of(sheet).pop(false),
             ),
             ListTile(
-              leading: const Icon(Icons.photo_camera_outlined),
+              leading: const Icon(CsIcons.camera),
               title: Text(l10n.voiceTakePhoto),
               onTap: () => Navigator.of(sheet).pop(true),
             ),
@@ -350,7 +346,7 @@ class _DetailsStepState extends State<_DetailsStep> {
           decoration: InputDecoration(
             labelText: l10n.voicePlaceLabel,
             hintText: l10n.voicePlaceHint,
-            prefixIcon: const Icon(Icons.place_outlined),
+            prefixIcon: const Icon(CsIcons.place),
           ),
         ),
         const SizedBox(height: CsSpace.sm),
@@ -377,7 +373,7 @@ class _DetailsStepState extends State<_DetailsStep> {
                   style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
                   child: Semantics(
                     label: l10n.voiceAddPhoto,
-                    child: const Icon(Icons.add_a_photo_outlined),
+                    child: const Icon(CsIcons.addPhoto),
                   ),
                 ),
               ),
@@ -460,7 +456,11 @@ class _PhotoThumb extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.block, color: cs.onError, size: 20),
+                              Icon(
+                                CsIcons.blocked,
+                                color: cs.onError,
+                                size: 20,
+                              ),
                               Text(
                                 AppLocalizations.of(context).voicePhotoRefused,
                                 textAlign: TextAlign.center,
@@ -472,7 +472,7 @@ class _PhotoThumb extends StatelessWidget {
                             ],
                           ),
                         )
-                      : Icon(Icons.error_outline, color: cs.onError),
+                      : Icon(CsIcons.error, color: cs.onError),
                 ),
               ),
             Positioned(
@@ -483,7 +483,7 @@ class _PhotoThumb extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 iconSize: 16,
                 onPressed: onRemove,
-                icon: const Icon(Icons.close),
+                icon: const Icon(CsIcons.close),
               ),
             ),
           ],
@@ -580,7 +580,7 @@ class _ReviewStep extends StatelessWidget {
                         dimension: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Icon(s.anonymous ? Icons.masks : Icons.send),
+                    : Icon(s.anonymous ? CsIcons.anonymousFill : CsIcons.send),
                 label: Text(l10n.voicePost),
               ),
             ),

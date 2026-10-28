@@ -80,7 +80,7 @@ class _ProfileFormState extends State<ProfileForm> {
                 autofillHints: const [AutofillHints.name],
                 decoration: InputDecoration(
                   labelText: l10n.displayNameLabel,
-                  prefixIcon: const Icon(Icons.person_outline_rounded),
+                  prefixIcon: const Icon(CsIcons.profile),
                   errorText: _error(l10n, s, 'displayName'),
                 ),
               ),
@@ -98,7 +98,7 @@ class _ProfileFormState extends State<ProfileForm> {
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         labelText: l10n.departmentLabel,
-                        prefixIcon: const Icon(Icons.apartment_rounded),
+                        prefixIcon: const Icon(CsIcons.department),
                         hintText: l10n.departmentHint,
                         errorText: _error(l10n, s, 'department'),
                       ),
@@ -114,7 +114,7 @@ class _ProfileFormState extends State<ProfileForm> {
                 onSubmitted: (_) => _submit(),
                 decoration: InputDecoration(
                   labelText: l10n.batchLabel,
-                  prefixIcon: const Icon(Icons.groups_outlined),
+                  prefixIcon: const Icon(CsIcons.groups),
                   hintText: l10n.batchHint,
                   errorText: _error(l10n, s, 'batch'),
                 ),
@@ -174,7 +174,7 @@ class _Suggestions extends StatelessWidget {
               children: [
                 for (final o in options)
                   ListTile(
-                    leading: const Icon(Icons.history_rounded, size: 20),
+                    leading: const Icon(CsIcons.history, size: 20),
                     title: Text(o),
                     onTap: () => onSelected(o),
                   ),

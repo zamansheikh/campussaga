@@ -254,7 +254,7 @@ class _MyGroups extends StatelessWidget {
       children: [
         for (final g in groups)
           CsRow(
-            icon: Icons.groups_rounded,
+            icon: CsIcons.groups,
             title: g.title,
             subtitle: [
               g.semester,
@@ -379,7 +379,7 @@ class _HeroCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => showClassSheet(context, item),
       child: _BrandCard(
-        icon: Icons.schedule_rounded,
+        icon: CsIcons.time,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -481,20 +481,17 @@ class _HeroCard extends StatelessWidget {
               runSpacing: CsSpace.xs,
               children: [
                 _Meta(
-                  icon: Icons.access_time_rounded,
+                  icon: CsIcons.time,
                   text:
                       '${clockText(context, item.startMin)} – '
                       '${clockText(context, item.endMin)}',
                 ),
                 if (item.room.isNotEmpty)
-                  _Meta(
-                    icon: Icons.meeting_room_outlined,
-                    text: l10n.roomShort(item.room),
-                  ),
+                  _Meta(icon: CsIcons.room, text: l10n.roomShort(item.room)),
                 if (s.teacher.isNotEmpty)
-                  _Meta(icon: Icons.person_outline_rounded, text: s.teacher),
+                  _Meta(icon: CsIcons.profile, text: s.teacher),
                 if (s.kind == ClassKind.lab)
-                  _Meta(icon: Icons.science_outlined, text: l10n.classLab),
+                  _Meta(icon: CsIcons.lab, text: l10n.classLab),
               ],
             ),
           ],
@@ -577,7 +574,7 @@ class _NothingLeft extends StatelessWidget {
                     borderRadius: BorderRadius.circular(CsRadius.sm + 2),
                   ),
                   child: Icon(
-                    Icons.free_breakfast_outlined,
+                    CsIcons.doneForToday,
                     size: 20,
                     color: cs.onPrimaryContainer,
                   ),
@@ -617,7 +614,7 @@ class _NothingLeft extends StatelessWidget {
                 alignment: AlignmentDirectional.centerStart,
                 child: FilledButton.icon(
                   onPressed: () => context.push(Routes.newSlot(crGroup.id)),
-                  icon: const Icon(Icons.add_rounded),
+                  icon: const Icon(CsIcons.add),
                   label: Text(l10n.addClass),
                 ),
               ),
@@ -639,7 +636,7 @@ class _JoinCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     const white = Colors.white;
     return _BrandCard(
-      icon: Icons.calendar_month_rounded,
+      icon: CsIcons.calendar,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -650,7 +647,7 @@ class _JoinCard extends StatelessWidget {
               color: white.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(CsRadius.md),
             ),
-            child: const Icon(Icons.groups_rounded, color: white),
+            child: const Icon(CsIcons.groups, color: white),
           ),
           const SizedBox(height: CsSpace.md),
           Text(
@@ -672,7 +669,7 @@ class _JoinCard extends StatelessWidget {
               minimumSize: const Size(0, 48),
             ),
             onPressed: () => context.push(Routes.joinGroup),
-            icon: const Icon(Icons.vpn_key_outlined),
+            icon: const Icon(CsIcons.key),
             label: Text(l10n.joinWithCode),
           ),
           const SizedBox(height: CsSpace.xs),
@@ -701,7 +698,7 @@ class _OfflineNotice extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.cloud_off_rounded, size: 18, color: cs.textSecondary),
+          Icon(CsIcons.offline, size: 18, color: cs.textSecondary),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

@@ -101,12 +101,12 @@ class _CampusViewState extends State<_CampusView> {
         actions: [
           IconButton(
             tooltip: l10n.voiceHowAnonymity,
-            icon: const Icon(Icons.privacy_tip_outlined),
+            icon: const Icon(CsIcons.privacy),
             onPressed: () => context.push(Routes.campusAnonymity),
           ),
           IconButton(
             tooltip: l10n.voiceMyIssues,
-            icon: const Icon(Icons.assignment_ind_outlined),
+            icon: const Icon(CsIcons.myIssues),
             onPressed: () => context.push(Routes.campusMine),
           ),
         ],
@@ -116,7 +116,7 @@ class _CampusViewState extends State<_CampusView> {
           final posted = await context.push<IssueCard>(Routes.campusNew);
           if (posted != null && context.mounted) unawaited(cubit.load());
         },
-        icon: const Icon(Icons.campaign_outlined),
+        icon: const Icon(CsIcons.raiseIssue),
         label: Text(l10n.voiceRaiseIssue),
       ),
       body: RefreshIndicator(
@@ -142,7 +142,7 @@ class _CampusViewState extends State<_CampusView> {
                       textInputAction: TextInputAction.search,
                       decoration: InputDecoration(
                         hintText: l10n.voiceSearchHint,
-                        prefixIcon: const Icon(Icons.search),
+                        prefixIcon: const Icon(CsIcons.search),
                       ),
                     ),
                     const SizedBox(height: CsSpace.sm),
@@ -181,7 +181,7 @@ class _CampusViewState extends State<_CampusView> {
                   children: [
                     if (widget.staff) ...[
                       FilterChip(
-                        avatar: const Icon(Icons.lock_outline, size: 18),
+                        avatar: const Icon(CsIcons.lock, size: 18),
                         label: Text(l10n.voiceSafetyReports),
                         selected: s.safety,
                         onSelected: cubit.setSafety,
@@ -239,7 +239,7 @@ class _CampusViewState extends State<_CampusView> {
         SliverFillRemaining(
           hasScrollBody: false,
           child: CsEmptyState(
-            icon: Icons.cloud_off_outlined,
+            icon: CsIcons.offline,
             title: voiceErrorText(context, s.failure!),
             actionLabel: l10n.tryAgain,
             onAction: context.read<FeedCubit>().load,
@@ -252,7 +252,7 @@ class _CampusViewState extends State<_CampusView> {
         SliverFillRemaining(
           hasScrollBody: false,
           child: CsEmptyState(
-            icon: Icons.forum_outlined,
+            icon: CsIcons.campus,
             title: s.query.isNotEmpty
                 ? l10n.voiceEmptySearch
                 : l10n.voiceEmptyFeed,
@@ -300,11 +300,7 @@ class _OfflineNote extends StatelessWidget {
     ),
     child: Row(
       children: [
-        Icon(
-          Icons.cloud_off_outlined,
-          size: 18,
-          color: context.cs.textSecondary,
-        ),
+        Icon(CsIcons.offline, size: 18, color: context.cs.textSecondary),
         const SizedBox(width: CsSpace.sm),
         Expanded(child: Text(text, style: context.text.bodySmall)),
       ],

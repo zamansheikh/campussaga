@@ -917,6 +917,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.1.0"
+  phosphoricons_flutter:
+    dependency: transitive
+    description:
+      name: phosphoricons_flutter
+      sha256: "44e70a09de3027e40484d900089a8ee20ceade0b3cb9d39b9f3be649a9eadb20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
   platform:
     dependency: transitive
     description:

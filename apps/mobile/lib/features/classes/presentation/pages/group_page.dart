@@ -106,6 +106,7 @@ class GroupPage extends StatelessWidget {
         title: Text(g.title),
         actions: [
           PopupMenuButton<_Action>(
+            icon: const Icon(CsIcons.more),
             onSelected: (a) => _act(context, g, a),
             itemBuilder: (context) => [
               if (g.isCr)
@@ -131,7 +132,7 @@ class GroupPage extends StatelessWidget {
       floatingActionButton: g.isCr && g.slots.isNotEmpty
           ? FloatingActionButton.extended(
               onPressed: () => context.push(Routes.newSlot(g.id)),
-              icon: const Icon(Icons.add_rounded),
+              icon: const Icon(CsIcons.add),
               label: Text(l10n.addClass),
             )
           : null,
@@ -171,14 +172,14 @@ class GroupPage extends StatelessWidget {
               children: [
                 if (g.slots.isNotEmpty)
                   CsRow(
-                    icon: Icons.checklist_rounded,
+                    icon: CsIcons.myCourses,
                     title: l10n.myCourses,
                     subtitle: _coursesShown(l10n, g),
                     onTap: () => context.push(Routes.groupCourses(g.id)),
                   ),
                 if (g.isCr)
                   CsRow(
-                    icon: Icons.people_alt_outlined,
+                    icon: CsIcons.members,
                     title: l10n.members,
                     subtitle: l10n.membersCount(g.memberCount),
                     onTap: () => context.push(Routes.groupMembers(g.id)),
@@ -327,7 +328,7 @@ class _Header extends StatelessWidget {
             color: cs.primaryContainer,
             borderRadius: BorderRadius.circular(CsRadius.md),
           ),
-          child: Icon(Icons.groups_rounded, color: cs.onPrimaryContainer),
+          child: Icon(CsIcons.groups, color: cs.onPrimaryContainer),
         ),
         const SizedBox(width: CsSpace.md),
         Expanded(
@@ -348,7 +349,7 @@ class _Header extends StatelessWidget {
         if (group.isCr)
           CsBadge(
             label: l10n.roleCr,
-            icon: Icons.star_rounded,
+            icon: CsIcons.star,
             tone: CsBadgeTone.success,
           ),
       ],
@@ -375,11 +376,7 @@ class _InviteBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.person_add_alt_1_outlined,
-            size: 18,
-            color: cs.textSecondary,
-          ),
+          Icon(CsIcons.invite, size: 18, color: cs.textSecondary),
           const SizedBox(width: CsSpace.sm),
           Expanded(
             child: Text(
@@ -413,7 +410,7 @@ class _InviteBar extends StatelessWidget {
                 ..hideCurrentSnackBar()
                 ..showSnackBar(SnackBar(content: Text(l10n.inviteCopied)));
             },
-            icon: const Icon(Icons.copy_rounded, size: 20),
+            icon: const Icon(CsIcons.copy, size: 20),
           ),
         ],
       ),
@@ -433,7 +430,7 @@ class _EmptyRoutine extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: CsSpace.md),
         child: CsEmptyState(
-          icon: Icons.event_note_rounded,
+          icon: CsIcons.routineNote,
           title: l10n.weeklyRoutine,
           message: group.isCr ? l10n.noClassesYetCr : l10n.noClassesYetMember,
           actionLabel: group.isCr ? l10n.addClass : null,

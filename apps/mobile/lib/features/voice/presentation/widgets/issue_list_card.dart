@@ -36,13 +36,13 @@ class IssueListCard extends StatelessWidget {
         if (c.private)
           CsBadge(
             label: l10n.voicePrivate,
-            icon: Icons.lock_outline,
+            icon: CsIcons.lock,
             tone: CsBadgeTone.danger,
           ),
         if (c.locationLabel.isNotEmpty)
           CsBadge(
             label: c.locationLabel,
-            icon: Icons.place_outlined,
+            icon: CsIcons.place,
             tone: CsBadgeTone.neutral,
           ),
       ],

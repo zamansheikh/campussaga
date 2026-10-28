@@ -35,7 +35,7 @@ class TimeBox extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Row(
             children: [
-              Icon(Icons.schedule_rounded, color: cs.textSecondary, size: 20),
+              Icon(CsIcons.time, color: cs.textSecondary, size: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(

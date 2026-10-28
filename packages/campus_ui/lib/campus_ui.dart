@@ -24,5 +24,6 @@ export 'src/theme/cs_theme.dart';
 export 'src/theme/cs_tokens.dart';
 export 'src/tokens/brand.dart';
 export 'src/tokens/color_tokens.dart';
+export 'src/tokens/cs_icons.dart';
 export 'src/tokens/dimensions.dart';
 export 'src/tokens/typography.dart';

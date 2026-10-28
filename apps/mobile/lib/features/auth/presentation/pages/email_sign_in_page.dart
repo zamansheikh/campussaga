@@ -99,7 +99,7 @@ class _EmailStepState extends State<_EmailStep> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _StepHeader(
-            icon: Icons.alternate_email_rounded,
+            icon: CsIcons.emailAt,
             title: l10n.emailStepTitle,
             subtitle: l10n.emailStepSubtitle,
           ),
@@ -117,7 +117,7 @@ class _EmailStepState extends State<_EmailStep> {
             decoration: InputDecoration(
               labelText: l10n.emailLabel,
               hintText: l10n.emailHint,
-              prefixIcon: const Icon(Icons.mail_outline_rounded),
+              prefixIcon: const Icon(CsIcons.email),
               errorText: state.failure == null
                   ? null
                   : emailErrorText(l10n, state.failure!),
@@ -170,7 +170,7 @@ class _CodeStepState extends State<_CodeStep> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _StepHeader(
-            icon: Icons.mark_email_read_outlined,
+            icon: CsIcons.emailSent,
             title: l10n.codeStepTitle,
             subtitle: l10n.codeSentTo(state.email),
           ),
@@ -179,7 +179,7 @@ class _CodeStepState extends State<_CodeStep> {
             Align(
               alignment: AlignmentDirectional.centerStart,
               child: CsBadge(
-                icon: Icons.school_rounded,
+                icon: CsIcons.academic,
                 label: state.university!.localName(lang),
               ),
             ),
@@ -214,7 +214,7 @@ class _CodeStepState extends State<_CodeStep> {
             onPressed: busy || state.resendIn > 0
                 ? null
                 : () => bloc.add(const ResendRequested()),
-            icon: const Icon(Icons.refresh_rounded),
+            icon: const Icon(CsIcons.refresh),
             label: Text(
               state.resendIn > 0
                   ? l10n.resendCodeIn(countdownText(state.resendIn))
@@ -232,11 +232,7 @@ class _CodeStepState extends State<_CodeStep> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.info_outline_rounded,
-                size: 16,
-                color: context.cs.textSecondary,
-              ),
+              Icon(CsIcons.info, size: 16, color: context.cs.textSecondary),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(l10n.codeSpamHint, style: context.text.bodySmall),

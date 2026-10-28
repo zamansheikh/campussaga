@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 
+import '../../tokens/cs_icons.dart';
+
 /// Icon and muted tint of each issue category (wire names from the API).
 /// Safety is the only red one. Each icon colour passes 3:1 on light and
 /// dark cards (test/color_contrast_test.dart).
 abstract final class CsCategoryStyle {
   static IconData icon(String category) => switch (category) {
-    'academic' => Icons.school_outlined,
-    'hostel' => Icons.bed_outlined,
-    'transport' => Icons.directions_bus_outlined,
-    'facilities' => Icons.handyman_outlined,
-    'safety' => Icons.health_and_safety_outlined,
-    'administration' => Icons.account_balance_outlined,
-    'food' => Icons.restaurant_outlined,
-    'it' => Icons.wifi,
-    _ => Icons.forum_outlined,
+    'academic' => CsIcons.academic,
+    'hostel' => CsIcons.hostel,
+    'transport' => CsIcons.bus,
+    'facilities' => CsIcons.maintenance,
+    'safety' => CsIcons.safety,
+    'administration' => CsIcons.university,
+    'food' => CsIcons.food,
+    'it' => CsIcons.wifi,
+    _ => CsIcons.campus,
   };
 
   static Color color(String category) => switch (category) {

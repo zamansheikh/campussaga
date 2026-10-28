@@ -39,10 +39,7 @@ class ProfileSetupPage extends StatelessWidget {
                 children: [
                   CsAvatar(name: user.displayName ?? user.email, size: 56),
                   const Spacer(),
-                  CsBadge(
-                    label: l10n.setupProfileStep,
-                    icon: Icons.flag_rounded,
-                  ),
+                  CsBadge(label: l10n.setupProfileStep, icon: CsIcons.flag),
                 ],
               ),
               const SizedBox(height: CsSpace.lg),
@@ -60,7 +57,7 @@ class ProfileSetupPage extends StatelessWidget {
                   alignment: AlignmentDirectional.centerStart,
                   child: CsBadge(
                     label: user.university!.localName(lang),
-                    icon: Icons.verified_rounded,
+                    icon: CsIcons.verified,
                     tone: CsBadgeTone.success,
                   ),
                 )

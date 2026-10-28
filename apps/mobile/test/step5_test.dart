@@ -1,4 +1,5 @@
 import 'package:campus_core/campus_core.dart';
+import 'package:campus_ui/campus_ui.dart';
 import 'package:campussaga/app/app.dart';
 import 'package:campussaga/app/clock.dart';
 import 'package:flutter/material.dart';
@@ -108,13 +109,13 @@ void main() {
     expect(find.text('Not verified'), findsOneWidget, reason: 'Gmail student');
 
     // Menus in order: Nabila, then Student (the only CR, you, has none).
-    await tester.tap(find.byIcon(Icons.more_vert).at(0));
+    await tester.tap(find.byIcon(CsIcons.more).at(0));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Make CR'));
     await tester.pumpAndSettle();
     expect(classes.membersOf['g-cse']![1].role, GroupRole.cr);
 
-    await tester.tap(find.byIcon(Icons.more_vert).last);
+    await tester.tap(find.byIcon(CsIcons.more).last);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Remove from group'));
     await tester.pumpAndSettle();
@@ -127,7 +128,7 @@ void main() {
     final classes = await signedIn(tester, sampleGroup(role: GroupRole.cr));
     await scrollAndTap(tester, find.text('CSE 61 · A'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.more_vert).first);
+    await tester.tap(find.byIcon(CsIcons.more).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Start new semester'));
     await tester.pumpAndSettle();

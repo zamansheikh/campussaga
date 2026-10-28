@@ -62,7 +62,7 @@ class MyCoursesPage extends StatelessWidget {
               children: [
                 for (final c in list)
                   CsRow(
-                    icon: Icons.menu_book_outlined,
+                    icon: CsIcons.course,
                     title: c.courseCode,
                     subtitle: c.courseTitle.isEmpty ? null : c.courseTitle,
                     showChevron: false,

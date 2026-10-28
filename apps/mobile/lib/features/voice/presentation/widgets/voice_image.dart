@@ -86,7 +86,7 @@ class _VoiceImageState extends State<VoiceImage> {
     color: cs.surfaceVariant,
     child: Center(
       child: Icon(
-        broken ? Icons.broken_image_outlined : Icons.image_outlined,
+        broken ? CsIcons.imageBroken : CsIcons.image,
         color: cs.textSecondary,
       ),
     ),

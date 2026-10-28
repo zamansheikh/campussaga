@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/cs_tokens.dart';
+import '../tokens/cs_icons.dart';
 import '../tokens/dimensions.dart';
 
 /// One choice in [CsOptionSheet].
@@ -116,9 +117,7 @@ class _OptionTile<T> extends StatelessWidget {
                 ),
               ),
               Icon(
-                selected
-                    ? Icons.check_circle_rounded
-                    : Icons.radio_button_unchecked_rounded,
+                selected ? CsIcons.checkCircle : CsIcons.circle,
                 color: selected ? cs.primary : cs.border,
               ),
             ],

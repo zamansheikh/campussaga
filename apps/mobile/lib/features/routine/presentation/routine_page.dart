@@ -51,7 +51,7 @@ class _RoutinePageState extends State<RoutinePage> {
           ? null
           : FloatingActionButton.extended(
               onPressed: () => _add(context, crGroups),
-              icon: const Icon(Icons.add_rounded),
+              icon: const Icon(CsIcons.add),
               label: Text(l10n.addAction),
             ),
       appBar: AppBar(
@@ -60,7 +60,7 @@ class _RoutinePageState extends State<RoutinePage> {
           IconButton(
             tooltip: l10n.classGroups,
             onPressed: () => context.push(Routes.groups),
-            icon: const Icon(Icons.groups_outlined),
+            icon: const Icon(CsIcons.groups),
           ),
         ],
       ),
@@ -85,7 +85,7 @@ class _RoutinePageState extends State<RoutinePage> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: CsSpace.md),
                   child: CsEmptyState(
-                    icon: Icons.event_note_rounded,
+                    icon: CsIcons.routineNote,
                     title: l10n.routineEmptyTitle,
                     message: l10n.routineEmptyMessage,
                     actionLabel: l10n.joinClassGroup,
@@ -99,10 +99,7 @@ class _RoutinePageState extends State<RoutinePage> {
                   padding: const EdgeInsets.all(CsSpace.lg),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.event_available_outlined,
-                        color: context.cs.textSecondary,
-                      ),
+                      Icon(CsIcons.dateCheck, color: context.cs.textSecondary),
                       const SizedBox(width: CsSpace.md),
                       Expanded(
                         child: Text(
@@ -151,13 +148,13 @@ extension on _RoutinePageState {
           'personal',
           l10n.addPersonalClass,
           subtitle: l10n.personalHint,
-          icon: Icons.person_outline_rounded,
+          icon: CsIcons.profile,
         ),
         CsOption(
           'extra',
           l10n.addExtraClass,
           subtitle: l10n.extraClassHint,
-          icon: Icons.event_available_outlined,
+          icon: CsIcons.dateCheck,
         ),
       ],
     );

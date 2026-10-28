@@ -159,7 +159,7 @@ class _SignInPanel extends StatelessWidget {
             const SizedBox(height: CsSpace.md),
             OutlinedButton.icon(
               onPressed: busy ? null : () => context.push(Routes.signInEmail),
-              icon: const Icon(Icons.mail_outline_rounded),
+              icon: const Icon(CsIcons.email),
               label: Text(l10n.useUniversityEmail),
             ),
             const SizedBox(height: CsSpace.lg),

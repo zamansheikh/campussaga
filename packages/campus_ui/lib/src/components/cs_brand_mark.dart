@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../tokens/cs_icons.dart';
+
 /// The app's mark: a teal tile with a graduation cap. A placeholder until
 /// the final logo; replace this one widget when it arrives.
 class CsBrandMark extends StatelessWidget {
@@ -27,7 +29,7 @@ class CsBrandMark extends StatelessWidget {
           ),
         ],
       ),
-      child: Icon(Icons.school_rounded, color: Colors.white, size: size * 0.56),
+      child: Icon(CsIcons.academic, color: Colors.white, size: size * 0.56),
     );
   }
 }
