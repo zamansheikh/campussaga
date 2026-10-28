@@ -18,6 +18,7 @@ import (
 	"github.com/zamansheikh/campussaga/backend/internal/modules/appconfig"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/classgroups"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/push"
+	"github.com/zamansheikh/campussaga/backend/internal/modules/transport"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/universities"
 	"github.com/zamansheikh/campussaga/backend/internal/modules/voice"
 	"github.com/zamansheikh/campussaga/backend/internal/platform/auth"
@@ -191,6 +192,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		pushSvc.Routes(r)
 		adminSvc.Routes(r)
 		voiceSvc.Routes(r)
+		transport.NewService(d, now).Routes(r)
 	})
 
 	var h http.Handler = root
