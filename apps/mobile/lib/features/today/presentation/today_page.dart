@@ -551,62 +551,77 @@ class _NothingLeft extends StatelessWidget {
     final crGroup = groups
         .where((g) => g.isCr && !g.isPersonal && g.slots.isEmpty)
         .firstOrNull;
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final subtitle = next != null
+        ? l10n.nextOn(DateFormat.MMMEd(locale).format(next.date))
+        : (crGroup != null ? l10n.noClassesYetCr : l10n.noClassesYetMember);
+    // Compact: a one-line header, then the next class as a plain row.
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(CsSpace.lg),
+        padding: const EdgeInsets.fromLTRB(
+          CsSpace.md,
+          CsSpace.md,
+          CsSpace.md,
+          CsSpace.sm,
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: cs.primaryContainer,
-                borderRadius: BorderRadius.circular(CsRadius.md),
-              ),
-              child: Icon(
-                Icons.free_breakfast_outlined,
-                color: cs.onPrimaryContainer,
-              ),
-            ),
-            const SizedBox(height: CsSpace.md),
-            Text(title, style: context.text.titleLarge),
-            if (next != null) ...[
-              const SizedBox(height: CsSpace.xs),
-              Text(
-                l10n.nextOn(weekdayName(context, next.date.weekday)),
-                style: context.text.bodyMedium?.copyWith(
-                  color: cs.textSecondary,
-                ),
-              ),
-              const SizedBox(height: CsSpace.md),
-              CsSection(
-                children: [
-                  ClassTile.on(
-                    next,
-                    groupTitle: groups.length > 1
-                        ? groupLabel(context, next.group)
-                        : null,
-                    onTap: () => showClassSheet(context, next!),
+            Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: cs.primaryContainer,
+                    borderRadius: BorderRadius.circular(CsRadius.sm + 2),
                   ),
-                ],
-              ),
-            ] else ...[
-              const SizedBox(height: CsSpace.xs),
-              Text(
-                crGroup != null ? l10n.noClassesYetCr : l10n.noClassesYetMember,
-                style: context.text.bodyMedium?.copyWith(
-                  color: cs.textSecondary,
+                  child: Icon(
+                    Icons.free_breakfast_outlined,
+                    size: 20,
+                    color: cs.onPrimaryContainer,
+                  ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: context.text.titleMedium),
+                      Text(
+                        subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.text.bodySmall?.copyWith(
+                          color: cs.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (next != null) ...[
+              const SizedBox(height: CsSpace.sm),
+              Divider(height: 1, color: cs.border),
+              ClassTile.on(
+                next,
+                groupTitle: groups.length > 1
+                    ? groupLabel(context, next.group)
+                    : null,
+                onTap: () => showClassSheet(context, next!),
               ),
-              if (crGroup != null) ...[
-                const SizedBox(height: CsSpace.md),
-                FilledButton.icon(
+            ] else if (crGroup != null) ...[
+              const SizedBox(height: CsSpace.md),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: FilledButton.icon(
                   onPressed: () => context.push(Routes.newSlot(crGroup.id)),
                   icon: const Icon(Icons.add_rounded),
                   label: Text(l10n.addClass),
                 ),
-              ],
+              ),
+              const SizedBox(height: CsSpace.sm),
             ],
           ],
         ),

@@ -58,7 +58,7 @@ void main() {
     appNow = () => DateTime(2026, 10, 27, 14, 0);
     await tester.pump(const Duration(seconds: 31));
     expect(find.text('Done for today'), findsOneWidget);
-    expect(find.text('Next class: Wednesday'), findsOneWidget);
+    expect(find.text('Next class: Wed, Oct 28'), findsOneWidget);
     expect(find.text('MAT201'), findsOneWidget);
   });
 
