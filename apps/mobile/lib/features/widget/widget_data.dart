@@ -43,9 +43,6 @@ Map<String, Object?> buildWidgetData({
   final dateFmt = DateFormat('EEE d MMM', locale);
   String time(DateTime day, int min) =>
       clock.format(day.add(Duration(minutes: min)));
-  String room(String r) => r.isEmpty ? '' : '${t.room} $r';
-  String join(List<String> parts) =>
-      parts.where((p) => p.isNotEmpty).join(' · ');
 
   final today = DateTime(now.year, now.month, now.day);
 
@@ -62,7 +59,8 @@ Map<String, Object?> buildWidgetData({
         'course': c.slot.courseCode,
         'title': c.slot.courseTitle,
         'time': '${time(day, c.startMin)} – ${time(day, c.endMin)}',
-        'room': room(c.room),
+        // The widget shows a pin icon: just the room, no "Room".
+        'room': c.room,
         'badge': c.extra
             ? t.extra
             : from != null
@@ -100,10 +98,10 @@ Map<String, Object?> buildWidgetData({
           'at': at.millisecondsSinceEpoch,
           'until': until.millisecondsSinceEpoch,
           'title': '${t.kind(a.kind)} · ${a.courseCode}',
-          'time': join([
-            if (when.isNotEmpty) a.kind.isDeadline ? '${t.due} $when' : when,
-            room(a.room),
-          ]),
+          'time': when.isEmpty
+              ? ''
+              : (a.kind.isDeadline ? '${t.due} $when' : when),
+          'room': a.room,
           'deadline': a.kind.isDeadline,
           'date': dateFmt.format(a.date),
         },

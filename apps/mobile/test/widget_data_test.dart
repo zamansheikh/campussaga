@@ -118,13 +118,13 @@ void main() {
       ],
     );
     expect(n(classes[0]['time']), '9:00 AM – 10:30 AM');
-    expect(classes[0]['room'], 'Room 301');
+    expect(classes[0]['room'], '301');
     expect(classes[0]['date'], 'Tue 27 Oct');
     expect(classes[0]['badge'], '');
     expect(classes[0]['end'], ms(2026, 10, 27, 10, 30));
     expect(classes[1]['badge'], 'Moved from Fri 30 Oct');
     expect(n(classes[1]['time']), '11:00 AM – 12:30 PM');
-    expect(classes[1]['room'], 'Room 805');
+    expect(classes[1]['room'], '805');
     expect(classes[2]['badge'], 'Extra class');
     expect(n(classes[2]['time']), '2:00 PM – 3:00 PM');
     expect(classes[2]['room'], '', reason: 'no room');
@@ -185,7 +185,8 @@ void main() {
       'Assignment · CSE102',
       'Lab report · CSE102',
     ], reason: 'hidden ENG101 and the mid beyond two weeks are left out');
-    expect(n(tests[0]['time']), '10:00 AM – 10:30 AM · Room 402');
+    expect(n(tests[0]['time']), '10:00 AM – 10:30 AM');
+    expect(tests[0]['room'], '402');
     expect(tests[0]['at'], ms(2026, 10, 28, 10, 0));
     expect(tests[0]['until'], ms(2026, 10, 28, 10, 30));
     expect(tests[0]['date'], 'Wed 28 Oct');
@@ -224,7 +225,7 @@ void main() {
     expect(labels['inMin'], '{m} মিনিট পর');
     final c = list(d, 'classes').first;
     expect(c['time'] as String, contains('৯:০০'));
-    expect(c['room'], 'রুম 301');
+    expect(c['room'], '301');
     expect(list(d, 'tests').first['title'], 'ক্লাস টেস্ট · CSE101');
   });
 

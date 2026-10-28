@@ -190,9 +190,8 @@ class NextClassWidget : AppWidgetProvider() {
                 progress = progress,
                 left = left,
                 testTitle = test?.optString("title") ?: labels.optString("noTest"),
-                testSub = test?.let {
-                    listOf(it.optString("date"), it.optString("time")).filter { s -> s.isNotEmpty() }.joinToString(" · ")
-                } ?: "",
+                // The chip says when; the line adds the time (or the date).
+                testSub = test?.let { it.optString("time").ifEmpty { it.optString("date") } } ?: "",
                 testWhen = testWhen,
                 nextRefresh = nextRefresh,
             )
