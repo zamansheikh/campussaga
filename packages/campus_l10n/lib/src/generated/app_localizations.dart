@@ -122,6 +122,114 @@ abstract class AppLocalizations {
   /// **'Profile'**
   String get navProfile;
 
+  /// No description provided for @navExplore.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get navExplore;
+
+  /// No description provided for @exploreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get exploreTitle;
+
+  /// No description provided for @exploreSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything Campus Saga does for you, in one place.'**
+  String get exploreSubtitle;
+
+  /// No description provided for @exploreYourTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Your tools'**
+  String get exploreYourTools;
+
+  /// No description provided for @exploreComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'On the way'**
+  String get exploreComingSoon;
+
+  /// No description provided for @exploreRemindersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Before every class'**
+  String get exploreRemindersHint;
+
+  /// No description provided for @exploreGroupsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Join or manage your sections'**
+  String get exploreGroupsHint;
+
+  /// No description provided for @exploreIssuesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Issues you raised'**
+  String get exploreIssuesHint;
+
+  /// No description provided for @busRoutesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus routes'**
+  String get busRoutesTitle;
+
+  /// No description provided for @busRoutesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your university\'s bus routes, stops and departure times, with the next bus from your stop.'**
+  String get busRoutesBody;
+
+  /// No description provided for @teacherReviewsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Teacher evaluations'**
+  String get teacherReviewsTitle;
+
+  /// No description provided for @teacherReviewsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate courses and teaching anonymously, to help classmates choose and help teachers improve.'**
+  String get teacherReviewsBody;
+
+  /// No description provided for @rankingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'University rankings'**
+  String get rankingsTitle;
+
+  /// No description provided for @rankingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'How universities compare, rated by their own students: teaching, facilities, campus life and how fast issues get fixed.'**
+  String get rankingsBody;
+
+  /// No description provided for @visitCampusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit other campuses'**
+  String get visitCampusTitle;
+
+  /// No description provided for @visitCampusBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Look around other universities: their campus, clubs, events and what their students are talking about.'**
+  String get visitCampusBody;
+
+  /// No description provided for @gotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get gotIt;
+
+  /// No description provided for @comingSoonNote.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re building this. It will arrive in a future update.'**
+  String get comingSoonNote;
+
   /// No description provided for @todayEmptyTitle.
   ///
   /// In en, this message translates to:

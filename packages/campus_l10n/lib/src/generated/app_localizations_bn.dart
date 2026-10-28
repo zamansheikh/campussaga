@@ -22,6 +22,64 @@ class AppLocalizationsBn extends AppLocalizations {
   String get navProfile => 'প্রোফাইল';
 
   @override
+  String get navExplore => 'এক্সপ্লোর';
+
+  @override
+  String get exploreTitle => 'এক্সপ্লোর';
+
+  @override
+  String get exploreSubtitle => 'ক্যাম্পাস সাগার সব সুবিধা, এক জায়গায়।';
+
+  @override
+  String get exploreYourTools => 'তোমার টুলস';
+
+  @override
+  String get exploreComingSoon => 'আসছে';
+
+  @override
+  String get exploreRemindersHint => 'প্রতিটি ক্লাসের আগে';
+
+  @override
+  String get exploreGroupsHint => 'সেকশনে যোগ দাও বা পরিচালনা করো';
+
+  @override
+  String get exploreIssuesHint => 'তোমার তোলা সমস্যাগুলো';
+
+  @override
+  String get busRoutesTitle => 'বাসের রুট';
+
+  @override
+  String get busRoutesBody =>
+      'তোমার বিশ্ববিদ্যালয়ের বাসের রুট, স্টপ আর ছাড়ার সময়, তোমার স্টপ থেকে পরের বাসসহ।';
+
+  @override
+  String get teacherReviewsTitle => 'শিক্ষক মূল্যায়ন';
+
+  @override
+  String get teacherReviewsBody =>
+      'নাম গোপন রেখে কোর্স আর পড়ানো রেট করো, যাতে সহপাঠীরা বেছে নিতে পারে আর শিক্ষকরা আরও ভালো করতে পারেন।';
+
+  @override
+  String get rankingsTitle => 'বিশ্ববিদ্যালয় র‍্যাংকিং';
+
+  @override
+  String get rankingsBody =>
+      'শিক্ষার্থীদের রেটিংয়ে বিশ্ববিদ্যালয়গুলোর তুলনা: পড়াশোনা, সুবিধা, ক্যাম্পাস জীবন আর সমস্যা কত দ্রুত সমাধান হয়।';
+
+  @override
+  String get visitCampusTitle => 'অন্য ক্যাম্পাস ঘুরে দেখো';
+
+  @override
+  String get visitCampusBody =>
+      'অন্য বিশ্ববিদ্যালয়গুলো ঘুরে দেখো: তাদের ক্যাম্পাস, ক্লাব, ইভেন্ট আর শিক্ষার্থীরা কী নিয়ে কথা বলছে।';
+
+  @override
+  String get gotIt => 'বুঝেছি';
+
+  @override
+  String get comingSoonNote => 'আমরা এটা বানাচ্ছি। সামনের কোনো আপডেটে আসবে।';
+
+  @override
   String get todayEmptyTitle => 'এখনো কোনো ক্লাস নেই';
 
   @override

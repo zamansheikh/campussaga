@@ -22,6 +22,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navProfile => 'Profile';
 
   @override
+  String get navExplore => 'Explore';
+
+  @override
+  String get exploreTitle => 'Explore';
+
+  @override
+  String get exploreSubtitle =>
+      'Everything Campus Saga does for you, in one place.';
+
+  @override
+  String get exploreYourTools => 'Your tools';
+
+  @override
+  String get exploreComingSoon => 'On the way';
+
+  @override
+  String get exploreRemindersHint => 'Before every class';
+
+  @override
+  String get exploreGroupsHint => 'Join or manage your sections';
+
+  @override
+  String get exploreIssuesHint => 'Issues you raised';
+
+  @override
+  String get busRoutesTitle => 'Bus routes';
+
+  @override
+  String get busRoutesBody =>
+      'Your university\'s bus routes, stops and departure times, with the next bus from your stop.';
+
+  @override
+  String get teacherReviewsTitle => 'Teacher evaluations';
+
+  @override
+  String get teacherReviewsBody =>
+      'Rate courses and teaching anonymously, to help classmates choose and help teachers improve.';
+
+  @override
+  String get rankingsTitle => 'University rankings';
+
+  @override
+  String get rankingsBody =>
+      'How universities compare, rated by their own students: teaching, facilities, campus life and how fast issues get fixed.';
+
+  @override
+  String get visitCampusTitle => 'Visit other campuses';
+
+  @override
+  String get visitCampusBody =>
+      'Look around other universities: their campus, clubs, events and what their students are talking about.';
+
+  @override
+  String get gotIt => 'Got it';
+
+  @override
+  String get comingSoonNote =>
+      'We\'re building this. It will arrive in a future update.';
+
+  @override
   String get todayEmptyTitle => 'No classes yet';
 
   @override

@@ -19,6 +19,7 @@ import '../features/classes/presentation/pages/join_group_page.dart';
 import '../features/classes/presentation/pages/members_page.dart';
 import '../features/classes/presentation/pages/my_courses_page.dart';
 import '../features/classes/presentation/pages/slot_editor_page.dart';
+import '../features/explore/explore_page.dart';
 import '../features/onboarding/presentation/onboarding_page.dart';
 import '../features/profile/presentation/pages/edit_profile_page.dart';
 import '../features/profile/presentation/pages/profile_setup_page.dart';
@@ -44,6 +45,7 @@ abstract final class Routes {
   static const today = '/today';
   static const routine = '/routine';
   static const profile = '/profile';
+  static const explore = '/explore';
   static const editProfile = '/profile/edit';
   static const reminders = '/profile/reminders';
   static const verifyEmail = '/profile/verify';
@@ -273,6 +275,14 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: Routes.explore,
+                builder: (context, state) => const ExplorePage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: Routes.profile,
                 builder: (context, state) => const ProfilePage(),
                 routes: [
@@ -315,8 +325,9 @@ class _StreamListenable extends ChangeNotifier {
   }
 }
 
-/// Bottom navigation that keeps each tab's state. The Campus tab (branch
-/// [_campusBranch]) shows only while the campusVoice flag is on.
+/// Bottom navigation that keeps each tab's state: Today, Routine, Campus,
+/// Explore, Profile. The Campus tab (branch [_campusBranch]) shows only
+/// while the campusVoice flag is on.
 class _HomeShell extends StatelessWidget {
   const _HomeShell({required this.shell});
 
@@ -331,7 +342,7 @@ class _HomeShell extends StatelessWidget {
       (VersionGateCubit g) => g.state.feature('campusVoice'),
     );
     // Visible tabs → branch indexes.
-    final branches = [0, 1, if (voice) _campusBranch, 3];
+    final branches = [0, 1, if (voice) _campusBranch, 3, 4];
     final selected = branches.indexOf(shell.currentIndex);
     if (selected < 0) {
       // The flag went off while on the Campus tab: back to Today.
@@ -362,6 +373,11 @@ class _HomeShell extends StatelessWidget {
               selectedIcon: const Icon(Icons.forum),
               label: l10n.navCampus,
             ),
+          NavigationDestination(
+            icon: const Icon(Icons.grid_view_outlined),
+            selectedIcon: const Icon(Icons.grid_view_rounded),
+            label: l10n.navExplore,
+          ),
           NavigationDestination(
             icon: const Icon(Icons.person_outline),
             selectedIcon: const Icon(Icons.person),
