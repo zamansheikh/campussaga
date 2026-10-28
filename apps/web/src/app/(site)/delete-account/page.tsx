@@ -25,10 +25,11 @@ export default function DeleteAccountPage() {
             Open VarsityKotha and go to the <strong>Profile</strong> tab.
           </li>
           <li>
-            Scroll down and tap <strong>Delete account</strong>.
+            Scroll to the bottom and tap <strong>Delete account</strong>.
           </li>
           <li>
-            Confirm with <strong>Delete my account</strong>.
+            Tick <strong>I understand this can&apos;t be undone</strong>, then tap{" "}
+            <strong>Delete my account</strong>.
           </li>
         </ol>
         <p>Your account is deleted at once and you are signed out on every device.</p>
@@ -126,10 +127,11 @@ export default function DeleteAccountPage() {
             ভার্সিটি কথা খুলে <strong>প্রোফাইল</strong> ট্যাবে যাও।
           </li>
           <li>
-            নিচে স্ক্রল করে <strong>অ্যাকাউন্ট মুছে ফেলো</strong> চাপো।
+            একদম নিচে স্ক্রল করে <strong>অ্যাকাউন্ট মুছে ফেলো</strong> চাপো।
           </li>
           <li>
-            <strong>আমার অ্যাকাউন্ট মুছে ফেলো</strong> চেপে নিশ্চিত করো।
+            <strong>আমি বুঝেছি, এটি আর ফেরানো যাবে না</strong>-তে টিক দিয়ে{" "}
+            <strong>আমার অ্যাকাউন্ট মুছে ফেলো</strong> চাপো।
           </li>
         </ol>
         <p>অ্যাকাউন্ট সাথে সাথে মুছে যাবে এবং সব ডিভাইস থেকে সাইন আউট হয়ে যাবে।</p>

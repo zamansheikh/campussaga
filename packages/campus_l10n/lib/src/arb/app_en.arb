@@ -344,6 +344,7 @@
   "deleteAccountTitle": "Delete your account?",
   "deleteAccountBody": "This permanently deletes your profile and signs you out on every device. It can't be undone.",
   "deleteAccountConfirm": "Delete my account",
+  "deleteAccountUnderstand": "I understand this can't be undone",
   "cancel": "Cancel",
   "updateRequiredTitle": "Update required",
   "updateRequiredBody": "This version of the app is no longer supported. Please update to keep using it.",

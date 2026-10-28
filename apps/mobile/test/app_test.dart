@@ -282,6 +282,12 @@ void main() {
 
     await tester.tap(find.text('Delete account'));
     await tester.pumpAndSettle();
+    // Nothing happens until the tick.
+    await tester.tap(find.text('Delete my account'));
+    await tester.pumpAndSettle();
+    expect(repo.deletes, 0);
+    await tester.tap(find.text("I understand this can't be undone"));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Delete my account'));
     await tester.pumpAndSettle();
 

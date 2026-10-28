@@ -1796,6 +1796,12 @@ abstract class AppLocalizations {
   /// **'Delete my account'**
   String get deleteAccountConfirm;
 
+  /// No description provided for @deleteAccountUnderstand.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand this can\'t be undone'**
+  String get deleteAccountUnderstand;
+
   /// No description provided for @cancel.
   ///
   /// In en, this message translates to:

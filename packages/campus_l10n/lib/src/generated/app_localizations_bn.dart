@@ -991,6 +991,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get deleteAccountConfirm => 'আমার অ্যাকাউন্ট মুছে ফেলো';
 
   @override
+  String get deleteAccountUnderstand => 'আমি বুঝেছি, এটি আর ফেরানো যাবে না';
+
+  @override
   String get cancel => 'বাতিল';
 
   @override

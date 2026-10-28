@@ -1011,6 +1011,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteAccountConfirm => 'Delete my account';
 
   @override
+  String get deleteAccountUnderstand => 'I understand this can\'t be undone';
+
+  @override
   String get cancel => 'Cancel';
 
   @override

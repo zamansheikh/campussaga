@@ -117,7 +117,6 @@ class ProfilePage extends StatelessWidget {
                     const AuthSignOutRequested(),
                   ),
                 ),
-                const _DeleteAccountRow(),
               ],
             ),
             const SizedBox(height: CsSpace.lg),
@@ -145,6 +144,10 @@ class ProfilePage extends StatelessWidget {
                 ),
               ],
             ),
+            // Kept apart from Sign out, at the very end, so nobody taps it by
+            // mistake; the dialog asks for a tick before it deletes.
+            const SizedBox(height: CsSpace.xxl),
+            const CsSection(children: [_DeleteAccountRow()]),
             const SizedBox(height: CsSpace.xl),
             const _Footer(),
           ],
@@ -439,23 +442,43 @@ class _DeleteAccountRow extends StatelessWidget {
   Future<void> _confirm(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthBloc>();
+    var sure = false;
     final ok = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        icon: Icon(CsIcons.delete, color: context.cs.error),
-        title: Text(l10n.deleteAccountTitle),
-        content: Text(l10n.deleteAccountBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          icon: Icon(CsIcons.delete, color: context.cs.error),
+          title: Text(l10n.deleteAccountTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.deleteAccountBody),
+              const SizedBox(height: CsSpace.sm),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                value: sure,
+                onChanged: (v) => setState(() => sure = v ?? false),
+                title: Text(l10n.deleteAccountUnderstand),
+              ),
+            ],
           ),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: context.cs.error),
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.deleteAccountConfirm),
-          ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: context.cs.error,
+                foregroundColor: context.cs.onError,
+              ),
+              onPressed: sure ? () => Navigator.of(context).pop(true) : null,
+              child: Text(l10n.deleteAccountConfirm),
+            ),
+          ],
+        ),
       ),
     );
     if (ok ?? false) auth.add(const AuthAccountDeleteRequested());
