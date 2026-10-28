@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
-	"unicode"
 )
 
 // Hold reasons (shown to the author and to moderators).
@@ -21,16 +20,7 @@ const (
 var wordList string
 
 var (
-	words = func() map[string]bool {
-		m := map[string]bool{}
-		for _, l := range strings.Split(wordList, "\n") {
-			l = strings.TrimSpace(l)
-			if l != "" && !strings.HasPrefix(l, "#") {
-				m[strings.ToLower(l)] = true
-			}
-		}
-		return m
-	}()
+	lang = loadWords(wordList)
 
 	// Bangladeshi mobile numbers, with or without +88, spaces or dashes.
 	phoneRe = regexp.MustCompile(`(?:\+?88[\s-]?)?0[\s-]?1[3-9](?:[\s-]?\d){8}`)
@@ -79,12 +69,8 @@ func checkText(parts ...string) string {
 			return HoldPersonalInfo
 		}
 	}
-	for _, w := range strings.FieldsFunc(strings.ToLower(text), func(r rune) bool {
-		return !(unicode.IsLetter(r) || unicode.IsMark(r) || unicode.IsDigit(r))
-	}) {
-		if words[w] {
-			return HoldLanguage
-		}
+	if lang.matches(text) {
+		return HoldLanguage
 	}
 	return ""
 }

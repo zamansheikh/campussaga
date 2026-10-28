@@ -1,43 +1,263 @@
-# Campus Voice language check: a post or comment containing one of these
-# words is held for a moderator (hold reason "language"). One word per line,
-# matched case-insensitively as a whole word. English, Banglish and Bangla.
-# Maintained by the Campus Saga team; keep it to clear abuse and slurs.
-fuck
-fucking
-fucker
-motherfucker
+# Campus Voice language check. A post or comment containing one of these is
+# HELD for a moderator (hold reason "language"); nothing is deleted, and a
+# moderator approves false alarms. English, Bangla (Bangla script) and
+# Banglish (romanized Bangla). Maintained by the Campus Saga team.
+#
+# Matching (filter.go): text is NFC-normalized, lower-cased, zero-width
+# characters removed, then split into words. Each line is one of:
+#   word      the whole word only ("ass" does not match "class")
+#   word*     a word starting with it ("fuck*" matches "fucking", "fuckboy")
+#   *stem*    a word containing it (only for stems that can't be innocent)
+# Evasions are handled in code: leetspeak (sh1t, b!tch), stretched letters
+# (fuuuck), spaced or dotted letters (f u c k, f.u.c.k), masks (f*ck).
+#
+# NOT listed on purpose: words a real complaint needs. Harassment, safety
+# and health reports must go through: rape, sexual, harass, abuse, assault,
+# drugs, nude/nudes and porn (leaked-photo reports), penis/vagina/breast
+# (clinical), "pond" and "erection" (ordinary words), and community names such as hijra,
+# hindu, chakma, pahari, bihari, rohingya. Also ambiguous words like
+# "shala" (brother-in-law), "mal" (goods), "bara/বাড়া", "চটি", "ধন" (wealth).
+# Keep to clear abuse, sexual vulgarity and slurs.
+
+# ---- English: sexual / vulgar --------------------------------------------
+fuck*
+motherfuck*
+fuk
+fuks
+fukin
+fuking
+fuq
+fck
+fcking
+fcuk
+fcuking
+phuck*
+fking
+fkin
 shit
-bitch
-bastard
-asshole
-cunt
+shits
+shitty
+shithead
+shithole
+bullshit
+dipshit
+horseshit
+ass
+asses
+asshole*
+arsehole*
+dumbass
+jackass
+bitch*
+biatch
+bastard*
+cunt*
 dick
-slut
-whore
+dicks
+dickhead*
+cock
+cocks
+cocksucker*
+pussy
+pussies
+twat*
+wank*
+jerkoff
+blowjob*
+handjob*
+cumshot*
+dildo*
+xxx
+xvideos
+xhamster
+pornhub
+onlyfans
+boobs
+boobies
+tits
+titties
+slut*
+whore*
+skank*
+hooker
+hookers
+milf
+horny
+orgasm*
+masturbat*
+
+# ---- English: slurs ---------------------------------------------------------
+fag
+fags
+faggot*
+dyke
+dykes
+tranny
+trannies
+nigger*
+nigga*
+chink
+chinks
+chinki
+chinku
 retard
-khanki
-magi
-chudi
+retards
+retarded
+spastic
+paki
+pakis
+
+# ---- Banglish (romanized Bangla, with common Hindi borrowings) -------------
+# sexual / vulgar
+chud*
+chod
 choda
-chudir
+chodo
+chodi
+chode
 chodna
-bokachoda
-banchod
-bainchod
-madarchod
-haramjada
-haramzada
-shuorer
-kuttar
-khankir
-মাগি
-খানকি
-চুদি
+chodon
+chodachudi
+bokachod*
+bokachud*
+banchod*
+bainchod*
+benchod*
+behenchod*
+bhenchod*
+madarchod*
+maderchod*
+motherchod*
+madachod*
+chut
+choot
+chutiya*
+chutia*
+lauda
+lawda
+loda
+lewra
+lawra
+leora
+gandu
+gaandu
+gaand
+gand
+baal
+baler
+balchal
+pondmara
+pondmarani
+
+# insults about women / sex workers
+khanki*
+khanqi*
+magi
+magir*
+maagi
+randi
+randir
+rendi
+rendir
+beshya*
+beissa
+beshsha*
+chinal*
+chhinal*
+
+# general abuse
+haramjad*
+haramzad*
+haramkhor*
+harami
+haramir
+haramipona
+shuorer*
+shuarer*
+suorer*
+suarer*
+shuor
+shuyor
+kuttar*
+kuttarbaccha*
+kuttarbacha*
+jaroj
+bejonma
+bejonmo
+abal
+
+# slurs
+malaun*
+malaon*
+malu
+
+# ---- Bangla script ------------------------------------------------------------
+# sexual / vulgar
+চুদ*
 চোদা
-চুদির
-বোকাচোদা
-হারামজাদা
+চোদো
+চোদি
+চোদে
+চোদন*
+চোদনা
+চোদাচুদি
+*বোকাচোদ*
+*বোকাচুদ*
+*বানচোদ*
+*বাইনচোদ*
+*মাদারচোদ*
+*চুদমারানি*
+*চুদানি*
+চুতিয়া*
+ধোন
+ধোনের
+লেওড়া*
+ল্যাওড়া*
+লাওড়া*
+লাউড়া*
+গুদ
+গুদে
+গুদের
+গুদমারানি*
+পোঁদ
+পোঁদে
+পোঁদের
+পোঁদমারা*
+বাল
+বালের
+বালছাল
+গান্ডু
+
+# insults about women / sex workers
+খানকি*
+খানকী*
+মাগি
+মাগী
+মাগির*
+মাগীর*
+বেশ্যা*
+ছিনাল*
+রেন্ডি*
+
+# general abuse
+হারামজাদা*
+হারামজাদি*
+হারামজাদী*
 হারামি
-কুত্তার
-শুয়োরের
-খানকির
+হারামী
+হারামির*
+হারামখোর*
+কুত্তার*
+কুত্তারবাচ্চা*
+শুয়োরের*
+শুওরের*
+শুয়রের*
+শুয়ারের*
+শুয়োর
+জারজ
+বেজন্মা*
+আবাল
+
+# slurs
+মালাউন*
+মালু
