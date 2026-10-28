@@ -47,7 +47,7 @@ Cloudflare (DNS, optional proxy / DDoS protection)
 │  nginx (TLS)   api.<domain> ─▶ 127.0.0.1:7030       │
 │                                                     │
 │  /opt/campussaga/deploy  (docker compose project    │
-│                           "campussaga")             │
+│                           "varsitykotha")           │
 │    api       campusapi serve   127.0.0.1:7030       │
 │    postgres  postgres:18       internal network only│
 │                                                     │
@@ -227,7 +227,7 @@ weekly cron on the VPS so they are also wiped by age:
 
 ```cron
 # /etc/cron.d/campussaga-logs: empty the API container's log every Sunday 03:30
-30 3 * * 0 root truncate -s 0 "$(docker inspect --format '{{.LogPath}}' campussaga-api-1)"
+30 3 * * 0 root truncate -s 0 "$(docker inspect --format '{{.LogPath}}' varsitykotha-api-1)"
 ```
 
 Keep the backup rotation in section 4 at 6 months or less. If any of

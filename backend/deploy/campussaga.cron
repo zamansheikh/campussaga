@@ -2,4 +2,4 @@
 # Nightly database dump, kept 14 days (deploy/backup.sh).
 10 3 * * * root sh /opt/campussaga/deploy/backup.sh >> /var/log/campussaga-backup.log 2>&1
 # Privacy policy: API logs are gone within 30 days (also capped at 3 x 10 MB in compose.yaml).
-30 3 * * 0 root truncate -s 0 "$(docker inspect --format '{{.LogPath}}' campussaga-api-1)"
+30 3 * * 0 root truncate -s 0 "$(docker inspect --format '{{.LogPath}}' varsitykotha-api-1)"

@@ -13,11 +13,11 @@ chmod 600 "$f"
 find backups -name 'campus-*.dump' -mtime +14 -delete
 echo "backup: $f ($(du -h "$f" | cut -f1))"
 
-# Campus Voice photos (the campussaga_media volume, read-only, through a
+# Campus Voice photos (the varsitykotha_media volume, read-only, through a
 # throwaway container: the API image has no shell), same 14 days.
-if docker volume inspect campussaga_media >/dev/null 2>&1; then
+if docker volume inspect varsitykotha_media >/dev/null 2>&1; then
   m="backups/media-$(date +%F-%H%M).tar.gz"
-  docker run --rm -v campussaga_media:/media:ro alpine:3.22 tar -C /media -czf - . > "$m.tmp"
+  docker run --rm -v varsitykotha_media:/media:ro alpine:3.22 tar -C /media -czf - . > "$m.tmp"
   mv "$m.tmp" "$m"
   chmod 600 "$m"
   echo "backup: $m ($(du -h "$m" | cut -f1))"

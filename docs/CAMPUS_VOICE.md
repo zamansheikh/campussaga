@@ -737,7 +737,7 @@ Small fixes found while building the API; the app and web follow these.
     `.env` before deploying this. `MEDIA_DIR=/data/media` with the new
     `media` volume (compose); the API image pre-creates `/data/media` owned
     by the nonroot user so a fresh volume is writable. `backup.sh` also tars
-    the `campussaga_media` volume (via a throwaway alpine container).
+    the `varsitykotha_media` volume (via a throwaway alpine container).
 
 ## 14. Photo check (2026-10-28)
 

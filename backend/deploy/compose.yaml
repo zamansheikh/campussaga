@@ -1,7 +1,9 @@
 # Production compose file. Copy to /opt/campussaga/deploy/compose.yaml on the
 # VPS (docs/DEPLOYMENT.md). Secrets come from deploy/.env next to it.
 
-name: campussaga
+# Containers: varsitykotha-postgres-1, -api-1, -nsfw-1, -web-1 (the project
+# was "campussaga" until 2026-10-28).
+name: varsitykotha
 services:
   postgres:
     image: postgres:18-alpine
@@ -72,6 +74,8 @@ services:
       driver: json-file
       options: {max-size: "10m", max-file: "3"}
 
+# varsitykotha_pgdata and varsitykotha_media. Renaming the project renames
+# these too, to new empty volumes: copy the data first (docs/DEPLOYMENT.md).
 volumes:
   pgdata:
   media:
