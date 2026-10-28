@@ -114,7 +114,7 @@ only for that email; no other address and not the admin panel accept it.
 The reviewer lands in a hidden demo university ("VarsityKotha Demo University",
 domain `review.varsitykotha.com`) that no other student can see or pick.
 
-**Enable** (on the server, in `/opt/varsitykotha/.env`; pick a random code and
+**Enable** (on the server, in `/opt/varsitykotha/deploy/.env`; pick a random code and
 keep it out of the repo and chat logs):
 
 ```sh
@@ -130,7 +130,7 @@ code is not 6 digits.
 
 ```sh
 cd /opt/varsitykotha/deploy
-docker compose exec -T postgres psql -U campus -d campus < review-seed.sql
+docker compose exec -T postgres psql -U campus -d campus < ../backend/deploy/review-seed.sql
 ```
 
 It creates the reviewer ("Play Reviewer", CSE batch 61), a CR and a classmate,
@@ -143,7 +143,7 @@ instructions with
 
 - Email: `play-review@review.varsitykotha.com`
 - Code: `<6 digits>` (the `REVIEW_CODE` value)
-- Steps: open the app, choose "Sign in with email", enter the email, tap
+- Steps: open the app, tap "Use university email instead", enter the email, tap
   Send code, then type the code. No email arrives; the code is the fixed one.
 
 **Rotate the code:** change `REVIEW_CODE` in `.env`, `docker compose up -d api`,
@@ -153,7 +153,7 @@ update the Play Console instructions. Do this after every review round.
 API (the reviewer can no longer sign in). To also delete the demo data:
 
 ```sh
-docker compose exec -T postgres psql -U campus -d campus < review-unseed.sql
+docker compose exec -T postgres psql -U campus -d campus < ../backend/deploy/review-unseed.sql
 ```
 
 ## 6. Feedback and support

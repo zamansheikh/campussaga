@@ -1,0 +1,9 @@
+{
+  "name": "varsitykotha-store-assets",
+  "private": true,
+  "type": "module",
+  "description": "Renders the Google Play screenshots, feature graphic, icon and promo video (see docs/PLAY_STORE.md).",
+  "dependencies": {
+    "puppeteer-core": "24.10.0"
+  }
+}

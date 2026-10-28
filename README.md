@@ -59,7 +59,8 @@ work: the site redirects, and the API keeps serving older app builds.
 | [docs/ADMIN.md](docs/ADMIN.md) | Web and admin panel, admin API |
 | [docs/CAMPUS_VOICE.md](docs/CAMPUS_VOICE.md) | Campus Voice: spec, moderation, photos |
 | [docs/TESTS_AND_MOVES.md](docs/TESTS_AND_MOVES.md) | Classes moved to another day, tests and deadlines |
-| [docs/BETA.md](docs/BETA.md) | Beta checklist: builds, Play Console, phone tests |
+| [docs/BETA.md](docs/BETA.md) | Beta checklist: builds, reviewer access, phone tests |
+| [docs/PLAY_STORE.md](docs/PLAY_STORE.md) | Google Play: listing assets, form answers, release steps |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Running the API, web and Postgres on our VPS |
 | [docs/UNIVERSITIES.md](docs/UNIVERSITIES.md) | All 169 Bangladeshi universities and their student email domains |
 | [site/](site/) | Static copy of the public pages on GitHub Pages |

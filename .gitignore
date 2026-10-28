@@ -39,3 +39,6 @@ ios/Runner/GoogleService-Info.plist
 campus-saga-final-bd8817ec94f5.json
 apps/web/node_modules/
 .claude/worktrees/
+
+# Google Play promo videos: rebuilt by tool/store/build.sh, uploaded to YouTube.
+store/google-play/*/promo-video.mp4

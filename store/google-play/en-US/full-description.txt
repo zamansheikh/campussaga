@@ -1,0 +1,37 @@
+VarsityKotha (ভার্সিটি কথা) is the daily app for university students in Bangladesh: your class routine every morning, and a safe way to raise campus problems and get them fixed.
+
+YOUR DAY, AT A GLANCE
+• Today shows your next class, room and teacher, with a live countdown
+• Announcements and upcoming tests in one place
+• Works offline: your routine is saved on your phone
+
+ONE ROUTINE FOR YOUR WHOLE SECTION
+• Your CR sets up the weekly routine once, and everyone in the section gets it
+• Join with a code, or find your class by searching your university's routines
+• Taking only some courses? Add just those and hide the rest
+• Add personal classes, like a tuition or a club meeting
+
+NEVER MISS A CHANGE
+• Cancelled class, new room, new time or moved to another day: your CR updates it in one tap and everyone gets a notification
+• Class tests, quizzes, assignments and exams, with dates and topics
+• Reminders before every class, and the evening before a test
+• A home-screen widget with your next class and next test
+
+CAMPUS VOICE
+• Raise problems about classes, halls, transport, food, Wi-Fi and safety
+• Anonymous by default: no one, not even your university, can see who wrote it
+• Others add "Me too", so the problems that affect the most students rise to the top
+• University officials reply in the open and update the status until it's solved
+• Photos are cleaned of location details and checked for unsafe content, and posts are moderated
+
+MORE FOR CAMPUS LIFE
+• Bus routes: every stop, and the next bus from yours
+• CGPA calculator on the UGC 4.00 scale, with a target planner
+• Teacher evaluations, university rankings and more are planned
+
+MADE FOR STUDENTS
+• Sign in with your university email, or with Google
+• English and Bangla, with a dark theme
+• No ads, and we never sell your data
+
+VarsityKotha is made by Silifton in Bangladesh. Questions or ideas? Write to hello@silifton.com.

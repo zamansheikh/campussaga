@@ -1,0 +1,6 @@
+Welcome to VarsityKotha!
+• Shared class routine for your section, with reminders
+• Class changes, tests and deadlines, with notifications
+• Campus Voice: raise campus problems anonymously
+• Find your class, bus routes and a CGPA calculator
+• Home-screen widget, English and Bangla, dark theme
