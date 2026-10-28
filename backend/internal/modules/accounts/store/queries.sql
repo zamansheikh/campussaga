@@ -127,3 +127,6 @@ WHERE s.id = @id AND s.user_id = @user_id AND s.revoked_at IS NULL AND s.expires
 
 -- name: PurgeSessions :execrows
 DELETE FROM sessions WHERE expires_at < @before OR revoked_at < @before;
+
+-- name: SetGooglePhoto :exec
+UPDATE users SET google_photo_url = sqlc.narg(url) WHERE id = @id;

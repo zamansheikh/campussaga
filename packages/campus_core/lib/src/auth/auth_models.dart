@@ -145,6 +145,8 @@ class UserProfile {
     this.batch,
     this.verified = false,
     this.universityEmail,
+    this.photoVersion,
+    this.googlePhotoUrl,
   });
 
   factory UserProfile.fromJson(Map<String, Object?> json) => UserProfile(
@@ -160,6 +162,8 @@ class UserProfile {
     // Older servers didn't send it: everyone was verified then.
     verified: json['verified'] as bool? ?? true,
     universityEmail: json['universityEmail'] as String?,
+    photoVersion: json['photoVersion'] as String?,
+    googlePhotoUrl: json['googlePhotoUrl'] as String?,
   );
 
   final String id;
@@ -179,6 +183,13 @@ class UserProfile {
   final String? displayName;
   final String? department;
   final String? batch;
+
+  /// Set when the student uploaded a profile photo (changes with each one).
+  final String? photoVersion;
+
+  /// The Google account photo (signed in with Google), shown when there's
+  /// no uploaded photo.
+  final String? googlePhotoUrl;
 
   /// Name, department and batch are all filled in.
   bool get isComplete =>

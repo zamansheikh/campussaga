@@ -67,6 +67,8 @@ final class AuthState extends Equatable {
     user?.university?.id,
     user?.verified,
     user?.universityEmail,
+    user?.photoVersion,
+    user?.googlePhotoUrl,
     isNewUser,
     profileSetupSkipped,
     deleting,

@@ -994,6 +994,48 @@ class AppLocalizationsBn extends AppLocalizations {
   String get deleteAccountUnderstand => 'আমি বুঝেছি, এটি আর ফেরানো যাবে না';
 
   @override
+  String get photoAdd => 'ছবি যোগ করো';
+
+  @override
+  String get photoChange => 'ছবি বদলাও';
+
+  @override
+  String get photoTake => 'ছবি তোলো';
+
+  @override
+  String get photoGallery => 'গ্যালারি থেকে বেছে নাও';
+
+  @override
+  String get photoRemove => 'ছবি সরাও';
+
+  @override
+  String get photoUpdated => 'ছবি হালনাগাদ হয়েছে';
+
+  @override
+  String get photoRemoved => 'ছবি সরানো হয়েছে';
+
+  @override
+  String get photoNotAllowed => 'এই ছবিটি ব্যবহার করা যাবে না। অন্য একটা দাও।';
+
+  @override
+  String get photoCheckDown =>
+      'এখন ছবি যাচাই করা যাচ্ছে না। পরে আবার চেষ্টা করো।';
+
+  @override
+  String get photoTooLarge => 'ছবিটি অনেক বড়।';
+
+  @override
+  String get photoInvalid => 'এই ফাইলটি ব্যবহারযোগ্য ছবি নয়।';
+
+  @override
+  String get photoWhoSees =>
+      'তোমার ক্লাস গ্রুপের সহপাঠীরা তোমার ছবি দেখে। ক্যাম্পাস ভয়েসে কখনো দেখায় না।';
+
+  @override
+  String get photoGoogleHint =>
+      'নিজের ছবি দেওয়া পর্যন্ত তোমার Google ছবি দেখাবে।';
+
+  @override
   String get cancel => 'বাতিল';
 
   @override

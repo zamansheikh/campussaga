@@ -16,6 +16,7 @@ import '../../auth/presentation/auth_error_text.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../reminders/presentation/bloc/reminders_cubit.dart';
 import 'widgets/university_picker.dart';
+import 'widgets/user_avatar.dart';
 
 /// Who you are, your preferences, and account actions.
 class ProfilePage extends StatelessWidget {
@@ -247,7 +248,13 @@ class _ProfileHeader extends StatelessWidget {
           children: [
             Row(
               children: [
-                CsAvatar(name: name, size: 60),
+                UserAvatar(
+                  userId: user.id,
+                  name: name,
+                  photoVersion: user.photoVersion,
+                  googlePhotoUrl: user.googlePhotoUrl,
+                  size: 60,
+                ),
                 const SizedBox(width: CsSpace.md),
                 Expanded(
                   child: Column(

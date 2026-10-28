@@ -26,6 +26,10 @@ type Member struct {
 	IsMe     bool      `json:"isMe"`
 	// Verified: proved a university email (others signed in with Gmail).
 	Verified bool `json:"verified"`
+	// The member's photo: an uploaded one (GET /users/{id}/photo?v=…), else
+	// their Google photo, else none (initials).
+	PhotoVersion   *string `json:"photoVersion"`
+	GooglePhotoURL *string `json:"googlePhotoUrl"`
 }
 
 // Members lists the group's students (CR only).
@@ -48,6 +52,7 @@ func (s *Service) Members(ctx context.Context, groupID uuid.UUID) ([]Member, err
 		out = append(out, Member{
 			UserID: r.UserID, Name: name, Role: r.Role, JoinedAt: r.JoinedAt,
 			IsMe: r.UserID == c.UserID, Verified: r.Verified,
+			PhotoVersion: r.PhotoKey, GooglePhotoURL: r.GooglePhotoUrl,
 		})
 	}
 	return out, nil

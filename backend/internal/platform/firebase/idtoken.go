@@ -25,6 +25,8 @@ type Identity struct {
 	Email         string
 	EmailVerified bool
 	Name          string
+	// Picture: the Google account photo URL ("" when none).
+	Picture string
 	// Provider is how the user signed in to Firebase, e.g. "google.com".
 	Provider string
 }
@@ -57,6 +59,7 @@ type claims struct {
 	Email         string `json:"email"`
 	EmailVerified bool   `json:"email_verified"`
 	Name          string `json:"name"`
+	Picture       string `json:"picture"`
 	AuthTime      int64  `json:"auth_time"`
 	Firebase      struct {
 		SignInProvider string `json:"sign_in_provider"`
@@ -116,6 +119,6 @@ func (v *Verifier) Verify(ctx context.Context, token string) (*Identity, error) 
 	}
 	return &Identity{
 		UID: c.Subject, Email: c.Email, EmailVerified: c.EmailVerified,
-		Name: c.Name, Provider: c.Firebase.SignInProvider,
+		Name: c.Name, Picture: c.Picture, Provider: c.Firebase.SignInProvider,
 	}, nil
 }

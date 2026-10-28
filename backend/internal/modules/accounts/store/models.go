@@ -92,4 +92,6 @@ type User struct {
 	UpdatedAt       time.Time
 	UniversityEmail *string
 	BlockedAt       *time.Time
+	GooglePhotoUrl  *string
+	PhotoKey        *string
 }

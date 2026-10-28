@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../auth/auth_models.dart';
 
 /// The signed-in student's own profile. Every method throws a `Failure`.
@@ -30,4 +32,19 @@ abstract interface class ProfileRepository {
 
   /// Checks the code: the student becomes verified at that university.
   Future<UserProfile> verifyUniversityEmail(String email, String code);
+
+  /// Sets the student's profile photo (the server re-encodes it, removing
+  /// location and other details, and refuses one that fails the check:
+  /// `PHOTO_NOT_ALLOWED`).
+  Future<UserProfile> uploadPhoto(
+    Uint8List bytes, {
+    required String filename,
+    required String contentType,
+  });
+
+  /// Removes the uploaded photo (the Google photo or initials show again).
+  Future<UserProfile> removePhoto();
+
+  /// A student's uploaded photo (theirs, a classmate's): a small JPEG.
+  Future<Uint8List> photo(String userId, String version);
 }

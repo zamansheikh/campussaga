@@ -261,6 +261,54 @@ void main() {
     expect(find.textContaining('CSE · 62'), findsOneWidget);
   });
 
+  testWidgets('add, refuse and remove a profile photo', (tester) async {
+    usePhoneScreen(tester);
+    final profile = FakeProfileRepository()..me = testUser;
+    final (repo, _) = await registerFakes(profile: profile);
+    repo.savedUser = testUser;
+    await tester.pumpWidget(const CampusApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit profile'));
+    await tester.pumpAndSettle();
+
+    // A refused photo says so and keeps none.
+    profile.photoFailure = const ValidationFailure(
+      {},
+      code: 'PHOTO_NOT_ALLOWED',
+    );
+    await tester.tap(find.text('Add a photo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Choose from gallery'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text("This photo can't be used. Try another one."),
+      findsOneWidget,
+    );
+    expect(profile.photoUploads, 0);
+    await tester.pump(const Duration(seconds: 6)); // the message goes away
+    await tester.pumpAndSettle();
+
+    profile.photoFailure = null;
+    await tester.tap(find.text('Add a photo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Choose from gallery'));
+    await tester.pumpAndSettle();
+    expect(profile.photoUploads, 1);
+    expect(find.text('Photo updated'), findsOneWidget);
+    expect(find.text('Change photo'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 6));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Change photo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Remove photo'));
+    await tester.pumpAndSettle();
+    expect(profile.photoRemovals, 1);
+    expect(find.text('Add a photo'), findsOneWidget);
+  });
+
   testWidgets('delete account asks first, then signs out', (tester) async {
     usePhoneScreen(tester);
     final (repo, _) = await registerFakes();

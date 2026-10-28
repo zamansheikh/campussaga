@@ -103,6 +103,10 @@ export default function PrivacyPage() {
               "Entered by you, so classmates can recognise you in class groups and so we can suggest the right class. If you sign in with Google, your name from Google is filled in for you and you can change it.",
             ],
             [
+              <strong key="k">Profile photo (optional)</strong>,
+              "If you sign in with Google, the link to your Google account photo. If you add your own photo, our server shrinks it, removes hidden details such as location, and checks it with our own nudity filter before keeping it. Your photo is shown to you, to classmates in your class groups and to our admins, never in Campus Voice. You can remove it any time in Edit profile; deleting your account deletes it.",
+            ],
+            [
               <strong key="k">Sign-in codes</strong>,
               "The 6-digit code we email you. We store only a one-way scrambled (hashed) form of it, never the code itself. It expires after 10 minutes.",
             ],
@@ -356,6 +360,12 @@ export default function PrivacyPage() {
           <li>
             <strong>নাম, বিভাগ ও ব্যাচ:</strong> তুমি নিজে দাও, যাতে ক্লাস গ্রুপে সহপাঠীরা তোমাকে চিনতে পারে। Google দিয়ে
             সাইন ইন করলে Google-এর নামটি আগে থেকে বসানো থাকে, তুমি বদলাতে পারো।
+          </li>
+          <li>
+            <strong>প্রোফাইল ছবি (ঐচ্ছিক):</strong> Google দিয়ে সাইন ইন করলে তোমার Google ছবির লিংক। নিজের ছবি দিলে আমাদের
+            সার্ভার সেটি ছোট করে, লোকেশনের মতো লুকানো তথ্য সরায় এবং নিজস্ব ফিল্টারে যাচাই করে তবেই রাখে। ছবিটি তুমি,
+            তোমার ক্লাস গ্রুপের সহপাঠীরা ও আমাদের অ্যাডমিনরা দেখে; ক্যাম্পাস ভয়েসে কখনো নয়। প্রোফাইল সম্পাদনা থেকে যেকোনো
+            সময় সরাতে পারো; অ্যাকাউন্ট মুছলে ছবিও মুছে যায়।
           </li>
           <li>
             <strong>সাইন-ইন কোড:</strong> সার্ভারে কোডটি সরাসরি রাখা হয় না, শুধু একমুখী গোপন (হ্যাশ) রূপে রাখা হয়। ১০

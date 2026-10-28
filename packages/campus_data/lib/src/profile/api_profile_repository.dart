@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:campus_core/campus_core.dart';
 
 import '../api_client.dart';
@@ -64,4 +66,31 @@ class ApiProfileRepository implements ProfileRepository {
         (await _api.post('/me/verify', {'email': email.trim(), 'code': code}))!
             as Map<String, Object?>,
       );
+
+  @override
+  Future<UserProfile> uploadPhoto(
+    Uint8List bytes, {
+    required String filename,
+    required String contentType,
+  }) async => UserProfile.fromJson(
+    (await _api.postMultipart(
+          '/me/photo',
+          method: 'PUT',
+          field: 'image',
+          bytes: bytes,
+          filename: filename,
+          contentType: contentType,
+        ))!
+        as Map<String, Object?>,
+  );
+
+  @override
+  Future<UserProfile> removePhoto() async => UserProfile.fromJson(
+    (await _api.delete('/me/photo'))! as Map<String, Object?>,
+  );
+
+  @override
+  Future<Uint8List> photo(String userId, String version) => _api.getBytes(
+    '/users/$userId/photo?v=${Uri.encodeQueryComponent(version)}',
+  );
 }

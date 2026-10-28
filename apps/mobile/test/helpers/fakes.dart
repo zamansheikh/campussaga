@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:campus_core/campus_core.dart';
 import 'package:campussaga/app/clock.dart';
@@ -167,6 +168,48 @@ class FakeGoogleAuth implements GoogleAuth {
 
 class FakeProfileRepository implements ProfileRepository {
   Failure? failure;
+
+  /// uploadPhoto fails with this (a refused photo).
+  Failure? photoFailure;
+  int photoUploads = 0;
+  int photoRemovals = 0;
+
+  UserProfile _withPhoto(String? version) {
+    final b = edited ?? me;
+    return UserProfile(
+      id: b.id,
+      email: b.email,
+      university: b.university,
+      role: b.role,
+      displayName: b.displayName,
+      department: b.department,
+      batch: b.batch,
+      verified: b.verified,
+      universityEmail: b.universityEmail,
+      photoVersion: version,
+      googlePhotoUrl: b.googlePhotoUrl,
+    );
+  }
+
+  @override
+  Future<UserProfile> uploadPhoto(
+    Uint8List bytes, {
+    required String filename,
+    required String contentType,
+  }) async {
+    if (photoFailure != null) throw photoFailure!;
+    photoUploads++;
+    return edited = me = _withPhoto('avatar-v$photoUploads.jpg');
+  }
+
+  @override
+  Future<UserProfile> removePhoto() async {
+    photoRemovals++;
+    return edited = me = _withPhoto(null);
+  }
+
+  @override
+  Future<Uint8List> photo(String userId, String version) async => Uint8List(0);
   final updates = <(String, String, String)>[];
   final suggestionQueries = <String>[];
   List<String> suggestions = const ['CSE', 'Computer Science'];

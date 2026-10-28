@@ -92,7 +92,7 @@ Google's reviewers have no university email. The API has a reviewer sign-in
 | Personal info → Email address | Yes | Required | App functionality, Account management | University or Google email |
 | Personal info → Name | Yes | Required | App functionality | Shown to classmates |
 | Personal info → User IDs | Yes | Required | App functionality, Account management | Internal account ID |
-| Photos and videos → Photos | Yes | Optional | App functionality | Only photos attached to Campus Voice posts |
+| Photos and videos → Photos | Yes | Optional | App functionality | Photos attached to Campus Voice posts, and an optional profile photo |
 | App activity → Other user-generated content | Yes | Optional | App functionality | Routines, announcements, Campus Voice posts and comments |
 | App activity → Other actions | Yes | Optional | App functionality | "Me too" votes, follows, reports |
 | App info and performance → Crash logs | Yes | Required | App functionality | Crashlytics; no user ID |

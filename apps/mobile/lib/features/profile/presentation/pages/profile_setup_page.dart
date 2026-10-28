@@ -9,6 +9,7 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../bloc/profile_form_cubit.dart';
 import '../widgets/profile_form.dart';
 import '../widgets/university_picker.dart';
+import '../widgets/user_avatar.dart';
 
 /// Shown after sign-in while name, department or batch is missing, or (a
 /// student who signed in with Gmail) the university. Saving (or "Later",
@@ -37,7 +38,7 @@ class ProfileSetupPage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CsAvatar(name: user.displayName ?? user.email, size: 56),
+                  UserAvatar.of(user, size: 56),
                   const Spacer(),
                   CsBadge(label: l10n.setupProfileStep, icon: CsIcons.flag),
                 ],

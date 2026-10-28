@@ -91,8 +91,9 @@ class ApiClient {
     required Uint8List bytes,
     required String filename,
     required String contentType,
+    String method = 'POST',
   }) => _withRefresh(() async {
-    final request = http.MultipartRequest('POST', _uri(path))
+    final request = http.MultipartRequest(method, _uri(path))
       ..headers['Accept'] = 'application/json'
       ..files.add(
         http.MultipartFile.fromBytes(

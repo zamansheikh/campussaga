@@ -1014,6 +1014,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteAccountUnderstand => 'I understand this can\'t be undone';
 
   @override
+  String get photoAdd => 'Add a photo';
+
+  @override
+  String get photoChange => 'Change photo';
+
+  @override
+  String get photoTake => 'Take a photo';
+
+  @override
+  String get photoGallery => 'Choose from gallery';
+
+  @override
+  String get photoRemove => 'Remove photo';
+
+  @override
+  String get photoUpdated => 'Photo updated';
+
+  @override
+  String get photoRemoved => 'Photo removed';
+
+  @override
+  String get photoNotAllowed => 'This photo can\'t be used. Try another one.';
+
+  @override
+  String get photoCheckDown =>
+      'Photos can\'t be checked right now. Try again later.';
+
+  @override
+  String get photoTooLarge => 'This photo is too large.';
+
+  @override
+  String get photoInvalid => 'This file isn\'t a photo we can use.';
+
+  @override
+  String get photoWhoSees =>
+      'Classmates in your class groups see your photo. Campus Voice never shows it.';
+
+  @override
+  String get photoGoogleHint => 'Your Google photo shows until you add one.';
+
+  @override
   String get cancel => 'Cancel';
 
   @override

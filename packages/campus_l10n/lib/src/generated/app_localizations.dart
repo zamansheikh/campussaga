@@ -1802,6 +1802,84 @@ abstract class AppLocalizations {
   /// **'I understand this can\'t be undone'**
   String get deleteAccountUnderstand;
 
+  /// No description provided for @photoAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a photo'**
+  String get photoAdd;
+
+  /// No description provided for @photoChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get photoChange;
+
+  /// No description provided for @photoTake.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get photoTake;
+
+  /// No description provided for @photoGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get photoGallery;
+
+  /// No description provided for @photoRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get photoRemove;
+
+  /// No description provided for @photoUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo updated'**
+  String get photoUpdated;
+
+  /// No description provided for @photoRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo removed'**
+  String get photoRemoved;
+
+  /// No description provided for @photoNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo can\'t be used. Try another one.'**
+  String get photoNotAllowed;
+
+  /// No description provided for @photoCheckDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos can\'t be checked right now. Try again later.'**
+  String get photoCheckDown;
+
+  /// No description provided for @photoTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo is too large.'**
+  String get photoTooLarge;
+
+  /// No description provided for @photoInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This file isn\'t a photo we can use.'**
+  String get photoInvalid;
+
+  /// No description provided for @photoWhoSees.
+  ///
+  /// In en, this message translates to:
+  /// **'Classmates in your class groups see your photo. Campus Voice never shows it.'**
+  String get photoWhoSees;
+
+  /// No description provided for @photoGoogleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Google photo shows until you add one.'**
+  String get photoGoogleHint;
+
   /// No description provided for @cancel.
   ///
   /// In en, this message translates to:

@@ -32,6 +32,8 @@ class GroupMember {
     required this.role,
     this.isMe = false,
     this.verified = true,
+    this.photoVersion,
+    this.googlePhotoUrl,
   });
 
   factory GroupMember.fromJson(Map<String, Object?> json) => GroupMember(
@@ -40,9 +42,15 @@ class GroupMember {
     role: GroupRole.parse(json['role'] as String?),
     isMe: json['isMe'] as bool? ?? false,
     verified: json['verified'] as bool? ?? true,
+    photoVersion: json['photoVersion'] as String?,
+    googlePhotoUrl: json['googlePhotoUrl'] as String?,
   );
 
   final String userId;
+
+  /// Their profile photo: uploaded (by version), else Google, else none.
+  final String? photoVersion;
+  final String? googlePhotoUrl;
   final String name;
   final GroupRole role;
   final bool isMe;

@@ -15,7 +15,7 @@ import (
 const changeUniversityUnverified = `-- name: ChangeUniversityUnverified :one
 UPDATE users SET university_id = $1, university_email = NULL, verified_at = NULL
 WHERE id = $2
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at, google_photo_url, photo_key
 `
 
 type ChangeUniversityUnverifiedParams struct {
@@ -40,6 +40,8 @@ func (q *Queries) ChangeUniversityUnverified(ctx context.Context, arg ChangeUniv
 		&i.UpdatedAt,
 		&i.UniversityEmail,
 		&i.BlockedAt,
+		&i.GooglePhotoUrl,
+		&i.PhotoKey,
 	)
 	return i, err
 }
@@ -155,7 +157,7 @@ func (q *Queries) FindSessionByPrevious(ctx context.Context, previousHash []byte
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at FROM users WHERE id = $1
+SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at, google_photo_url, photo_key FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
@@ -174,13 +176,15 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.UpdatedAt,
 		&i.UniversityEmail,
 		&i.BlockedAt,
+		&i.GooglePhotoUrl,
+		&i.PhotoKey,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
 
-SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at FROM users WHERE email = $1 OR university_email = $1
+SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at, google_photo_url, photo_key FROM users WHERE email = $1 OR university_email = $1
 ORDER BY (email = $1) DESC LIMIT 1
 `
 
@@ -203,6 +207,8 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.UpdatedAt,
 		&i.UniversityEmail,
 		&i.BlockedAt,
+		&i.GooglePhotoUrl,
+		&i.PhotoKey,
 	)
 	return i, err
 }
@@ -249,7 +255,7 @@ func (q *Queries) InsertSession(ctx context.Context, arg InsertSessionParams) (S
 const insertUser = `-- name: InsertUser :one
 INSERT INTO users (email, university_id, university_email, verified_at)
 VALUES ($1, $2, $3, $4)
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at, google_photo_url, photo_key
 `
 
 type InsertUserParams struct {
@@ -280,6 +286,8 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, e
 		&i.UpdatedAt,
 		&i.UniversityEmail,
 		&i.BlockedAt,
+		&i.GooglePhotoUrl,
+		&i.PhotoKey,
 	)
 	return i, err
 }
@@ -452,9 +460,23 @@ func (q *Queries) SessionUser(ctx context.Context, arg SessionUserParams) (Sessi
 	return i, err
 }
 
+const setGooglePhoto = `-- name: SetGooglePhoto :exec
+UPDATE users SET google_photo_url = $1 WHERE id = $2
+`
+
+type SetGooglePhotoParams struct {
+	Url *string
+	ID  uuid.UUID
+}
+
+func (q *Queries) SetGooglePhoto(ctx context.Context, arg SetGooglePhotoParams) error {
+	_, err := q.db.Exec(ctx, setGooglePhoto, arg.Url, arg.ID)
+	return err
+}
+
 const setUniversity = `-- name: SetUniversity :one
 UPDATE users SET university_id = $1 WHERE id = $2 AND verified_at IS NULL
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at, google_photo_url, photo_key
 `
 
 type SetUniversityParams struct {
@@ -478,6 +500,8 @@ func (q *Queries) SetUniversity(ctx context.Context, arg SetUniversityParams) (U
 		&i.UpdatedAt,
 		&i.UniversityEmail,
 		&i.BlockedAt,
+		&i.GooglePhotoUrl,
+		&i.PhotoKey,
 	)
 	return i, err
 }
@@ -488,7 +512,7 @@ UPDATE users SET
     department   = $2,
     batch        = $3
 WHERE id = $4
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at, google_photo_url, photo_key
 `
 
 type UpdateProfileParams struct {
@@ -519,6 +543,8 @@ func (q *Queries) UpdateProfile(ctx context.Context, arg UpdateProfileParams) (U
 		&i.UpdatedAt,
 		&i.UniversityEmail,
 		&i.BlockedAt,
+		&i.GooglePhotoUrl,
+		&i.PhotoKey,
 	)
 	return i, err
 }
@@ -563,7 +589,7 @@ const verifyUser = `-- name: VerifyUser :one
 UPDATE users SET university_email = $1, university_id = $2,
     verified_at = $3
 WHERE id = $4
-RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at
+RETURNING id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at, google_photo_url, photo_key
 `
 
 type VerifyUserParams struct {
@@ -594,6 +620,8 @@ func (q *Queries) VerifyUser(ctx context.Context, arg VerifyUserParams) (User, e
 		&i.UpdatedAt,
 		&i.UniversityEmail,
 		&i.BlockedAt,
+		&i.GooglePhotoUrl,
+		&i.PhotoKey,
 	)
 	return i, err
 }

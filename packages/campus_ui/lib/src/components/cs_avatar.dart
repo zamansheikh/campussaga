@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
-/// Round avatar with the person's initials on a colour picked from their
-/// name, so the same person always gets the same colour.
+/// Round avatar: the person's photo when there is one, else their initials
+/// on a colour picked from their name (the same person always gets the same
+/// colour). The initials also show while the photo loads or if it fails.
 class CsAvatar extends StatelessWidget {
-  const CsAvatar({super.key, required this.name, this.size = 48});
+  const CsAvatar({super.key, required this.name, this.size = 48, this.image});
 
   final String name;
   final double size;
+  final ImageProvider? image;
 
   // Deep tones: white initials stay readable (WCAG AA) on every one.
   static const _palette = [
@@ -32,6 +34,27 @@ class CsAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final initials = _initials(context);
+    final img = image;
+    if (img == null) return initials;
+    return ClipOval(
+      child: SizedBox.square(
+        dimension: size,
+        child: Image(
+          image: img,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          gaplessPlayback: true,
+          frameBuilder: (context, child, frame, sync) =>
+              frame == null && !sync ? initials : child,
+          errorBuilder: (_, _, _) => initials,
+        ),
+      ),
+    );
+  }
+
+  Widget _initials(BuildContext context) {
     final colors =
         _palette[name.codeUnits.fold<int>(0, (a, b) => a + b) %
             _palette.length];

@@ -17,6 +17,7 @@ import (
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/admin"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/appconfig"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/classgroups"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/photos"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/push"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/transport"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/universities"
@@ -170,6 +171,10 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 	if checker == nil && cfg.IsProduction() {
 		log.Warn("voice: NSFW_URL not set; photos are held for moderators until the photo check runs")
 	}
+	photoSvc := photos.NewService(d, store, photos.Check{
+		Scorer: checker, Max: cmp.Or(cfg.NSFWHold, 0.70), Required: cfg.IsProduction(),
+	}, func(ctx context.Context) (any, error) { return accSvc.GetMe(ctx) }, log)
+	accSvc.OnPhotoGone(photoSvc.Remove)
 	voiceSvc.SetPhotoCheck(voice.PhotoCheck{
 		Checker: checker, Reject: cmp.Or(cfg.NSFWReject, 0.98), Hold: cmp.Or(cfg.NSFWHold, 0.70),
 		Required: cfg.IsProduction(),
@@ -200,10 +205,14 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		adminSvc.Routes(r)
 		voiceSvc.Routes(r)
 		transport.NewService(d, now, roads, log).Routes(r)
+		photoSvc.Routes(r)
 	})
 
 	var h http.Handler = root
-	h = httpx.MaxBody(64<<10, map[string]int64{cfg.APIPrefix + "/uploads": voice.UploadLimit})(h)
+	h = httpx.MaxBody(64<<10, map[string]int64{
+		cfg.APIPrefix + "/uploads":  voice.UploadLimit,
+		cfg.APIPrefix + "/me/photo": photos.UploadLimit,
+	})(h)
 	h = httpx.SecurityHeaders(h)
 	h = httpx.AccessLog(h)
 	h = httpx.Recover(h)

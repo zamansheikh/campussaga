@@ -28,6 +28,10 @@ type Me struct {
 	UniversityEmail *string    `json:"universityEmail"`
 	VerifiedAt      *time.Time `json:"verifiedAt"`
 	CreatedAt       time.Time  `json:"createdAt"`
+	// PhotoVersion: set when the student uploaded a photo (GET
+	// /users/{id}/photo?v=…); else GooglePhotoURL, else initials.
+	PhotoVersion   *string `json:"photoVersion"`
+	GooglePhotoURL *string `json:"googlePhotoUrl"`
 }
 
 func (s *Service) meView(ctx context.Context, u store.User) (*Me, error) {
@@ -43,6 +47,7 @@ func (s *Service) meView(ctx context.Context, u store.User) (*Me, error) {
 		DisplayName: u.DisplayName, Department: u.Department, Batch: u.Batch,
 		Role: string(u.Role), Verified: u.VerifiedAt != nil, UniversityEmail: u.UniversityEmail,
 		VerifiedAt: u.VerifiedAt, CreatedAt: u.CreatedAt,
+		PhotoVersion: u.PhotoKey, GooglePhotoURL: u.GooglePhotoUrl,
 	}, nil
 }
 
@@ -128,6 +133,16 @@ func (s *Service) DepartmentSuggestions(ctx context.Context, q string) ([]string
 // (sessions cascade). Required by the Play Store and our privacy promise.
 func (s *Service) DeleteMe(ctx context.Context) error {
 	c := auth.MustUser(ctx)
-	_, err := store.New(s.d.Q(ctx)).DeleteUser(ctx, c.UserID)
-	return err
+	q := store.New(s.d.Q(ctx))
+	u, err := q.GetUser(ctx, c.UserID)
+	if err != nil {
+		return err
+	}
+	if _, err := q.DeleteUser(ctx, c.UserID); err != nil {
+		return err
+	}
+	if s.photoGone != nil {
+		s.photoGone(u.PhotoKey) // the uploaded profile photo file
+	}
+	return nil
 }

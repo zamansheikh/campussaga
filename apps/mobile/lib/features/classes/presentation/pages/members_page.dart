@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../profile/presentation/widgets/user_avatar.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
 
@@ -152,7 +153,13 @@ class _MemberRow extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(CsSpace.md, 10, CsSpace.xs, 10),
       child: Row(
         children: [
-          CsAvatar(name: name, size: 38),
+          UserAvatar(
+            userId: member.userId,
+            name: name,
+            photoVersion: member.photoVersion,
+            googlePhotoUrl: member.googlePhotoUrl,
+            size: 38,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Wrap(

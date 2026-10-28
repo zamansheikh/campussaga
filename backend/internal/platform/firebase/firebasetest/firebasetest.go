@@ -38,6 +38,7 @@ type Token struct {
 	Email         string
 	EmailVerified bool
 	Name          string    // the Google name; empty = no name claim
+	Picture       string    // the Google photo URL; empty = no picture claim
 	Provider      string    // default google.com
 	IssuedAt      time.Time // default now
 	Audience      string    // default ProjectID
@@ -74,6 +75,9 @@ func (s *Signer) Sign(t Token) string {
 	}
 	if t.Name != "" {
 		claims["name"] = t.Name
+	}
+	if t.Picture != "" {
+		claims["picture"] = t.Picture
 	}
 	tok := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 	tok.Header["kid"] = s.KeyID

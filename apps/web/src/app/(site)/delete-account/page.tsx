@@ -45,7 +45,7 @@ export default function DeleteAccountPage() {
 
         <h2>What is deleted</h2>
         <ul>
-          <li>Your profile: email, university email, name, department and batch.</li>
+          <li>Your profile: email, university email, name, department, batch and profile photo.</li>
           <li>All your sessions (you are signed out everywhere).</li>
           <li>Any pending sign-in code.</li>
           <li>
@@ -145,7 +145,7 @@ export default function DeleteAccountPage() {
 
         <h2>কী মুছে যায়</h2>
         <ul>
-          <li>তোমার প্রোফাইল: ইমেইল, বিশ্ববিদ্যালয়ের ইমেইল, নাম, বিভাগ ও ব্যাচ।</li>
+          <li>তোমার প্রোফাইল: ইমেইল, বিশ্ববিদ্যালয়ের ইমেইল, নাম, বিভাগ, ব্যাচ ও প্রোফাইল ছবি।</li>
           <li>তোমার সব সেশন।</li>
           <li>অপেক্ষমাণ সাইন-ইন কোড।</li>
           <li>

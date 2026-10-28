@@ -18,6 +18,7 @@ import '../../classes/presentation/bloc/my_classes_cubit.dart';
 import '../../classes/presentation/class_format.dart';
 import '../../classes/presentation/widgets/class_sheet.dart';
 import '../../classes/presentation/widgets/class_tile.dart';
+import '../../profile/presentation/widgets/user_avatar.dart';
 import '../../reminders/presentation/bloc/reminders_cubit.dart';
 import '../../reminders/presentation/reminder_prompt.dart';
 
@@ -310,7 +311,7 @@ class _Greeting extends StatelessWidget {
           const SizedBox(width: CsSpace.md),
           GestureDetector(
             onTap: () => context.go(Routes.profile),
-            child: CsAvatar(name: user.displayName ?? user.email, size: 44),
+            child: UserAvatar.of(user, size: 44),
           ),
         ],
       ],

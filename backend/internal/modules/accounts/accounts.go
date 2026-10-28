@@ -90,7 +90,12 @@ type Service struct {
 	cfg    Config
 	now    func() time.Time
 	log    *slog.Logger
+	// photoGone deletes a profile photo file once its account is deleted.
+	photoGone func(key *string)
 }
+
+// OnPhotoGone sets what deletes a deleted account's profile photo file.
+func (s *Service) OnPhotoGone(f func(key *string)) { s.photoGone = f }
 
 func NewService(d *db.DB, tokens *auth.Tokens, m mailer.Sender, unis Universities, google GoogleVerifier, cfg Config, now func() time.Time, log *slog.Logger) *Service {
 	if now == nil {
@@ -405,8 +410,20 @@ func (s *Service) SignInWithGoogle(ctx context.Context, idToken, nameHint string
 			for utf8.RuneCountInString(name) > 60 {
 				name = string([]rune(name)[:60])
 			}
-			if user, err = q.UpdateProfile(ctx, store.UpdateProfileParams{ID: user.ID, DisplayName: apply(nil, &name)}); err != nil {
+			// Department and batch stay as they are.
+			if user, err = q.UpdateProfile(ctx, store.UpdateProfileParams{
+				ID: user.ID, DisplayName: apply(nil, &name), Department: user.Department, Batch: user.Batch,
+			}); err != nil {
 				return err
+			}
+		}
+		// The Google photo, refreshed each sign-in (https links only).
+		if pic := strings.TrimSpace(id.Picture); strings.HasPrefix(pic, "https://") && len(pic) <= 500 {
+			if user.GooglePhotoUrl == nil || *user.GooglePhotoUrl != pic {
+				if err := q.SetGooglePhoto(ctx, store.SetGooglePhotoParams{ID: user.ID, Url: &pic}); err != nil {
+					return err
+				}
+				user.GooglePhotoUrl = &pic
 			}
 		}
 		tokens, err := s.startSession(ctx, q, user, now)
