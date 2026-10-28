@@ -303,7 +303,7 @@ const createGroup = `-- name: CreateGroup :one
 
 INSERT INTO class_groups (university_id, department, batch, section, semester, join_code, created_by)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable
+RETURNING id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable, keep_when_empty
 `
 
 type CreateGroupParams struct {
@@ -340,6 +340,7 @@ func (q *Queries) CreateGroup(ctx context.Context, arg CreateGroupParams) (Class
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Discoverable,
+		&i.KeepWhenEmpty,
 	)
 	return i, err
 }
@@ -628,7 +629,7 @@ func (q *Queries) GetChange(ctx context.Context, arg GetChangeParams) (RoutineCh
 }
 
 const getGroup = `-- name: GetGroup :one
-SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable FROM class_groups WHERE id = $1
+SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable, keep_when_empty FROM class_groups WHERE id = $1
 `
 
 func (q *Queries) GetGroup(ctx context.Context, id uuid.UUID) (ClassGroup, error) {
@@ -646,12 +647,13 @@ func (q *Queries) GetGroup(ctx context.Context, id uuid.UUID) (ClassGroup, error
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Discoverable,
+		&i.KeepWhenEmpty,
 	)
 	return i, err
 }
 
 const getGroupByCode = `-- name: GetGroupByCode :one
-SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable FROM class_groups WHERE join_code = $1
+SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable, keep_when_empty FROM class_groups WHERE join_code = $1
 `
 
 func (q *Queries) GetGroupByCode(ctx context.Context, joinCode string) (ClassGroup, error) {
@@ -669,12 +671,13 @@ func (q *Queries) GetGroupByCode(ctx context.Context, joinCode string) (ClassGro
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Discoverable,
+		&i.KeepWhenEmpty,
 	)
 	return i, err
 }
 
 const getGroupForUpdate = `-- name: GetGroupForUpdate :one
-SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable FROM class_groups WHERE id = $1 FOR UPDATE
+SELECT id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable, keep_when_empty FROM class_groups WHERE id = $1 FOR UPDATE
 `
 
 func (q *Queries) GetGroupForUpdate(ctx context.Context, id uuid.UUID) (ClassGroup, error) {
@@ -692,6 +695,7 @@ func (q *Queries) GetGroupForUpdate(ctx context.Context, id uuid.UUID) (ClassGro
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Discoverable,
+		&i.KeepWhenEmpty,
 	)
 	return i, err
 }
@@ -1112,7 +1116,7 @@ func (q *Queries) ListMembers(ctx context.Context, groupID uuid.UUID) ([]ListMem
 }
 
 const listMyGroups = `-- name: ListMyGroups :many
-SELECT g.id, g.university_id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_by, g.created_at, g.updated_at, g.discoverable, m.role,
+SELECT g.id, g.university_id, g.department, g.batch, g.section, g.semester, g.join_code, g.created_by, g.created_at, g.updated_at, g.discoverable, g.keep_when_empty, m.role,
        (SELECT count(*) FROM class_group_members x WHERE x.group_id = g.id) AS member_count
 FROM class_groups g
 JOIN class_group_members m ON m.group_id = g.id
@@ -1147,6 +1151,7 @@ func (q *Queries) ListMyGroups(ctx context.Context, userID uuid.UUID) ([]ListMyG
 			&i.ClassGroup.CreatedAt,
 			&i.ClassGroup.UpdatedAt,
 			&i.ClassGroup.Discoverable,
+			&i.ClassGroup.KeepWhenEmpty,
 			&i.Role,
 			&i.MemberCount,
 		); err != nil {
@@ -1622,7 +1627,7 @@ const updateGroup = `-- name: UpdateGroup :one
 UPDATE class_groups
 SET department = $1, batch = $2, section = $3, semester = $4
 WHERE id = $5
-RETURNING id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable
+RETURNING id, university_id, department, batch, section, semester, join_code, created_by, created_at, updated_at, discoverable, keep_when_empty
 `
 
 type UpdateGroupParams struct {
@@ -1654,6 +1659,7 @@ func (q *Queries) UpdateGroup(ctx context.Context, arg UpdateGroupParams) (Class
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Discoverable,
+		&i.KeepWhenEmpty,
 	)
 	return i, err
 }

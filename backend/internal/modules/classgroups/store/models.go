@@ -37,17 +37,18 @@ type Assessment struct {
 }
 
 type ClassGroup struct {
-	ID           uuid.UUID
-	UniversityID uuid.UUID
-	Department   string
-	Batch        string
-	Section      string
-	Semester     string
-	JoinCode     string
-	CreatedBy    *uuid.UUID
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	Discoverable bool
+	ID            uuid.UUID
+	UniversityID  uuid.UUID
+	Department    string
+	Batch         string
+	Section       string
+	Semester      string
+	JoinCode      string
+	CreatedBy     *uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Discoverable  bool
+	KeepWhenEmpty bool
 }
 
 type PersonalSlot struct {

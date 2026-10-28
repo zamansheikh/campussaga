@@ -410,13 +410,15 @@ func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 // Leave removes the caller from the group. The last member leaving deletes
-// it. The only CR can't leave while classmates remain (they would lose the
+// it, unless it's kept when empty (an official routine an admin published).
+// The only CR can't leave while classmates remain (they would lose the
 // person who keeps the routine up to date); they can delete the group.
 func (s *Service) Leave(ctx context.Context, id uuid.UUID) error {
 	c := auth.MustUser(ctx)
 	return s.d.InTx(ctx, func(ctx context.Context) error {
 		q := store.New(s.d.Q(ctx))
-		if _, err := q.GetGroupForUpdate(ctx, id); db.IsNoRows(err) {
+		g, err := q.GetGroupForUpdate(ctx, id)
+		if db.IsNoRows(err) {
 			return ErrGroupNotFound
 		} else if err != nil {
 			return err
@@ -433,6 +435,9 @@ func (s *Service) Leave(ctx context.Context, id uuid.UUID) error {
 			return err
 		}
 		if members == 1 {
+			if g.KeepWhenEmpty {
+				return q.RemoveMember(ctx, store.RemoveMemberParams{GroupID: id, UserID: c.UserID})
+			}
 			return q.DeleteGroup(ctx, id)
 		}
 		if role == RoleCR {

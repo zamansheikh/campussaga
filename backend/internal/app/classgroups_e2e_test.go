@@ -212,3 +212,18 @@ func lower(s string) string {
 	}
 	return string(b)
 }
+
+// A routine an admin published (kept when empty) stays when its last member
+// leaves; it can be found and joined again.
+func TestKeptGroupSurvivesLastLeave(t *testing.T) {
+	h := newHarness(t)
+	tok := h.signIn("pmscs@test.ac.bd").Tokens.AccessToken
+	var id string
+	require.NoError(t, h.app.DB.Pool.QueryRow(context.Background(), `
+		INSERT INTO class_groups (university_id, department, batch, semester, join_code, keep_when_empty)
+		VALUES ($1, 'CSE', 'PMSCS', 'Fall 2026', 'TJMSLP', true) RETURNING id::text`, h.universityID("test-uni")).Scan(&id))
+	require.Equal(t, http.StatusOK, h.do("POST", "/groups/join", tok, map[string]string{"code": "TJMSLP"}).Status)
+	require.Equal(t, http.StatusNoContent, h.do("POST", "/groups/"+id+"/leave", tok, nil).Status)
+	r := h.do("POST", "/groups/join", tok, map[string]string{"code": "TJMSLP"})
+	require.Equal(t, http.StatusOK, r.Status, "still there: "+r.Raw)
+}
