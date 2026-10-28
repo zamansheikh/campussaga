@@ -20,7 +20,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."   # apps/mobile
-BETA_URL="https://api-campus.silifton.com/api/v1"
+BETA_URL="https://api.varsitykotha.com/api/v1"
 PORT=8090
 
 server="" type="" bump="" install="" yes=""

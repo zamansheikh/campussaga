@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy campus.silifton.com (apps/web, Next.js) from this Mac to the VPS:
+# Deploy varsitykotha.com (apps/web, Next.js) from this Mac to the VPS:
 # copy the app, keep the current image as campusweb:rollback, build, restart,
 # then check the site answers through the container.
 #

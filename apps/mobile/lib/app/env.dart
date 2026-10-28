@@ -24,11 +24,9 @@ abstract final class Env {
       ? _apiBaseUrl
       : (kReleaseMode ? '' : localApiBaseUrl);
 
-  /// Public web pages (apps/web on campus.silifton.com; GitHub Pages keeps
-  /// a copy). Move to the product domain once it is chosen; the rebranding
-  /// checklist lists this line.
-  // Moves to https://varsitykotha.com once that domain is live.
-  static const String siteUrl = 'https://campus.silifton.com';
+  /// Public web pages (apps/web; GitHub Pages keeps a copy). The old
+  /// campus.silifton.com redirects here.
+  static const String siteUrl = 'https://varsitykotha.com';
   static const String privacyPolicyUrl = '$siteUrl/privacy.html';
 
   /// Where testers and students send feedback.

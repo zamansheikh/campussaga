@@ -1,4 +1,4 @@
-// Package admin is the superadmin panel's API (campus.silifton.com/admin):
+// Package admin is the superadmin panel's API (varsitykotha.com/admin):
 // dashboard numbers, users, universities, class groups, app settings,
 // pushes and the audit log. Every route needs a signed-in admin, except
 // the two sign-in ones; every change writes an audit_log row.

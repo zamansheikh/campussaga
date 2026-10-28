@@ -1,4 +1,4 @@
-# campus.silifton.com: Next.js standalone server (public pages + /admin).
+# varsitykotha.com: Next.js standalone server (public pages + /admin).
 # Build: docker build -t campussaga-web apps/web
 # Needs internet at build time (npm ci, Google Fonts are self-hosted by next/font).
 

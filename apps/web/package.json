@@ -2,7 +2,7 @@
   "name": "campussaga-web",
   "version": "0.1.0",
   "private": true,
-  "description": "campus.silifton.com: public pages and the superadmin panel.",
+  "description": "varsitykotha.com: public pages and the superadmin panel.",
   "engines": {
     "node": ">=22"
   },

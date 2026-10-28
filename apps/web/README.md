@@ -1,4 +1,4 @@
-# campus.silifton.com (apps/web)
+# varsitykotha.com (apps/web)
 
 One Next.js app for the whole domain:
 
@@ -52,7 +52,7 @@ Checks: `npm run lint`, `npm run typecheck`, `npm run build`.
 | Variable | Default | Notes |
 |---|---|---|
 | `API_URL` | `http://127.0.0.1:8090/api/v1` | Go API base URL as seen from the Next.js server. In the Docker compose network: `http://api:8090/api/v1` |
-| `SITE_URL` | `https://campus.silifton.com` | Used for metadata (Open Graph, sitemap). Static pages read it at build time |
+| `SITE_URL` | `https://varsitykotha.com` | Used for metadata (Open Graph, sitemap). Static pages read it at build time |
 | `PORT` | `7031` in the Docker image | |
 
 No secrets: the app holds no keys; admin sessions come from the Go API.

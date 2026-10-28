@@ -50,7 +50,7 @@ services:
       driver: json-file
       options: {max-size: "10m", max-file: "3"}
 
-  # campus.silifton.com: public pages + admin panel (apps/web, Next.js).
+  # varsitykotha.com: public pages + admin panel (apps/web, Next.js).
   # nginx proxies the site to 127.0.0.1:7031; the web server talks to the
   # API over the compose network. Deploy with deploy/deploy-web.sh.
   web:
@@ -62,7 +62,7 @@ services:
       PORT: "7031"
       HOSTNAME: 0.0.0.0
       API_URL: http://api:8090/api/v1
-      SITE_URL: https://campus.silifton.com
+      SITE_URL: https://varsitykotha.com
     # One replica only: token refreshes are merged in this process's memory.
     depends_on: [api]
     ports: ["127.0.0.1:7031:7031"]
