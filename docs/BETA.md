@@ -74,6 +74,13 @@ upload.
    ```sh
    firebase apps:android:sha:create 1:1058979568560:android:4cd9ab36c355f065ed5475 <SHA> --project varsitykotha
    ```
+   Then check that `google-services.json` (`firebase apps:sdkconfig android …`)
+   lists an `oauth_client` with `client_type: 1` for that SHA-1. If it doesn't,
+   create the Android OAuth client by hand: Google Cloud console → project
+   `varsitykotha` → APIs & Services → Credentials → Create OAuth client ID →
+   Android, package `com.silifton.varsitykotha`, the SHA-1. Without it, sign-in
+   fails with `[16] Account reauth failed` (this happened on 2026-10-28 for the
+   debug and upload keys).
 5. Data safety form: answer from [site/privacy.html](../site/privacy.html)
    (email, name, app activity in groups, crash logs, device IDs = push token;
    encrypted in transit; deletion in-app and by email; no ads, no selling).
