@@ -78,8 +78,7 @@ upload.
    (email, name, app activity in groups, crash logs, device IDs = push token;
    encrypted in transit; deletion in-app and by email; no ads, no selling).
 6. Before closed/open testing or production, Google reviews the app and
-   needs a way to sign in. Plan a reviewer account (e.g. a test university
-   domain with a fixed code) before leaving internal testing.
+   needs a way to sign in: see [Reviewer access](#reviewer-access).
 
 ## 5. Test on real phones before inviting students
 
@@ -97,6 +96,58 @@ Two phones (CR and classmate), ideally one Xiaomi/Oppo/Vivo/Realme:
 - [ ] Make a co-CR; step down; start a new semester
 - [ ] Bangla: switch language; notifications arrive in Bangla
 - [ ] Delete account works and the CR role passes on
+
+## Reviewer access
+
+Reviewers have no university email, so Play Console's **App access** needs a
+fixed login. The API has an off-by-default reviewer sign-in: one email, one
+fixed 6-digit code, no email sent. The code goes through the normal code path
+(same limit of 5 wrong tries, resend and hourly limits, 10 minute expiry),
+only for that email; no other address and not the admin panel accept it.
+The reviewer lands in a hidden demo university ("VarsityKotha Demo University",
+domain `review.varsitykotha.com`) that no other student can see or pick.
+
+**Enable** (on the server, in `/opt/varsitykotha/.env`; pick a random code and
+keep it out of the repo and chat logs):
+
+```sh
+REVIEW_EMAIL=play-review@review.varsitykotha.com
+REVIEW_CODE=<6 digits>
+```
+
+then deploy as usual (migration 00580 adds the demo flag) or at least
+`docker compose up -d api`. The API refuses to start if only one is set or the
+code is not 6 digits.
+
+**Seed the demo data** (once; safe to re-run, it refreshes the dates):
+
+```sh
+cd /opt/varsitykotha/deploy
+docker compose exec -T postgres psql -U campus -d campus < review-seed.sql
+```
+
+It creates the reviewer ("Play Reviewer", CSE batch 61), a CR and a classmate,
+a class group (join code `DEMXRV`) with a Sunday-Thursday routine of 5 courses,
+an upcoming class test and assignment, two announcements and four Campus Voice
+issues with a few supports and comments.
+
+**Play Console, App access** ("All or some functionality is restricted"): add
+instructions with
+
+- Email: `play-review@review.varsitykotha.com`
+- Code: `<6 digits>` (the `REVIEW_CODE` value)
+- Steps: open the app, choose "Sign in with email", enter the email, tap
+  Send code, then type the code. No email arrives; the code is the fixed one.
+
+**Rotate the code:** change `REVIEW_CODE` in `.env`, `docker compose up -d api`,
+update the Play Console instructions. Do this after every review round.
+
+**Disable and clean up:** remove both variables from `.env` and restart the
+API (the reviewer can no longer sign in). To also delete the demo data:
+
+```sh
+docker compose exec -T postgres psql -U campus -d campus < review-unseed.sql
+```
 
 ## 6. Feedback and support
 
