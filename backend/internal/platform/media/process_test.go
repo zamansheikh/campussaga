@@ -39,7 +39,7 @@ func TestProcessScalesAndRefuses(t *testing.T) {
 	p, err := Process(b.Bytes())
 	require.NoError(t, err)
 	assert.Equal(t, FullSide, p.Width)
-	assert.Equal(t, 800, p.Height)
+	assert.Equal(t, FullSide/2, p.Height, "keeps the 2:1 shape")
 	th, err := jpeg.Decode(bytes.NewReader(p.Thumb))
 	require.NoError(t, err)
 	assert.Equal(t, ThumbSide, th.Bounds().Dx())

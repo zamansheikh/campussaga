@@ -20,7 +20,7 @@ abstract interface class PhotoPicker {
   Future<PickedPhoto?> pick({required bool camera});
 }
 
-/// image_picker, resized to at most 1600 px and re-compressed (q85), so
+/// image_picker, resized to at most 1280 px and re-compressed (q80), so
 /// uploads are small (docs/CAMPUS_VOICE.md §7). The server cleans the photo
 /// again (metadata removed).
 class ImagePickerPhotoPicker implements PhotoPicker {
@@ -30,9 +30,9 @@ class ImagePickerPhotoPicker implements PhotoPicker {
   Future<PickedPhoto?> pick({required bool camera}) async {
     final file = await _picker.pickImage(
       source: camera ? ImageSource.camera : ImageSource.gallery,
-      maxWidth: 1600,
-      maxHeight: 1600,
-      imageQuality: 85,
+      maxWidth: 1280,
+      maxHeight: 1280,
+      imageQuality: 80,
       requestFullMetadata: false,
     );
     if (file == null) return null;

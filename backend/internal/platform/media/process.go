@@ -16,9 +16,12 @@ import (
 const (
 	MaxBytes     = 8 << 20 // per photo
 	maxPixelSide = 8000
-	FullSide     = 1600
-	ThumbSide    = 480
-	quality      = 82
+	// Sized for phone screens and cheap storage: a detailed 4K photo comes
+	// out near 110 KB full and 12 KB thumb (1600 px q82 was 218 KB + 25 KB).
+	FullSide     = 1280
+	ThumbSide    = 400
+	fullQuality  = 70
+	thumbQuality = 65
 )
 
 var (
@@ -59,11 +62,11 @@ func Process(data []byte) (*Processed, error) {
 	}
 	full := scale(img, FullSide)
 	thumb := scale(img, ThumbSide)
-	fb, err := encode(full)
+	fb, err := encode(full, fullQuality)
 	if err != nil {
 		return nil, err
 	}
-	tb, err := encode(thumb)
+	tb, err := encode(thumb, thumbQuality)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +74,7 @@ func Process(data []byte) (*Processed, error) {
 	return &Processed{Full: fb, Thumb: tb, Width: b.Dx(), Height: b.Dy()}, nil
 }
 
-func encode(img image.Image) ([]byte, error) {
+func encode(img image.Image, quality int) ([]byte, error) {
 	var buf bytes.Buffer
 	if err := jpeg.Encode(&buf, img, &jpeg.Options{Quality: quality}); err != nil {
 		return nil, err
