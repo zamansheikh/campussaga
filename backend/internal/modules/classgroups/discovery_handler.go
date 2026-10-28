@@ -47,7 +47,7 @@ func (s *Service) handleRoutinePreview(ctx context.Context, in *routinePreviewRe
 type joinCoursesReq struct {
 	ID string `json:"-" path:"id" validate:"required,uuid"`
 	// Courses to take (codes or keys); every other course is hidden.
-	Courses []string `json:"courses" validate:"required,min=1,max=50,dive,max=20"`
+	Courses []string `json:"courses" validate:"max=50,dive,max=20"`
 	// Code: the join code, for a group that isn't findable.
 	Code string `json:"code" validate:"max=6"`
 }

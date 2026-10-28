@@ -205,6 +205,15 @@ func TestSimilarGroupsAndLimits(t *testing.T) {
 	assert.Empty(t, similar("CSE", "61", "B"))
 	assert.Empty(t, similar("CSE", "62", "A"))
 
+	// A routine with no classes yet: join it whole, no courses picked.
+	r = h.do("POST", "/groups", cr, map[string]string{"department": "CSE", "batch": "70", "semester": "Fall 2026"})
+	require.Equal(t, http.StatusCreated, r.Status, r.Raw)
+	var empty groupJSON
+	r.into(t, &empty)
+	early := h.signIn("early@test.ac.bd").Tokens.AccessToken
+	assert.Equal(t, http.StatusOK, h.do("POST", "/groups/"+empty.ID+"/join-courses", early,
+		map[string]any{"courses": []string{}}).Status)
+
 	// Not-verified students without a university can't search.
 	gmail, _ := h.gmailSignIn("nouni@gmail.com")
 	assert.Equal(t, "UNIVERSITY_REQUIRED", h.do("GET", "/groups/search?q=cse", gmail, nil).code())

@@ -297,9 +297,6 @@ func (s *Service) JoinCourses(ctx context.Context, id uuid.UUID, courses []strin
 			picked[k] = true
 		}
 	}
-	if len(picked) == 0 {
-		return nil, apperr.Validation(map[string]string{"courses": "pick at least one course"})
-	}
 	err := s.d.InTx(ctx, func(ctx context.Context) error {
 		q := store.New(s.d.Q(ctx))
 		g, member, err := s.visibleGroup(ctx, q, c, id, code, true) // locked: serialises joins
@@ -313,6 +310,11 @@ func (s *Service) JoinCourses(ctx context.Context, id uuid.UUID, courses []strin
 		all := map[string]bool{}
 		for _, sl := range slots {
 			all[CourseKey(sl.CourseCode)] = true
+		}
+		// No courses picked: fine only while the routine is still empty
+		// (joining the whole section before the CR adds classes).
+		if len(picked) == 0 && len(all) > 0 {
+			return apperr.Validation(map[string]string{"courses": "pick at least one course"})
 		}
 		for k := range picked {
 			if !all[k] {
