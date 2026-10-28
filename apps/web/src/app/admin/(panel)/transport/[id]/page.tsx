@@ -48,6 +48,14 @@ export default async function BusRoutePage({ params }: { params: Promise<{ id: s
               <p className="text-muted-foreground">
                 {university?.name ?? "University"} · updated {formatDateTime(r.updatedAt)}
               </p>
+              {r.driverPhone ? (
+                <p className="mt-2 text-sm">
+                  Driver: {r.driverName ? `${r.driverName}, ` : ""}
+                  <a href={`tel:${r.driverPhone}`} className="font-medium text-primary underline-offset-4 hover:underline">
+                    {r.driverPhone}
+                  </a>
+                </p>
+              ) : null}
               {r.notes ? <p className="mt-2 max-w-prose text-sm whitespace-pre-line">{r.notes}</p> : null}
             </div>
             <div className="flex shrink-0 gap-2">

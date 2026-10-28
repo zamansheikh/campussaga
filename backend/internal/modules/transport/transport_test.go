@@ -73,3 +73,21 @@ func TestKeptLocations(t *testing.T) {
 	})
 	assert.Equal(t, []*LatLng{{Lat: 3, Lng: 4}, {Lat: 5, Lng: 6}, nil, nil, {Lat: 7, Lng: 8}}, got)
 }
+
+func TestCleanPhone(t *testing.T) {
+	for in, want := range map[string]string{
+		"01989155614":       "01989155614",
+		"০১৯৮৯১৫৫৬১৪":       "01989155614",
+		"+880 1989-155614":  "+8801989155614",
+		" (017) 1234.5678 ": "01712345678",
+		"":                  "",
+	} {
+		got, ok := cleanPhone(in)
+		assert.True(t, ok, in)
+		assert.Equal(t, want, got, in)
+	}
+	for _, bad := range []string{"call me", "12345", "+", "0171234567890123456"} {
+		_, ok := cleanPhone(bad)
+		assert.False(t, ok, bad)
+	}
+}

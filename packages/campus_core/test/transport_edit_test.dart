@@ -127,4 +127,12 @@ void main() {
       expect(parseStopList(' ,\n ; '), isEmpty);
     });
   });
+
+  test('cleanPhone', () {
+    expect(cleanPhone('০১৯৮৯ ১৫৫৬১৪'), '01989155614');
+    expect(cleanPhone('+880 1989-155614'), '+8801989155614');
+    expect(cleanPhone(''), '');
+    expect(cleanPhone('call me'), isNull);
+    expect(cleanPhone('123'), isNull);
+  });
 }

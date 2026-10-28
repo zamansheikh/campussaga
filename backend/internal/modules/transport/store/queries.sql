@@ -12,12 +12,13 @@ SELECT count(*) FROM bus_routes WHERE university_id = @university_id;
 SELECT * FROM bus_routes WHERE id = @id;
 
 -- name: CreateRoute :one
-INSERT INTO bus_routes (university_id, name, color, notes, active)
-VALUES (@university_id, @name, @color, @notes, @active)
+INSERT INTO bus_routes (university_id, name, color, notes, active, driver_name, driver_phone)
+VALUES (@university_id, @name, @color, @notes, @active, @driver_name, @driver_phone)
 RETURNING *;
 
 -- name: UpdateRoute :one
-UPDATE bus_routes SET name = @name, color = @color, notes = @notes, active = @active
+UPDATE bus_routes SET name = @name, color = @color, notes = @notes, active = @active,
+    driver_name = @driver_name, driver_phone = @driver_phone
 WHERE id = @id
 RETURNING *;
 

@@ -21,6 +21,8 @@ type BusRoute struct {
 	UpdatedAt    time.Time
 	Path         *string
 	PathKey      string
+	DriverName   string
+	DriverPhone  string
 }
 
 type BusStop struct {

@@ -1,6 +1,7 @@
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:flutter/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../auth/presentation/auth_error_text.dart';
 import '../../classes/presentation/class_format.dart';
@@ -75,3 +76,7 @@ const busColors = [
   '#CA8A04',
   '#16A34A',
 ];
+
+/// Opens the phone's dialer with [phone] (the student presses call).
+Future<void> callPhone(String phone) =>
+    launchUrl(Uri(scheme: 'tel', path: phone));

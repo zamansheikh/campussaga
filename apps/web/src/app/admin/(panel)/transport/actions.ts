@@ -12,6 +12,13 @@ const routeSchema = z.object({
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Pick a colour."),
   notes: z.string().trim().max(500, "Keep the notes under 500 characters."),
   active: z.boolean(),
+  driverName: z.string().trim().max(60, "Keep the driver's name under 60 characters."),
+  // Bangla digits, spaces and dashes are fine; the API stores digits only.
+  driverPhone: z
+    .string()
+    .trim()
+    .max(30)
+    .refine((v) => v === "" || /^\+?[0-9০-৯][0-9০-৯ ().-]{4,24}$/.test(v), "Use a phone number like 01712345678."),
 });
 
 export type RouteInput = z.input<typeof routeSchema>;

@@ -508,6 +508,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get busFindingYou => 'Finding you…';
 
   @override
+  String get busDriver => 'Driver';
+
+  @override
+  String get busDriverName => 'Driver\'s name (optional)';
+
+  @override
+  String get busDriverPhone => 'Driver\'s phone (optional)';
+
+  @override
+  String get busDriverPhoneHint => 'e.g. 01712345678';
+
+  @override
+  String get busCallDriver => 'Call driver';
+
+  @override
+  String busCallName(String name) {
+    return 'Call $name';
+  }
+
+  @override
+  String get busPhoneInvalid => 'Use a phone number like 01712345678.';
+
+  @override
   String get teacherReviewsTitle => 'Teacher evaluations';
 
   @override

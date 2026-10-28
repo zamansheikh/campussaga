@@ -503,6 +503,29 @@ class AppLocalizationsBn extends AppLocalizations {
   String get busFindingYou => 'তোমাকে খোঁজা হচ্ছে…';
 
   @override
+  String get busDriver => 'চালক';
+
+  @override
+  String get busDriverName => 'চালকের নাম (ঐচ্ছিক)';
+
+  @override
+  String get busDriverPhone => 'চালকের ফোন (ঐচ্ছিক)';
+
+  @override
+  String get busDriverPhoneHint => 'যেমন: 01712345678';
+
+  @override
+  String get busCallDriver => 'চালককে কল করো';
+
+  @override
+  String busCallName(String name) {
+    return '$name-কে কল করো';
+  }
+
+  @override
+  String get busPhoneInvalid => '01712345678-এর মতো ফোন নম্বর দাও।';
+
+  @override
   String get teacherReviewsTitle => 'শিক্ষক মূল্যায়ন';
 
   @override

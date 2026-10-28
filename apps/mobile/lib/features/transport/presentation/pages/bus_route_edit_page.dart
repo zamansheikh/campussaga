@@ -27,6 +27,9 @@ class _BusRouteEditPageState extends State<BusRouteEditPage> {
       : _cubit.state.route(widget.routeId!);
   late final _name = TextEditingController(text: _route?.name ?? '');
   late final _notes = TextEditingController(text: _route?.notes ?? '');
+  late final _driver = TextEditingController(text: _route?.driverName ?? '');
+  late final _phone = TextEditingController(text: _route?.driverPhone ?? '');
+  String? _phoneError;
   late String _color = _route?.color ?? busColors.first;
   late bool _active = _route?.active ?? true;
   bool _saving = false;
@@ -36,20 +39,21 @@ class _BusRouteEditPageState extends State<BusRouteEditPage> {
   void dispose() {
     _name.dispose();
     _notes.dispose();
+    _driver.dispose();
+    _phone.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context);
     final name = _name.text.trim();
-    if (name.isEmpty) {
-      setState(() => _nameError = l10n.busNameRequired);
-      return;
-    }
+    final phone = cleanPhone(_phone.text);
     setState(() {
-      _saving = true;
-      _nameError = null;
+      _nameError = name.isEmpty ? l10n.busNameRequired : null;
+      _phoneError = phone == null ? l10n.busPhoneInvalid : null;
     });
+    if (name.isEmpty || phone == null) return;
+    setState(() => _saving = true);
     final messenger = ScaffoldMessenger.of(context);
     try {
       final r = await _cubit.saveRoute(
@@ -58,6 +62,8 @@ class _BusRouteEditPageState extends State<BusRouteEditPage> {
         color: _color,
         notes: _notes.text.trim(),
         active: _active,
+        driverName: _driver.text.trim(),
+        driverPhone: phone,
       );
       if (!mounted) return;
       messenger.showSnackBar(SnackBar(content: Text(l10n.busSaved)));
@@ -146,6 +152,31 @@ class _BusRouteEditPageState extends State<BusRouteEditPage> {
             decoration: InputDecoration(
               labelText: l10n.busNotes,
               hintText: l10n.busNotesHint,
+            ),
+          ),
+          const SizedBox(height: CsSpace.sm),
+          Text(l10n.busDriver, style: context.text.labelLarge),
+          const SizedBox(height: CsSpace.sm),
+          TextField(
+            controller: _driver,
+            maxLength: 60,
+            textCapitalization: TextCapitalization.words,
+            decoration: InputDecoration(
+              labelText: l10n.busDriverName,
+              counterText: '',
+            ),
+          ),
+          const SizedBox(height: CsSpace.md),
+          TextField(
+            controller: _phone,
+            keyboardType: TextInputType.phone,
+            maxLength: 20,
+            decoration: InputDecoration(
+              labelText: l10n.busDriverPhone,
+              hintText: l10n.busDriverPhoneHint,
+              errorText: _phoneError,
+              prefixIcon: const Icon(CsIcons.call),
+              counterText: '',
             ),
           ),
           SwitchListTile(

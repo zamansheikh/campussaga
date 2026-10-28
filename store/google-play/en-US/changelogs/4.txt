@@ -1,3 +1,5 @@
-• Bus routes on the map: see the whole route, tap a stop for its next bus and directions
-• A clearer route page: when a stop has no time listed, it says when the bus leaves
-• For transport reps: paste a notice's stops at once, minutes from the stop before, same times on the way back, several departures at once, and undo
+• Bus routes on the map, along the roads, with stop names
+• Where am I: see yourself on the route and your nearest stop
+• Call the bus driver from the route page
+• Clearer times: when a stop has no time, it says when the bus leaves
+• For transport reps: paste a notice's stops, place stops on the map, and add several times at once

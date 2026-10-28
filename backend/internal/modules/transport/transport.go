@@ -86,8 +86,12 @@ type Route struct {
 	Color        string    `json:"color"`
 	Notes        string    `json:"notes"`
 	Active       bool      `json:"active"`
-	Stops        []Stop    `json:"stops"`
-	Trips        []Trip    `json:"trips"`
+	// The driver students can call ("" when not given); phone is digits
+	// with an optional leading +.
+	DriverName  string `json:"driverName"`
+	DriverPhone string `json:"driverPhone"`
+	Stops       []Stop `json:"stops"`
+	Trips       []Trip `json:"trips"`
 	// Path is the road path through the placed stops, an encoded polyline
 	// (precision 5); null: draw straight lines.
 	Path      *string   `json:"path"`
@@ -143,7 +147,8 @@ func routesView(ctx context.Context, q *store.Queries, rows []store.BusRoute) ([
 		ids[i], at[r.ID] = r.ID, i
 		out = append(out, Route{
 			ID: r.ID, UniversityID: r.UniversityID, Name: r.Name, Color: r.Color, Notes: r.Notes,
-			Active: r.Active, Stops: []Stop{}, Trips: []Trip{}, Path: r.Path, UpdatedAt: r.UpdatedAt,
+			Active: r.Active, DriverName: r.DriverName, DriverPhone: r.DriverPhone,
+			Stops: []Stop{}, Trips: []Trip{}, Path: r.Path, UpdatedAt: r.UpdatedAt,
 		})
 	}
 	stops, err := q.StopsForRoutes(ctx, ids)
@@ -296,6 +301,9 @@ type RouteInput struct {
 	Color  string `json:"color" validate:"omitempty,max=7"`
 	Notes  string `json:"notes" validate:"max=500"`
 	Active *bool  `json:"active"`
+	// Left out (apps from before the call button): an update keeps them.
+	DriverName  *string `json:"driverName" validate:"omitempty,max=60"`
+	DriverPhone *string `json:"driverPhone" validate:"omitempty,max=30"`
 }
 
 var colorRe = regexp.MustCompile(`^#[0-9A-F]{6}$`)
@@ -312,7 +320,49 @@ func (in *RouteInput) clean() error {
 	if !colorRe.MatchString(in.Color) {
 		return apperr.Validation(map[string]string{"color": "must be a color like #0F766E"})
 	}
+	if in.DriverName != nil {
+		n := strings.Join(strings.Fields(*in.DriverName), " ")
+		in.DriverName = &n
+	}
+	if in.DriverPhone != nil {
+		p, ok := cleanPhone(*in.DriverPhone)
+		if !ok {
+			return apperr.Validation(map[string]string{"driverPhone": "must be a phone number like 01712345678"})
+		}
+		in.DriverPhone = &p
+	}
 	return nil
+}
+
+var phoneRe = regexp.MustCompile(`^\+?[0-9]{6,15}$`)
+
+// cleanPhone: Bangla digits to ASCII, spaces, dashes, dots and brackets
+// dropped. "" is fine (no phone).
+func cleanPhone(s string) (string, bool) {
+	var b strings.Builder
+	for _, r := range strings.TrimSpace(s) {
+		switch {
+		case r >= '০' && r <= '৯':
+			b.WriteRune('0' + (r - '০'))
+		case r == ' ' || r == '-' || r == '.' || r == '(' || r == ')':
+		default:
+			b.WriteRune(r)
+		}
+	}
+	p := b.String()
+	return p, p == "" || phoneRe.MatchString(p)
+}
+
+// driver: the input's driver fields, or [keepName]/[keepPhone] when left out.
+func (in *RouteInput) driver(keepName, keepPhone string) (string, string) {
+	name, phone := keepName, keepPhone
+	if in.DriverName != nil {
+		name = *in.DriverName
+	}
+	if in.DriverPhone != nil {
+		phone = *in.DriverPhone
+	}
+	return name, phone
 }
 
 func (in *RouteInput) active() bool { return in.Active == nil || *in.Active }
@@ -338,7 +388,11 @@ func (s *Service) create(ctx context.Context, uni uuid.UUID, in *RouteInput) (*R
 		if n >= MaxRoutes {
 			return ErrRouteLimit
 		}
-		r, err := q.CreateRoute(ctx, store.CreateRouteParams{UniversityID: uni, Name: in.Name, Color: in.Color, Notes: in.Notes, Active: in.active()})
+		dn, dp := in.driver("", "")
+		r, err := q.CreateRoute(ctx, store.CreateRouteParams{
+			UniversityID: uni, Name: in.Name, Color: in.Color, Notes: in.Notes, Active: in.active(),
+			DriverName: dn, DriverPhone: dp,
+		})
 		if err != nil {
 			return err
 		}
@@ -384,7 +438,11 @@ func (s *Service) handleUpdate(ctx context.Context, in *updateRouteReq) (*Route,
 		if err != nil {
 			return err
 		}
-		r, err = q.UpdateRoute(ctx, store.UpdateRouteParams{ID: r.ID, Name: in.Name, Color: in.Color, Notes: in.Notes, Active: in.active()})
+		dn, dp := in.driver(r.DriverName, r.DriverPhone)
+		r, err = q.UpdateRoute(ctx, store.UpdateRouteParams{
+			ID: r.ID, Name: in.Name, Color: in.Color, Notes: in.Notes, Active: in.active(),
+			DriverName: dn, DriverPhone: dp,
+		})
 		if err != nil {
 			return err
 		}

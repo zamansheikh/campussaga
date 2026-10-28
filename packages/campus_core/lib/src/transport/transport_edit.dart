@@ -198,3 +198,20 @@ abstract final class BusDays {
   static const friSat = {5, 6};
   static const everyDay = {1, 2, 3, 4, 5, 6, 7};
 }
+
+final _phone = RegExp(r'^\+?[0-9]{6,15}$');
+
+/// A phone number as the server stores it: Bangla digits as ASCII, spaces,
+/// dashes, dots and brackets dropped. Null when it isn't one; '' for none.
+String? cleanPhone(String s) {
+  final b = StringBuffer();
+  for (final r in s.trim().runes) {
+    if (r >= 0x09E6 && r <= 0x09EF) {
+      b.writeCharCode(0x30 + r - 0x09E6);
+    } else if (!' -.()'.runes.contains(r)) {
+      b.writeCharCode(r);
+    }
+  }
+  final p = b.toString();
+  return p.isEmpty || _phone.hasMatch(p) ? p : null;
+}

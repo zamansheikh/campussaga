@@ -24,6 +24,7 @@ abstract final class CsIcons {
   static const IconData bus = PhosphorIconsRegular.bus;
   static const IconData calendar = PhosphorIconsRegular.calendarDots;
   static const IconData camera = PhosphorIconsRegular.camera;
+  static const IconData call = PhosphorIconsRegular.phoneCall;
   static const IconData campus = PhosphorIconsRegular.chatsCircle;
   static const IconData campusFill = PhosphorIconsFill.chatsCircle;
   static const IconData cancelClass = PhosphorIconsRegular.calendarX;

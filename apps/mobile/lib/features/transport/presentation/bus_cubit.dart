@@ -119,6 +119,8 @@ class BusCubit extends Cubit<BusState> {
     required String color,
     String notes = '',
     bool active = true,
+    String driverName = '',
+    String driverPhone = '',
   }) async {
     final r = id == null
         ? await _repo.createRoute(
@@ -126,6 +128,8 @@ class BusCubit extends Cubit<BusState> {
             color: color,
             notes: notes,
             active: active,
+            driverName: driverName,
+            driverPhone: driverPhone,
           )
         : await _repo.updateRoute(
             id,
@@ -133,6 +137,8 @@ class BusCubit extends Cubit<BusState> {
             color: color,
             notes: notes,
             active: active,
+            driverName: driverName,
+            driverPhone: driverPhone,
           );
     _replace(r);
     return r;

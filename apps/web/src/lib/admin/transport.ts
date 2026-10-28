@@ -33,6 +33,8 @@ export type BusRoute = {
   color: string;
   notes: string;
   active: boolean;
+  driverName: string;
+  driverPhone: string;
   stops: BusStop[];
   trips: BusTrip[];
   updatedAt: string;

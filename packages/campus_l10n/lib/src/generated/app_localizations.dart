@@ -920,6 +920,48 @@ abstract class AppLocalizations {
   /// **'Finding you…'**
   String get busFindingYou;
 
+  /// No description provided for @busDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get busDriver;
+
+  /// No description provided for @busDriverName.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver\'s name (optional)'**
+  String get busDriverName;
+
+  /// No description provided for @busDriverPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver\'s phone (optional)'**
+  String get busDriverPhone;
+
+  /// No description provided for @busDriverPhoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 01712345678'**
+  String get busDriverPhoneHint;
+
+  /// No description provided for @busCallDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Call driver'**
+  String get busCallDriver;
+
+  /// No description provided for @busCallName.
+  ///
+  /// In en, this message translates to:
+  /// **'Call {name}'**
+  String busCallName(String name);
+
+  /// No description provided for @busPhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a phone number like 01712345678.'**
+  String get busPhoneInvalid;
+
   /// No description provided for @teacherReviewsTitle.
   ///
   /// In en, this message translates to:

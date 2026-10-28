@@ -134,7 +134,19 @@ class _BusRouteMapPageState extends State<BusRouteMapPage> {
             ? null
             : nearestStop(r, me.latitude, me.longitude);
         return Scaffold(
-          appBar: AppBar(title: Text(r.name)),
+          appBar: AppBar(
+            title: Text(r.name),
+            actions: [
+              if (r.driverPhone.isNotEmpty)
+                IconButton(
+                  tooltip: r.driverName.isEmpty
+                      ? l10n.busCallDriver
+                      : l10n.busCallName(r.driverName),
+                  onPressed: () => callPhone(r.driverPhone),
+                  icon: const Icon(CsIcons.call),
+                ),
+            ],
+          ),
           body: Stack(
             children: [
               FlutterMap(

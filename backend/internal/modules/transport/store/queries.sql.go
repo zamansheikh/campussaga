@@ -25,9 +25,9 @@ func (q *Queries) CountRoutes(ctx context.Context, universityID uuid.UUID) (int6
 }
 
 const createRoute = `-- name: CreateRoute :one
-INSERT INTO bus_routes (university_id, name, color, notes, active)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, university_id, name, color, notes, active, created_at, updated_at, path, path_key
+INSERT INTO bus_routes (university_id, name, color, notes, active, driver_name, driver_phone)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+RETURNING id, university_id, name, color, notes, active, created_at, updated_at, path, path_key, driver_name, driver_phone
 `
 
 type CreateRouteParams struct {
@@ -36,6 +36,8 @@ type CreateRouteParams struct {
 	Color        string
 	Notes        string
 	Active       bool
+	DriverName   string
+	DriverPhone  string
 }
 
 func (q *Queries) CreateRoute(ctx context.Context, arg CreateRouteParams) (BusRoute, error) {
@@ -45,6 +47,8 @@ func (q *Queries) CreateRoute(ctx context.Context, arg CreateRouteParams) (BusRo
 		arg.Color,
 		arg.Notes,
 		arg.Active,
+		arg.DriverName,
+		arg.DriverPhone,
 	)
 	var i BusRoute
 	err := row.Scan(
@@ -58,6 +62,8 @@ func (q *Queries) CreateRoute(ctx context.Context, arg CreateRouteParams) (BusRo
 		&i.UpdatedAt,
 		&i.Path,
 		&i.PathKey,
+		&i.DriverName,
+		&i.DriverPhone,
 	)
 	return i, err
 }
@@ -105,7 +111,7 @@ func (q *Queries) DeleteTrips(ctx context.Context, routeID uuid.UUID) error {
 }
 
 const getRoute = `-- name: GetRoute :one
-SELECT id, university_id, name, color, notes, active, created_at, updated_at, path, path_key FROM bus_routes WHERE id = $1
+SELECT id, university_id, name, color, notes, active, created_at, updated_at, path, path_key, driver_name, driver_phone FROM bus_routes WHERE id = $1
 `
 
 func (q *Queries) GetRoute(ctx context.Context, id uuid.UUID) (BusRoute, error) {
@@ -122,6 +128,8 @@ func (q *Queries) GetRoute(ctx context.Context, id uuid.UUID) (BusRoute, error) 
 		&i.UpdatedAt,
 		&i.Path,
 		&i.PathKey,
+		&i.DriverName,
+		&i.DriverPhone,
 	)
 	return i, err
 }
@@ -254,7 +262,7 @@ func (q *Queries) ListReps(ctx context.Context, universityID *uuid.UUID) ([]List
 
 const listRoutes = `-- name: ListRoutes :many
 
-SELECT id, university_id, name, color, notes, active, created_at, updated_at, path, path_key FROM bus_routes
+SELECT id, university_id, name, color, notes, active, created_at, updated_at, path, path_key, driver_name, driver_phone FROM bus_routes
 WHERE university_id = $1 AND (active OR $2::bool)
 ORDER BY name, id
 `
@@ -285,6 +293,8 @@ func (q *Queries) ListRoutes(ctx context.Context, arg ListRoutesParams) ([]BusRo
 			&i.UpdatedAt,
 			&i.Path,
 			&i.PathKey,
+			&i.DriverName,
+			&i.DriverPhone,
 		); err != nil {
 			return nil, err
 		}
@@ -442,17 +452,20 @@ func (q *Queries) UniversityExists(ctx context.Context, id uuid.UUID) (bool, err
 }
 
 const updateRoute = `-- name: UpdateRoute :one
-UPDATE bus_routes SET name = $1, color = $2, notes = $3, active = $4
-WHERE id = $5
-RETURNING id, university_id, name, color, notes, active, created_at, updated_at, path, path_key
+UPDATE bus_routes SET name = $1, color = $2, notes = $3, active = $4,
+    driver_name = $5, driver_phone = $6
+WHERE id = $7
+RETURNING id, university_id, name, color, notes, active, created_at, updated_at, path, path_key, driver_name, driver_phone
 `
 
 type UpdateRouteParams struct {
-	Name   string
-	Color  string
-	Notes  string
-	Active bool
-	ID     uuid.UUID
+	Name        string
+	Color       string
+	Notes       string
+	Active      bool
+	DriverName  string
+	DriverPhone string
+	ID          uuid.UUID
 }
 
 func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) (BusRoute, error) {
@@ -461,6 +474,8 @@ func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) (BusRo
 		arg.Color,
 		arg.Notes,
 		arg.Active,
+		arg.DriverName,
+		arg.DriverPhone,
 		arg.ID,
 	)
 	var i BusRoute
@@ -475,6 +490,8 @@ func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) (BusRo
 		&i.UpdatedAt,
 		&i.Path,
 		&i.PathKey,
+		&i.DriverName,
+		&i.DriverPhone,
 	)
 	return i, err
 }

@@ -136,6 +136,8 @@ class BusRoute {
     this.color = '#0F766E',
     this.notes = '',
     this.active = true,
+    this.driverName = '',
+    this.driverPhone = '',
     this.stops = const [],
     this.trips = const [],
     this.path,
@@ -147,6 +149,8 @@ class BusRoute {
     color: j['color'] as String? ?? '#0F766E',
     notes: j['notes'] as String? ?? '',
     active: j['active'] as bool? ?? true,
+    driverName: j['driverName'] as String? ?? '',
+    driverPhone: j['driverPhone'] as String? ?? '',
     stops: [
       for (final s in (j['stops'] as List? ?? const []))
         BusStop.fromJson((s as Map).cast()),
@@ -163,6 +167,10 @@ class BusRoute {
   final String color;
   final String notes;
   final bool active;
+
+  /// The driver students can call ('' when not given).
+  final String driverName;
+  final String driverPhone;
   final List<BusStop> stops;
   final List<BusTrip> trips;
 
@@ -189,6 +197,8 @@ class BusRoute {
     'color': color,
     'notes': notes,
     'active': active,
+    'driverName': driverName,
+    'driverPhone': driverPhone,
     'stops': [for (final s in stops) s.toJson()],
     'trips': [for (final t in trips) t.toJson()],
     'path': path,
@@ -362,6 +372,8 @@ abstract interface class TransportRepository {
     required String color,
     String notes = '',
     bool active = true,
+    String driverName = '',
+    String driverPhone = '',
   });
   Future<BusRoute> updateRoute(
     String id, {
@@ -369,6 +381,8 @@ abstract interface class TransportRepository {
     required String color,
     String notes = '',
     bool active = true,
+    String driverName = '',
+    String driverPhone = '',
   });
   Future<void> deleteRoute(String id);
   Future<BusRoute> setStops(String id, List<BusStop> stops);

@@ -21,7 +21,16 @@ class ApiTransportRepository implements TransportRepository {
     String color,
     String notes,
     bool active,
-  ) => {'name': name, 'color': color, 'notes': notes, 'active': active};
+    String driverName,
+    String driverPhone,
+  ) => {
+    'name': name,
+    'color': color,
+    'notes': notes,
+    'active': active,
+    'driverName': driverName,
+    'driverPhone': driverPhone,
+  };
 
   @override
   Future<BusRoute> createRoute({
@@ -29,8 +38,13 @@ class ApiTransportRepository implements TransportRepository {
     required String color,
     String notes = '',
     bool active = true,
+    String driverName = '',
+    String driverPhone = '',
   }) async => _route(
-    await _api.post('/transport/routes', _fields(name, color, notes, active)),
+    await _api.post(
+      '/transport/routes',
+      _fields(name, color, notes, active, driverName, driverPhone),
+    ),
   );
 
   @override
@@ -40,10 +54,12 @@ class ApiTransportRepository implements TransportRepository {
     required String color,
     String notes = '',
     bool active = true,
+    String driverName = '',
+    String driverPhone = '',
   }) async => _route(
     await _api.put(
       '/transport/routes/$id',
-      _fields(name, color, notes, active),
+      _fields(name, color, notes, active, driverName, driverPhone),
     ),
   );
 

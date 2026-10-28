@@ -43,6 +43,8 @@ class FakeTransportRepository implements TransportRepository {
     String color = '#0F766E',
     String notes = '',
     bool active = true,
+    String driverName = '',
+    String driverPhone = '',
   }) async => _put(
     BusRoute(
       id: 'r${++_ids}',
@@ -50,6 +52,8 @@ class FakeTransportRepository implements TransportRepository {
       color: color,
       notes: notes,
       active: active,
+      driverName: driverName,
+      driverPhone: driverPhone,
     ),
   );
 
@@ -60,6 +64,8 @@ class FakeTransportRepository implements TransportRepository {
     String color = '#0F766E',
     String notes = '',
     bool active = true,
+    String driverName = '',
+    String driverPhone = '',
   }) async {
     final r = _get(id);
     return _put(
@@ -69,6 +75,8 @@ class FakeTransportRepository implements TransportRepository {
         color: color,
         notes: notes,
         active: active,
+        driverName: driverName,
+        driverPhone: driverPhone,
         stops: r.stops,
         trips: r.trips,
       ),
@@ -89,6 +97,8 @@ class FakeTransportRepository implements TransportRepository {
         color: r.color,
         notes: r.notes,
         active: r.active,
+        driverName: r.driverName,
+        driverPhone: r.driverPhone,
         stops: [
           for (final s in stops)
             BusStop(
@@ -116,6 +126,8 @@ class FakeTransportRepository implements TransportRepository {
         color: r.color,
         notes: r.notes,
         active: r.active,
+        driverName: r.driverName,
+        driverPhone: r.driverPhone,
         stops: r.stops,
         trips: [
           for (final t in trips)
@@ -417,5 +429,41 @@ void main() {
     await tester.tap(find.text('From campus'));
     await tester.pumpAndSettle();
     expect(find.text('No buses from campus on this route.'), findsOneWidget);
+  });
+
+  testWidgets('a rep adds the driver; students see a call button', (
+    tester,
+  ) async {
+    usePhoneScreen(tester);
+    final (repo, _) = await _setUp(canEdit: true);
+    await _openBus(tester);
+    await tester.tap(find.text('Mirpur'));
+    await tester.pumpAndSettle();
+    expect(find.text('Call driver'), findsNothing);
+
+    await tester.tap(find.byTooltip('Show menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit route'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextField, "Driver's name (optional)"),
+      'Parvez',
+    );
+    final phone = find.widgetWithText(TextField, "Driver's phone (optional)");
+    await tester.enterText(phone, 'call me');
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.pumpAndSettle();
+    expect(find.text('Use a phone number like 01712345678.'), findsOneWidget);
+    await tester.enterText(phone, '০১৯৮৯ ১৫৫৬১৪');
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.pumpAndSettle();
+
+    final r = repo.list.single;
+    expect(r.driverName, 'Parvez');
+    expect(r.driverPhone, '01989155614');
+    expect(r.stops, isNotEmpty, reason: 'editing the route keeps its stops');
+    expect(find.text('Parvez'), findsOneWidget);
+    expect(find.text('Driver · 01989155614'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Call driver'), findsOneWidget);
   });
 }

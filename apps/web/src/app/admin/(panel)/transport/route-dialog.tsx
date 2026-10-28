@@ -35,6 +35,8 @@ export function RouteDialog({ universityId, route }: { universityId?: string; ro
   const [color, setColor] = useState(route?.color ?? defaultRouteColor);
   const [notes, setNotes] = useState(route?.notes ?? "");
   const [active, setActive] = useState(route?.active ?? true);
+  const [driverName, setDriverName] = useState(route?.driverName ?? "");
+  const [driverPhone, setDriverPhone] = useState(route?.driverPhone ?? "");
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
 
@@ -43,13 +45,15 @@ export function RouteDialog({ universityId, route }: { universityId?: string; ro
     setColor(route?.color ?? defaultRouteColor);
     setNotes(route?.notes ?? "");
     setActive(route?.active ?? true);
+    setDriverName(route?.driverName ?? "");
+    setDriverPhone(route?.driverPhone ?? "");
     setError(undefined);
   }
 
   function submit() {
     setError(undefined);
     startTransition(async () => {
-      const input = { name, color, notes, active };
+      const input = { name, color, notes, active, driverName, driverPhone };
       const res = route ? await updateRoute(route.id, input) : await createRoute(universityId ?? "", input);
       if (!res.ok) {
         setError(res.error);
@@ -139,6 +143,31 @@ export function RouteDialog({ universityId, route }: { universityId?: string; ro
               rows={3}
               placeholder="e.g. Show your student ID card. No bus on government holidays."
             />
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="route-driver">Driver&apos;s name (optional)</Label>
+              <Input
+                id="route-driver"
+                value={driverName}
+                onChange={(e) => setDriverName(e.target.value)}
+                maxLength={60}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="route-phone">Driver&apos;s phone (optional)</Label>
+              <Input
+                id="route-phone"
+                type="tel"
+                inputMode="tel"
+                value={driverPhone}
+                onChange={(e) => setDriverPhone(e.target.value)}
+                maxLength={30}
+                placeholder="01712345678"
+              />
+              <p className="text-xs text-muted-foreground">Students get a &quot;Call driver&quot; button.</p>
+            </div>
           </div>
 
           <div className="flex items-start justify-between gap-4 rounded-lg border p-3">

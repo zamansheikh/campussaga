@@ -229,3 +229,34 @@ func TestBusRoutePath(t *testing.T) {
 	roads.fail = false
 	assert.NotNil(t, put(two))
 }
+
+func TestBusRouteDriver(t *testing.T) {
+	h := newHarness(t)
+	admin := h.makeAdmin("admin@test.ac.bd")
+	var route struct {
+		ID          string `json:"id"`
+		DriverName  string `json:"driverName"`
+		DriverPhone string `json:"driverPhone"`
+	}
+	r := h.do("POST", "/admin/transport/routes", admin, map[string]any{
+		"universityId": h.universityID("test-uni"), "name": "PMSCS 1",
+		"driverName": " Parvez ", "driverPhone": "০১৯৮৯ ১৫৫৬১৪",
+	})
+	require.Equal(t, http.StatusCreated, r.Status, r.Raw)
+	r.into(t, &route)
+	assert.Equal(t, "Parvez", route.DriverName)
+	assert.Equal(t, "01989155614", route.DriverPhone)
+	base := "/transport/routes/" + route.ID
+
+	// An app from before the call button sends no driver fields: kept.
+	r = h.do("PUT", base, admin, map[string]any{"name": "PMSCS 1", "notes": "x"})
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	r.into(t, &route)
+	assert.Equal(t, "01989155614", route.DriverPhone)
+
+	// Cleared on purpose; a bad number is refused.
+	r = h.do("PUT", base, admin, map[string]any{"name": "PMSCS 1", "driverName": "", "driverPhone": ""})
+	r.into(t, &route)
+	assert.Equal(t, "", route.DriverPhone)
+	assert.Equal(t, "VALIDATION_FAILED", h.do("PUT", base, admin, map[string]any{"name": "PMSCS 1", "driverPhone": "call me"}).code())
+}

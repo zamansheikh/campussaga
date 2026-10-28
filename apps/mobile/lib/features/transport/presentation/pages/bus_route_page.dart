@@ -222,6 +222,10 @@ class _BusRoutePageState extends State<BusRoutePage> {
                   ),
                   const SizedBox(height: CsSpace.md),
                 ],
+                if (r.driverPhone.isNotEmpty) ...[
+                  _DriverCard(route: r),
+                  const SizedBox(height: CsSpace.md),
+                ],
                 SegmentedButton<BusDirection>(
                   segments: [
                     ButtonSegment(
@@ -692,6 +696,64 @@ class _SetupCard extends StatelessWidget {
               l10n.busSetupTimes,
               route.trips.isNotEmpty,
               hasStops ? onTimes : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The route's driver with a call button (opens the dialer).
+class _DriverCard extends StatelessWidget {
+  const _DriverCard({required this.route});
+
+  final BusRoute route;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cs = context.cs;
+    final name = route.driverName;
+    return Material(
+      color: cs.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(CsRadius.lg),
+        side: BorderSide(color: cs.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(CsSpace.md, 10, 10, 10),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: Color(route.argb).withValues(alpha: 0.15),
+              child: Icon(CsIcons.bus, color: Color(route.argb)),
+            ),
+            const SizedBox(width: CsSpace.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name.isEmpty ? l10n.busDriver : name,
+                    style: context.text.titleSmall,
+                  ),
+                  Text(
+                    name.isEmpty
+                        ? route.driverPhone
+                        : '${l10n.busDriver} · ${route.driverPhone}',
+                    style: context.text.bodySmall?.copyWith(
+                      color: cs.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            FilledButton.icon(
+              onPressed: () => callPhone(route.driverPhone),
+              icon: const Icon(CsIcons.call, size: 18),
+              label: Text(l10n.busCallDriver),
             ),
           ],
         ),
