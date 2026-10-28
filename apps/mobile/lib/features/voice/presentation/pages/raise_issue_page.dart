@@ -116,37 +116,68 @@ class _CategoryStep extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final cubit = context.read<RaiseIssueCubit>();
     final selected = context.select((RaiseIssueCubit c) => c.state.category);
-    return ListView(
-      padding: const EdgeInsets.all(CsSpace.md),
+    // Tapping picks (and shows the pick); Next continues, so a slip of the
+    // finger never jumps ahead with the wrong category.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l10n.voiceStepCategory, style: context.text.titleLarge),
-        const SizedBox(height: CsSpace.md),
-        GridView.count(
-          crossAxisCount: 3,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: CsSpace.sm,
-          crossAxisSpacing: CsSpace.sm,
-          childAspectRatio: 0.95,
-          children: [
-            for (final c in IssueCategory.values)
-              _CategoryTile(
-                category: c,
-                selected: selected == c,
-                onTap: () => cubit.pickCategory(c),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(CsSpace.md),
+            children: [
+              Text(l10n.voiceStepCategory, style: context.text.titleLarge),
+              const SizedBox(height: CsSpace.md),
+              GridView.count(
+                crossAxisCount: 3,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: CsSpace.sm,
+                crossAxisSpacing: CsSpace.sm,
+                childAspectRatio: 0.95,
+                children: [
+                  for (final c in IssueCategory.values)
+                    _CategoryTile(
+                      category: c,
+                      selected: selected == c,
+                      onTap: () => cubit.pickCategory(c),
+                    ),
+                ],
               ),
-          ],
+              const SizedBox(height: CsSpace.md),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.lock_outline,
+                    size: 18,
+                    color: context.cs.textSecondary,
+                  ),
+                  const SizedBox(width: CsSpace.sm),
+                  Expanded(
+                    child: Text(
+                      l10n.voiceSafetyNote,
+                      style: context.text.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: CsSpace.md),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.lock_outline, size: 18, color: context.cs.textSecondary),
-            const SizedBox(width: CsSpace.sm),
-            Expanded(
-              child: Text(l10n.voiceSafetyNote, style: context.text.bodySmall),
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              CsSpace.md,
+              CsSpace.sm,
+              CsSpace.md,
+              CsSpace.md,
             ),
-          ],
+            child: FilledButton(
+              onPressed: selected == null ? null : cubit.toDetails,
+              child: Text(l10n.voiceNext),
+            ),
+          ),
         ),
       ],
     );
@@ -181,7 +212,22 @@ class _CategoryTile extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CsCategoryIcon(category: category.wire),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  CsCategoryIcon(category: category.wire),
+                  if (selected)
+                    PositionedDirectional(
+                      top: -6,
+                      end: -10,
+                      child: Icon(
+                        Icons.check_circle_rounded,
+                        size: 20,
+                        color: cs.primary,
+                      ),
+                    ),
+                ],
+              ),
               const SizedBox(height: CsSpace.sm),
               Text(
                 categoryLabel(AppLocalizations.of(context), category),

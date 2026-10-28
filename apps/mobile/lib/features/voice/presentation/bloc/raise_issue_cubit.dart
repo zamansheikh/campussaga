@@ -156,9 +156,15 @@ class RaiseIssueCubit extends Cubit<RaiseState> {
     ),
   );
 
+  /// Selects a category (the student continues with [toDetails]).
   void pickCategory(IssueCategory c) {
-    emit(state.copyWith(category: c, step: 1));
+    emit(state.copyWith(category: c));
     _save();
+  }
+
+  /// Step 1 → 2, once a category is picked.
+  void toDetails() {
+    if (state.category != null) emit(state.copyWith(step: 1));
   }
 
   void setTitle(String v) {

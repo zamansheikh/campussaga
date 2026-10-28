@@ -140,8 +140,24 @@ void main() {
     await tester.tap(find.text('Raise issue'));
     await tester.pumpAndSettle();
     expect(find.text('Step 1 of 3'), findsOneWidget);
+    expect(
+      tester
+          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Next'))
+          .onPressed,
+      isNull,
+      reason: 'nothing picked yet',
+    );
     await tester.tap(find.text('Hostel'));
     await tester.pumpAndSettle();
+    expect(
+      find.text('Step 1 of 3'),
+      findsOneWidget,
+      reason: 'picking is not moving on',
+    );
+    expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Step 2 of 3'), findsOneWidget);
 
     // Too short: say how much to write.
     await tester.enterText(find.widgetWithText(TextField, 'Title'), 'Water');
