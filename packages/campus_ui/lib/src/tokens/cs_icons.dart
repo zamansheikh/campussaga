@@ -12,8 +12,10 @@ abstract final class CsIcons {
   static const IconData alarm = PhosphorIconsRegular.alarm;
   static const IconData anonymous = PhosphorIconsRegular.detective;
   static const IconData anonymousFill = PhosphorIconsFill.detective;
+  static const IconData arrowDown = PhosphorIconsRegular.arrowDown;
   static const IconData arrowLeft = PhosphorIconsRegular.arrowLeft;
   static const IconData arrowRight = PhosphorIconsRegular.arrowRight;
+  static const IconData arrowUp = PhosphorIconsRegular.arrowUp;
   static const IconData assignment = PhosphorIconsRegular.fileText;
   static const IconData battery = PhosphorIconsRegular.batteryWarning;
   static const IconData bell = PhosphorIconsRegular.bell;
@@ -25,6 +27,7 @@ abstract final class CsIcons {
   static const IconData campus = PhosphorIconsRegular.chatsCircle;
   static const IconData campusFill = PhosphorIconsFill.chatsCircle;
   static const IconData cancelClass = PhosphorIconsRegular.calendarX;
+  static const IconData cgpa = PhosphorIconsRegular.calculator;
   static const IconData changeDay = PhosphorIconsRegular.calendarPlus;
   static const IconData changeStatus = PhosphorIconsRegular.arrowsClockwise;
   static const IconData checkCircle = PhosphorIconsFill.checkCircle;
@@ -69,6 +72,7 @@ abstract final class CsIcons {
   static const IconData lab = PhosphorIconsRegular.flask;
   static const IconData language = PhosphorIconsRegular.translate;
   static const IconData light = PhosphorIconsRegular.sun;
+  static const IconData listAdd = PhosphorIconsRegular.listPlus;
   static const IconData lock = PhosphorIconsRegular.lock;
   static const IconData maintenance = PhosphorIconsRegular.wrench;
 
@@ -101,6 +105,7 @@ abstract final class CsIcons {
   static const IconData routineNote = PhosphorIconsRegular.calendarDots;
   static const IconData rules = PhosphorIconsRegular.gavel;
   static const IconData safety = PhosphorIconsRegular.shieldWarning;
+  static const IconData scale = PhosphorIconsRegular.slidersHorizontal;
   static const IconData search = PhosphorIconsRegular.magnifyingGlass;
   static const IconData searchEmpty = PhosphorIconsRegular.magnifyingGlassMinus;
   static const IconData send = PhosphorIconsRegular.paperPlaneRight;
@@ -110,6 +115,7 @@ abstract final class CsIcons {
   static const IconData star = PhosphorIconsFill.star;
   static const IconData swap = PhosphorIconsRegular.arrowsLeftRight;
   static const IconData sync = PhosphorIconsRegular.arrowsClockwise;
+  static const IconData target = PhosphorIconsRegular.target;
   static const IconData teacherReviews = PhosphorIconsRegular.chalkboardTeacher;
   static const IconData test = PhosphorIconsRegular.exam;
   static const IconData theme = PhosphorIconsRegular.palette;

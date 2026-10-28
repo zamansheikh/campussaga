@@ -80,6 +80,231 @@ class AppLocalizationsBn extends AppLocalizations {
   String get comingSoonNote => 'আমরা এটা বানাচ্ছি। সামনের কোনো আপডেটে আসবে।';
 
   @override
+  String get cgpaTitle => 'সিজিপিএ ক্যালকুলেটর';
+
+  @override
+  String get cgpaHint => 'জিপিএ, সিজিপিএ আর লক্ষ্য';
+
+  @override
+  String get cgpaLabel => 'সিজিপিএ';
+
+  @override
+  String cgpaGpa(String gpa) {
+    return 'জিপিএ $gpa';
+  }
+
+  @override
+  String cgpaCredits(String credits) {
+    return '$credits ক্রেডিট';
+  }
+
+  @override
+  String get cgpaCreditsEarned => 'অর্জিত ক্রেডিট';
+
+  @override
+  String get cgpaLastSemester => 'গত সেমিস্টার';
+
+  @override
+  String get cgpaScaleUgc => 'ইউজিসি স্কেল';
+
+  @override
+  String get cgpaScaleCustom => 'নিজস্ব স্কেল';
+
+  @override
+  String get cgpaNoGrades => 'এখনো গ্রেড নেই';
+
+  @override
+  String cgpaCoursesCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countStringটি কোর্স';
+  }
+
+  @override
+  String get cgpaSemesters => 'সেমিস্টার';
+
+  @override
+  String get cgpaAddSemester => 'সেমিস্টার যোগ করো';
+
+  @override
+  String get cgpaSemesterName => 'সেমিস্টারের নাম';
+
+  @override
+  String get cgpaSemesterHint => 'যেমন: Spring 2026';
+
+  @override
+  String get cgpaRename => 'নাম বদলাও';
+
+  @override
+  String get cgpaMoveUp => 'উপরে নাও';
+
+  @override
+  String get cgpaMoveDown => 'নিচে নাও';
+
+  @override
+  String get cgpaDeleteSemesterTitle => 'এই সেমিস্টার আর এর কোর্সগুলো মুছবে?';
+
+  @override
+  String get cgpaEmptyTitle => 'তোমার সিজিপিএ হিসাব রাখো';
+
+  @override
+  String get cgpaEmptyBody => 'সেমিস্টার আর গ্রেড যোগ করো। সব এই ফোনেই থাকে।';
+
+  @override
+  String get cgpaAddCourse => 'কোর্স যোগ করো';
+
+  @override
+  String get cgpaEditCourse => 'কোর্স এডিট করো';
+
+  @override
+  String get cgpaCourseCode => 'কোর্স কোড';
+
+  @override
+  String get cgpaCourseTitle => 'কোর্সের নাম (ঐচ্ছিক)';
+
+  @override
+  String get cgpaCreditsLabel => 'ক্রেডিট';
+
+  @override
+  String get cgpaCreditsInvalid => 'ক্রেডিট ০.৫ থেকে ৬ এর মধ্যে হতে হবে।';
+
+  @override
+  String get cgpaCodeRequired => 'কোর্স কোড বা নাম লেখো।';
+
+  @override
+  String get cgpaGradeLetter => 'লেটার গ্রেড';
+
+  @override
+  String get cgpaGradeMarks => 'নম্বর';
+
+  @override
+  String get cgpaNotGraded => 'এখনো গ্রেড হয়নি';
+
+  @override
+  String get cgpaMarksLabel => '১০০-র মধ্যে নম্বর';
+
+  @override
+  String cgpaMarksGives(String letter, String points) {
+    return 'গ্রেড: $letter ($points)';
+  }
+
+  @override
+  String get cgpaMarksInvalid => 'নম্বর ০ থেকে ১০০ হতে হবে।';
+
+  @override
+  String get cgpaNotCounted => 'গোনা হয়নি: রিটেক';
+
+  @override
+  String get cgpaFromRoutine => 'রুটিনের কোর্সগুলো যোগ করো';
+
+  @override
+  String get cgpaFromRoutineHint =>
+      'তোমার এখনকার কোর্সগুলো, গ্রেড দেওয়ার জন্য তৈরি।';
+
+  @override
+  String get cgpaTarget => 'লক্ষ্য ঠিক করো';
+
+  @override
+  String get cgpaTargetCgpa => 'লক্ষ্য সিজিপিএ';
+
+  @override
+  String get cgpaNextCredits => 'আর কত ক্রেডিট বাকি';
+
+  @override
+  String cgpaTargetNeeds(String gpa) {
+    return 'ওই ক্রেডিটগুলোতে তোমার জিপিএ $gpa লাগবে।';
+  }
+
+  @override
+  String get cgpaTargetReached =>
+      'তুমি ইতিমধ্যে সেখানে আছো। পাস করতে থাকলেই থাকবে।';
+
+  @override
+  String cgpaTargetOut(String gpa) {
+    return 'সম্ভব নয়: জিপিএ $gpa লাগবে। আরও ক্রেডিট বা কম লক্ষ্য দিয়ে দেখো।';
+  }
+
+  @override
+  String get cgpaTargetInvalid => 'লক্ষ্য সিজিপিএ আর বাকি ক্রেডিট লেখো।';
+
+  @override
+  String get cgpaGradingScale => 'গ্রেডিং স্কেল';
+
+  @override
+  String get cgpaUseUgc => 'ইউজিসি অভিন্ন স্কেল (৪.০০)';
+
+  @override
+  String get cgpaUseUgcHint =>
+      'বাংলাদেশের বেশিরভাগ বিশ্ববিদ্যালয় এটা ব্যবহার করে।';
+
+  @override
+  String get cgpaUseCustom => 'আমার বিশ্ববিদ্যালয়ের নিজস্ব স্কেল';
+
+  @override
+  String get cgpaUseCustomHint => 'নিজের গ্রেড, পয়েন্ট আর নম্বরের সীমা দাও।';
+
+  @override
+  String get cgpaGradeShort => 'গ্রেড';
+
+  @override
+  String get cgpaPoints => 'পয়েন্ট';
+
+  @override
+  String get cgpaMinMarks => 'যত নম্বর থেকে';
+
+  @override
+  String get cgpaAddGrade => 'গ্রেড যোগ করো';
+
+  @override
+  String get cgpaRetakeRule => 'রিটেক করা কোর্স';
+
+  @override
+  String get cgpaRetakeBest => 'সেরা চেষ্টা গোনা হবে';
+
+  @override
+  String get cgpaRetakeBestHint =>
+      'সাধারণ নিয়ম: ভালো গ্রেড আগেরটার জায়গা নেয়।';
+
+  @override
+  String get cgpaRetakeLatest => 'শেষ চেষ্টা গোনা হবে';
+
+  @override
+  String get cgpaRetakeAll => 'সব চেষ্টা গোনা হবে';
+
+  @override
+  String get cgpaRetakeHint => 'কোর্স কোড দিয়ে চেষ্টাগুলো মেলানো হয়।';
+
+  @override
+  String get cgpaProblemEmpty => 'অন্তত একটি গ্রেড যোগ করো।';
+
+  @override
+  String get cgpaProblemLetter => 'প্রতিটি গ্রেডের আলাদা নাম লাগবে।';
+
+  @override
+  String get cgpaProblemPoints => 'পয়েন্ট ০ থেকে ৫ হতে হবে।';
+
+  @override
+  String get cgpaProblemMarks =>
+      'প্রতিটি গ্রেডের শুরুর নম্বর আলাদা হতে হবে, ০ থেকে ১০০।';
+
+  @override
+  String get cgpaProblemZero => 'একটি গ্রেড ০ নম্বর থেকে শুরু হতে হবে।';
+
+  @override
+  String get cgpaProblemOrder => 'বেশি নম্বরে কম পয়েন্ট হতে পারে না।';
+
+  @override
+  String get cgpaClearAll => 'সব মুছে ফেলো';
+
+  @override
+  String get cgpaClearTitle => 'এই ফোনের সব সেমিস্টার আর গ্রেড মুছবে?';
+
+  @override
+  String get cgpaSave => 'সেভ করো';
+
+  @override
   String get todayEmptyTitle => 'এখনো কোনো ক্লাস নেই';
 
   @override

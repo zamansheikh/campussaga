@@ -82,6 +82,237 @@ class AppLocalizationsEn extends AppLocalizations {
       'We\'re building this. It will arrive in a future update.';
 
   @override
+  String get cgpaTitle => 'CGPA calculator';
+
+  @override
+  String get cgpaHint => 'GPA, CGPA and targets';
+
+  @override
+  String get cgpaLabel => 'CGPA';
+
+  @override
+  String cgpaGpa(String gpa) {
+    return 'GPA $gpa';
+  }
+
+  @override
+  String cgpaCredits(String credits) {
+    return '$credits credits';
+  }
+
+  @override
+  String get cgpaCreditsEarned => 'Credits earned';
+
+  @override
+  String get cgpaLastSemester => 'Last semester';
+
+  @override
+  String get cgpaScaleUgc => 'UGC scale';
+
+  @override
+  String get cgpaScaleCustom => 'Custom scale';
+
+  @override
+  String get cgpaNoGrades => 'No grades yet';
+
+  @override
+  String cgpaCoursesCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString courses',
+      one: '1 course',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cgpaSemesters => 'Semesters';
+
+  @override
+  String get cgpaAddSemester => 'Add semester';
+
+  @override
+  String get cgpaSemesterName => 'Semester name';
+
+  @override
+  String get cgpaSemesterHint => 'e.g. Spring 2026';
+
+  @override
+  String get cgpaRename => 'Rename';
+
+  @override
+  String get cgpaMoveUp => 'Move up';
+
+  @override
+  String get cgpaMoveDown => 'Move down';
+
+  @override
+  String get cgpaDeleteSemesterTitle => 'Delete this semester and its courses?';
+
+  @override
+  String get cgpaEmptyTitle => 'Track your CGPA';
+
+  @override
+  String get cgpaEmptyBody =>
+      'Add your semesters and grades. Everything stays on this phone.';
+
+  @override
+  String get cgpaAddCourse => 'Add course';
+
+  @override
+  String get cgpaEditCourse => 'Edit course';
+
+  @override
+  String get cgpaCourseCode => 'Course code';
+
+  @override
+  String get cgpaCourseTitle => 'Course title (optional)';
+
+  @override
+  String get cgpaCreditsLabel => 'Credits';
+
+  @override
+  String get cgpaCreditsInvalid => 'Credits must be between 0.5 and 6.';
+
+  @override
+  String get cgpaCodeRequired => 'Enter a course code or title.';
+
+  @override
+  String get cgpaGradeLetter => 'Letter grade';
+
+  @override
+  String get cgpaGradeMarks => 'Marks';
+
+  @override
+  String get cgpaNotGraded => 'Not graded yet';
+
+  @override
+  String get cgpaMarksLabel => 'Marks out of 100';
+
+  @override
+  String cgpaMarksGives(String letter, String points) {
+    return 'Grade: $letter ($points)';
+  }
+
+  @override
+  String get cgpaMarksInvalid => 'Marks must be 0 to 100.';
+
+  @override
+  String get cgpaNotCounted => 'Not counted: retaken';
+
+  @override
+  String get cgpaFromRoutine => 'Add my routine\'s courses';
+
+  @override
+  String get cgpaFromRoutineHint => 'Your current courses, ready to grade.';
+
+  @override
+  String get cgpaTarget => 'Plan a target';
+
+  @override
+  String get cgpaTargetCgpa => 'Target CGPA';
+
+  @override
+  String get cgpaNextCredits => 'Credits left to take';
+
+  @override
+  String cgpaTargetNeeds(String gpa) {
+    return 'You need a GPA of $gpa in those credits.';
+  }
+
+  @override
+  String get cgpaTargetReached =>
+      'You\'re already there. Keep passing to stay above it.';
+
+  @override
+  String cgpaTargetOut(String gpa) {
+    return 'Not reachable: it would need a GPA of $gpa. Try more credits or a lower target.';
+  }
+
+  @override
+  String get cgpaTargetInvalid => 'Enter a target CGPA and the credits left.';
+
+  @override
+  String get cgpaGradingScale => 'Grading scale';
+
+  @override
+  String get cgpaUseUgc => 'UGC uniform scale (4.00)';
+
+  @override
+  String get cgpaUseUgcHint => 'Most Bangladeshi universities use it.';
+
+  @override
+  String get cgpaUseCustom => 'My university\'s own scale';
+
+  @override
+  String get cgpaUseCustomHint =>
+      'Set your own grades, points and mark ranges.';
+
+  @override
+  String get cgpaGradeShort => 'Grade';
+
+  @override
+  String get cgpaPoints => 'Points';
+
+  @override
+  String get cgpaMinMarks => 'From marks';
+
+  @override
+  String get cgpaAddGrade => 'Add grade';
+
+  @override
+  String get cgpaRetakeRule => 'Retaken courses';
+
+  @override
+  String get cgpaRetakeBest => 'Best attempt counts';
+
+  @override
+  String get cgpaRetakeBestHint =>
+      'The usual rule: a better grade replaces the earlier one.';
+
+  @override
+  String get cgpaRetakeLatest => 'Latest attempt counts';
+
+  @override
+  String get cgpaRetakeAll => 'Every attempt counts';
+
+  @override
+  String get cgpaRetakeHint => 'Attempts are matched by course code.';
+
+  @override
+  String get cgpaProblemEmpty => 'Add at least one grade.';
+
+  @override
+  String get cgpaProblemLetter => 'Every grade needs its own name.';
+
+  @override
+  String get cgpaProblemPoints => 'Points must be 0 to 5.';
+
+  @override
+  String get cgpaProblemMarks =>
+      'Each grade needs its own starting mark, 0 to 100.';
+
+  @override
+  String get cgpaProblemZero => 'One grade must start at 0 marks.';
+
+  @override
+  String get cgpaProblemOrder => 'More marks can\'t give fewer points.';
+
+  @override
+  String get cgpaClearAll => 'Clear everything';
+
+  @override
+  String get cgpaClearTitle => 'Delete all semesters and grades on this phone?';
+
+  @override
+  String get cgpaSave => 'Save';
+
+  @override
   String get todayEmptyTitle => 'No classes yet';
 
   @override
