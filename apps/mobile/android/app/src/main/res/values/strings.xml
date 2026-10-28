@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">Next class</string>
+    <string name="widget_description">Your next class and your next test, at a glance.</string>
+    <string name="widget_next_class">Next class</string>
+    <string name="widget_next_test">Next test</string>
+    <string name="widget_open_app">Open Campus Saga to see your classes</string>
+</resources>

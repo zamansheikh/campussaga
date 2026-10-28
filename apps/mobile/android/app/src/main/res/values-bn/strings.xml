@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">পরের ক্লাস</string>
+    <string name="widget_description">তোমার পরের ক্লাস আর পরের পরীক্ষা, এক নজরে।</string>
+    <string name="widget_next_class">পরের ক্লাস</string>
+    <string name="widget_next_test">পরের পরীক্ষা</string>
+    <string name="widget_open_app">ক্লাস দেখতে ক্যাম্পাস সাগা খোলো</string>
+</resources>
