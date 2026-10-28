@@ -47,6 +47,12 @@ func newHarness(t *testing.T) *harness {
 // newHarnessWith lets a test change the app's options (e.g. a fake photo check).
 func newHarnessWith(t *testing.T, tune func(*Options)) *harness {
 	t.Helper()
+	return newHarnessFull(t, tune, nil)
+}
+
+// newHarnessFull also lets a test change the process config.
+func newHarnessFull(t *testing.T, tune func(*Options), tuneCfg func(*config.Config)) *harness {
+	t.Helper()
 	d := testkit.NewDB(t)
 	h := &harness{t: t, mail: &mail.Memory{}, google: firebasetest.New("campus-test"), push: &push.MemorySender{}, now: time.Date(2026, 10, 27, 9, 0, 0, 0, time.UTC)}
 	cfg := &config.Config{
@@ -57,6 +63,9 @@ func newHarnessWith(t *testing.T, tune func(*Options)) *harness {
 		CodeTTL: 10 * time.Minute, CodeResendAfter: 60 * time.Second,
 		CodeMaxPerHour: 5, CodeMaxAttempts: 5, ShutdownTimeout: time.Second,
 		VoiceHMACSecret: []byte("test-voice-secret-test-voice-secret"),
+	}
+	if tuneCfg != nil {
+		tuneCfg(cfg)
 	}
 	h.media, _ = media.NewDisk(t.TempDir())
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))

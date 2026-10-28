@@ -17,7 +17,7 @@ import (
 func (s *Service) SetUniversity(ctx context.Context, universityID uuid.UUID, leaveVerified bool) (*Me, error) {
 	c := auth.MustUser(ctx)
 	uni, err := s.unis.Get(ctx, universityID)
-	if db.IsNoRows(err) || (err == nil && uni == nil) {
+	if db.IsNoRows(err) || (err == nil && (uni == nil || uni.IsDemo)) {
 		return nil, ErrUniversityNotFound
 	}
 	if err != nil {
@@ -55,7 +55,7 @@ func (s *Service) RequestVerifyCode(ctx context.Context, rawEmail string) (*Code
 	if err != nil {
 		return nil, err
 	}
-	if uni == nil {
+	if uni == nil || uni.IsDemo {
 		return nil, ErrUniversityEmailRequired
 	}
 	used, err := store.New(s.d.Q(ctx)).EmailInUse(ctx, store.EmailInUseParams{Email: email, ID: c.UserID})
@@ -65,7 +65,7 @@ func (s *Service) RequestVerifyCode(ctx context.Context, rawEmail string) (*Code
 	if used {
 		return nil, ErrEmailInUse
 	}
-	if err := s.sendCode(ctx, email, uni); err != nil {
+	if err := s.sendCode(ctx, email, uni, false); err != nil {
 		return nil, err
 	}
 	return &CodeSent{
@@ -86,6 +86,9 @@ func (s *Service) VerifyUniversityEmail(ctx context.Context, rawEmail, code stri
 	}
 	if err := s.notCurrentEmail(ctx, c, email); err != nil {
 		return nil, err
+	}
+	if s.isReview(email) {
+		return nil, ErrCodeExpired // the review code only signs in, never verifies
 	}
 	now := s.now()
 	var (

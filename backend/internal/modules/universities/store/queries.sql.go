@@ -12,7 +12,7 @@ import (
 )
 
 const getUniversity = `-- name: GetUniversity :one
-SELECT u.id, u.slug, u.name, u.name_bn, u.city,
+SELECT u.id, u.slug, u.name, u.name_bn, u.city, u.is_demo,
        coalesce((SELECT array_agg(d.domain ORDER BY d.domain) FROM university_domains d WHERE d.university_id = u.id), '{}')::text[] AS domains
 FROM universities u WHERE u.id = $1
 `
@@ -23,6 +23,7 @@ type GetUniversityRow struct {
 	Name    string
 	NameBn  *string
 	City    *string
+	IsDemo  bool
 	Domains []string
 }
 
@@ -35,6 +36,7 @@ func (q *Queries) GetUniversity(ctx context.Context, id uuid.UUID) (GetUniversit
 		&i.Name,
 		&i.NameBn,
 		&i.City,
+		&i.IsDemo,
 		&i.Domains,
 	)
 	return i, err
@@ -45,7 +47,7 @@ SELECT u.id, u.slug, u.name, u.name_bn, u.city, u.timezone, u.week_start,
        coalesce(array_agg(d.domain ORDER BY d.domain) FILTER (WHERE d.domain IS NOT NULL), '{}')::text[] AS domains
 FROM universities u
 LEFT JOIN university_domains d ON d.university_id = u.id
-WHERE u.is_active
+WHERE u.is_active AND NOT u.is_demo
 GROUP BY u.id
 ORDER BY u.name
 `
@@ -61,6 +63,7 @@ type ListActiveRow struct {
 	Domains   []string
 }
 
+// Demo universities (app-store reviewers) are never listed.
 func (q *Queries) ListActive(ctx context.Context) ([]ListActiveRow, error) {
 	rows, err := q.db.Query(ctx, listActive)
 	if err != nil {
@@ -91,7 +94,7 @@ func (q *Queries) ListActive(ctx context.Context) ([]ListActiveRow, error) {
 }
 
 const matchDomain = `-- name: MatchDomain :one
-SELECT u.id, u.slug, u.name, u.name_bn
+SELECT u.id, u.slug, u.name, u.name_bn, u.is_demo
 FROM university_domains d
 JOIN universities u ON u.id = d.university_id
 WHERE d.domain = ANY($1::text[]) AND u.is_active
@@ -104,6 +107,7 @@ type MatchDomainRow struct {
 	Slug   string
 	Name   string
 	NameBn *string
+	IsDemo bool
 }
 
 // The longest matching domain wins (cse.du.ac.bd before du.ac.bd).
@@ -116,6 +120,7 @@ func (q *Queries) MatchDomain(ctx context.Context, candidates []string) (MatchDo
 		&i.Slug,
 		&i.Name,
 		&i.NameBn,
+		&i.IsDemo,
 	)
 	return i, err
 }

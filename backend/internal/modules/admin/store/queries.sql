@@ -20,8 +20,8 @@ SELECT (SELECT count(*) FROM class_groups)::int AS groups,
        (SELECT count(*) FROM announcements)::int AS announcements,
        (SELECT count(*) FROM device_tokens WHERE platform = 'android')::int AS android,
        (SELECT count(*) FROM device_tokens WHERE platform = 'ios')::int AS ios,
-       (SELECT count(*) FROM universities WHERE is_active)::int AS universities_active,
-       (SELECT count(*) FROM universities)::int AS universities_total;
+       (SELECT count(*) FROM universities WHERE is_active AND NOT is_demo)::int AS universities_active,
+       (SELECT count(*) FROM universities WHERE NOT is_demo)::int AS universities_total;
 
 -- Sign-ups per Bangladesh day from first_day to last_day, zero days included.
 -- name: SignupsByDay :many
@@ -35,6 +35,7 @@ ORDER BY d;
 SELECT un.id, un.name, count(u.id)::int AS users
 FROM universities un
 JOIN users u ON u.university_id = un.id
+WHERE NOT un.is_demo
 GROUP BY un.id
 ORDER BY users DESC, un.name
 LIMIT 10;
