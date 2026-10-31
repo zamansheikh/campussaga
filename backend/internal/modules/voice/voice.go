@@ -100,6 +100,9 @@ func (v viewer) modOf(uni uuid.UUID) bool {
 // begin loads the caller and checks the feature flag (staff always pass).
 func (s *Service) begin(ctx context.Context, q *store.Queries) (viewer, error) {
 	c := auth.MustUser(ctx)
+	if uni, ok := campusScope(ctx); ok { // a campus admin: a moderator of that university only
+		return viewer{id: c.UserID, uni: uni, role: RoleModerator, verified: true, staffUni: &uni}, nil
+	}
 	v := viewer{id: c.UserID, uni: c.UniversityID, role: c.Role, verified: c.Verified}
 	if v.role == RoleAuthority || v.role == RoleModerator {
 		st, err := q.Staff(ctx, c.UserID)

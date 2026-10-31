@@ -202,6 +202,30 @@ func (s *Service) handleSetDomains(ctx context.Context, in *domainsReq) (*Univer
 	return s.university(ctx, id)
 }
 
+// AddDomain adds one email domain to a university (an approved domain
+// request): the same checks as setting the domains by hand.
+func (s *Service) AddDomain(ctx context.Context, universityID uuid.UUID, domain string) error {
+	domains, bad := normalizeDomains([]string{domain})
+	if bad != "" {
+		return apperr.Validation(map[string]string{"domain": bad})
+	}
+	if len(domains) == 0 {
+		return apperr.Validation(map[string]string{"domain": "is required"})
+	}
+	return s.d.InTx(ctx, func(ctx context.Context) error {
+		q := store.New(s.d.Q(ctx))
+		if _, err := q.GetUniversity(ctx, universityID); db.IsNoRows(err) {
+			return ErrUniversityNotFound
+		} else if err != nil {
+			return err
+		}
+		if err := insertDomains(ctx, q, universityID, domains); err != nil {
+			return err
+		}
+		return s.audit(ctx, q, "university.domains", "university", universityID.String(), map[string]any{"added": domains})
+	})
+}
+
 func (s *Service) university(ctx context.Context, id uuid.UUID) (*University, error) {
 	r, err := store.New(s.d.Q(ctx)).GetUniversity(ctx, id)
 	if db.IsNoRows(err) {

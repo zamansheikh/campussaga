@@ -32,6 +32,9 @@ type Me struct {
 	// /users/{id}/photo?v=…); else GooglePhotoURL, else initials.
 	PhotoVersion   *string `json:"photoVersion"`
 	GooglePhotoURL *string `json:"googlePhotoUrl"`
+	// CampusAdmin: appointed by the team for the student's own university
+	// (docs/CAMPUS_ADMINS.md); they stay a student.
+	CampusAdmin bool `json:"campusAdmin"`
 }
 
 func (s *Service) meView(ctx context.Context, u store.User) (*Me, error) {
@@ -42,8 +45,13 @@ func (s *Service) meView(ctx context.Context, u store.User) (*Me, error) {
 			return nil, err
 		}
 	}
+	campusAdmin, err := store.New(s.d.Q(ctx)).IsCampusAdmin(ctx, u.ID)
+	if err != nil {
+		return nil, err
+	}
 	return &Me{
-		ID: u.ID, Email: u.Email, University: uni,
+		CampusAdmin: campusAdmin,
+		ID:          u.ID, Email: u.Email, University: uni,
 		DisplayName: u.DisplayName, Department: u.Department, Batch: u.Batch,
 		Role: string(u.Role), Verified: u.VerifiedAt != nil, UniversityEmail: u.UniversityEmail,
 		VerifiedAt: u.VerifiedAt, CreatedAt: u.CreatedAt,

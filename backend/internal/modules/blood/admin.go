@@ -148,7 +148,44 @@ type adminCloseReq struct {
 // handleAdminClose closes an open request and writes the audit row in the
 // same transaction.
 func (s *Service) handleAdminClose(ctx context.Context, in *adminCloseReq) (*AdminRequest, error) {
-	id := uuid.MustParse(in.ID)
+	return s.closeRequest(ctx, uuid.MustParse(in.ID), in.Reason, nil, "blood.close")
+}
+
+// CampusOpen lists a university's open requests (a campus admin's view).
+func (s *Service) CampusOpen(ctx context.Context, uni uuid.UUID) ([]AdminRequest, error) {
+	rows, err := store.New(s.d.Q(ctx)).AdminListRequests(ctx, store.AdminListRequestsParams{
+		Status: "open", UniversityID: &uni, QLike: like(""), Lim: 100,
+	})
+	if err != nil {
+		return nil, err
+	}
+	out := make([]AdminRequest, 0, len(rows))
+	for _, x := range rows {
+		out = append(out, adminView(x.BloodRequest, x.UniversityName, x.RequesterName, nil, x.ResponseCount))
+	}
+	return out, nil
+}
+
+// noEmail: a campus admin never sees a student's email.
+func noEmail(r AdminRequest) AdminRequest {
+	if r.Requester != nil {
+		r.Requester.Email = ""
+	}
+	return r
+}
+
+// CampusClose closes one of the university's open requests (audit
+// campus.blood_close); another university's request is not found.
+func (s *Service) CampusClose(ctx context.Context, uni, id uuid.UUID, reason string) (*AdminRequest, error) {
+	r, err := s.closeRequest(ctx, id, reason, &uni, "campus.blood_close")
+	if err != nil {
+		return nil, err
+	}
+	v := noEmail(*r)
+	return &v, nil
+}
+
+func (s *Service) closeRequest(ctx context.Context, id uuid.UUID, reason string, scope *uuid.UUID, action string) (*AdminRequest, error) {
 	actor := auth.MustUser(ctx).UserID
 	var out *AdminRequest
 	err := s.d.InTx(ctx, func(ctx context.Context) error {
@@ -160,16 +197,19 @@ func (s *Service) handleAdminClose(ctx context.Context, in *adminCloseReq) (*Adm
 		if err != nil {
 			return err
 		}
+		if scope != nil && r.UniversityID != *scope {
+			return ErrRequestNotFound
+		}
 		if r.Status != "open" {
 			return ErrNotOpen
 		}
 		if err := q.CloseRequest(ctx, store.CloseRequestParams{ID: id, Status: "closed", ClosedAt: ptr(s.now())}); err != nil {
 			return err
 		}
-		meta, _ := json.Marshal(map[string]string{"reason": in.Reason})
+		meta, _ := json.Marshal(map[string]string{"reason": reason})
 		target := id.String()
 		if err := q.InsertAudit(ctx, store.InsertAuditParams{
-			ActorID: &actor, Action: "blood.close", TargetType: ptr("blood_request"), TargetID: &target, Meta: meta,
+			ActorID: &actor, Action: action, TargetType: ptr("blood_request"), TargetID: &target, Meta: meta,
 		}); err != nil {
 			return err
 		}

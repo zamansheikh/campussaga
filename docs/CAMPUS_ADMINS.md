@@ -184,3 +184,36 @@ Every write is audited (actions `campus.*` and `admin.campus_admin.*`).
 - **Privacy policy:** a short "Verification by classmates and CRs" section.
   Who vouched for or confirmed a student is kept and shown to that
   university's campus admins.
+
+## 6. As implemented (backend notes)
+- Extra columns: `vouches.void_at` (set when the verification the vouches gave
+  is taken away; they stop counting but still count for the voucher's quota
+  and the 90-day block rule). History rows for `email` and `admin` come from
+  database triggers on `users`, which also keep `verified_via` in step with
+  `verified_at` (so the email code, Google sign-in and the admin's hand switch
+  need no change).
+- Claims: `Verified` is not stored in the token; the session check reads it
+  from the database on every request, so a vouch- or CR-verified student is
+  verified on their very next request and on every refreshed token.
+- Extra errors: `ADMIN_VERIFIED` (409) when a campus admin tries to remove a
+  verification the team gave by hand; `NOT_VERIFIED` (409) for unverify of an
+  unverified student or a CR candidate who is not verified; `LAST_CR`,
+  `CR_LIMIT_REACHED`, `CR_NOT_FOUND`, `MEMBER_NOT_FOUND`, `GROUP_NOT_FOUND`,
+  `REP_NOT_FOUND`, `USER_NOT_FOUND`.
+- Arrays: `GET /campus-admin/sections`, `/campus-admin/reports`,
+  `/campus-admin/blood` and `/admin/campus-admins` return a bare array in
+  `data`. `/campus-admin/bus-reps` returns `{items}` like the admin one, with
+  `email` always `""`. Blood items have `requester.email` `""`.
+- `POST /campus-admin/reports/{kind}/{id}` and `DELETE .../bus-reps/{user}`
+  return 204. `PUT/DELETE .../sections/{id}/cr` return the section list.
+- Reports list skips private (safety) issues; those stay with authorities and
+  moderators. Hide/restore/dismiss run the Campus Voice moderation code with a
+  moderator viewer scoped to the university (audit `moderation.*` plus
+  `campus.report_*`).
+- The automatic block counts only unverifications done through
+  `/campus-admin/students/{id}/unverify`.
+- `GET /admin/domain-requests` defaults to `status=open` (`all` for every one).
+- `POST /universities/domain-requests` returns `202 {"received": true}`; the
+  same email with an open request is not stored twice.
+- Health thresholds: `no_campus_admin` when 0 campus admins and >= 5 students;
+  `low_verified` when >= 10 students and under 40% verified.

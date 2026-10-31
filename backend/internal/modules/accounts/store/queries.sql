@@ -132,3 +132,8 @@ DELETE FROM sessions WHERE expires_at < @before OR revoked_at < @before;
 
 -- name: SetGooglePhoto :exec
 UPDATE users SET google_photo_url = sqlc.narg(url) WHERE id = @id;
+
+-- name: IsCampusAdmin :one
+SELECT EXISTS (
+    SELECT 1 FROM campus_admins c JOIN users u ON u.id = c.user_id
+    WHERE c.user_id = @user_id AND u.university_id = c.university_id AND u.verified_at IS NOT NULL);

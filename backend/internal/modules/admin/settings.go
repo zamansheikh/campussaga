@@ -68,6 +68,12 @@ type Stats struct {
 		TripsShared       int `json:"tripsShared"`
 		RatingsLast30Days int `json:"ratingsLast30Days"`
 	} `json:"bus"`
+	// Feedback: new = not opened yet, open = not done or declined.
+	Feedback struct {
+		New       int `json:"new"`
+		Open      int `json:"open"`
+		Last7Days int `json:"last7Days"`
+	} `json:"feedback"`
 	SignupsByDay    []DayCount      `json:"signupsByDay"`
 	TopUniversities []UniversityUse `json:"topUniversities"`
 }
@@ -138,6 +144,14 @@ func (s *Service) handleStats(ctx context.Context, _ *httpx.Empty) (*Stats, erro
 	}
 	out.Bus.LiveNow, out.Bus.SharesLast7Days = int(bu.LiveNow), int(bu.Shares)
 	out.Bus.TripsShared, out.Bus.RatingsLast30Days = int(bu.TripsShared), int(bu.Ratings)
+
+	if err := s.d.Q(ctx).QueryRow(ctx, `
+		SELECT count(*) FILTER (WHERE status = 'new')::int,
+		       count(*) FILTER (WHERE status IN ('new', 'seen', 'planned', 'in_progress'))::int,
+		       count(*) FILTER (WHERE created_at >= $1)::int
+		FROM feedback`, week).Scan(&out.Feedback.New, &out.Feedback.Open, &out.Feedback.Last7Days); err != nil {
+		return nil, err
+	}
 
 	today := bdToday(now)
 	days, err := q.SignupsByDay(ctx, store.SignupsByDayParams{

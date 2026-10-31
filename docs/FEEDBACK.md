@@ -96,3 +96,18 @@ last7Days}`.
 - **"Needs attention":** a Feedback section with the count, linking to the list.
 - **Dashboard:** a small Feedback card.
 - **Audit log:** labels for `feedback.reply` and `feedback.status`.
+
+## 5. As implemented (backend notes)
+- Image `url` / `thumbUrl` are paths relative to the API prefix
+  (`/feedback/{id}/images/{imageId}` and `?size=thumb`); the panel uses
+  `/admin/feedback/{id}/images/{imageId}`. Both need the bearer token.
+- Screenshots are uploaded with `POST /uploads` (so Campus Voice must be on
+  for students, and the nudity check runs); flagged ones are kept for the
+  team to see.
+- `POST /feedback/{id}/messages` returns 201 `Message`; the admin reply
+  returns 201 with an `author: {id,name}` block. Admin items also carry
+  `locale`. `PATCH /admin/feedback/{id}` returns the admin item.
+- The admin list `?status=` also accepts `all`; the default is `all`.
+- Opening a thread (`GET /feedback/{id}`) clears `unread`; opening or
+  replying in the panel clears `teamUnread` and turns `new` into `seen`.
+- The push body for a status change is `Status: Planned` / `অবস্থা: পরিকল্পনায় আছে`.

@@ -17,7 +17,9 @@ import (
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/admin"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/appconfig"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/blood"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/campusadmin"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/classgroups"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/feedback"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/photos"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/push"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/transport"
@@ -47,6 +49,8 @@ type App struct {
 	Voice        *voice.Service
 	Blood        *blood.Service
 	Transport    *transport.Service
+	CampusAdmin  *campusadmin.Service
+	Feedback     *feedback.Service
 
 	handler http.Handler
 }
@@ -62,6 +66,8 @@ type Options struct {
 	PhotoChecker voice.PhotoChecker
 	// RoadRouter replaces OSRM for bus route paths (tests).
 	RoadRouter transport.RoadRouter
+	// MXLookup replaces the DNS check of domain requests (tests).
+	MXLookup campusadmin.MXLookup
 }
 
 // New assembles the app on an open, migrated database.
@@ -210,7 +216,35 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
 	})
 
-	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc, Blood: bloodSvc, Transport: transportSvc}
+	campusSvc := campusadmin.NewService(d, now, campusadmin.Ports{
+		Reports:        func(ctx context.Context, uni uuid.UUID) (any, error) { return voiceSvc.CampusReports(ctx, uni) },
+		ReportsWaiting: voiceSvc.CampusReportsWaiting,
+		Moderate:       voiceSvc.CampusModerate,
+		BloodOpen:      func(ctx context.Context, uni uuid.UUID) (any, error) { return bloodSvc.CampusOpen(ctx, uni) },
+		BloodClose: func(ctx context.Context, uni, id uuid.UUID, reason string) (any, error) {
+			return bloodSvc.CampusClose(ctx, uni, id, reason)
+		},
+		AddDomain: adminSvc.AddDomain,
+	})
+	campusSvc.SetMXLookup(o.MXLookup)
+	campusSvc.SetNotifier(func(userIDs []uuid.UUID, n campusadmin.Notice) {
+		texts := make(map[string]push.Text, len(n.Texts))
+		for lang, t := range n.Texts {
+			texts[lang] = push.Text{Title: t.Title, Body: t.Body}
+		}
+		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
+	})
+
+	feedbackSvc := feedback.NewService(d, store, now)
+	feedbackSvc.SetNotifier(func(userIDs []uuid.UUID, n feedback.Notice) {
+		texts := make(map[string]push.Text, len(n.Texts))
+		for lang, t := range n.Texts {
+			texts[lang] = push.Text{Title: t.Title, Body: t.Body}
+		}
+		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
+	})
+
+	a := &App{CampusAdmin: campusSvc, Feedback: feedbackSvc, Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc, Blood: bloodSvc, Transport: transportSvc}
 
 	root := chi.NewRouter()
 	root.NotFound(httpx.NotFoundHandler)
@@ -230,6 +264,8 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		transportSvc.Routes(r)
 		bloodSvc.Routes(r)
 		photoSvc.Routes(r)
+		campusSvc.Routes(r)
+		feedbackSvc.Routes(r)
 	})
 
 	var h http.Handler = root

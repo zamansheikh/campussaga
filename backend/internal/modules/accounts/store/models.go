@@ -94,4 +94,6 @@ type User struct {
 	BlockedAt       *time.Time
 	GooglePhotoUrl  *string
 	PhotoKey        *string
+	VerifiedVia     *string
+	VouchCode       *string
 }
