@@ -1,7 +1,7 @@
 name: varsitykotha
 description: "Student app: class routine, reminders and campus voice."
 publish_to: none
-version: 1.0.0+5
+version: 1.0.2+6
 
 environment:
   sdk: ^3.13.0

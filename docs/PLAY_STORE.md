@@ -8,7 +8,7 @@ sign-in still has to be switched on on the server** (section 2).
 
 | What | File | Play requirement |
 |---|---|---|
-| App Bundle | `~/Desktop/varsitykotha-<version>-beta-release.aab` (`apps/mobile/tool/build.sh --server beta --type aab` moves each bundle to the Desktop) | Signed with the upload key, target SDK 36, min SDK 24, version 1.0.0 (3), native libraries 16 KB aligned, native debug symbols included, no advertising ID |
+| App Bundle | `~/Desktop/varsitykotha-<version>-beta-release.aab` (`apps/mobile/tool/build.sh --server beta --type aab` moves each bundle to the Desktop) | Signed with the upload key, target SDK 36, min SDK 24, version 1.0.2 (6) (first upload was 1.0.0 (3)), native libraries 16 KB aligned, native debug symbols included, no advertising ID |
 | App icon | `store/google-play/icon-512.png` | 512 × 512 PNG |
 | Feature graphic | `store/google-play/<locale>/feature-graphic.png` | 1024 × 500 |
 | Phone screenshots | `store/google-play/<locale>/phone-01.png` … `phone-08.png` | 8 × 1080 × 1920 (9:16) |
