@@ -21,14 +21,18 @@ abstract final class CsOptionSheet {
     required String title,
     required List<CsOption<T>> options,
     required T selected,
+    String? message,
   }) {
     return showModalBottomSheet<T>(
       context: context,
       // Cover the bottom navigation bar too.
       useRootNavigator: true,
+      // As tall as the options need, scrolling past most of the screen.
+      isScrollControlled: true,
+      useSafeArea: true,
       builder: (context) {
         return SafeArea(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(
               CsSpace.md,
               0,
@@ -46,7 +50,22 @@ abstract final class CsOptionSheet {
                     CsSpace.xs,
                     CsSpace.sm,
                   ),
-                  child: Text(title, style: context.text.titleMedium),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: context.text.titleMedium),
+                      if (message != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: CsSpace.xxs),
+                          child: Text(
+                            message,
+                            style: context.text.bodySmall?.copyWith(
+                              color: context.cs.textSecondary,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
                 for (final o in options)
                   Padding(

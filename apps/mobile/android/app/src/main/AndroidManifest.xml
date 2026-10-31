@@ -4,9 +4,15 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <!-- Bus route map, "Where am I": asked only when the student taps it,
-         used on the phone only (never sent), while the app is open. -->
+         used on the phone only (never sent), while the app is open.
+         Live buses: while a student shares the bus they're on (started by
+         hand, in the app), points go to the server under an ongoing
+         notification (a location foreground service), also with the
+         screen off. No background location permission. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <application
         android:label="VarsityKotha"
         android:name="${applicationName}"

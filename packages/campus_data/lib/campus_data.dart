@@ -12,5 +12,6 @@ export 'src/classes/api_class_group_repository.dart';
 export 'src/config/api_app_config_repository.dart';
 export 'src/profile/api_profile_repository.dart';
 export 'src/push/api_device_repository.dart';
+export 'src/transport/api_bus_live_repository.dart';
 export 'src/transport/api_transport_repository.dart';
 export 'src/voice/api_voice_repository.dart';

@@ -3620,4 +3620,352 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get visitReadOnlyNote =>
       'You\'re visiting another university: read and react; only its students can comment.';
+
+  @override
+  String get busLive => 'Live';
+
+  @override
+  String busLiveSharing(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString students sharing',
+      one: '1 student sharing',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String busLiveSecondsAgo(int seconds) {
+    final intl.NumberFormat secondsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String secondsString = secondsNumberFormat.format(seconds);
+
+    return '$secondsString s ago';
+  }
+
+  @override
+  String busLiveMinutesAgo(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString min ago';
+  }
+
+  @override
+  String busLiveAt(String stop) {
+    return 'At $stop';
+  }
+
+  @override
+  String busLiveHeading(String stop) {
+    return 'On the way to $stop';
+  }
+
+  @override
+  String busLiveNear(String stop) {
+    return 'Near $stop';
+  }
+
+  @override
+  String get busLiveOnTheWay => 'On the way';
+
+  @override
+  String get busLiveOffRoute => 'Off the usual route';
+
+  @override
+  String busLiveLate(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString min late';
+  }
+
+  @override
+  String busLiveEarly(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString min early';
+  }
+
+  @override
+  String get busLiveOnTime => 'On time';
+
+  @override
+  String busLiveEta(String stop, int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return 'At $stop in ~$minutesString min';
+  }
+
+  @override
+  String busLiveEtaNow(String stop) {
+    return 'Reaching $stop now';
+  }
+
+  @override
+  String busLivePassed(String stop) {
+    return 'It has passed $stop';
+  }
+
+  @override
+  String get busLiveMap => 'Live map';
+
+  @override
+  String busLiveEtaShort(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '~$minutesString min';
+  }
+
+  @override
+  String get busLiveNow => 'now';
+
+  @override
+  String get busLiveBus => 'Live bus';
+
+  @override
+  String get busOffTimetable => 'Not on the timetable';
+
+  @override
+  String busShareAsk(String time) {
+    return 'On the $time bus?';
+  }
+
+  @override
+  String get busShareAskBody =>
+      'Share where it is so students waiting at the stops can see it.';
+
+  @override
+  String get busShareImOn => 'I\'m on this bus';
+
+  @override
+  String get busShareOn => 'Share this bus live';
+
+  @override
+  String get busSharingTitle => 'You\'re sharing this bus live';
+
+  @override
+  String busSharingOthers(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You and $countString other students',
+      one: 'You and 1 other student',
+      zero: 'Only you so far',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get busSharingOffline =>
+      'No internet: your points are kept and sent later';
+
+  @override
+  String get busSharingStarting => 'Starting…';
+
+  @override
+  String get busSharingStop => 'Stop sharing';
+
+  @override
+  String get busShareWhich => 'Which bus are you on?';
+
+  @override
+  String get busShareOther => 'Another bus';
+
+  @override
+  String get busShareWhat =>
+      'Your location is sent while you share, also with the screen off. A notification stays up until it stops.';
+
+  @override
+  String get busShareWho =>
+      'Students on this route see the bus, never who shares it.';
+
+  @override
+  String get busShareEnds =>
+      'It stops by itself at the end of the route or after 3 hours. Points are deleted after a day.';
+
+  @override
+  String get busShareStart => 'Start sharing';
+
+  @override
+  String get busShareNotOnRoute =>
+      'You seem to be away from this route. Start sharing once you\'re on the bus.';
+
+  @override
+  String get busShareNotRunning =>
+      'That bus isn\'t running now. Pick the one you\'re on.';
+
+  @override
+  String get busShareLimit =>
+      'You\'ve shared many trips today. Try again tomorrow.';
+
+  @override
+  String busShareNoticeTitle(String route) {
+    return 'Sharing $route live';
+  }
+
+  @override
+  String get busShareNoticeText =>
+      'Students waiting can see where the bus is. Open the app to stop.';
+
+  @override
+  String get busShareChannel => 'Live bus sharing';
+
+  @override
+  String get busThanksTitle => 'Thanks for sharing!';
+
+  @override
+  String busThanksHelped(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString students watched your bus.',
+      one: '1 student watched your bus.',
+      zero: 'Your bus was on the map for everyone on this route.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String busThanksTrips(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString trips shared so far',
+      one: 'Your first trip shared',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get busEndedArrived =>
+      'The bus reached the end of the route, so sharing stopped.';
+
+  @override
+  String get busEndedOffRoute => 'You left the route, so sharing stopped.';
+
+  @override
+  String get busEndedExpired => 'Sharing stopped after a long while.';
+
+  @override
+  String get busEndedReplaced => 'Sharing moved to another bus.';
+
+  @override
+  String busFeedbackTitle(String time) {
+    return 'How was the $time bus?';
+  }
+
+  @override
+  String get busFeedbackTrip => 'How was the trip?';
+
+  @override
+  String busFeedbackAt(String stop, String time) {
+    return '$stop at $time';
+  }
+
+  @override
+  String get busFeedbackOnTime => 'On time';
+
+  @override
+  String get busFeedbackLate => 'Late';
+
+  @override
+  String get busFeedbackNoShow => 'Didn\'t come';
+
+  @override
+  String get busFeedbackCrowded => 'It was crowded';
+
+  @override
+  String get busFeedbackThanks => 'Thanks! This helps everyone on the route.';
+
+  @override
+  String get busFeedbackNotNow => 'Not now';
+
+  @override
+  String get busNoteOnTime => 'Usually on time';
+
+  @override
+  String get busNoteLate => 'Often late';
+
+  @override
+  String busNoteLateMin(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return 'Often ~$minutesString min late';
+  }
+
+  @override
+  String get busNoteCrowded => 'Often crowded';
+
+  @override
+  String get busNoteNoShow => 'Sometimes doesn\'t come';
+
+  @override
+  String get busAlert => 'Alert me';
+
+  @override
+  String busAlertOn(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return 'Alert: $minutesString min';
+  }
+
+  @override
+  String get busAlertTitle => 'Tell me when a live bus is…';
+
+  @override
+  String busAlertMinutes(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString min from my stop';
+  }
+
+  @override
+  String get busAlertHint => 'Works when a student on the bus shares it live.';
+
+  @override
+  String get busAlertOff => 'Off';
+
+  @override
+  String busAlertSaved(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return 'We\'ll tell you when the bus is $minutesString min away.';
+  }
+
+  @override
+  String get busShareJoin => 'I\'m on it';
 }

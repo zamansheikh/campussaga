@@ -11,15 +11,21 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../app/clock.dart';
 import '../../../../app/di.dart';
+import '../../../../app/version/version_gate_cubit.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../data/my_location.dart';
+import '../../data/transport_store.dart';
 import '../bus_cubit.dart';
 import '../bus_format.dart';
+import '../bus_live_cubit.dart';
 import '../bus_map.dart';
+import '../widgets/bus_live_widgets.dart';
 
-/// The whole route on a map, along the roads, with each stop's name. The
-/// strip at the bottom lists the stops with their next bus; "Where am I"
-/// shows the student on the map with their nearest stop (location used on
-/// the phone only, asked for on tap).
+/// The whole route on a map, along the roads, with each stop's name and
+/// its live buses. The strip at the bottom lists the stops with their next
+/// bus (or a live bus's ETA); "Where am I" shows the student on the map
+/// with their nearest stop (location used on the phone only, asked for on
+/// tap).
 class BusRouteMapPage extends StatefulWidget {
   const BusRouteMapPage({super.key, required this.routeId});
 
@@ -37,11 +43,56 @@ class _BusRouteMapPageState extends State<BusRouteMapPage> {
   bool _locating = false;
   StreamSubscription<Position>? _follow;
 
+  /// Live buses, polled while the map is open (null: the feature is off).
+  BusLiveCubit? _live;
+  AppLifecycleListener? _lifecycle;
+
   @override
   void dispose() {
     unawaited(_follow?.cancel());
+    _lifecycle?.dispose();
+    unawaited(_live?.close());
     _map.dispose();
     super.dispose();
+  }
+
+  BusLiveCubit? _ensureLive() {
+    final user = context.read<AuthBloc>().state.user;
+    if (_live != null || user == null) return _live;
+    final live = _live = BusLiveCubit(
+      getIt<BusLiveRepository>(),
+      getIt<TransportStore>(),
+      routeId: widget.routeId,
+      userId: user.id,
+    );
+    _lifecycle = AppLifecycleListener(
+      onHide: live.pause,
+      onShow: () {
+        live.resume();
+        unawaited(live.refresh());
+      },
+    );
+    unawaited(live.start(extras: false));
+    return live;
+  }
+
+  Widget _withLive(Widget Function(BusLiveState? ls) build) {
+    final live = _live;
+    if (live == null) return build(null);
+    return BlocBuilder<BusLiveCubit, BusLiveState>(
+      bloc: live,
+      builder: (_, ls) => build(ls),
+    );
+  }
+
+  /// The live bus and my stop together (or the bus alone).
+  void _showBus(BusRoute r, BusRun run, String? myStop) {
+    final stop = r.stops.where((s) => s.id == myStop).firstOrNull;
+    final p = stop == null ? null : stopPoint(stop);
+    _fitTo([
+      LatLng(run.lat, run.lng),
+      ?p,
+    ], const EdgeInsets.fromLTRB(64, 120, 64, 240));
   }
 
   void _fitTo(List<LatLng> pts, EdgeInsets padding) {
@@ -116,7 +167,9 @@ class _BusRouteMapPageState extends State<BusRouteMapPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final cs = context.cs;
+    if (context.select((VersionGateCubit g) => g.state.feature('busLive'))) {
+      _ensureLive();
+    }
     return BlocBuilder<BusCubit, BusState>(
       bloc: _cubit,
       builder: (context, s) {
@@ -133,140 +186,203 @@ class _BusRouteMapPageState extends State<BusRouteMapPage> {
         final near = me == null
             ? null
             : nearestStop(r, me.latitude, me.longitude);
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(r.name),
-            actions: [
-              if (r.driverPhone.isNotEmpty)
-                IconButton(
-                  tooltip: r.driverName.isEmpty
-                      ? l10n.busCallDriver
-                      : l10n.busCallName(r.driverName),
-                  onPressed: () => callPhone(r.driverPhone),
-                  icon: const Icon(CsIcons.call),
-                ),
-            ],
-          ),
-          body: Stack(
-            children: [
-              FlutterMap(
-                mapController: _map,
-                options: MapOptions(
-                  initialCenter: points.first,
-                  initialZoom: 15,
-                  initialCameraFit: points.length > 1
-                      ? CameraFit.coordinates(
-                          coordinates: points,
-                          padding: const EdgeInsets.fromLTRB(48, 48, 48, 190),
-                          maxZoom: 17,
-                        )
-                      : null,
-                  minZoom: 5,
-                  maxZoom: 19,
-                ),
-                children: [
-                  busTiles(context),
-                  routeLine(r),
-                  stopMarkers(
-                    r,
-                    myStopId: myStop,
-                    selectedId: _selected,
-                    onTap: (stop) => _showStop(r, stop),
+        return _withLive((ls) {
+          final now = appNow();
+          final runs = ls?.live.runs ?? const <BusRun>[];
+          // The bus heading this way soonest, for each stop's ETA.
+          int? eta(BusStop stop) {
+            int? best;
+            for (final run in runs) {
+              final m = busEtaMinutes(run, stop.id, now);
+              if (m != null && (best == null || m < best)) best = m;
+            }
+            return best;
+          }
+
+          final riders = runs.fold(0, (n, r) => n + r.riders);
+          final newest = runs.isEmpty
+              ? null
+              : runs
+                    .map((r) => r.updatedAt)
+                    .reduce((a, b) => a.isAfter(b) ? a : b);
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(r.name),
+              actions: [
+                if (r.driverPhone.isNotEmpty)
+                  IconButton(
+                    tooltip: r.driverName.isEmpty
+                        ? l10n.busCallDriver
+                        : l10n.busCallName(r.driverName),
+                    onPressed: () => callPhone(r.driverPhone),
+                    icon: const Icon(CsIcons.call),
                   ),
-                  if (me != null) meMarker(me),
-                  const BusMapAttribution(),
-                ],
-              ),
-              Positioned(
-                right: CsSpace.md,
-                top: CsSpace.md,
-                child: Column(
+              ],
+            ),
+            body: Stack(
+              children: [
+                FlutterMap(
+                  mapController: _map,
+                  options: MapOptions(
+                    initialCenter: points.first,
+                    initialZoom: 15,
+                    initialCameraFit: points.length > 1
+                        ? CameraFit.coordinates(
+                            coordinates: points,
+                            padding: const EdgeInsets.fromLTRB(48, 48, 48, 190),
+                            maxZoom: 17,
+                          )
+                        : null,
+                    minZoom: 5,
+                    maxZoom: 19,
+                  ),
                   children: [
-                    _MapButton(
-                      tooltip: l10n.busFitRoute,
-                      icon: CsIcons.map,
-                      onPressed: () => _fit(r),
+                    busTiles(context),
+                    routeLine(r),
+                    stopMarkers(
+                      r,
+                      myStopId: myStop,
+                      selectedId: _selected,
+                      onTap: (stop) => _showStop(r, stop),
                     ),
-                    const SizedBox(height: CsSpace.sm),
-                    _MapButton(
-                      tooltip: l10n.busWhereAmI,
-                      icon: CsIcons.directions,
-                      busy: _locating,
-                      active: me != null,
-                      onPressed: () => _locate(r),
-                    ),
+                    if (runs.isNotEmpty)
+                      LiveBusLayer(
+                        route: r,
+                        runs: runs,
+                        now: now,
+                        onTap: (run) => _showBus(r, run, myStop),
+                      ),
+                    if (me != null) meMarker(me),
+                    const BusMapAttribution(),
                   ],
                 ),
-              ),
-              if (me != null)
                 Positioned(
-                  left: CsSpace.md,
+                  right: CsSpace.md,
                   top: CsSpace.md,
-                  child: Material(
-                    color: cs.surface.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(CsRadius.md),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: CsSpace.sm,
-                        vertical: 4,
-                      ),
-                      child: Text(
-                        l10n.busLocationPrivate,
-                        style: context.text.labelSmall,
-                      ),
-                    ),
-                  ),
-                ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: SafeArea(
-                  top: false,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (near != null)
-                        _NearestCard(
-                          near: near,
-                          mine: near.stop.id == myStop,
-                          onTap: () => _showStop(r, near.stop),
-                          onSet: () => _cubit.setMyStop(r.id, near.stop.id),
+                      _MapButton(
+                        tooltip: l10n.busFitRoute,
+                        icon: CsIcons.map,
+                        onPressed: () => _fit(r),
+                      ),
+                      if (runs.isNotEmpty) ...[
+                        const SizedBox(height: CsSpace.sm),
+                        _MapButton(
+                          tooltip: l10n.busLiveBus,
+                          icon: CsIcons.bus,
+                          onPressed: () => _showBus(r, runs.first, myStop),
                         ),
-                      SizedBox(
-                        height: 92,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.fromLTRB(
-                            CsSpace.md,
-                            CsSpace.sm,
-                            CsSpace.md,
-                            CsSpace.md,
-                          ),
-                          itemCount: r.stops.length,
-                          separatorBuilder: (_, _) =>
-                              const SizedBox(width: CsSpace.sm),
-                          itemBuilder: (context, i) => _StopChip(
-                            route: r,
-                            index: i,
-                            selected: r.stops[i].id == _selected,
-                            mine: r.stops[i].id == myStop,
-                            onTap: r.stops[i].hasLocation
-                                ? () => _showStop(r, r.stops[i])
-                                : null,
-                          ),
-                        ),
+                      ],
+                      const SizedBox(height: CsSpace.sm),
+                      _MapButton(
+                        tooltip: l10n.busWhereAmI,
+                        icon: CsIcons.directions,
+                        busy: _locating,
+                        active: me != null,
+                        onPressed: () => _locate(r),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
-          ),
-        );
+                Positioned(
+                  left: CsSpace.md,
+                  top: CsSpace.md,
+                  right: 72,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (newest != null)
+                        _MapNote(
+                          child: CsLiveLabel(
+                            label: l10n.busLive,
+                            detail:
+                                '${l10n.busLiveSharing(riders)} · ${busAgoText(l10n, newest, now)}',
+                            pulse: newest,
+                          ),
+                        ),
+                      if (newest != null && me != null)
+                        const SizedBox(height: CsSpace.xs),
+                      if (me != null)
+                        _MapNote(
+                          child: Text(
+                            l10n.busLocationPrivate,
+                            style: context.text.labelSmall,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: SafeArea(
+                    top: false,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (near != null)
+                          _NearestCard(
+                            near: near,
+                            mine: near.stop.id == myStop,
+                            onTap: () => _showStop(r, near.stop),
+                            onSet: () => _cubit.setMyStop(r.id, near.stop.id),
+                          ),
+                        SizedBox(
+                          height: 92,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.fromLTRB(
+                              CsSpace.md,
+                              CsSpace.sm,
+                              CsSpace.md,
+                              CsSpace.md,
+                            ),
+                            itemCount: r.stops.length,
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(width: CsSpace.sm),
+                            itemBuilder: (context, i) => _StopChip(
+                              route: r,
+                              index: i,
+                              eta: eta(r.stops[i]),
+                              selected: r.stops[i].id == _selected,
+                              mine: r.stops[i].id == myStop,
+                              onTap: r.stops[i].hasLocation
+                                  ? () => _showStop(r, r.stops[i])
+                                  : null,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
       },
     );
   }
+}
+
+/// A small note over the map's corner.
+class _MapNote extends StatelessWidget {
+  const _MapNote({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: context.cs.surface.withValues(alpha: 0.92),
+    borderRadius: BorderRadius.circular(CsRadius.md),
+    elevation: 1,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: CsSpace.sm, vertical: 4),
+      child: child,
+    ),
+  );
 }
 
 class _MapButton extends StatelessWidget {
@@ -328,10 +444,14 @@ class _StopChip extends StatelessWidget {
     required this.selected,
     required this.mine,
     required this.onTap,
+    this.eta,
   });
 
   final BusRoute route;
   final int index;
+
+  /// Minutes until a live bus gets here (null: none on its way).
+  final int? eta;
   final bool selected;
   final bool mine;
   final VoidCallback? onTap;
@@ -343,7 +463,10 @@ class _StopChip extends StatelessWidget {
     final s = route.stops[index];
     final color = Color(route.argb);
     final next = _soonest(route, s, appNow());
-    final when = next == null
+    final live = eta;
+    final when = live != null
+        ? '${l10n.busLive} · ${live == 0 ? l10n.busLiveNow : l10n.busLiveEtaShort(live)}'
+        : next == null
         ? (s.hasLocation ? '—' : l10n.busLocationNone)
         : '${next.trip.direction == BusDirection.toCampus ? l10n.busToCampus : l10n.busFromCampus} '
               '${timeOf(context, next.at)}';
@@ -393,7 +516,11 @@ class _StopChip extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: context.text.bodySmall?.copyWith(
-                          color: next == null ? cs.textSecondary : cs.primary,
+                          color: live != null
+                              ? cs.error
+                              : next == null
+                              ? cs.textSecondary
+                              : cs.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

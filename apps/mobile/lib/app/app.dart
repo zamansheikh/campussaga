@@ -19,6 +19,7 @@ import '../features/push/push_messaging.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/data/reminder_store.dart';
 import '../features/reminders/presentation/bloc/reminders_cubit.dart';
+import '../features/transport/data/bus_sharing.dart';
 import '../features/voice/data/voice_cache.dart';
 import '../features/voice/presentation/widgets/voice_image.dart';
 import '../features/widget/home_widget.dart';
@@ -116,6 +117,10 @@ class _CampusAppState extends State<CampusApp> {
       if (!s.needsProfileSetup) unawaited(_push.askPermission());
     } else if (s.status == AuthStatus.signedOut) {
       unawaited(_classes.clear());
+      // No more sharing a bus as the account that left.
+      if (getIt.isRegistered<BusSharing>()) {
+        unawaited(getIt<BusSharing>().stop());
+      }
       // Campus Voice: nothing of this account stays on the phone.
       unawaited(getIt<VoiceCache>().clear());
       VoiceImage.clear();
@@ -127,7 +132,9 @@ class _CampusAppState extends State<CampusApp> {
   /// A push while the app is open: show it, and fetch what changed.
   void _onPush(PushNote note) {
     final type = '${note.data['type']}';
-    if (!type.startsWith('issue_') && !type.startsWith('blood_')) {
+    if (!type.startsWith('issue_') &&
+        !type.startsWith('blood_') &&
+        !type.startsWith('bus_')) {
       unawaited(_classes.refresh());
     }
     final title = note.title;
@@ -144,6 +151,17 @@ class _CampusAppState extends State<CampusApp> {
   /// A push was tapped: open its issue (Campus Voice) or, after fetching
   /// what changed, its group.
   void _onPushOpened(PushNote note) {
+    final route = note.data['routeId'];
+    if ('${note.data['type']}'.startsWith('bus_') && route is String) {
+      WidgetsBinding.instance
+        ..addPostFrameCallback((_) {
+          if (_auth.state.status == AuthStatus.signedIn) {
+            unawaited(_router.push(Routes.busRoute(route)));
+          }
+        })
+        ..ensureVisualUpdate();
+      return;
+    }
     final blood = note.data['requestId'];
     if ('${note.data['type']}'.startsWith('blood_') && blood is String) {
       WidgetsBinding.instance

@@ -5995,6 +5995,426 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You\'re visiting another university: read and react; only its students can comment.'**
   String get visitReadOnlyNote;
+
+  /// No description provided for @busLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get busLive;
+
+  /// No description provided for @busLiveSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 student sharing} other{{count} students sharing}}'**
+  String busLiveSharing(int count);
+
+  /// No description provided for @busLiveSecondsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s ago'**
+  String busLiveSecondsAgo(int seconds);
+
+  /// No description provided for @busLiveMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min ago'**
+  String busLiveMinutesAgo(int minutes);
+
+  /// No description provided for @busLiveAt.
+  ///
+  /// In en, this message translates to:
+  /// **'At {stop}'**
+  String busLiveAt(String stop);
+
+  /// No description provided for @busLiveHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'On the way to {stop}'**
+  String busLiveHeading(String stop);
+
+  /// No description provided for @busLiveNear.
+  ///
+  /// In en, this message translates to:
+  /// **'Near {stop}'**
+  String busLiveNear(String stop);
+
+  /// No description provided for @busLiveOnTheWay.
+  ///
+  /// In en, this message translates to:
+  /// **'On the way'**
+  String get busLiveOnTheWay;
+
+  /// No description provided for @busLiveOffRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Off the usual route'**
+  String get busLiveOffRoute;
+
+  /// No description provided for @busLiveLate.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min late'**
+  String busLiveLate(int minutes);
+
+  /// No description provided for @busLiveEarly.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min early'**
+  String busLiveEarly(int minutes);
+
+  /// No description provided for @busLiveOnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'On time'**
+  String get busLiveOnTime;
+
+  /// No description provided for @busLiveEta.
+  ///
+  /// In en, this message translates to:
+  /// **'At {stop} in ~{minutes} min'**
+  String busLiveEta(String stop, int minutes);
+
+  /// No description provided for @busLiveEtaNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Reaching {stop} now'**
+  String busLiveEtaNow(String stop);
+
+  /// No description provided for @busLivePassed.
+  ///
+  /// In en, this message translates to:
+  /// **'It has passed {stop}'**
+  String busLivePassed(String stop);
+
+  /// No description provided for @busLiveMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Live map'**
+  String get busLiveMap;
+
+  /// No description provided for @busLiveEtaShort.
+  ///
+  /// In en, this message translates to:
+  /// **'~{minutes} min'**
+  String busLiveEtaShort(int minutes);
+
+  /// No description provided for @busLiveNow.
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get busLiveNow;
+
+  /// No description provided for @busLiveBus.
+  ///
+  /// In en, this message translates to:
+  /// **'Live bus'**
+  String get busLiveBus;
+
+  /// No description provided for @busOffTimetable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not on the timetable'**
+  String get busOffTimetable;
+
+  /// No description provided for @busShareAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'On the {time} bus?'**
+  String busShareAsk(String time);
+
+  /// No description provided for @busShareAskBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Share where it is so students waiting at the stops can see it.'**
+  String get busShareAskBody;
+
+  /// No description provided for @busShareImOn.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m on this bus'**
+  String get busShareImOn;
+
+  /// No description provided for @busShareOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Share this bus live'**
+  String get busShareOn;
+
+  /// No description provided for @busSharingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re sharing this bus live'**
+  String get busSharingTitle;
+
+  /// No description provided for @busSharingOthers.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Only you so far} =1{You and 1 other student} other{You and {count} other students}}'**
+  String busSharingOthers(int count);
+
+  /// No description provided for @busSharingOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet: your points are kept and sent later'**
+  String get busSharingOffline;
+
+  /// No description provided for @busSharingStarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting…'**
+  String get busSharingStarting;
+
+  /// No description provided for @busSharingStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop sharing'**
+  String get busSharingStop;
+
+  /// No description provided for @busShareWhich.
+  ///
+  /// In en, this message translates to:
+  /// **'Which bus are you on?'**
+  String get busShareWhich;
+
+  /// No description provided for @busShareOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Another bus'**
+  String get busShareOther;
+
+  /// No description provided for @busShareWhat.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location is sent while you share, also with the screen off. A notification stays up until it stops.'**
+  String get busShareWhat;
+
+  /// No description provided for @busShareWho.
+  ///
+  /// In en, this message translates to:
+  /// **'Students on this route see the bus, never who shares it.'**
+  String get busShareWho;
+
+  /// No description provided for @busShareEnds.
+  ///
+  /// In en, this message translates to:
+  /// **'It stops by itself at the end of the route or after 3 hours. Points are deleted after a day.'**
+  String get busShareEnds;
+
+  /// No description provided for @busShareStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start sharing'**
+  String get busShareStart;
+
+  /// No description provided for @busShareNotOnRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'You seem to be away from this route. Start sharing once you\'re on the bus.'**
+  String get busShareNotOnRoute;
+
+  /// No description provided for @busShareNotRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'That bus isn\'t running now. Pick the one you\'re on.'**
+  String get busShareNotRunning;
+
+  /// No description provided for @busShareLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve shared many trips today. Try again tomorrow.'**
+  String get busShareLimit;
+
+  /// No description provided for @busShareNoticeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing {route} live'**
+  String busShareNoticeTitle(String route);
+
+  /// No description provided for @busShareNoticeText.
+  ///
+  /// In en, this message translates to:
+  /// **'Students waiting can see where the bus is. Open the app to stop.'**
+  String get busShareNoticeText;
+
+  /// No description provided for @busShareChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Live bus sharing'**
+  String get busShareChannel;
+
+  /// No description provided for @busThanksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for sharing!'**
+  String get busThanksTitle;
+
+  /// No description provided for @busThanksHelped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Your bus was on the map for everyone on this route.} =1{1 student watched your bus.} other{{count} students watched your bus.}}'**
+  String busThanksHelped(int count);
+
+  /// No description provided for @busThanksTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Your first trip shared} other{{count} trips shared so far}}'**
+  String busThanksTrips(int count);
+
+  /// No description provided for @busEndedArrived.
+  ///
+  /// In en, this message translates to:
+  /// **'The bus reached the end of the route, so sharing stopped.'**
+  String get busEndedArrived;
+
+  /// No description provided for @busEndedOffRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'You left the route, so sharing stopped.'**
+  String get busEndedOffRoute;
+
+  /// No description provided for @busEndedExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing stopped after a long while.'**
+  String get busEndedExpired;
+
+  /// No description provided for @busEndedReplaced.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing moved to another bus.'**
+  String get busEndedReplaced;
+
+  /// No description provided for @busFeedbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How was the {time} bus?'**
+  String busFeedbackTitle(String time);
+
+  /// No description provided for @busFeedbackTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'How was the trip?'**
+  String get busFeedbackTrip;
+
+  /// No description provided for @busFeedbackAt.
+  ///
+  /// In en, this message translates to:
+  /// **'{stop} at {time}'**
+  String busFeedbackAt(String stop, String time);
+
+  /// No description provided for @busFeedbackOnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'On time'**
+  String get busFeedbackOnTime;
+
+  /// No description provided for @busFeedbackLate.
+  ///
+  /// In en, this message translates to:
+  /// **'Late'**
+  String get busFeedbackLate;
+
+  /// No description provided for @busFeedbackNoShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t come'**
+  String get busFeedbackNoShow;
+
+  /// No description provided for @busFeedbackCrowded.
+  ///
+  /// In en, this message translates to:
+  /// **'It was crowded'**
+  String get busFeedbackCrowded;
+
+  /// No description provided for @busFeedbackThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks! This helps everyone on the route.'**
+  String get busFeedbackThanks;
+
+  /// No description provided for @busFeedbackNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get busFeedbackNotNow;
+
+  /// No description provided for @busNoteOnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Usually on time'**
+  String get busNoteOnTime;
+
+  /// No description provided for @busNoteLate.
+  ///
+  /// In en, this message translates to:
+  /// **'Often late'**
+  String get busNoteLate;
+
+  /// No description provided for @busNoteLateMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Often ~{minutes} min late'**
+  String busNoteLateMin(int minutes);
+
+  /// No description provided for @busNoteCrowded.
+  ///
+  /// In en, this message translates to:
+  /// **'Often crowded'**
+  String get busNoteCrowded;
+
+  /// No description provided for @busNoteNoShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sometimes doesn\'t come'**
+  String get busNoteNoShow;
+
+  /// No description provided for @busAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert me'**
+  String get busAlert;
+
+  /// No description provided for @busAlertOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert: {minutes} min'**
+  String busAlertOn(int minutes);
+
+  /// No description provided for @busAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell me when a live bus is…'**
+  String get busAlertTitle;
+
+  /// No description provided for @busAlertMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min from my stop'**
+  String busAlertMinutes(int minutes);
+
+  /// No description provided for @busAlertHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Works when a student on the bus shares it live.'**
+  String get busAlertHint;
+
+  /// No description provided for @busAlertOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get busAlertOff;
+
+  /// No description provided for @busAlertSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll tell you when the bus is {minutes} min away.'**
+  String busAlertSaved(int minutes);
+
+  /// No description provided for @busShareJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m on it'**
+  String get busShareJoin;
 }
 
 class _AppLocalizationsDelegate

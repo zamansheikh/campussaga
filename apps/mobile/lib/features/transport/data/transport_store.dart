@@ -12,6 +12,10 @@ abstract interface class TransportStore {
   /// Route id → the stop id the student picked.
   Future<Map<String, String>> myStops(String userId);
   Future<void> saveMyStops(String userId, Map<String, String> stops);
+
+  /// Trips the student rated or waved away ("How was the 7:30 bus?").
+  Future<Set<String>> feedbackDone(String userId);
+  Future<void> saveFeedbackDone(String userId, Set<String> keys);
 }
 
 class PrefsTransportStore implements TransportStore {
@@ -22,6 +26,10 @@ class PrefsTransportStore implements TransportStore {
 
   static String _routesKey(String user) => 'transport.routes.$user';
   static String _stopsKey(String user) => 'transport.myStops.$user';
+  static String _feedbackKey(String user) => 'transport.feedback.$user';
+
+  /// Only the latest are kept: older trips are never asked about.
+  static const _keepFeedback = 40;
 
   @override
   Future<BusRoutes?> routes(String userId) async {
@@ -52,12 +60,33 @@ class PrefsTransportStore implements TransportStore {
   @override
   Future<void> saveMyStops(String userId, Map<String, String> stops) =>
       _prefs.setString(_stopsKey(userId), jsonEncode(stops));
+
+  @override
+  Future<Set<String>> feedbackDone(String userId) async {
+    try {
+      return {...?await _prefs.getStringList(_feedbackKey(userId))};
+    } on Object {
+      return {};
+    }
+  }
+
+  @override
+  Future<void> saveFeedbackDone(String userId, Set<String> keys) {
+    final list = keys.toList();
+    return _prefs.setStringList(
+      _feedbackKey(userId),
+      list.length > _keepFeedback
+          ? list.sublist(list.length - _keepFeedback)
+          : list,
+    );
+  }
 }
 
 /// In-memory store (tests).
 class MemoryTransportStore implements TransportStore {
   final saved = <String, BusRoutes>{};
   final stops = <String, Map<String, String>>{};
+  final feedback = <String, Set<String>>{};
 
   @override
   Future<BusRoutes?> routes(String userId) async => saved[userId];
@@ -73,4 +102,13 @@ class MemoryTransportStore implements TransportStore {
   @override
   Future<void> saveMyStops(String userId, Map<String, String> s) async =>
       stops[userId] = Map.of(s);
+
+  @override
+  Future<Set<String>> feedbackDone(String userId) async => {
+    ...?feedback[userId],
+  };
+
+  @override
+  Future<void> saveFeedbackDone(String userId, Set<String> keys) async =>
+      feedback[userId] = {...keys};
 }

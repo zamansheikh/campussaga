@@ -157,4 +157,11 @@ abstract final class CsIcons {
   static const IconData folder = PhosphorIconsRegular.folderOpen;
   static const IconData blood = PhosphorIconsRegular.drop;
   static const IconData bloodFill = PhosphorIconsFill.drop;
+
+  // Live buses.
+  static const IconData live = PhosphorIconsRegular.broadcast;
+  static const IconData stopSharing = PhosphorIconsRegular.stopCircle;
+  static const IconData crowded = PhosphorIconsRegular.usersFour;
+  static const IconData late = PhosphorIconsRegular.clockCountdown;
+  static const IconData thanks = PhosphorIconsRegular.handshake;
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
@@ -8,11 +10,13 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/clock.dart';
 import '../../../../app/di.dart';
 import '../../../../app/router.dart';
+import '../../../../app/version/version_gate_cubit.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../bus_cubit.dart';
 import '../bus_format.dart';
 
-/// The student's university bus routes, each with its next bus.
+/// The student's university bus routes, each with its next bus and a
+/// "Live" mark while students share one of its buses.
 class BusRoutesPage extends StatefulWidget {
   const BusRoutesPage({super.key});
 
@@ -23,6 +27,11 @@ class BusRoutesPage extends StatefulWidget {
 class _BusRoutesPageState extends State<BusRoutesPage> {
   final _cubit = getIt<BusCubit>();
 
+  /// Route id → students sharing a bus of it now.
+  Map<String, int> _live = const {};
+  Timer? _poll;
+  AppLifecycleListener? _lifecycle;
+
   @override
   void initState() {
     super.initState();
@@ -31,12 +40,59 @@ class _BusRoutesPageState extends State<BusRoutesPage> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      BlocProvider.value(value: _cubit, child: const _RoutesView());
+  void dispose() {
+    _poll?.cancel();
+    _lifecycle?.dispose();
+    super.dispose();
+  }
+
+  void _startLive() {
+    if (_poll != null) return;
+    _poll = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) => unawaited(_loadLive()),
+    );
+    _lifecycle = AppLifecycleListener(
+      onHide: () {
+        _poll?.cancel();
+        _poll = null;
+      },
+      onShow: () {
+        _poll ??= Timer.periodic(
+          const Duration(seconds: 30),
+          (_) => unawaited(_loadLive()),
+        );
+        unawaited(_loadLive());
+      },
+    );
+    unawaited(_loadLive());
+  }
+
+  Future<void> _loadLive() async {
+    try {
+      final live = await getIt<BusLiveRepository>().liveRoutes();
+      if (mounted) setState(() => _live = live);
+    } on Failure {
+      // The list works without it.
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (context.select((VersionGateCubit g) => g.state.feature('busLive'))) {
+      _startLive();
+    }
+    return BlocProvider.value(
+      value: _cubit,
+      child: _RoutesView(live: _live),
+    );
+  }
 }
 
 class _RoutesView extends StatelessWidget {
-  const _RoutesView();
+  const _RoutesView({this.live = const {}});
+
+  final Map<String, int> live;
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +158,12 @@ class _RoutesView extends StatelessWidget {
               ),
             ),
           for (final r in routes.routes) ...[
-            _RouteCard(route: r, myStop: s.myStops[r.id], now: now),
+            _RouteCard(
+              route: r,
+              myStop: s.myStops[r.id],
+              now: now,
+              riders: live[r.id],
+            ),
             const SizedBox(height: CsSpace.sm),
           ],
         ],
@@ -148,11 +209,15 @@ class _RouteCard extends StatelessWidget {
     required this.route,
     required this.myStop,
     required this.now,
+    this.riders,
   });
 
   final BusRoute route;
   final String? myStop;
   final DateTime now;
+
+  /// Students sharing one of its buses now (null: none live).
+  final int? riders;
 
   @override
   Widget build(BuildContext context) {
@@ -201,7 +266,9 @@ class _RouteCard extends StatelessWidget {
                             CsBadge(
                               label: l10n.busHidden,
                               tone: CsBadgeTone.neutral,
-                            ),
+                            )
+                          else if (riders != null)
+                            CsLiveLabel(label: l10n.busLive),
                         ],
                       ),
                       if (route.span.isNotEmpty) ...[
@@ -212,6 +279,16 @@ class _RouteCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: context.text.bodySmall?.copyWith(
                             color: cs.textSecondary,
+                          ),
+                        ),
+                      ],
+                      if (riders != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          l10n.busLiveSharing(riders!),
+                          style: context.text.bodySmall?.copyWith(
+                            color: cs.error,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],

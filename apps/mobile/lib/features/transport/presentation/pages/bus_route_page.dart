@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
@@ -8,18 +10,24 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/clock.dart';
 import '../../../../app/di.dart';
 import '../../../../app/router.dart';
+import '../../../../app/version/version_gate_cubit.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../classes/presentation/class_format.dart';
+import '../../data/bus_sharing.dart';
+import '../../data/transport_store.dart';
 import '../bus_cubit.dart';
 import '../bus_format.dart';
+import '../bus_live_cubit.dart';
 import '../bus_map.dart';
+import '../widgets/bus_live_widgets.dart';
 import '../widgets/bus_route_map_card.dart';
 
 enum _Edit { route, stops, trips, delete }
 
-/// One route: the next buses from my stop, the map, the stops with this
-/// trip's times, and every departure. Reps get edit buttons, and a setup
-/// guide while the route has no stops or times.
+/// One route: its live buses (docs/BUS_LIVE.md), the next buses from my
+/// stop, the map, the stops with this trip's times, and every departure.
+/// Reps get edit buttons, and a setup guide while the route has no stops
+/// or times.
 class BusRoutePage extends StatefulWidget {
   const BusRoutePage({super.key, required this.routeId, this.setup = false});
 
@@ -38,6 +46,10 @@ class _BusRoutePageState extends State<BusRoutePage> {
       ? BusDirection.toCampus
       : BusDirection.fromCampus;
 
+  /// Live buses, once the feature is on (null until then).
+  BusLiveCubit? _live;
+  AppLifecycleListener? _lifecycle;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +58,140 @@ class _BusRoutePageState extends State<BusRoutePage> {
     if (_cubit.state.routes == null && user != null) _cubit.open(user.id);
     if (widget.setup) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _editStops());
+    }
+  }
+
+  @override
+  void dispose() {
+    _lifecycle?.dispose();
+    unawaited(_live?.close());
+    super.dispose();
+  }
+
+  /// Starts polling the route's live buses (paused while the app is
+  /// hidden).
+  BusLiveCubit? _ensureLive() {
+    final user = context.read<AuthBloc>().state.user;
+    if (_live != null || user == null) return _live;
+    final live = _live = BusLiveCubit(
+      getIt<BusLiveRepository>(),
+      getIt<TransportStore>(),
+      routeId: widget.routeId,
+      userId: user.id,
+    );
+    _lifecycle = AppLifecycleListener(
+      onHide: live.pause,
+      onShow: () {
+        live.resume();
+        unawaited(live.refresh());
+      },
+    );
+    unawaited(live.start());
+    // Sharing ended while this page was closed: thank them now.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _onShare(getIt<BusSharing>().state),
+    );
+    return live;
+  }
+
+  Future<void> _share(BusRoute r, {BusTripDay? trip}) async {
+    final choice = await showBusShareSheet(
+      context,
+      route: r,
+      direction: _dir,
+      preferred: trip,
+    );
+    if (choice == null || !mounted) return;
+    await startBusSharing(context, getIt<BusSharing>(), r, choice);
+    await _live?.refresh();
+  }
+
+  Future<void> _stopSharing() async {
+    await getIt<BusSharing>().stop();
+    await _live?.refresh();
+  }
+
+  /// A session of this route ended: thanks, and "How was the trip?".
+  Future<void> _onShare(BusShareState s) async {
+    final ended = s.ended;
+    final live = _live;
+    if (ended == null || ended.routeId != widget.routeId || live == null) {
+      return;
+    }
+    getIt<BusSharing>().seenEnded();
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final departs = ended.departsMin;
+    await showBusThanksSheet(
+      context,
+      ended: ended,
+      onFeedback: departs == null
+          ? null
+          : (status, crowded) async {
+              try {
+                await live.feedback(
+                  direction: ended.direction,
+                  departsMin: departs,
+                  day: ended.day,
+                  status: status,
+                  crowded: crowded,
+                );
+                messenger.showSnackBar(
+                  SnackBar(content: Text(l10n.busFeedbackThanks)),
+                );
+              } on Failure catch (f) {
+                messenger.showSnackBar(
+                  SnackBar(content: Text(busErrorText(l10n, f))),
+                );
+              }
+            },
+    );
+    // Asked about this trip: nothing more about this route today.
+    if (departs != null) {
+      await live.answer(ended.direction, departs, ended.day);
+    }
+    await live.refresh();
+  }
+
+  Future<void> _feedback(
+    BusLiveCubit live,
+    BusTripDay trip,
+    BusTripStatus status,
+    bool crowded,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await live.feedback(
+        direction: trip.trip.direction,
+        departsMin: trip.trip.departsMin,
+        day: trip.day,
+        status: status,
+        crowded: crowded,
+      );
+      messenger.showSnackBar(SnackBar(content: Text(l10n.busFeedbackThanks)));
+    } on Failure catch (f) {
+      messenger.showSnackBar(SnackBar(content: Text(busErrorText(l10n, f))));
+    }
+  }
+
+  Future<void> _alert(BusLiveCubit live, BusRoute r, BusStop stop) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final current = live.state.alerts[_dir];
+    final minutes = await pickBusAlert(context, current: current?.leadMin);
+    if (minutes == null || !mounted) return;
+    try {
+      if (minutes == 0) {
+        if (current != null) await live.removeAlert(_dir);
+      } else {
+        await live.setAlert(stopId: stop.id, direction: _dir, leadMin: minutes);
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.busAlertSaved(minutes))),
+        );
+      }
+    } on Failure catch (f) {
+      messenger.showSnackBar(SnackBar(content: Text(busErrorText(l10n, f))));
     }
   }
 
@@ -144,9 +290,131 @@ class _BusRoutePageState extends State<BusRoutePage> {
     if (picked != null) await _cubit.setMyStop(r.id, picked);
   }
 
+  /// The live buses, my sharing and "How was the trip?", newest news
+  /// first; nothing when there's nothing to say.
+  Widget _liveCards(
+    BusRoute r,
+    BusLiveCubit live,
+    BusLiveState ls,
+    BusShareState share,
+    BusStop? myStop,
+  ) => BusTicker(
+    builder: (context, now) {
+      final cards = <Widget>[];
+      final mine = share.sharing(r.id);
+      final hasMap = routePoints(r).isNotEmpty;
+      VoidCallback? openMap() =>
+          hasMap ? () => context.push(Routes.busMap(r.id)) : null;
+      if (mine) {
+        cards.add(
+          share.status == BusShareStatus.starting
+              ? const LinearProgressIndicator()
+              : BusSharingCard(
+                  route: r,
+                  share: share,
+                  now: now,
+                  onStop: _stopSharing,
+                  onOpenMap: openMap(),
+                ),
+        );
+      }
+      // This way first.
+      final runs =
+          [
+            for (final run in ls.live.runs)
+              if (!(mine && run.mine)) run,
+          ]..sort(
+            (a, b) => (a.direction == _dir ? 0 : 1).compareTo(
+              b.direction == _dir ? 0 : 1,
+            ),
+          );
+      for (final run in runs) {
+        cards.add(
+          BusLiveCard(
+            route: r,
+            run: run,
+            now: now,
+            myStopId: myStop?.id,
+            onOpenMap: openMap(),
+            onJoin: share.active
+                ? null
+                : () => _share(
+                    r,
+                    trip: run.departsMin == null
+                        ? null
+                        : runningTrips(r, now, direction: run.direction)
+                              .where((t) => t.trip.departsMin == run.departsMin)
+                              .firstOrNull,
+                  ),
+          ),
+        );
+      }
+      if (!mine && ls.live.runs.isEmpty && ls.loaded) {
+        final trip = runningTrips(r, now).firstOrNull;
+        if (trip != null) {
+          cards.add(
+            BusShareInviteCard(
+              route: r,
+              trip: trip,
+              starting: share.status == BusShareStatus.starting,
+              onShare: share.active ? () {} : () => _share(r, trip: trip),
+            ),
+          );
+        }
+      }
+      final recent = myStop == null || mine
+          ? null
+          : recentTripAt(r, myStop.id, now);
+      if (recent != null) {
+        final t = recent.trip;
+        final asked =
+            ls.answered.contains(
+              feedbackKey(r.id, t.trip.direction, t.trip.departsMin, t.day),
+            ) ||
+            ls.answered.contains(feedbackDayKey(r.id, now));
+        // Still on its way to my stop: too early to ask.
+        final coming = ls.live.runs.any(
+          (run) =>
+              run.direction == t.trip.direction &&
+              run.departsMin == t.trip.departsMin &&
+              !run.passed.contains(myStop!.id),
+        );
+        if (!asked && !coming) {
+          cards.add(
+            BusFeedbackCard(
+              trip: t,
+              stop: myStop!,
+              at: recent.at,
+              onPick: (status, crowded) => _feedback(live, t, status, crowded),
+              onDismiss: () =>
+                  live.answer(t.trip.direction, t.trip.departsMin, t.day),
+            ),
+          );
+        }
+      }
+      if (cards.isEmpty) return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.only(bottom: CsSpace.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < cards.length; i++) ...[
+              if (i > 0) const SizedBox(height: CsSpace.sm),
+              cards[i],
+            ],
+          ],
+        ),
+      );
+    },
+  );
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final liveOn = context.select(
+      (VersionGateCubit g) => g.state.feature('busLive'),
+    );
+    final live = liveOn ? _ensureLive() : null;
     return BlocBuilder<BusCubit, BusState>(
       bloc: _cubit,
       builder: (context, s) {
@@ -157,143 +425,185 @@ class _BusRoutePageState extends State<BusRoutePage> {
             body: CsEmptyState(icon: CsIcons.bus, title: l10n.busRouteNotFound),
           );
         }
-        final canEdit = s.routes?.canEdit ?? false;
-        final now = appNow();
-        final myStopId = s.myStops[r.id];
-        final myStop = r.stops.where((x) => x.id == myStopId).firstOrNull;
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(r.name),
-            actions: [
-              if (canEdit)
-                PopupMenuButton<_Edit>(
-                  icon: const Icon(CsIcons.more),
-                  onSelected: (e) => _edit(r, e),
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                      value: _Edit.route,
-                      child: Text(l10n.busEditRoute),
-                    ),
-                    PopupMenuItem(
-                      value: _Edit.stops,
-                      child: Text(l10n.busEditStops),
-                    ),
-                    PopupMenuItem(
-                      value: _Edit.trips,
-                      child: Text(l10n.busEditTimetable),
-                    ),
-                    PopupMenuItem(
-                      value: _Edit.delete,
-                      child: Text(
-                        l10n.busDeleteRoute,
-                        style: TextStyle(color: context.cs.error),
+        if (live == null) return _page(context, r, s, null, null, null);
+        return BlocConsumer<BusSharing, BusShareState>(
+          bloc: getIt<BusSharing>(),
+          listenWhen: (a, b) => b.ended != null && a.ended != b.ended,
+          listener: (_, share) => unawaited(_onShare(share)),
+          builder: (context, share) => BlocBuilder<BusLiveCubit, BusLiveState>(
+            bloc: live,
+            builder: (context, ls) => _page(context, r, s, live, ls, share),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _page(
+    BuildContext context,
+    BusRoute r,
+    BusState s,
+    BusLiveCubit? live,
+    BusLiveState? ls,
+    BusShareState? share,
+  ) {
+    final l10n = AppLocalizations.of(context);
+    final canEdit = s.routes?.canEdit ?? false;
+    final now = appNow();
+    final myStopId = s.myStops[r.id];
+    final myStop = r.stops.where((x) => x.id == myStopId).firstOrNull;
+    final nextTrip = myStop == null
+        ? null
+        : nextDepartures(
+            r,
+            stopId: myStop.id,
+            direction: _dir,
+            now: now,
+            limit: 1,
+          ).firstOrNull?.trip;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(r.name),
+        actions: [
+          if (live != null && share != null && !share.active && r.active)
+            IconButton(
+              tooltip: l10n.busShareOn,
+              onPressed: () => _share(r),
+              icon: const Icon(CsIcons.live),
+            ),
+          if (canEdit)
+            PopupMenuButton<_Edit>(
+              icon: const Icon(CsIcons.more),
+              onSelected: (e) => _edit(r, e),
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: _Edit.route,
+                  child: Text(l10n.busEditRoute),
+                ),
+                PopupMenuItem(
+                  value: _Edit.stops,
+                  child: Text(l10n.busEditStops),
+                ),
+                PopupMenuItem(
+                  value: _Edit.trips,
+                  child: Text(l10n.busEditTimetable),
+                ),
+                PopupMenuItem(
+                  value: _Edit.delete,
+                  child: Text(
+                    l10n.busDeleteRoute,
+                    style: TextStyle(color: context.cs.error),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _cubit.refresh,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(
+            CsSpace.screen,
+            CsSpace.sm,
+            CsSpace.screen,
+            CsSpace.xl,
+          ),
+          children: [
+            if (live != null && ls != null && share != null)
+              _liveCards(r, live, ls, share, myStop),
+            if (r.notes.isNotEmpty) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: context.cs.surfaceVariant,
+                  borderRadius: BorderRadius.circular(CsRadius.md),
+                ),
+                child: Row(
+                  children: [
+                    Icon(CsIcons.info, size: 18, color: context.cs.primary),
+                    const SizedBox(width: CsSpace.sm),
+                    Expanded(
+                      child: CsLinkText(
+                        r.notes,
+                        style: context.text.bodyMedium,
                       ),
                     ),
                   ],
                 ),
-            ],
-          ),
-          body: RefreshIndicator(
-            onRefresh: _cubit.refresh,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                CsSpace.screen,
-                CsSpace.sm,
-                CsSpace.screen,
-                CsSpace.xl,
               ),
-              children: [
-                if (r.notes.isNotEmpty) ...[
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: context.cs.surfaceVariant,
-                      borderRadius: BorderRadius.circular(CsRadius.md),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(CsIcons.info, size: 18, color: context.cs.primary),
-                        const SizedBox(width: CsSpace.sm),
-                        Expanded(
-                          child: CsLinkText(
-                            r.notes,
-                            style: context.text.bodyMedium,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: CsSpace.md),
-                ],
-                if (r.driverPhone.isNotEmpty) ...[
-                  _DriverCard(route: r),
-                  const SizedBox(height: CsSpace.md),
-                ],
-                SegmentedButton<BusDirection>(
-                  segments: [
-                    ButtonSegment(
-                      value: BusDirection.toCampus,
-                      label: Text(l10n.busToCampus),
-                    ),
-                    ButtonSegment(
-                      value: BusDirection.fromCampus,
-                      label: Text(l10n.busFromCampus),
-                    ),
-                  ],
-                  selected: {_dir},
-                  showSelectedIcon: false,
-                  onSelectionChanged: (v) => setState(() => _dir = v.first),
+              const SizedBox(height: CsSpace.md),
+            ],
+            if (r.driverPhone.isNotEmpty) ...[
+              _DriverCard(route: r),
+              const SizedBox(height: CsSpace.md),
+            ],
+            SegmentedButton<BusDirection>(
+              segments: [
+                ButtonSegment(
+                  value: BusDirection.toCampus,
+                  label: Text(l10n.busToCampus),
                 ),
-                const SizedBox(height: CsSpace.md),
-                if (canEdit && (r.stops.isEmpty || r.trips.isEmpty)) ...[
-                  _SetupCard(
-                    route: r,
-                    onStops: _editStops,
-                    onTimes: _editTrips,
-                  ),
-                  const SizedBox(height: CsSpace.md),
-                ],
-                _MyStopCard(
-                  route: r,
-                  stop: myStop,
-                  direction: _dir,
-                  now: now,
-                  onPick: () => _pickStop(r, myStopId),
-                ),
-                if (routePoints(r).isNotEmpty) ...[
-                  const SizedBox(height: CsSpace.lg),
-                  BusRouteMapCard(
-                    route: r,
-                    myStopId: myStopId,
-                    onOpen: () => context.push(Routes.busMap(r.id)),
-                  ),
-                ] else if (canEdit && r.stops.isNotEmpty) ...[
-                  const SizedBox(height: CsSpace.md),
-                  OutlinedButton.icon(
-                    onPressed: _editStops,
-                    icon: const Icon(CsIcons.placeAdd),
-                    label: Text(l10n.busSetupMap),
-                  ),
-                ],
-                const SizedBox(height: CsSpace.lg),
-                _StopsTimeline(
-                  route: r,
-                  direction: _dir,
-                  now: now,
-                  myStopId: myStopId,
-                  onEdit: canEdit ? _editStops : null,
-                ),
-                const SizedBox(height: CsSpace.lg),
-                _Departures(
-                  route: r,
-                  direction: _dir,
-                  onEdit: canEdit ? _editTrips : null,
+                ButtonSegment(
+                  value: BusDirection.fromCampus,
+                  label: Text(l10n.busFromCampus),
                 ),
               ],
+              selected: {_dir},
+              showSelectedIcon: false,
+              onSelectionChanged: (v) => setState(() => _dir = v.first),
             ),
-          ),
-        );
-      },
+            const SizedBox(height: CsSpace.md),
+            if (canEdit && (r.stops.isEmpty || r.trips.isEmpty)) ...[
+              _SetupCard(route: r, onStops: _editStops, onTimes: _editTrips),
+              const SizedBox(height: CsSpace.md),
+            ],
+            _MyStopCard(
+              route: r,
+              stop: myStop,
+              direction: _dir,
+              now: now,
+              onPick: () => _pickStop(r, myStopId),
+              notes: nextTrip == null
+                  ? const []
+                  : ls?.insight(nextTrip)?.notes ?? const [],
+              alert: ls?.alerts[_dir],
+              onAlert: live == null || myStop == null
+                  ? null
+                  : () => _alert(live, r, myStop),
+            ),
+            if (routePoints(r).isNotEmpty) ...[
+              const SizedBox(height: CsSpace.lg),
+              BusRouteMapCard(
+                route: r,
+                myStopId: myStopId,
+                onOpen: () => context.push(Routes.busMap(r.id)),
+              ),
+            ] else if (canEdit && r.stops.isNotEmpty) ...[
+              const SizedBox(height: CsSpace.md),
+              OutlinedButton.icon(
+                onPressed: _editStops,
+                icon: const Icon(CsIcons.placeAdd),
+                label: Text(l10n.busSetupMap),
+              ),
+            ],
+            const SizedBox(height: CsSpace.lg),
+            _StopsTimeline(
+              route: r,
+              direction: _dir,
+              now: now,
+              myStopId: myStopId,
+              onEdit: canEdit ? _editStops : null,
+            ),
+            const SizedBox(height: CsSpace.lg),
+            _Departures(
+              route: r,
+              direction: _dir,
+              onEdit: canEdit ? _editTrips : null,
+              insight: ls?.insight,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -305,6 +615,9 @@ class _MyStopCard extends StatelessWidget {
     required this.direction,
     required this.now,
     required this.onPick,
+    this.notes = const [],
+    this.alert,
+    this.onAlert,
   });
 
   final BusRoute route;
@@ -312,6 +625,13 @@ class _MyStopCard extends StatelessWidget {
   final BusDirection direction;
   final DateTime now;
   final VoidCallback onPick;
+
+  /// What riders say about the next bus ("Usually on time").
+  final List<BusTripNote> notes;
+
+  /// "Tell me when the bus is near" (null: live buses are off).
+  final BusAlert? alert;
+  final VoidCallback? onAlert;
 
   /// Why there's no time for [s]: no buses this way, no time listed for
   /// this stop (then when the bus leaves its first timed stop), or none
@@ -403,6 +723,17 @@ class _MyStopCard extends StatelessWidget {
                 color: cs.onPrimaryContainer,
               ),
             ),
+            if (notes.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: CsSpace.xs),
+                child: Text(
+                  [for (final n in notes) busNoteText(l10n, n)].join(' · '),
+                  style: context.text.bodySmall?.copyWith(
+                    color: cs.onPrimaryContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             if (next.length > 1) ...[
               const SizedBox(height: CsSpace.xs),
               Text(
@@ -414,12 +745,39 @@ class _MyStopCard extends StatelessWidget {
               ),
             ],
           ],
-          Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: TextButton(
-              onPressed: onPick,
-              child: Text(l10n.busChangeStop),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (onAlert != null)
+                Flexible(
+                  child: TextButton.icon(
+                    onPressed: onAlert,
+                    icon: Icon(
+                      alert == null ? CsIcons.bell : CsIcons.bellActive,
+                      size: 18,
+                    ),
+                    label: Text(
+                      alert == null
+                          ? l10n.busAlert
+                          : l10n.busAlertOn(alert!.leadMin),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                )
+              else
+                const SizedBox.shrink(),
+              Flexible(
+                child: TextButton(
+                  onPressed: onPick,
+                  child: Text(
+                    l10n.busChangeStop,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -573,11 +931,15 @@ class _Departures extends StatelessWidget {
     required this.route,
     required this.direction,
     this.onEdit,
+    this.insight,
   });
 
   final BusRoute route;
   final BusDirection direction;
   final VoidCallback? onEdit;
+
+  /// What riders say about a trip (null: live buses are off).
+  final BusTripInsight? Function(BusTrip)? insight;
 
   @override
   Widget build(BuildContext context) {
@@ -602,6 +964,9 @@ class _Departures extends StatelessWidget {
                 weekdaysText(context, t.weekdays),
                 if (from != null) l10n.busTripFirstStop(from),
                 if (t.note.isNotEmpty) t.note,
+                for (final n
+                    in insight?.call(t)?.notes ?? const <BusTripNote>[])
+                  busNoteText(l10n, n),
               ].join(' · '),
               showChevron: false,
             ),
@@ -707,7 +1072,9 @@ class _SetupCard extends StatelessWidget {
   }
 }
 
-/// The route's driver with a call button (opens the dialer).
+/// The route's driver: name and number, and a round call button (opens
+/// the dialer); the whole card calls too. The button stays one small size
+/// whatever the language, so the number never wraps.
 class _DriverCard extends StatelessWidget {
   const _DriverCard({required this.route});
 
@@ -718,47 +1085,57 @@ class _DriverCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final cs = context.cs;
     final name = route.driverName;
+    final call = name.isEmpty ? l10n.busCallDriver : l10n.busCallName(name);
     return Material(
       color: cs.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(CsRadius.lg),
         side: BorderSide(color: cs.border),
       ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(CsSpace.md, 10, 10, 10),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: Color(route.argb).withValues(alpha: 0.15),
-              child: Icon(CsIcons.bus, color: Color(route.argb)),
-            ),
-            const SizedBox(width: CsSpace.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name.isEmpty ? l10n.busDriver : name,
-                    style: context.text.titleSmall,
-                  ),
-                  Text(
-                    name.isEmpty
-                        ? route.driverPhone
-                        : '${l10n.busDriver} · ${route.driverPhone}',
-                    style: context.text.bodySmall?.copyWith(
-                      color: cs.textSecondary,
-                    ),
-                  ),
-                ],
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => callPhone(route.driverPhone),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(CsSpace.md, 12, 12, 12),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: Color(route.argb).withValues(alpha: 0.15),
+                child: Icon(CsIcons.bus, color: Color(route.argb)),
               ),
-            ),
-            FilledButton.icon(
-              onPressed: () => callPhone(route.driverPhone),
-              icon: const Icon(CsIcons.call, size: 18),
-              label: Text(l10n.busCallDriver),
-            ),
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name.isEmpty ? l10n.busDriver : name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.text.titleSmall,
+                    ),
+                    Text(
+                      name.isEmpty
+                          ? route.driverPhone
+                          : '${l10n.busDriver} · ${route.driverPhone}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.text.bodySmall?.copyWith(
+                        color: cs.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: CsSpace.sm),
+              IconButton.filled(
+                tooltip: call,
+                onPressed: () => callPhone(route.driverPhone),
+                icon: const Icon(CsIcons.call, size: 20),
+              ),
+            ],
+          ),
         ),
       ),
     );

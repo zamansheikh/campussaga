@@ -11,6 +11,7 @@ import '../features/push/push_messaging.dart';
 import '../features/reminders/data/phone_info.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/data/reminder_store.dart';
+import '../features/transport/data/bus_sharing.dart';
 import '../features/transport/data/transport_store.dart';
 import '../features/transport/presentation/bus_cubit.dart';
 import '../features/voice/data/photo_picker.dart';
@@ -92,4 +93,11 @@ void registerTransport() => getIt
   ..registerLazySingleton<TransportStore>(PrefsTransportStore.new)
   ..registerLazySingleton<BusCubit>(
     () => BusCubit(getIt<TransportRepository>(), getIt<TransportStore>()),
+  )
+  ..registerLazySingleton<BusLiveRepository>(
+    () => ApiBusLiveRepository(getIt<ApiClient>()),
+  )
+  // App-wide: sharing goes on while the student moves between pages.
+  ..registerLazySingleton<BusSharing>(
+    () => BusSharing(getIt<BusLiveRepository>()),
   );

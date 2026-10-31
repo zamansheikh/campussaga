@@ -445,7 +445,7 @@ void main() {
     await _openBus(tester);
     await tester.tap(find.text('Mirpur'));
     await tester.pumpAndSettle();
-    expect(find.text('Call driver'), findsNothing);
+    expect(find.byIcon(CsIcons.call), findsNothing);
 
     await tester.tap(find.byTooltip('Show menu'));
     await tester.pumpAndSettle();
@@ -470,6 +470,6 @@ void main() {
     expect(r.stops, isNotEmpty, reason: 'editing the route keeps its stops');
     expect(find.text('Parvez'), findsOneWidget);
     expect(find.text('Driver · 01989155614'), findsOneWidget);
-    expect(find.widgetWithText(FilledButton, 'Call driver'), findsOneWidget);
+    expect(find.byTooltip('Call Parvez'), findsOneWidget);
   });
 }
