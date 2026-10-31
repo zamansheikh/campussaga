@@ -118,6 +118,7 @@ class FeedTopics extends StatelessWidget {
         children: [
           if (issues) ...[
             ChoiceChip(
+              avatar: const Icon(CsIcons.circle, size: 18),
               label: Text(l10n.campusIssuesOpen),
               selected: !s.solved,
               showCheckmark: false,
@@ -133,10 +134,11 @@ class FeedTopics extends StatelessWidget {
             ),
             if (staff) ...[
               const SizedBox(width: CsSpace.sm),
-              FilterChip(
+              ChoiceChip(
                 avatar: const Icon(CsIcons.lock, size: 18),
                 label: Text(l10n.voiceSafetyReports),
                 selected: s.safety,
+                showCheckmark: false,
                 onSelected: cubit.setSafety,
               ),
             ],

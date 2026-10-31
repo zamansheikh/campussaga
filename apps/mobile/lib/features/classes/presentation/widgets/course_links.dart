@@ -53,7 +53,7 @@ class CourseLinks extends StatelessWidget {
           runSpacing: CsSpace.sm,
           children: [
             if (i.chatLink.isNotEmpty)
-              _LinkChip(
+              CsPill(
                 icon: CsIcons.campus,
                 label: chatAppName(i.chatLink),
                 tooltip: l10n.courseChat,
@@ -65,14 +65,14 @@ class CourseLinks extends StatelessWidget {
                 onOpen: () => _open(context, classroomUrl),
               ),
             if (i.materialsLink.isNotEmpty)
-              _LinkChip(
+              CsPill(
                 icon: CsIcons.folder,
                 label: l10n.courseMaterialsShort,
                 tooltip: l10n.courseMaterials,
                 onTap: () => _open(context, Uri.parse(i.materialsLink)),
               ),
             if (i.teacherEmail.isNotEmpty)
-              _LinkChip(
+              CsPill(
                 icon: CsIcons.email,
                 label: i.teacherEmail,
                 tooltip: l10n.courseTeacherEmail,
@@ -107,68 +107,6 @@ class CourseLinks extends StatelessWidget {
             ),
           ),
       ],
-    );
-  }
-}
-
-/// A small tappable pill: icon and a short label.
-class _LinkChip extends StatelessWidget {
-  const _LinkChip({
-    super.key,
-    required this.icon,
-    required this.label,
-    required this.tooltip,
-    required this.onTap,
-    this.trailing,
-  });
-
-  final IconData icon;
-  final String label;
-  final String tooltip;
-  final VoidCallback onTap;
-  final IconData? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = context.cs;
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: cs.primaryContainer.withValues(alpha: 0.55),
-        shape: StadiumBorder(side: BorderSide(color: cs.border)),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: CsSpace.sm + 4,
-              vertical: CsSpace.sm,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 16, color: cs.primary),
-                const SizedBox(width: 6),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 200),
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.text.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                if (trailing != null) ...[
-                  const SizedBox(width: 6),
-                  Icon(trailing, size: 14, color: cs.textSecondary),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -212,7 +150,7 @@ class _ClassroomChipState extends State<_ClassroomChip> {
     return AnimatedSwitcher(
       duration: CsMotion.fast,
       child: _copied
-          ? _LinkChip(
+          ? CsPill(
               key: const ValueKey('copied'),
               icon: CsIcons.checkCircle,
               label: '${l10n.courseCopied} · ${l10n.courseOpenClassroom}',
@@ -220,7 +158,7 @@ class _ClassroomChipState extends State<_ClassroomChip> {
               trailing: CsIcons.openExternal,
               onTap: widget.onOpen,
             )
-          : _LinkChip(
+          : CsPill(
               key: const ValueKey('code'),
               icon: CsIcons.academic,
               label: l10n.courseClassroomChip(widget.code),

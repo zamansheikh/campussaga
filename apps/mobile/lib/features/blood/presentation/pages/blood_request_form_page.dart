@@ -302,10 +302,13 @@ class _BloodRequestFormPageState extends State<BloodRequestFormPage> {
                 showCheckmark: false,
                 onSelected: (_) => _setDay(_Day.other),
               ),
-              ActionChip(
+              // The same kind of chip as the days (always chosen).
+              ChoiceChip(
                 avatar: const Icon(CsIcons.time, size: 18),
                 label: Text(_time.format(context)),
-                onPressed: _pickTime,
+                selected: false,
+                showCheckmark: false,
+                onSelected: (_) => _pickTime(),
               ),
             ],
           ),

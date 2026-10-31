@@ -15,6 +15,7 @@ export 'src/components/cs_empty_state.dart';
 export 'src/components/cs_link_text.dart';
 export 'src/components/cs_option_sheet.dart';
 export 'src/components/cs_page.dart';
+export 'src/components/cs_pill.dart';
 export 'src/components/cs_section.dart';
 export 'src/components/voice/cs_anon_toggle.dart';
 export 'src/components/voice/cs_category.dart';

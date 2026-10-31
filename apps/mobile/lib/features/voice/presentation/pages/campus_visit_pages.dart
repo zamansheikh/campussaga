@@ -490,31 +490,26 @@ class _Header extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: CsSpace.sm),
+          const SizedBox(height: CsSpace.md),
+          // One pill size for facts and the website link.
           Wrap(
             spacing: CsSpace.sm,
-            runSpacing: CsSpace.xs,
-            crossAxisAlignment: WrapCrossAlignment.center,
+            runSpacing: CsSpace.sm,
             children: [
               if (profile.mine)
-                CsBadge(label: l10n.visitYourCampus, icon: CsIcons.verified),
-              if (c.city.isNotEmpty)
-                CsBadge(
-                  label: c.city,
-                  icon: CsIcons.place,
-                  tone: CsBadgeTone.neutral,
+                CsPill(
+                  label: l10n.visitYourCampus,
+                  icon: CsIcons.verified,
+                  highlight: true,
                 ),
+              if (c.city.isNotEmpty) CsPill(label: c.city, icon: CsIcons.place),
               if (kind.isNotEmpty)
-                CsBadge(
-                  label: kind,
-                  icon: CsIcons.university,
-                  tone: CsBadgeTone.neutral,
-                ),
+                CsPill(label: kind, icon: CsIcons.university),
               if (profile.website.isNotEmpty)
-                ActionChip(
-                  avatar: const Icon(CsIcons.openExternal, size: 16),
-                  label: Text(l10n.visitWebsite),
-                  onPressed: () => CsLinkText.onOpen?.call(
+                CsPill(
+                  label: l10n.visitWebsite,
+                  icon: CsIcons.visitCampus,
+                  onTap: () => CsLinkText.onOpen?.call(
                     context,
                     Uri.parse(profile.website),
                   ),
