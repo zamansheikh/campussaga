@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const activeSessions = `-- name: ActiveSessions :one
@@ -28,6 +29,113 @@ func (q *Queries) ActiveSessions(ctx context.Context, arg ActiveSessionsParams) 
 	var column_1 int32
 	err := row.Scan(&column_1)
 	return column_1, err
+}
+
+const bloodCounts = `-- name: BloodCounts :one
+SELECT (SELECT count(*) FROM blood_donors)::int AS donors,
+       (SELECT count(*) FROM blood_donors
+         WHERE available AND (last_donated IS NULL OR last_donated <= $1::date))::int AS available,
+       (SELECT count(*) FROM blood_requests WHERE status = 'open' AND needed_by >= $2::timestamptz)::int AS open_requests,
+       (SELECT count(*) FROM blood_requests WHERE created_at > $3::timestamptz)::int AS requests,
+       (SELECT count(*) FROM blood_responses WHERE created_at > $3::timestamptz)::int AS responses
+`
+
+type BloodCountsParams struct {
+	EligibleOn pgtype.Date
+	OpenAfter  time.Time
+	Since      time.Time
+}
+
+type BloodCountsRow struct {
+	Donors       int32
+	Available    int32
+	OpenRequests int32
+	Requests     int32
+	Responses    int32
+}
+
+// Blood donation. Available: switched on and no donation within the rest
+// days (same rule as the blood module's eligible()). Open: not past the
+// 24 hours after needed-by that the app hides it.
+func (q *Queries) BloodCounts(ctx context.Context, arg BloodCountsParams) (BloodCountsRow, error) {
+	row := q.db.QueryRow(ctx, bloodCounts, arg.EligibleOn, arg.OpenAfter, arg.Since)
+	var i BloodCountsRow
+	err := row.Scan(
+		&i.Donors,
+		&i.Available,
+		&i.OpenRequests,
+		&i.Requests,
+		&i.Responses,
+	)
+	return i, err
+}
+
+const busCounts = `-- name: BusCounts :one
+SELECT (SELECT count(*) FROM bus_live_sessions WHERE ended_at IS NULL AND last_at >= $1::timestamptz)::int AS live_now,
+       (SELECT count(*) FROM bus_live_sessions WHERE started_at > $2::timestamptz)::int AS shares,
+       (SELECT COALESCE(sum(trips), 0) FROM bus_share_stats)::int AS trips_shared,
+       (SELECT count(*) FROM bus_trip_feedback WHERE created_at > $3::timestamptz)::int AS ratings
+`
+
+type BusCountsParams struct {
+	FreshSince   time.Time
+	Since        time.Time
+	RatingsSince time.Time
+}
+
+type BusCountsRow struct {
+	LiveNow     int32
+	Shares      int32
+	TripsShared int32
+	Ratings     int32
+}
+
+// Live buses.
+func (q *Queries) BusCounts(ctx context.Context, arg BusCountsParams) (BusCountsRow, error) {
+	row := q.db.QueryRow(ctx, busCounts, arg.FreshSince, arg.Since, arg.RatingsSince)
+	var i BusCountsRow
+	err := row.Scan(
+		&i.LiveNow,
+		&i.Shares,
+		&i.TripsShared,
+		&i.Ratings,
+	)
+	return i, err
+}
+
+const campusCounts = `-- name: CampusCounts :one
+
+SELECT (SELECT count(*) FROM issues WHERE kind = 'issue' AND created_at > $1::timestamptz)::int AS issues,
+       (SELECT count(*) FROM issues WHERE kind = 'post' AND created_at > $1::timestamptz)::int AS posts,
+       (SELECT count(*) FROM issues WHERE kind = 'question' AND created_at > $1::timestamptz)::int AS questions,
+       (SELECT count(*) FROM issues WHERE kind = 'poll' AND created_at > $1::timestamptz)::int AS polls,
+       (SELECT count(*) FROM comments WHERE created_at > $1::timestamptz)::int AS comments,
+       (SELECT count(*) FROM issue_votes WHERE created_at > $1::timestamptz)::int AS reactions
+`
+
+type CampusCountsRow struct {
+	Issues    int32
+	Posts     int32
+	Questions int32
+	Polls     int32
+	Comments  int32
+	Reactions int32
+}
+
+// ---- Build 6 features (campus, blood, live buses) -------------------------------------
+// Campus social: counts only.
+func (q *Queries) CampusCounts(ctx context.Context, since time.Time) (CampusCountsRow, error) {
+	row := q.db.QueryRow(ctx, campusCounts, since)
+	var i CampusCountsRow
+	err := row.Scan(
+		&i.Issues,
+		&i.Posts,
+		&i.Questions,
+		&i.Polls,
+		&i.Comments,
+		&i.Reactions,
+	)
+	return i, err
 }
 
 const countAudit = `-- name: CountAudit :one

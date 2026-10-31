@@ -114,6 +114,13 @@ func eligible(available bool, last *time.Time, today time.Time) bool {
 	return last == nil || !today.Before(canDonateFrom(*last))
 }
 
+// EligibleOn is the latest last-donation date that lets a donor give blood
+// at now: 120 days before today in Bangladesh.
+func EligibleOn(now time.Time) time.Time {
+	t := now.In(dhaka)
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC).AddDate(0, 0, -DonorRestDays)
+}
+
 func (s *Service) donorView(d store.BloodDonor) *Donor {
 	out := &Donor{
 		BloodGroup: d.BloodGroup, Available: d.Available, Phone: d.Phone,

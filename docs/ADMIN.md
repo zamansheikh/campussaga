@@ -186,7 +186,7 @@ Item:
 | Method | Path | Notes |
 |---|---|---|
 | GET | `/admin/transport/routes/{id}/activity` | `{live: {runs: [Run]}, insights: {trips: [TripInsight]}, sharesLast7Days, ratingsLast30Days}`. `Run` and `TripInsight` have the same shape as `/transport/routes/{id}/live` and `/insights` (docs/BUS_LIVE.md); there is no `mine`, and no user ids. |
-| POST | `/admin/transport/routes/{id}/live/end` | Ends every open sharing session on the route (a fake or stuck bus) → `{ended: n}`. The sharers' next ping answers `{ended: true, reason: "admin"}`, which the app treats as stopped. Audit `transport.live.end` with `{ended}`. Needs migration `00700_bus_live_admin_end.sql` to add `admin` to the `end_reason` check. |
+| POST | `/admin/transport/routes/{id}/live/end` | Ends every open sharing session on the route (a fake or stuck bus) → `{ended: n}`. The sharers' next ping answers `{ended: true, reason: "admin"}`, which the app treats as stopped. Audit `transport.live.end` with `{ended}`. Needs migration `00710_bus_live_admin_end.sql` to add `admin` to the `end_reason` check. |
 
 ### Moderation
 The moderation issue view adds `campusOnly` (boolean). The page shows

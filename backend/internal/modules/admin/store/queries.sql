@@ -319,3 +319,32 @@ SELECT (SELECT count(*) FROM issues WHERE status IN ('open', 'acknowledged', 'in
        ((SELECT count(*) FROM issues WHERE report_count > 0 AND visibility <> 'removed')
         + (SELECT count(*) FROM comments WHERE report_count > 0 AND visibility <> 'removed'))::int AS reported,
        (SELECT count(*) FROM issues x WHERE x.kind = 'issue' AND x.created_at > @since::timestamptz)::int AS issues_last_7_days;
+
+-- ---- Build 6 features (campus, blood, live buses) -------------------------------------
+
+-- Campus social: counts only.
+-- name: CampusCounts :one
+SELECT (SELECT count(*) FROM issues WHERE kind = 'issue' AND created_at > @since::timestamptz)::int AS issues,
+       (SELECT count(*) FROM issues WHERE kind = 'post' AND created_at > @since::timestamptz)::int AS posts,
+       (SELECT count(*) FROM issues WHERE kind = 'question' AND created_at > @since::timestamptz)::int AS questions,
+       (SELECT count(*) FROM issues WHERE kind = 'poll' AND created_at > @since::timestamptz)::int AS polls,
+       (SELECT count(*) FROM comments WHERE created_at > @since::timestamptz)::int AS comments,
+       (SELECT count(*) FROM issue_votes WHERE created_at > @since::timestamptz)::int AS reactions;
+
+-- Blood donation. Available: switched on and no donation within the rest
+-- days (same rule as the blood module's eligible()). Open: not past the
+-- 24 hours after needed-by that the app hides it.
+-- name: BloodCounts :one
+SELECT (SELECT count(*) FROM blood_donors)::int AS donors,
+       (SELECT count(*) FROM blood_donors
+         WHERE available AND (last_donated IS NULL OR last_donated <= sqlc.arg(eligible_on)::date))::int AS available,
+       (SELECT count(*) FROM blood_requests WHERE status = 'open' AND needed_by >= @open_after::timestamptz)::int AS open_requests,
+       (SELECT count(*) FROM blood_requests WHERE created_at > @since::timestamptz)::int AS requests,
+       (SELECT count(*) FROM blood_responses WHERE created_at > @since::timestamptz)::int AS responses;
+
+-- Live buses.
+-- name: BusCounts :one
+SELECT (SELECT count(*) FROM bus_live_sessions WHERE ended_at IS NULL AND last_at >= @fresh_since::timestamptz)::int AS live_now,
+       (SELECT count(*) FROM bus_live_sessions WHERE started_at > @since::timestamptz)::int AS shares,
+       (SELECT COALESCE(sum(trips), 0) FROM bus_share_stats)::int AS trips_shared,
+       (SELECT count(*) FROM bus_trip_feedback WHERE created_at > @ratings_since::timestamptz)::int AS ratings;

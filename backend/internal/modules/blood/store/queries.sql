@@ -145,3 +145,39 @@ ORDER BY x.created_at, x.donor_id;
 
 -- name: DisplayName :one
 SELECT COALESCE(NULLIF(display_name, ''), 'Student')::text FROM users WHERE id = @id;
+
+-- ---- admin panel ----------------------------------------------------------
+
+-- name: AdminListRequests :many
+SELECT sqlc.embed(r), un.name AS university_name, u.display_name AS requester_name, u.email AS requester_email,
+       (SELECT count(*) FROM blood_responses x WHERE x.request_id = r.id)::int AS response_count
+FROM blood_requests r
+JOIN universities un ON un.id = r.university_id
+LEFT JOIN users u ON u.id = r.requester_id
+WHERE (@status::text = 'all' OR r.status = @status::text)
+  AND (sqlc.narg(university_id)::uuid IS NULL OR r.university_id = sqlc.narg(university_id))
+  AND (@q::text = '' OR r.hospital ILIKE @q_like OR r.area ILIKE @q_like OR r.contact_name ILIKE @q_like
+       OR r.contact_phone ILIKE @q_like OR u.email ILIKE @q_like)
+ORDER BY r.created_at DESC, r.id DESC
+LIMIT @lim OFFSET @off;
+
+-- name: AdminCountRequests :one
+SELECT count(*)::int
+FROM blood_requests r
+LEFT JOIN users u ON u.id = r.requester_id
+WHERE (@status::text = 'all' OR r.status = @status::text)
+  AND (sqlc.narg(university_id)::uuid IS NULL OR r.university_id = sqlc.narg(university_id))
+  AND (@q::text = '' OR r.hospital ILIKE @q_like OR r.area ILIKE @q_like OR r.contact_name ILIKE @q_like
+       OR r.contact_phone ILIKE @q_like OR u.email ILIKE @q_like);
+
+-- name: AdminGetRequest :one
+SELECT sqlc.embed(r), un.name AS university_name, u.display_name AS requester_name, u.email AS requester_email,
+       (SELECT count(*) FROM blood_responses x WHERE x.request_id = r.id)::int AS response_count
+FROM blood_requests r
+JOIN universities un ON un.id = r.university_id
+LEFT JOIN users u ON u.id = r.requester_id
+WHERE r.id = @id;
+
+-- name: InsertAudit :exec
+INSERT INTO audit_log (actor_id, action, target_type, target_id, meta)
+VALUES (@actor_id, @action, @target_type, @target_id, @meta);

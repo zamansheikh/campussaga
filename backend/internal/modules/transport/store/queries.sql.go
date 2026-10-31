@@ -936,6 +936,51 @@ func (q *Queries) OpenSessionOfUser(ctx context.Context, userID uuid.UUID) (BusL
 	return i, err
 }
 
+const openSessionsOfRoute = `-- name: OpenSessionsOfRoute :many
+
+SELECT id, route_id, user_id, direction, service_date, departs, started_at, last_at, ended_at, end_reason, last_lat, last_lng, last_accuracy, last_progress, last_off, speed, pings FROM bus_live_sessions WHERE route_id = $1 AND ended_at IS NULL ORDER BY started_at, id FOR UPDATE
+`
+
+// ---- admin panel ----------------------------------------------------------
+// Every open share on a route, fresh or not.
+func (q *Queries) OpenSessionsOfRoute(ctx context.Context, routeID uuid.UUID) ([]BusLiveSession, error) {
+	rows, err := q.db.Query(ctx, openSessionsOfRoute, routeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BusLiveSession{}
+	for rows.Next() {
+		var i BusLiveSession
+		if err := rows.Scan(
+			&i.ID,
+			&i.RouteID,
+			&i.UserID,
+			&i.Direction,
+			&i.ServiceDate,
+			&i.Departs,
+			&i.StartedAt,
+			&i.LastAt,
+			&i.EndedAt,
+			&i.EndReason,
+			&i.LastLat,
+			&i.LastLng,
+			&i.LastAccuracy,
+			&i.LastProgress,
+			&i.LastOff,
+			&i.Speed,
+			&i.Pings,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const pendingAlerts = `-- name: PendingAlerts :many
 SELECT a.user_id, a.route_id, a.direction, a.stop_id, a.lead_min, a.created_at FROM bus_alerts a
 WHERE a.route_id = $1 AND a.direction = $2
@@ -1054,6 +1099,29 @@ func (q *Queries) RepUniversity(ctx context.Context, userID uuid.UUID) (uuid.UUI
 	var university_id uuid.UUID
 	err := row.Scan(&university_id)
 	return university_id, err
+}
+
+const routeActivityCounts = `-- name: RouteActivityCounts :one
+SELECT (SELECT count(*) FROM bus_live_sessions WHERE route_id = $1::uuid AND started_at > $2::timestamptz)::int AS shares,
+       (SELECT count(*) FROM bus_trip_feedback WHERE route_id = $1::uuid AND created_at > $3::timestamptz)::int AS ratings
+`
+
+type RouteActivityCountsParams struct {
+	RouteID      uuid.UUID
+	SharesSince  time.Time
+	RatingsSince time.Time
+}
+
+type RouteActivityCountsRow struct {
+	Shares  int32
+	Ratings int32
+}
+
+func (q *Queries) RouteActivityCounts(ctx context.Context, arg RouteActivityCountsParams) (RouteActivityCountsRow, error) {
+	row := q.db.QueryRow(ctx, routeActivityCounts, arg.RouteID, arg.SharesSince, arg.RatingsSince)
+	var i RouteActivityCountsRow
+	err := row.Scan(&i.Shares, &i.Ratings)
+	return i, err
 }
 
 const runDelays = `-- name: RunDelays :many

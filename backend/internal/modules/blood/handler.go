@@ -25,6 +25,7 @@ func (s *Service) Routes(r *httpx.Router) {
 		Post("/blood/requests/{id}/respond", httpx.Handle(s.handleRespond))
 	r.Student().Delete("/blood/requests/{id}/respond", httpx.Handle(s.handleWithdraw))
 	r.Student().Post("/blood/requests/{id}/close", httpx.Handle(s.handleClose))
+	s.adminRoutes(r)
 }
 
 func (s *Service) handleMe(ctx context.Context, _ *httpx.Empty) (*donorRes, error) {

@@ -82,6 +82,8 @@ func (s *Service) Routes(r *httpx.Router) {
 	a.Get("/admin/transport/reps", httpx.Handle(s.handleListReps))
 	a.Put("/admin/transport/reps", httpx.Handle(s.handleSetRep))
 	a.Delete("/admin/transport/reps/{user}", httpx.Handle(s.handleRemoveRep, httpx.NoContent()))
+	a.Get("/admin/transport/routes/{id}/activity", httpx.Handle(s.handleAdminActivity))
+	a.Post("/admin/transport/routes/{id}/live/end", httpx.Handle(s.handleAdminEnd))
 }
 
 // ---- views ------------------------------------------------------------------

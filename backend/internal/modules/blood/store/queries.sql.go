@@ -7,10 +7,166 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+const adminCountRequests = `-- name: AdminCountRequests :one
+SELECT count(*)::int
+FROM blood_requests r
+LEFT JOIN users u ON u.id = r.requester_id
+WHERE ($1::text = 'all' OR r.status = $1::text)
+  AND ($2::uuid IS NULL OR r.university_id = $2)
+  AND ($3::text = '' OR r.hospital ILIKE $4 OR r.area ILIKE $4 OR r.contact_name ILIKE $4
+       OR r.contact_phone ILIKE $4 OR u.email ILIKE $4)
+`
+
+type AdminCountRequestsParams struct {
+	Status       string
+	UniversityID *uuid.UUID
+	Q            string
+	QLike        string
+}
+
+func (q *Queries) AdminCountRequests(ctx context.Context, arg AdminCountRequestsParams) (int32, error) {
+	row := q.db.QueryRow(ctx, adminCountRequests,
+		arg.Status,
+		arg.UniversityID,
+		arg.Q,
+		arg.QLike,
+	)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
+const adminGetRequest = `-- name: AdminGetRequest :one
+SELECT r.id, r.university_id, r.requester_id, r.blood_group, r.units, r.hospital, r.area, r.needed_by, r.urgent, r.contact_name, r.contact_phone, r.note, r.status, r.notified, r.created_at, r.closed_at, un.name AS university_name, u.display_name AS requester_name, u.email AS requester_email,
+       (SELECT count(*) FROM blood_responses x WHERE x.request_id = r.id)::int AS response_count
+FROM blood_requests r
+JOIN universities un ON un.id = r.university_id
+LEFT JOIN users u ON u.id = r.requester_id
+WHERE r.id = $1
+`
+
+type AdminGetRequestRow struct {
+	BloodRequest   BloodRequest
+	UniversityName string
+	RequesterName  *string
+	RequesterEmail *string
+	ResponseCount  int32
+}
+
+func (q *Queries) AdminGetRequest(ctx context.Context, id uuid.UUID) (AdminGetRequestRow, error) {
+	row := q.db.QueryRow(ctx, adminGetRequest, id)
+	var i AdminGetRequestRow
+	err := row.Scan(
+		&i.BloodRequest.ID,
+		&i.BloodRequest.UniversityID,
+		&i.BloodRequest.RequesterID,
+		&i.BloodRequest.BloodGroup,
+		&i.BloodRequest.Units,
+		&i.BloodRequest.Hospital,
+		&i.BloodRequest.Area,
+		&i.BloodRequest.NeededBy,
+		&i.BloodRequest.Urgent,
+		&i.BloodRequest.ContactName,
+		&i.BloodRequest.ContactPhone,
+		&i.BloodRequest.Note,
+		&i.BloodRequest.Status,
+		&i.BloodRequest.Notified,
+		&i.BloodRequest.CreatedAt,
+		&i.BloodRequest.ClosedAt,
+		&i.UniversityName,
+		&i.RequesterName,
+		&i.RequesterEmail,
+		&i.ResponseCount,
+	)
+	return i, err
+}
+
+const adminListRequests = `-- name: AdminListRequests :many
+
+SELECT r.id, r.university_id, r.requester_id, r.blood_group, r.units, r.hospital, r.area, r.needed_by, r.urgent, r.contact_name, r.contact_phone, r.note, r.status, r.notified, r.created_at, r.closed_at, un.name AS university_name, u.display_name AS requester_name, u.email AS requester_email,
+       (SELECT count(*) FROM blood_responses x WHERE x.request_id = r.id)::int AS response_count
+FROM blood_requests r
+JOIN universities un ON un.id = r.university_id
+LEFT JOIN users u ON u.id = r.requester_id
+WHERE ($1::text = 'all' OR r.status = $1::text)
+  AND ($2::uuid IS NULL OR r.university_id = $2)
+  AND ($3::text = '' OR r.hospital ILIKE $4 OR r.area ILIKE $4 OR r.contact_name ILIKE $4
+       OR r.contact_phone ILIKE $4 OR u.email ILIKE $4)
+ORDER BY r.created_at DESC, r.id DESC
+LIMIT $6 OFFSET $5
+`
+
+type AdminListRequestsParams struct {
+	Status       string
+	UniversityID *uuid.UUID
+	Q            string
+	QLike        string
+	Off          int32
+	Lim          int32
+}
+
+type AdminListRequestsRow struct {
+	BloodRequest   BloodRequest
+	UniversityName string
+	RequesterName  *string
+	RequesterEmail *string
+	ResponseCount  int32
+}
+
+// ---- admin panel ----------------------------------------------------------
+func (q *Queries) AdminListRequests(ctx context.Context, arg AdminListRequestsParams) ([]AdminListRequestsRow, error) {
+	rows, err := q.db.Query(ctx, adminListRequests,
+		arg.Status,
+		arg.UniversityID,
+		arg.Q,
+		arg.QLike,
+		arg.Off,
+		arg.Lim,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []AdminListRequestsRow{}
+	for rows.Next() {
+		var i AdminListRequestsRow
+		if err := rows.Scan(
+			&i.BloodRequest.ID,
+			&i.BloodRequest.UniversityID,
+			&i.BloodRequest.RequesterID,
+			&i.BloodRequest.BloodGroup,
+			&i.BloodRequest.Units,
+			&i.BloodRequest.Hospital,
+			&i.BloodRequest.Area,
+			&i.BloodRequest.NeededBy,
+			&i.BloodRequest.Urgent,
+			&i.BloodRequest.ContactName,
+			&i.BloodRequest.ContactPhone,
+			&i.BloodRequest.Note,
+			&i.BloodRequest.Status,
+			&i.BloodRequest.Notified,
+			&i.BloodRequest.CreatedAt,
+			&i.BloodRequest.ClosedAt,
+			&i.UniversityName,
+			&i.RequesterName,
+			&i.RequesterEmail,
+			&i.ResponseCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
 
 const closeRequest = `-- name: CloseRequest :exec
 UPDATE blood_requests SET status = $1, closed_at = $2 WHERE id = $3
@@ -267,6 +423,30 @@ func (q *Queries) GetRequestForUpdate(ctx context.Context, id uuid.UUID) (BloodR
 		&i.ClosedAt,
 	)
 	return i, err
+}
+
+const insertAudit = `-- name: InsertAudit :exec
+INSERT INTO audit_log (actor_id, action, target_type, target_id, meta)
+VALUES ($1, $2, $3, $4, $5)
+`
+
+type InsertAuditParams struct {
+	ActorID    *uuid.UUID
+	Action     string
+	TargetType *string
+	TargetID   *string
+	Meta       json.RawMessage
+}
+
+func (q *Queries) InsertAudit(ctx context.Context, arg InsertAuditParams) error {
+	_, err := q.db.Exec(ctx, insertAudit,
+		arg.ActorID,
+		arg.Action,
+		arg.TargetType,
+		arg.TargetID,
+		arg.Meta,
+	)
+	return err
 }
 
 const insertNotices = `-- name: InsertNotices :exec

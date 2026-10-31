@@ -8,8 +8,10 @@ import (
 	"unicode"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/admin/store"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/blood"
 	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
 	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
 )
@@ -47,6 +49,25 @@ type Stats struct {
 		Reported        int `json:"reported"`
 		IssuesLast7Days int `json:"issuesLast7Days"`
 	} `json:"voice"`
+	// Campus social, blood donation and live buses: counts only.
+	Campus struct {
+		PostsLast7Days     map[string]int `json:"postsLast7Days"`
+		CommentsLast7Days  int            `json:"commentsLast7Days"`
+		ReactionsLast7Days int            `json:"reactionsLast7Days"`
+	} `json:"campus"`
+	Blood struct {
+		Donors             int `json:"donors"`
+		Available          int `json:"available"`
+		OpenRequests       int `json:"openRequests"`
+		RequestsLast7Days  int `json:"requestsLast7Days"`
+		ResponsesLast7Days int `json:"responsesLast7Days"`
+	} `json:"blood"`
+	Bus struct {
+		LiveNow           int `json:"liveNow"`
+		SharesLast7Days   int `json:"sharesLast7Days"`
+		TripsShared       int `json:"tripsShared"`
+		RatingsLast30Days int `json:"ratingsLast30Days"`
+	} `json:"bus"`
 	SignupsByDay    []DayCount      `json:"signupsByDay"`
 	TopUniversities []UniversityUse `json:"topUniversities"`
 }
@@ -89,6 +110,34 @@ func (s *Service) handleStats(ctx context.Context, _ *httpx.Empty) (*Stats, erro
 	}
 	out.Voice.Open, out.Voice.Solved, out.Voice.Held = int(vc.Open), int(vc.Solved), int(vc.Held)
 	out.Voice.Reported, out.Voice.IssuesLast7Days = int(vc.Reported), int(vc.IssuesLast7Days)
+
+	week := now.Add(-7 * 24 * time.Hour)
+	cc, err := q.CampusCounts(ctx, week)
+	if err != nil {
+		return nil, err
+	}
+	out.Campus.PostsLast7Days = map[string]int{
+		"issue": int(cc.Issues), "post": int(cc.Posts), "question": int(cc.Questions), "poll": int(cc.Polls),
+	}
+	out.Campus.CommentsLast7Days, out.Campus.ReactionsLast7Days = int(cc.Comments), int(cc.Reactions)
+
+	bc, err := q.BloodCounts(ctx, store.BloodCountsParams{
+		EligibleOn: pgtype.Date{Time: blood.EligibleOn(now), Valid: true}, OpenAfter: now.Add(-24 * time.Hour), Since: week,
+	})
+	if err != nil {
+		return nil, err
+	}
+	out.Blood.Donors, out.Blood.Available, out.Blood.OpenRequests = int(bc.Donors), int(bc.Available), int(bc.OpenRequests)
+	out.Blood.RequestsLast7Days, out.Blood.ResponsesLast7Days = int(bc.Requests), int(bc.Responses)
+
+	bu, err := q.BusCounts(ctx, store.BusCountsParams{
+		FreshSince: now.Add(-2 * time.Minute), Since: week, RatingsSince: now.Add(-30 * 24 * time.Hour),
+	})
+	if err != nil {
+		return nil, err
+	}
+	out.Bus.LiveNow, out.Bus.SharesLast7Days = int(bu.LiveNow), int(bu.Shares)
+	out.Bus.TripsShared, out.Bus.RatingsLast30Days = int(bu.TripsShared), int(bu.Ratings)
 
 	today := bdToday(now)
 	days, err := q.SignupsByDay(ctx, store.SignupsByDayParams{

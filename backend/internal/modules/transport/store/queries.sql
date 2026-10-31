@@ -241,3 +241,13 @@ DELETE FROM bus_run_stops WHERE passed_at < @before;
 
 -- name: PurgeFeedback :execrows
 DELETE FROM bus_trip_feedback WHERE created_at < @before;
+
+-- ---- admin panel ----------------------------------------------------------
+
+-- Every open share on a route, fresh or not.
+-- name: OpenSessionsOfRoute :many
+SELECT * FROM bus_live_sessions WHERE route_id = @route_id AND ended_at IS NULL ORDER BY started_at, id FOR UPDATE;
+
+-- name: RouteActivityCounts :one
+SELECT (SELECT count(*) FROM bus_live_sessions WHERE route_id = @route_id::uuid AND started_at > @shares_since::timestamptz)::int AS shares,
+       (SELECT count(*) FROM bus_trip_feedback WHERE route_id = @route_id::uuid AND created_at > @ratings_since::timestamptz)::int AS ratings;

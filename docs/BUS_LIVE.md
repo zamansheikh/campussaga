@@ -49,7 +49,7 @@ bus_live_sessions
   direction text (to_campus|from_campus), service_date date,
   departs smallint (-1 = not on the timetable),
   started_at, last_at timestamptz, ended_at timestamptz null,
-  end_reason text null (stopped|arrived|expired|replaced|off_route),
+  end_reason text null (stopped|arrived|expired|replaced|off_route|admin),
   last_lat, last_lng double null, last_accuracy real null,
   last_progress real null   -- metres, direction of travel
   last_off real null        -- metres from the route line
