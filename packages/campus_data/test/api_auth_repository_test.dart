@@ -112,6 +112,39 @@ void main() {
     await repo.dispose();
   });
 
+  test(
+    'newer saved tokens are used instead of sending a replaced one',
+    () async {
+      // This copy of the app read the old tokens; an earlier copy (Android
+      // restarted the app) refreshed and saved new ones since.
+      final store = MemoryTokenStore();
+      await store.write(AuthTokens.fromJson(tokens('old')));
+      var refreshes = 0;
+      final api = ApiClient(
+        const ApiConfig(baseUrl: 'https://api.test/api/v1'),
+        httpClient: MockClient((req) async {
+          if (req.url.path.endsWith('/auth/refresh')) {
+            refreshes++;
+            return err(401, 'REFRESH_INVALID');
+          }
+          if (req.url.path.endsWith('/ping')) return ok(null);
+          if (req.headers['Authorization'] == 'Bearer access-old') {
+            return err(401, 'TOKEN_EXPIRED');
+          }
+          return ok(user);
+        }),
+      );
+      final repo = ApiAuthRepository(api, store);
+      await api.get('/ping'); // this copy has the old tokens in memory
+      await store.write(AuthTokens.fromJson(tokens('saved')));
+
+      expect(await api.get('/me'), isNotNull);
+      expect(refreshes, 0, reason: 'no replayed refresh token');
+      expect(store.tokens?.refreshToken, 'refresh-saved');
+      await repo.dispose();
+    },
+  );
+
   test('a rejected refresh ends the session and forgets tokens', () async {
     final store = MemoryTokenStore();
     await store.write(AuthTokens.fromJson(tokens('old')));

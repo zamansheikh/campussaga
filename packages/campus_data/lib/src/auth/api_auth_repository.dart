@@ -55,8 +55,19 @@ class ApiAuthRepository implements AuthRepository {
   });
 
   Future<bool> _doRefresh() async {
-    final current = await _current();
+    var current = await _current();
     if (current == null) return false;
+    // Android can restart the app on some system changes; an earlier copy
+    // may have refreshed and saved newer tokens since these were read.
+    // Use those rather than send a replaced refresh token.
+    final saved = await _store.read();
+    if (saved != null && saved.refreshToken != current.refreshToken) {
+      _tokens = current = saved;
+      final fresh = saved.accessTokenExpiresAt.isAfter(
+        DateTime.now().add(const Duration(seconds: 30)),
+      );
+      if (fresh) return true;
+    }
     try {
       final data = await _api.post('/auth/refresh', {
         'refreshToken': current.refreshToken,
