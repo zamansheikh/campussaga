@@ -5092,4 +5092,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get badgesPageTitle => 'Badges';
+
+  @override
+  String badgesPlus(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '+$countString';
+  }
+
+  @override
+  String get badgesMore => 'More';
 }

@@ -161,9 +161,11 @@ class CsSectionTitle extends StatelessWidget {
       child: action == null
           ? text
           : Row(
+              // The action sits at the right edge; a long one (e.g. in
+              // Bangla) shrinks instead of overflowing.
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(child: text),
-                // A long action (e.g. in Bangla) shrinks instead of overflowing.
+                Flexible(child: text),
                 Flexible(child: action!),
               ],
             ),

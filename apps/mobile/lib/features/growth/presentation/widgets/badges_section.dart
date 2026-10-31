@@ -125,48 +125,76 @@ class _BadgesSectionState extends State<BadgesSection> {
               side: BorderSide(color: cs.border),
             ),
             clipBehavior: Clip.antiAlias,
-            child: SizedBox(
-              height: 104,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: CsSpace.sm,
-                  vertical: 10,
-                ),
-                children: [
-                  for (final b in badges.badges)
-                    _MiniBadge(
-                      icon: CsBadgeIcon(
-                        badgeKey: b.key,
-                        tier: b.tier,
-                        size: 46,
-                        semanticLabel: badgeName(l10n, b.key),
-                      ),
-                      label: badgeName(l10n, b.key),
-                      shown: badges.featured?.key == b.key,
-                      onTap: () => _open(b, badges.info(b.key), b.key),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: CsSpace.xs,
+                vertical: CsSpace.sm,
+              ),
+              // As many equal slots as fit (4 on most phones), so nothing
+              // is cut at the edge; the last one is "+N" when more are earned.
+              child: LayoutBuilder(
+                builder: (context, box) {
+                  final slots = (box.maxWidth / 84).floor().clamp(4, 6);
+                  final width = box.maxWidth / slots;
+                  final earned = [
+                    ...badges.badges.where(
+                      (b) => b.key == badges.featured?.key,
                     ),
-                  if (locked > 0)
-                    _MiniBadge(
-                      icon: Container(
-                        width: 46,
-                        height: 46,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: cs.border, width: 2),
-                        ),
-                        child: Icon(
-                          CsIcons.lock,
-                          size: 20,
-                          color: cs.textSecondary,
-                        ),
-                      ),
-                      label: l10n.badgesToEarn(locked),
-                      muted: true,
-                      onTap: _seeAll,
+                    ...badges.badges.where(
+                      (b) => b.key != badges.featured?.key,
                     ),
-                ],
+                  ];
+                  final fits = earned.length + (locked > 0 ? 1 : 0) <= slots;
+                  final shown = fits ? earned : earned.take(slots - 1);
+                  final more = earned.length - shown.length;
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final b in shown)
+                        _MiniBadge(
+                          width: width,
+                          icon: CsBadgeIcon(
+                            badgeKey: b.key,
+                            tier: b.tier,
+                            size: 46,
+                            semanticLabel: badgeName(l10n, b.key),
+                          ),
+                          label: badgeName(l10n, b.key),
+                          shown: badges.featured?.key == b.key,
+                          onTap: () => _open(b, badges.info(b.key), b.key),
+                        ),
+                      if (more > 0)
+                        _MiniBadge(
+                          width: width,
+                          icon: _Circle(
+                            child: Text(
+                              l10n.badgesPlus(more),
+                              style: context.text.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          label: l10n.badgesMore,
+                          muted: true,
+                          onTap: _seeAll,
+                        )
+                      else if (locked > 0)
+                        _MiniBadge(
+                          width: width,
+                          icon: _Circle(
+                            child: Icon(
+                              CsIcons.lock,
+                              size: 20,
+                              color: cs.textSecondary,
+                            ),
+                          ),
+                          label: l10n.badgesToEarn(locked),
+                          muted: true,
+                          onTap: _seeAll,
+                        ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -243,9 +271,11 @@ class _BadgesSectionState extends State<BadgesSection> {
   }
 }
 
-/// One badge in the Profile row: the icon and its name under it.
+/// One badge in the Profile row: the icon and its name under it, on one
+/// line.
 class _MiniBadge extends StatelessWidget {
   const _MiniBadge({
+    required this.width,
     required this.icon,
     required this.label,
     required this.onTap,
@@ -253,6 +283,7 @@ class _MiniBadge extends StatelessWidget {
     this.muted = false,
   });
 
+  final double width;
   final Widget icon;
   final String label;
   final VoidCallback onTap;
@@ -264,31 +295,53 @@ class _MiniBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = context.cs;
-    return InkWell(
-      borderRadius: BorderRadius.circular(CsRadius.md),
-      onTap: onTap,
-      child: SizedBox(
-        width: 76,
-        child: Column(
-          children: [
-            icon,
-            const SizedBox(height: 6),
-            Text(
-              label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: context.text.labelSmall?.copyWith(
-                height: 1.15,
-                color: muted ? cs.textSecondary : cs.textPrimary,
-                fontWeight: shown ? FontWeight.w800 : FontWeight.w500,
+    return SizedBox(
+      width: width,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(CsRadius.md),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+          child: Column(
+            children: [
+              icon,
+              const SizedBox(height: 6),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: context.text.labelSmall?.copyWith(
+                  color: muted ? cs.textSecondary : cs.textPrimary,
+                  fontWeight: shown ? FontWeight.w800 : FontWeight.w500,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+}
+
+/// The round frame of the "+N" and "to earn" slots, the size of a badge.
+class _Circle extends StatelessWidget {
+  const _Circle({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 46,
+    height: 46,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: context.cs.surfaceVariant,
+      border: Border.all(color: context.cs.border, width: 2),
+    ),
+    child: child,
+  );
 }
 
 /// A badge still to earn: greyed, with how to earn it.

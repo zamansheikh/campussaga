@@ -1317,5 +1317,7 @@
   "claimNotWinner": "শুধু বিজয়ীরা পুরস্কার নিতে পারে।",
   "badgesSeeAll": "সব দেখো · {earned}/{total}",
   "badgesToEarn": "আরও {count}টি",
-  "badgesPageTitle": "ব্যাজ"
+  "badgesPageTitle": "ব্যাজ",
+  "badgesPlus": "+{count}",
+  "badgesMore": "আরও"
 }

@@ -8005,6 +8005,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Badges'**
   String get badgesPageTitle;
+
+  /// No description provided for @badgesPlus.
+  ///
+  /// In en, this message translates to:
+  /// **'+{count}'**
+  String badgesPlus(int count);
+
+  /// No description provided for @badgesMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get badgesMore;
 }
 
 class _AppLocalizationsDelegate

@@ -1837,5 +1837,8 @@
   "@badgesSeeAll": {"placeholders": {"earned": {"type": "int", "format": "decimalPattern"}, "total": {"type": "int", "format": "decimalPattern"}}},
   "badgesToEarn": "{count} to earn",
   "@badgesToEarn": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}},
-  "badgesPageTitle": "Badges"
+  "badgesPageTitle": "Badges",
+  "badgesPlus": "+{count}",
+  "@badgesPlus": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}},
+  "badgesMore": "More"
 }
