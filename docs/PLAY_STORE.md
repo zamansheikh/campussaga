@@ -96,11 +96,12 @@ Google's reviewers have no university email. The API has a reviewer sign-in
 | Health and fitness → Health info | Yes | Optional | App functionality | Blood donation: blood group and last donation date |
 | Photos and videos → Photos | Yes | Optional | App functionality | Photos attached to Campus Voice posts, and an optional profile photo |
 | App activity → Other user-generated content | Yes | Optional | App functionality | Routines, announcements, course links, Campus posts, comments and polls, blood requests |
-| App activity → Other actions | Yes | Optional | App functionality | Reactions, poll votes, follows, reports, blood donation offers |
+| App activity → Other actions | Yes | Optional | App functionality | Reactions, poll votes, follows, reports, blood donation offers, bus trip ratings, "bus near" alerts |
+| App activity → App interactions | Yes | Optional | App functionality | Live buses (build 6): which live bus a student opened, kept 24 h, only to tell a sharer how many students saw their bus |
 | App info and performance → Crash logs | Yes | Required | App functionality | Crashlytics; no user ID |
 | App info and performance → Diagnostics | Yes | Required | App functionality | Crashlytics device and app version |
 | Device or other IDs | Yes | Required | App functionality | Push token and Crashlytics installation ID |
-| Location → Precise location | Yes | Optional | App functionality | Live buses (build 6): only while a student shares the bus they're on; points deleted 24 h after sharing ends. Also a rep's "Use my location" for a stop |
+| Location → Precise location | Yes | Optional | App functionality | Live buses (build 6): only while a student shares the bus they're on; points deleted 24 h after sharing ends, so **not** "processed ephemerally". Also a rep's "Use my location" for a stop |
 
 Not collected: approximate location, contacts, financial info, messages,
 audio, files, web history, installed apps. (Phone number and health info
