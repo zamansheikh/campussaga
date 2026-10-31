@@ -241,10 +241,11 @@ func TestGrowthCampaigns(t *testing.T) {
 	a = h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+a.ID, map[string]any{"status": "live"}, http.StatusOK)
 	assert.Equal(t, "live", a.Status)
 
-	// Live: only ends_at, settles_at, rules and prizes can change.
-	for _, f := range []map[string]any{{"titleEn": "New"}, {"bodyEn": "x"}, {"startsAt": start.Format(time.RFC3339)}, {"universityIds": []string{}}} {
-		assert.Equal(t, "CAMPAIGN_LOCKED", h.do("PATCH", "/admin/campaigns/"+a.ID, admin.Tok, f).code(), "%v", f)
-	}
+	// Live: still editable (a spelling fix, new criteria), and it stays live.
+	a = h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+a.ID, map[string]any{"titleEn": "Invite and wim"}, http.StatusOK)
+	a = h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+a.ID, map[string]any{"titleEn": "Invite and win"}, http.StatusOK)
+	assert.Equal(t, "Invite and win", a.TitleEn)
+	assert.Equal(t, "live", a.Status)
 	a = h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+a.ID, map[string]any{"rulesBn": "বিনামূল্যে অংশগ্রহণ"}, http.StatusOK)
 	a = h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+a.ID, map[string]any{"endsAt": end.Add(24 * time.Hour).Format(time.RFC3339)}, http.StatusOK)
 	settles := end.Add(7 * 24 * time.Hour) // unchanged: still after the new end
@@ -556,7 +557,9 @@ func TestGrowthCampaigns(t *testing.T) {
 	}
 	assert.Equal(t, map[string]string{"p3-en": "You won: Laptop!", "p1-bn": "তুমি জিতেছ: হেডফোন!"}, pushed)
 	assert.Equal(t, "CAMPAIGN_NOT_ANNOUNCEABLE", h.do("POST", "/admin/campaigns/"+a.ID+"/announce", admin.Tok, map[string]any{"winners": picks}).code())
-	assert.Equal(t, "CAMPAIGN_LOCKED", h.do("PATCH", "/admin/campaigns/"+a.ID, admin.Tok, map[string]any{"rulesEn": "changed"}).code())
+	// Even after the announcement the text can be fixed; it stays announced.
+	fixed := h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+a.ID, map[string]any{"rulesBn": "বিনামূল্যে অংশগ্রহণ।"}, http.StatusOK)
+	assert.Equal(t, "announced", fixed.Status)
 	assert.Equal(t, "CAMPAIGN_WINNERS", h.do("POST", "/admin/campaigns/"+b.ID+"/announce", admin.Tok, map[string]any{"winners": []map[string]any{{"userId": admin.ID, "rank": 1}}}).code(), "winners must be participants of that campaign")
 
 	// ---- winners claim ----

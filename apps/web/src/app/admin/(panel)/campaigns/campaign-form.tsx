@@ -79,12 +79,12 @@ function shift(v: string, ms: number): string {
 }
 
 /**
- * Create or edit a campaign. Once it is live only the end and settle dates,
- * the rules and the prizes can change, so the other fields are locked.
+ * Create or edit a campaign. Everything can be changed at any time, also
+ * while it is live (a spelling fix, new criteria); every change is in the
+ * audit log.
  */
 export function CampaignForm({ campaign, universities }: { campaign?: AdminCampaign; universities: UniversityOption[] }) {
   const router = useRouter();
-  const live = Boolean(campaign && campaign.status !== "draft");
   const [titleEn, setTitleEn] = useState(campaign?.titleEn ?? "");
   const [titleBn, setTitleBn] = useState(campaign?.titleBn ?? "");
   const [bodyEn, setBodyEn] = useState(campaign?.bodyEn ?? "");
@@ -107,9 +107,7 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
   const [sectionPrizeBn, setSectionPrizeBn] = useState(campaign?.sectionPrizeBn ?? "");
   const [finisherRewardEn, setFinisherRewardEn] = useState(campaign?.finisherRewardEn ?? "");
   const [finisherRewardBn, setFinisherRewardBn] = useState(campaign?.finisherRewardBn ?? "");
-  // While live the count may only go up from what it is now.
-  const liveFinisherCount = campaign?.finisherRewardCount ?? 0;
-  const [finisherCount, setFinisherCount] = useState(String(liveFinisherCount));
+  const [finisherCount, setFinisherCount] = useState(String(campaign?.finisherRewardCount ?? 0));
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
 
@@ -147,8 +145,6 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
           finisherRewardBn,
           finisherRewardCount: finisherCount.trim() === "" ? Number.NaN : Number(finisherCount),
         },
-        live,
-        liveFinisherCount,
       );
       if (!res.ok) {
         setError(res.error);
@@ -164,12 +160,6 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
 
   return (
     <div className="max-w-3xl space-y-6">
-      {live ? (
-        <p className="rounded-lg border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          This campaign is live. Only the end and settle dates, the rules, the prizes and how many finishers get the reward (only up) can change.
-        </p>
-      ) : null}
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">What students see</CardTitle>
@@ -177,16 +167,16 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <Field label="Title (English)" htmlFor="c-title-en">
-            <Input id="c-title-en" value={titleEn} onChange={(e) => setTitleEn(e.target.value)} maxLength={120} disabled={live} />
+            <Input id="c-title-en" value={titleEn} onChange={(e) => setTitleEn(e.target.value)} maxLength={120} />
           </Field>
           <Field label="Title (Bangla)" htmlFor="c-title-bn">
-            <Input id="c-title-bn" lang="bn" value={titleBn} onChange={(e) => setTitleBn(e.target.value)} maxLength={120} disabled={live} />
+            <Input id="c-title-bn" lang="bn" value={titleBn} onChange={(e) => setTitleBn(e.target.value)} maxLength={120} />
           </Field>
           <Field label="Description (English)" htmlFor="c-body-en">
-            <Textarea id="c-body-en" rows={4} value={bodyEn} onChange={(e) => setBodyEn(e.target.value)} maxLength={2000} disabled={live} />
+            <Textarea id="c-body-en" rows={4} value={bodyEn} onChange={(e) => setBodyEn(e.target.value)} maxLength={2000} />
           </Field>
           <Field label="Description (Bangla)" htmlFor="c-body-bn">
-            <Textarea id="c-body-bn" lang="bn" rows={4} value={bodyBn} onChange={(e) => setBodyBn(e.target.value)} maxLength={2000} disabled={live} />
+            <Textarea id="c-body-bn" lang="bn" rows={4} value={bodyBn} onChange={(e) => setBodyBn(e.target.value)} maxLength={2000} />
           </Field>
           <Field label={`Rules (English) · ${rulesEn.length}/8000`} htmlFor="c-rules-en">
             <Textarea id="c-rules-en" rows={8} value={rulesEn} onChange={(e) => setRulesEn(e.target.value)} maxLength={8000} />
@@ -219,7 +209,7 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-3">
           <Field label="Starts" htmlFor="c-start">
-            <Input id="c-start" type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} disabled={live} />
+            <Input id="c-start" type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
           </Field>
           <Field label="Ends" htmlFor="c-end">
             <Input id="c-end" type="datetime-local" value={endsAt} onChange={(e) => changeEnd(e.target.value)} />
@@ -246,16 +236,15 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
         <CardContent className="space-y-3">
           <div className="flex gap-4 text-sm">
             <label className="flex items-center gap-2">
-              <input type="radio" name="scope" checked={all} onChange={() => setAll(true)} disabled={live} /> All universities
+              <input type="radio" name="scope" checked={all} onChange={() => setAll(true)} /> All universities
             </label>
             <label className="flex items-center gap-2">
-              <input type="radio" name="scope" checked={!all} onChange={() => setAll(false)} disabled={live} /> Only some
+              <input type="radio" name="scope" checked={!all} onChange={() => setAll(false)} /> Only some
             </label>
           </div>
           {!all ? (
             <>
-              {!live ? (
-                <div className="sm:w-96">
+              <div className="sm:w-96">
                   <UniversityCombobox
                     universities={universities.filter((u) => !uniIds.includes(u.id))}
                     value={null}
@@ -263,17 +252,14 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
                     placeholder="Add a university"
                   />
                 </div>
-              ) : null}
               <ul className="flex flex-wrap gap-2">
                 {uniIds.length === 0 ? <li className="text-sm text-muted-foreground">No university chosen yet.</li> : null}
                 {uniIds.map((id) => (
                   <li key={id} className="flex items-center gap-1 rounded-full border bg-card py-1 ps-3 pe-1 text-sm">
                     {unis.get(id) ?? id}
-                    {!live ? (
-                      <Button variant="ghost" size="icon" className="size-6" aria-label={`Remove ${unis.get(id) ?? "university"}`} onClick={() => setUniIds((l) => l.filter((x) => x !== id))}>
-                        <X />
-                      </Button>
-                    ) : null}
+                    <Button variant="ghost" size="icon" className="size-6" aria-label={`Remove ${unis.get(id) ?? "university"}`} onClick={() => setUniIds((l) => l.filter((x) => x !== id))}>
+                      <X />
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -286,7 +272,7 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
         <CardHeader>
           <CardTitle className="text-base">Points</CardTitle>
           <CardDescription>
-            What each thing is worth. 0 turns it off. The rules page lists them for students. Points can only change while the campaign is a draft.
+            What each thing is worth. 0 turns it off. The rules page lists them for students. You can change them at any time; every change is in the audit log.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -309,7 +295,7 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
                         step={1}
                         value={scoring[f.key]}
                         onChange={(e) => setScoring((s) => ({ ...s, [f.key]: e.target.value }))}
-                        disabled={live}
+                       
                         aria-describedby={`${id}-hint`}
                       />
                       <p id={`${id}-hint`} className="text-xs text-muted-foreground">
@@ -377,11 +363,11 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
               maxLength={120}
               placeholder="e.g. A pizza party for the whole section"
               onChange={(e) => setSectionPrizeEn(e.target.value)}
-              disabled={live}
+             
             />
           </Field>
           <Field label="Section prize (Bangla, optional)" htmlFor="c-section-bn">
-            <Input id="c-section-bn" lang="bn" value={sectionPrizeBn} maxLength={120} onChange={(e) => setSectionPrizeBn(e.target.value)} disabled={live} />
+            <Input id="c-section-bn" lang="bn" value={sectionPrizeBn} maxLength={120} onChange={(e) => setSectionPrizeBn(e.target.value)} />
           </Field>
         </CardContent>
       </Card>
@@ -391,7 +377,7 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
           <CardTitle className="text-base">Race finisher reward</CardTitle>
           <CardDescription>
             A small reward for the first students who enter the prize race (they get the Race finisher badge either way). They add their mobile number in
-            the app; you send it and mark it sent. 0: no reward. Once live, the number can only go up.
+            the app; you send it and mark it sent. 0: no reward. 
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-[1fr_1fr_10rem]">
@@ -402,18 +388,18 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
               maxLength={120}
               placeholder="e.g. 20 TK mobile recharge"
               onChange={(e) => setFinisherRewardEn(e.target.value)}
-              disabled={live}
+             
             />
           </Field>
           <Field label="Reward (Bangla)" htmlFor="c-finisher-bn">
-            <Input id="c-finisher-bn" lang="bn" value={finisherRewardBn} maxLength={120} onChange={(e) => setFinisherRewardBn(e.target.value)} disabled={live} />
+            <Input id="c-finisher-bn" lang="bn" value={finisherRewardBn} maxLength={120} onChange={(e) => setFinisherRewardBn(e.target.value)} />
           </Field>
           <Field label="For the first" htmlFor="c-finisher-count">
             <Input
               id="c-finisher-count"
               type="number"
               inputMode="numeric"
-              min={live ? liveFinisherCount : 0}
+              min={0}
               max={10000}
               step={1}
               value={finisherCount}

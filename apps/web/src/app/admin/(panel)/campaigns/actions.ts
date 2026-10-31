@@ -59,7 +59,6 @@ const campaign = z
     settlesAt: iso,
     universityIds: z.array(z.uuid()).nullable(),
     prizes: z.array(prize).min(1, "Add at least one prize.").max(20),
-    // Only drafts send points (they can't change once live).
     scoring: scoring.optional(),
     // Section challenge prize (§9.1): empty means badges only.
     sectionPrizeEn: z.string().trim().max(120, "The section prize (English) can be at most 120 characters."),
@@ -90,20 +89,13 @@ function refresh(id?: string) {
 }
 
 /**
- * Creates a draft, or saves one. [live] campaigns only change end, settle,
- * rules and prizes, so only those are sent, plus the number of finishers
- * who get the reward, which may only go up ([liveFinisherCount] is the
- * current one).
+ * Creates a draft, or saves a campaign. Everything can change at any time,
+ * also while it is live (a spelling fix, new criteria).
  */
-export async function saveCampaign(
-  id: string | null,
-  input: CampaignInput,
-  live: boolean,
-  liveFinisherCount = 0,
-): Promise<ActionResult<{ id: string }>> {
+export async function saveCampaign(id: string | null, input: CampaignInput): Promise<ActionResult<{ id: string }>> {
   await requireAdmin();
   if (id !== null && !uuid.safeParse(id).success) return { ok: false, error: "That campaign isn't valid." };
-  const parsed = campaign.safeParse(live ? { ...input, scoring: undefined } : input);
+  const parsed = campaign.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Some fields are invalid." };
   const c = parsed.data;
   try {
@@ -112,20 +104,7 @@ export async function saveCampaign(
       refresh();
       return { ok: true, data: { id: created.id } };
     }
-    if (live && c.finisherRewardCount < liveFinisherCount) {
-      return { ok: false, error: `While the campaign is live, the number of finishers who get the reward can only go up (now ${liveFinisherCount}).` };
-    }
-    const body = live
-      ? {
-          endsAt: c.endsAt,
-          settlesAt: c.settlesAt,
-          rulesEn: c.rulesEn,
-          rulesBn: c.rulesBn,
-          prizes: c.prizes,
-          // Sent only when raised, so an older server never sees it.
-          ...(c.finisherRewardCount > liveFinisherCount ? { finisherRewardCount: c.finisherRewardCount } : {}),
-        }
-      : c;
+    const body = c;
     await api(`/admin/campaigns/${id}`, { method: "PATCH", body });
     refresh(id);
     return { ok: true, data: { id } };

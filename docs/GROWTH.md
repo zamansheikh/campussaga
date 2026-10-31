@@ -190,7 +190,7 @@ Ranks are ordered by score, then by whoever reached that score earlier.
 | Method | Path | Notes |
 |---|---|---|
 | GET / POST | `/admin/campaigns` | List; create (status `draft`). |
-| GET / PATCH | `/admin/campaigns/{id}` | Edit while `draft`. PATCH `{status:"live"}` publishes. Once live, only `ends_at`, `settles_at`, rules and prizes can change. |
+| GET / PATCH | `/admin/campaigns/{id}` | Editable at any time, also while live or announced (spelling fixes, new criteria; decision 2026-11-01). PATCH `{status:"live"}` publishes. Every change is audited. |
 | GET | `/admin/campaigns/{id}/standings` | Top 100: `[{rank, user: {id,name,email,university}, score, hidden, invites: [{referred: {id,name,university}, source, createdAt, verifiedVia, activeDays, qualifiedAt, sameDevice, disqualified}], flags: ["same_device", "burst" (≥10 invites in 1 hour), "new_account" (referrer under 7 days old)]}]` |
 | POST | `/admin/referrals/{referredId}/disqualify` | `{reason}` |
 | POST | `/admin/referrals/{referredId}/restore` | Undoes a disqualify. |
@@ -311,8 +311,8 @@ it's hard to farm.
 
 ### 8.1 Point values
 Stored per campaign in `campaigns.scoring jsonb NOT NULL DEFAULT <defaults>`.
-Editable while the campaign is a **draft** only (changing rules mid-campaign
-is unfair). Each value is an integer 0–100 (0 turns that one off);
+Editable at any time, also while live (the team fixes mistakes and updates
+criteria; every change is audited). Each value is an integer 0–100 (0 turns that one off);
 `busShareDays` 0–60, `sectionSetupMax` 0–10, `pioneerFirst` 1–1000. Missing
 keys take the default. Error `INVALID_SCORING` (400).
 
@@ -355,7 +355,7 @@ keys take the default. Error `INVALID_SCORING` (400).
     Name as the app shows a group (department, batch, section).
 - Leaderboard `score` is points (shape unchanged).
 - **Admin:**
-  - create and PATCH take `scoring` (draft only, merged over defaults);
+  - create and PATCH take `scoring` (any time, merged over the current values);
     list and detail return it;
   - standings rows add `points: {invite, otherCampus, pioneer, friendSection, joinSection, bloodDonor, busShare, sectionSetup}` (points per key);
   - each invite adds `otherCampus`, `pioneer` and `inSection` booleans;
@@ -383,7 +383,7 @@ keys take the default. Error `INVALID_SCORING` (400).
 - **Rules page** (`/campaigns/[id]`): a "How to earn points" table (EN and
   BN) from `scoring`, in place of "how invites count".
 - **Admin campaign form:** a "Points" group with a number field per key
-  (draft only; read-only once live), defaults filled in.
+  (editable at any time), defaults filled in.
 - **Standings:** the points breakdown per participant, the new invite
   booleans, and the `self_vouched` flag.
 
@@ -449,7 +449,7 @@ a few. No lucky draws.
 - **Badge** `race_finisher` for anyone with a finisher row (no tiers, stays).
 - **Reward for the first N**: `campaigns.finisher_reward_en/_bn` (text ≤ 120,
   e.g. "20 TK mobile recharge") and `finisher_reward_count` (0–10000, default
-  0 = no reward). Editable while draft; once live the count may only go up.
+  0 = no reward). Editable at any time.
 - **Student API** (campaign detail):
   - `finisherReward: {title, count, left}` or null when count is 0;
   - `finisher: {position, inReward, claimed, sent}` or null.

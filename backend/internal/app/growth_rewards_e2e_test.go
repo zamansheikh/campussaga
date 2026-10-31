@@ -127,7 +127,9 @@ func TestGrowthSectionChallenge(t *testing.T) {
 	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+plain.ID, map[string]any{"status": "live"}, http.StatusOK)
 	farOnly := h.gwAdminCampaign(admin.Tok, "POST", "/admin/campaigns", campaignBody(start, end, map[string]any{
 		"titleEn": "Far only", "universityIds": []string{far}}), http.StatusCreated)
-	assert.Equal(t, "CAMPAIGN_LOCKED", h.do("PATCH", "/admin/campaigns/"+a.ID, admin.Tok, map[string]any{"sectionPrizeEn": "Other"}).code(), "draft only")
+	// Editable while live; set back to keep the checks below.
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+a.ID, map[string]any{"sectionPrizeEn": "Other"}, http.StatusOK)
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+a.ID, map[string]any{"sectionPrizeEn": "Pizza party for the section"}, http.StatusOK)
 	assert.Equal(t, "VALIDATION_FAILED", h.do("POST", "/admin/campaigns", admin.Tok, campaignBody(start, end, map[string]any{
 		"sectionPrizeEn": strings.Repeat("x", 121)})).code())
 
@@ -291,9 +293,12 @@ func TestGrowthFinishers(t *testing.T) {
 	r.into(t, &adm)
 	assert.Equal(t, 2, adm.FinisherRewardCount, "a draft can lower it")
 	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+f.ID, map[string]any{"status": "live"}, http.StatusOK)
+	// Editable while live too (set back below).
 	for _, p := range []map[string]any{{"finisherRewardCount": 1}, {"finisherRewardEn": "30 TK"}, {"finisherRewardBn": "x"}} {
-		assert.Equal(t, "CAMPAIGN_LOCKED", h.do("PATCH", "/admin/campaigns/"+f.ID, admin.Tok, p).code(), "%v", p)
+		h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+f.ID, p, http.StatusOK)
 	}
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+f.ID, map[string]any{
+		"finisherRewardEn": "20 TK mobile recharge", "finisherRewardBn": "২০ টাকা মোবাইল রিচার্জ"}, http.StatusOK)
 	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+f.ID, map[string]any{"finisherRewardCount": 2}, http.StatusOK)
 	var pub struct {
 		FinisherRewardEn    string `json:"finisherRewardEn"`

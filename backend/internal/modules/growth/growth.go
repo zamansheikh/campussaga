@@ -50,7 +50,6 @@ var (
 	ErrCampaignNotFound   = apperr.New(http.StatusNotFound, "CAMPAIGN_NOT_FOUND", "This campaign was not found")
 	ErrNotAWinner         = apperr.New(http.StatusForbidden, "NOT_A_WINNER", "You are not a winner of this campaign")
 	ErrAlreadyClaimed     = apperr.New(http.StatusConflict, "ALREADY_CLAIMED", "You already sent your details")
-	ErrCampaignLocked     = apperr.New(http.StatusConflict, "CAMPAIGN_LOCKED", "This campaign can't be changed this way any more")
 	ErrCampaignIncomplete = apperr.New(http.StatusUnprocessableEntity, "CAMPAIGN_INCOMPLETE", "A campaign needs a title, rules and prizes before it goes live")
 	ErrCampaignDates      = apperr.New(http.StatusUnprocessableEntity, "CAMPAIGN_DATES", "The dates don't fit: start < end <= settle")
 	ErrCampaignPrizes     = apperr.New(http.StatusUnprocessableEntity, "CAMPAIGN_PRIZES", "The prize ranks are not valid")

@@ -156,8 +156,9 @@ func TestGrowthPoints(t *testing.T) {
 	want["busShareDays"], want["pioneerFirst"], want["minOwnCampus"], want["minOtherCampus"] = 2, 3, 0, 0
 	assert.Equal(t, want, created.Scoring, "merged over the stored values")
 	require.Equal(t, http.StatusOK, h.do("PATCH", "/admin/campaigns/"+id, admin.Tok, map[string]any{"status": "live"}).Status)
-	assert.Equal(t, "CAMPAIGN_LOCKED", h.do("PATCH", "/admin/campaigns/"+id, admin.Tok, map[string]any{"scoring": map[string]any{"invite": 20}}).code(),
-		"point values can't change once live")
+	// Point values stay editable while live (a fixed mistake, new criteria).
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+id, map[string]any{"scoring": map[string]any{"invite": 20}}, http.StatusOK)
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+id, map[string]any{"scoring": map[string]any{"invite": 10}}, http.StatusOK)
 
 	// The Min campaign: the same values with only the other-universities
 	// minimum (2, set while a draft; locked once live) and none for my own.
@@ -168,7 +169,8 @@ func TestGrowthPoints(t *testing.T) {
 	r.into(t, &created)
 	assert.Equal(t, 2, created.Scoring["minOtherCampus"])
 	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+minC, map[string]any{"status": "live"}, http.StatusOK)
-	assert.Equal(t, "CAMPAIGN_LOCKED", h.do("PATCH", "/admin/campaigns/"+minC, admin.Tok, map[string]any{"scoring": map[string]any{"minOtherCampus": 1}}).code())
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+minC, map[string]any{"scoring": map[string]any{"minOtherCampus": 1}}, http.StatusOK)
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+minC, map[string]any{"scoring": map[string]any{"minOtherCampus": 2}}, http.StatusOK)
 
 	// A second campaign with joining a section and bus shares turned off.
 	off := h.gwAdminCampaign(admin.Tok, "POST", "/admin/campaigns", campaignBody(start, end, map[string]any{
@@ -483,7 +485,8 @@ func TestGrowthPoints(t *testing.T) {
 	assert.Equal(t, 3, created.Scoring["minOwnCampus"], "set while a draft")
 	assert.Equal(t, 2, created.Scoring["minOtherCampus"], "the default")
 	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+bothC, map[string]any{"status": "live"}, http.StatusOK)
-	assert.Equal(t, "CAMPAIGN_LOCKED", h.do("PATCH", "/admin/campaigns/"+bothC, admin.Tok, map[string]any{"scoring": map[string]any{"minOwnCampus": 1}}).code())
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+bothC, map[string]any{"scoring": map[string]any{"minOwnCampus": 1}}, http.StatusOK)
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+bothC, map[string]any{"scoring": map[string]any{"minOwnCampus": 3}}, http.StatusOK)
 
 	friends := func(inviter, prefix string, own, other int) {
 		for i := range own {
@@ -586,3 +589,33 @@ func TestGrowthPoints(t *testing.T) {
 }
 
 func ptInt(n int) *int { return &n }
+
+// A campaign stays editable at any time: before and after it starts.
+func TestGrowthCampaignAlwaysEditable(t *testing.T) {
+	h := newHarness(t)
+	now := h.Now()
+	admin := h.gwStudent("admin@test.ac.bd", "Admin One")
+	h.sql(`UPDATE users SET role = 'admin' WHERE id = $1`, admin.ID)
+	id := h.gwAdminCampaign(admin.Tok, "POST", "/admin/campaigns",
+		campaignBody(now.Add(5*time.Minute), now.Add(30*24*time.Hour), nil), http.StatusCreated).ID
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+id, map[string]any{"status": "live"}, http.StatusOK)
+
+	edit := func(body map[string]any) map[string]int {
+		r := h.do("PATCH", "/admin/campaigns/"+id, admin.Tok, body)
+		require.Equal(t, http.StatusOK, r.Status, r.Raw)
+		var c struct {
+			Status  string         `json:"status"`
+			Scoring map[string]int `json:"scoring"`
+		}
+		r.into(t, &c)
+		assert.Equal(t, "live", c.Status)
+		return c.Scoring
+	}
+	sc := edit(map[string]any{"titleEn": "Renamed before the start", "scoring": map[string]any{"invite": 20, "minOwnCampus": 1}})
+	assert.Equal(t, 20, sc["invite"])
+	assert.Equal(t, 1, sc["minOwnCampus"])
+
+	h.advance(6 * time.Minute) // started
+	sc = edit(map[string]any{"titleEn": "Spelling fixed", "scoring": map[string]any{"invite": 15}, "finisherRewardCount": 0})
+	assert.Equal(t, 15, sc["invite"])
+}

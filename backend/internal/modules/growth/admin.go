@@ -245,9 +245,9 @@ type patchReq struct {
 	UniversityIDs *[]uuid.UUID `json:"universityIds" validate:"omitnil,max=200"`
 	Prizes        *[]Prize     `json:"prizes" validate:"omitnil,max=20,dive"`
 	Status        *string      `json:"status" validate:"omitnil,oneof=live"`
-	// Scoring: point values merged over the current ones; draft only.
+	// Scoring: point values merged over the current ones.
 	Scoring *ScoringInput `json:"scoring"`
-	// §9: draft only, except the finisher count, which may go up while live.
+	// §9: the section prize and the finisher reward.
 	SectionPrizeEn      *string `json:"sectionPrizeEn" validate:"omitnil,max=120"`
 	SectionPrizeBn      *string `json:"sectionPrizeBn" validate:"omitnil,max=120"`
 	FinisherRewardEn    *string `json:"finisherRewardEn" validate:"omitnil,max=120"`
@@ -262,19 +262,8 @@ func (s *Service) handleAdminPatch(ctx context.Context, in *patchReq) (*AdminCam
 		if err != nil {
 			return err
 		}
-		if c.Status == "announced" {
-			return ErrCampaignLocked
-		}
-		// A draft can change freely; once live only the end, the settle
-		// date, the rules and the prizes can (never the point values).
-		if c.Status != "draft" {
-			if in.TitleEn != nil || in.TitleBn != nil || in.BodyEn != nil || in.BodyBn != nil || in.StartsAt != nil ||
-				in.UniversityIDs != nil || in.Status != nil || in.Scoring != nil ||
-				in.SectionPrizeEn != nil || in.SectionPrizeBn != nil || in.FinisherRewardEn != nil || in.FinisherRewardBn != nil ||
-				(in.FinisherRewardCount != nil && *in.FinisherRewardCount < c.FinisherRewardCount) {
-				return ErrCampaignLocked
-			}
-		}
+		// Everything can change at any time (a spelling mistake, new
+		// criteria); every change is in the audit log.
 		if c.Scoring, err = in.Scoring.mergeOver(c.Scoring); err != nil {
 			return err
 		}

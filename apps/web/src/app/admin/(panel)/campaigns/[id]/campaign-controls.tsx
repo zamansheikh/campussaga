@@ -24,7 +24,7 @@ export function PublishButton({ id, title }: { id: string; title: string }) {
       description={
         <>
           <p>
-            &quot;{title}&quot; goes live for students. After this, only the end and settle dates, the rules and the prizes can change.
+            &quot;{title}&quot; goes live for students. You can still edit it afterwards.
           </p>
           <p>Check the dates, the universities and the prizes first.</p>
         </>
