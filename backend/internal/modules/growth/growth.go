@@ -58,6 +58,7 @@ var (
 	ErrNotAnnounceable    = apperr.New(http.StatusConflict, "CAMPAIGN_NOT_ANNOUNCEABLE", "Only a live campaign can be announced, once")
 	ErrWinners            = apperr.New(http.StatusUnprocessableEntity, "CAMPAIGN_WINNERS", "The winners are not valid")
 	ErrInvalidScoring     = apperr.New(http.StatusBadRequest, "INVALID_SCORING", "Point values must be whole numbers in their range")
+	ErrNotEligible        = apperr.New(http.StatusUnprocessableEntity, "NOT_ELIGIBLE", "A winner must have the minimum friends from other universities")
 )
 
 // NoticeText is a push in one language.

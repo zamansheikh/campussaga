@@ -466,6 +466,10 @@ type StandingRow struct {
 	// Disqualified participants are listed after the ranked ones (rank null)
 	// so they can be restored.
 	Disqualified bool `json:"disqualified"`
+	// Eligible: at least minOtherCampus counted friends at other
+	// universities (OtherCampus), so ranked; the others have rank null (§8.5).
+	Eligible    bool `json:"eligible"`
+	OtherCampus int  `json:"otherCampus"`
 	// Points per key (zero for a disqualified participant).
 	Points  Points       `json:"points"`
 	Invites []InviteView `json:"invites"`
@@ -479,17 +483,31 @@ func (s *Service) handleAdminStandings(ctx context.Context, in *campaignReq) (*[
 	if err != nil {
 		return nil, err
 	}
-	top, err := s.standings(ctx, c, nil, standingsSize)
+	all, err := s.standings(ctx, c, nil, 1_000_000)
 	if err != nil {
 		return nil, err
 	}
+	// The top eligible (ranked), then the top who aren't eligible yet.
 	out := []StandingRow{}
 	users := map[uuid.UUID]int{}
-	for _, x := range top {
-		rank := x.Rank
+	ranked, others := 0, 0
+	for _, x := range all {
+		if x.Eligible {
+			if ranked++; ranked > standingsSize {
+				continue
+			}
+		} else if others++; others > standingsSize {
+			break
+		}
+		var rank *int
+		if x.Eligible {
+			r := x.Rank
+			rank = &r
+		}
 		users[x.UserID] = len(out)
-		out = append(out, StandingRow{Rank: &rank, Score: x.Score, Hidden: x.Hidden, Points: x.Tally.points(c.Scoring),
-			Invites: []InviteView{}, Flags: []string{}, User: StandingUser{ID: x.UserID, Name: x.Name, University: x.UniName}})
+		out = append(out, StandingRow{Rank: rank, Score: x.Score, Hidden: x.Hidden, Eligible: x.Eligible, OtherCampus: x.Tally.OtherCampus,
+			Points: x.Tally.points(c.Scoring), Invites: []InviteView{}, Flags: []string{},
+			User: StandingUser{ID: x.UserID, Name: x.Name, University: x.UniName}})
 	}
 	// Disqualified participants, after the ranked ones.
 	rows, err := s.d.Q(ctx).Query(ctx, `SELECT d.user_id, coalesce(u.display_name, ''), un.name, u.leaderboard_hidden
@@ -686,14 +704,19 @@ func (s *Service) handleAdminAnnounce(ctx context.Context, in *announceReq) (*[]
 		if err != nil {
 			return err
 		}
-		eligible := map[uuid.UUID]bool{}
+		// Participants, and whether each may win (§8.5).
+		participant := map[uuid.UUID]bool{}
 		for _, x := range all {
-			eligible[x.UserID] = true
+			participant[x.UserID] = x.Eligible
 		}
 		users, ranks := map[uuid.UUID]bool{}, map[int]bool{}
 		for _, w := range in.Winners {
-			if !eligible[w.UserID] || users[w.UserID] || ranks[w.Rank] {
+			canWin, ok := participant[w.UserID]
+			if !ok || users[w.UserID] || ranks[w.Rank] {
 				return ErrWinners
+			}
+			if !canWin {
+				return ErrNotEligible
 			}
 			users[w.UserID], ranks[w.Rank] = true, true
 			if _, ok := c.prizeFor(w.Rank); !ok {

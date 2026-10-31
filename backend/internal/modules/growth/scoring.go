@@ -3,7 +3,9 @@ package growth
 import "encoding/json"
 
 // Scoring is a campaign's point values (docs/GROWTH.md §8.1). A 0 turns one
-// off. BusShareDays, SectionSetupMax and PioneerFirst are limits, not points.
+// off. BusShareDays, SectionSetupMax and PioneerFirst are limits, not points;
+// MinOtherCampus is how many counted friends at other universities a student
+// needs to be ranked (§8.5, 0: none).
 type Scoring struct {
 	Invite          int `json:"invite"`
 	OtherCampus     int `json:"otherCampus"`
@@ -16,12 +18,13 @@ type Scoring struct {
 	SectionSetup    int `json:"sectionSetup"`
 	SectionSetupMax int `json:"sectionSetupMax"`
 	PioneerFirst    int `json:"pioneerFirst"`
+	MinOtherCampus  int `json:"minOtherCampus"`
 }
 
 // DefaultScoring matches the column default of 00760_campaign_points.sql.
 var DefaultScoring = Scoring{
 	Invite: 10, OtherCampus: 5, Pioneer: 5, FriendSection: 3, JoinSection: 2, BloodDonor: 3,
-	BusShare: 2, BusShareDays: 10, SectionSetup: 15, SectionSetupMax: 2, PioneerFirst: 20,
+	BusShare: 2, BusShareDays: 10, SectionSetup: 15, SectionSetupMax: 2, PioneerFirst: 20, MinOtherCampus: 2,
 }
 
 // Mission rules that aren't point values.
@@ -44,6 +47,7 @@ type ScoringInput struct {
 	SectionSetup    *int `json:"sectionSetup"`
 	SectionSetupMax *int `json:"sectionSetupMax"`
 	PioneerFirst    *int `json:"pioneerFirst"`
+	MinOtherCampus  *int `json:"minOtherCampus"`
 }
 
 // mergeOver sets the given keys on base and checks the ranges.
@@ -78,6 +82,7 @@ func (in *ScoringInput) mergeOver(base Scoring) (Scoring, error) {
 		{&out.SectionSetup, in.SectionSetup, 0, 100},
 		{&out.SectionSetupMax, in.SectionSetupMax, 0, 10},
 		{&out.PioneerFirst, in.PioneerFirst, 1, 1000},
+		{&out.MinOtherCampus, in.MinOtherCampus, 0, 20},
 	} {
 		if err := set(f.dst, f.v, f.lo, f.hi); err != nil {
 			return out, err

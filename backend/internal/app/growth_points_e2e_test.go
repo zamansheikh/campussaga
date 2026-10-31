@@ -21,12 +21,14 @@ type ptMission struct {
 }
 
 type ptDetail struct {
-	ID       string         `json:"id"`
-	MyScore  int            `json:"myScore"`
-	MyRank   *int           `json:"myRank"`
-	Scoring  map[string]int `json:"scoring"`
-	Missions []ptMission    `json:"missions"`
-	Section  *struct {
+	ID            string         `json:"id"`
+	MyScore       int            `json:"myScore"`
+	MyRank        *int           `json:"myRank"`
+	MyOtherCampus int            `json:"myOtherCampus"`
+	Eligible      bool           `json:"eligible"`
+	Scoring       map[string]int `json:"scoring"`
+	Missions      []ptMission    `json:"missions"`
+	Section       *struct {
 		GroupID string `json:"groupId"`
 		Name    string `json:"name"`
 		Slots   int    `json:"slots"`
@@ -54,7 +56,7 @@ type ptStanding struct {
 
 var defaultScoring = map[string]int{
 	"invite": 10, "otherCampus": 5, "pioneer": 5, "friendSection": 3, "joinSection": 2, "bloodDonor": 3,
-	"busShare": 2, "busShareDays": 10, "sectionSetup": 15, "sectionSetupMax": 2, "pioneerFirst": 20,
+	"busShare": 2, "busShareDays": 10, "sectionSetup": 15, "sectionSetupMax": 2, "pioneerFirst": 20, "minOtherCampus": 2,
 }
 
 // ptUser inserts a student at a university; verifiedAt nil: unverified.
@@ -133,24 +135,38 @@ func TestGrowthPoints(t *testing.T) {
 	id := created.ID
 	for _, bad := range []map[string]any{
 		{"invite": 101}, {"joinSection": -1}, {"busShareDays": 61}, {"sectionSetupMax": 11}, {"pioneerFirst": 0}, {"pioneerFirst": 1001},
+		{"minOtherCampus": -1}, {"minOtherCampus": 21},
 	} {
 		r := h.do("POST", "/admin/campaigns", admin.Tok, campaignBody(start, end, map[string]any{"scoring": bad}))
 		assert.Equal(t, "INVALID_SCORING", r.code(), "%v", bad)
 		assert.Equal(t, http.StatusBadRequest, r.Status)
 	}
 	assert.Equal(t, "INVALID_SCORING", h.do("PATCH", "/admin/campaigns/"+id, admin.Tok, map[string]any{"scoring": map[string]any{"invite": 500}}).code())
-	r := h.do("PATCH", "/admin/campaigns/"+id, admin.Tok, map[string]any{"scoring": map[string]any{"busShareDays": 2, "pioneerFirst": 3}})
+	// No minimum of friends from other universities here (0: everyone with
+	// points is ranked); the Min campaign below keeps the default 2.
+	r := h.do("PATCH", "/admin/campaigns/"+id, admin.Tok, map[string]any{"scoring": map[string]any{"busShareDays": 2, "pioneerFirst": 3, "minOtherCampus": 0}})
 	require.Equal(t, http.StatusOK, r.Status, r.Raw)
 	r.into(t, &created)
 	want := map[string]int{}
 	for k, v := range defaultScoring {
 		want[k] = v
 	}
-	want["busShareDays"], want["pioneerFirst"] = 2, 3
+	want["busShareDays"], want["pioneerFirst"], want["minOtherCampus"] = 2, 3, 0
 	assert.Equal(t, want, created.Scoring, "merged over the stored values")
 	require.Equal(t, http.StatusOK, h.do("PATCH", "/admin/campaigns/"+id, admin.Tok, map[string]any{"status": "live"}).Status)
 	assert.Equal(t, "CAMPAIGN_LOCKED", h.do("PATCH", "/admin/campaigns/"+id, admin.Tok, map[string]any{"scoring": map[string]any{"invite": 20}}).code(),
 		"point values can't change once live")
+
+	// The Min campaign: the same values with the default minimum (2), set
+	// while a draft; locked once live.
+	minC := h.gwAdminCampaign(admin.Tok, "POST", "/admin/campaigns", campaignBody(start, end, map[string]any{
+		"titleEn": "Min", "scoring": map[string]any{"busShareDays": 2, "pioneerFirst": 3, "minOtherCampus": 5}}), http.StatusCreated).ID
+	r = h.do("PATCH", "/admin/campaigns/"+minC, admin.Tok, map[string]any{"scoring": map[string]any{"minOtherCampus": 2}})
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	r.into(t, &created)
+	assert.Equal(t, 2, created.Scoring["minOtherCampus"])
+	h.gwAdminCampaign(admin.Tok, "PATCH", "/admin/campaigns/"+minC, map[string]any{"status": "live"}, http.StatusOK)
+	assert.Equal(t, "CAMPAIGN_LOCKED", h.do("PATCH", "/admin/campaigns/"+minC, admin.Tok, map[string]any{"scoring": map[string]any{"minOtherCampus": 1}}).code())
 
 	// A second campaign with joining a section and bus shares turned off.
 	off := h.gwAdminCampaign(admin.Tok, "POST", "/admin/campaigns", campaignBody(start, end, map[string]any{
@@ -237,7 +253,10 @@ func TestGrowthPoints(t *testing.T) {
 
 	dc := h.ptDetail(c.Tok, id)
 	assert.Equal(t, 2*15+2, dc.MyScore, "two sections count (the most), and she's in one")
-	assert.Equal(t, 2, *dc.MyRank)
+	require.NotNil(t, dc.MyRank)
+	assert.Equal(t, 2, *dc.MyRank, "no minimum here: ranked without friends from other universities")
+	assert.True(t, dc.Eligible)
+	assert.Zero(t, dc.MyOtherCampus)
 	assert.Nil(t, dc.Section, "already at the most sections that count")
 
 	db := h.ptDetail(b.Tok, id)
@@ -379,6 +398,84 @@ func TestGrowthPoints(t *testing.T) {
 	da = h.ptDetail(a.Tok, id)
 	assert.Zero(t, da.MyScore)
 	assert.Nil(t, da.MyRank)
+
+	// ---- the minimum of friends from other universities (Min: 2) ----
+	g := h.gwStudent("gita@test.ac.bd", "Gita One Away")
+	h.ptInvite(g.ID, h.ptUser("Friend Six", far, at(-time.Minute), ""), now, at(time.Hour), false) // one friend at another university
+	dm := h.ptDetail(a.Tok, minC)
+	assert.Equal(t, 53, dm.MyScore)
+	assert.Equal(t, 2, dm.MyOtherCampus)
+	assert.True(t, dm.Eligible, "exactly at the minimum")
+	require.NotNil(t, dm.MyRank)
+	assert.Equal(t, 1, *dm.MyRank)
+	dg := h.ptDetail(g.Tok, minC)
+	assert.Equal(t, 10+5, dg.MyScore, "points still count below the minimum")
+	assert.Equal(t, 1, dg.MyOtherCampus)
+	assert.False(t, dg.Eligible)
+	assert.Nil(t, dg.MyRank, "not ranked below the minimum")
+	assert.Len(t, dg.Missions, 8, "and sees their progress")
+	dc = h.ptDetail(c.Tok, minC)
+	assert.Equal(t, 32, dc.MyScore)
+	assert.Nil(t, dc.MyRank)
+	assert.False(t, dc.Eligible)
+	var inList ptDetail
+	var list []ptDetail
+	h.do("GET", "/campaigns", g.Tok, nil).into(t, &list)
+	for _, x := range list {
+		if x.ID == minC {
+			inList = x
+		}
+	}
+	assert.Equal(t, 1, inList.MyOtherCampus)
+	assert.False(t, inList.Eligible)
+	assert.Nil(t, inList.MyRank)
+	// Leaderboards (both scopes) list only the eligible; my row is null when I'm not.
+	for _, scope := range []string{"", "?scope=university"} {
+		bd := h.gwBoard(c.Tok, minC, scope)
+		require.Len(t, bd.Rows, 1, scope)
+		assert.Equal(t, "Amina Inviter", bd.Rows[0].Name)
+		assert.Equal(t, 1, bd.Rows[0].Rank)
+		assert.Nil(t, bd.Me, scope)
+	}
+	assert.Nil(t, h.gwBoard(g.Tok, minC, "").Me)
+	assert.Equal(t, 1, h.gwBoard(a.Tok, minC, "").Me.Rank)
+	// Admin standings: the eligible ranked first, then the rest with rank null.
+	sr = h.do("GET", "/admin/campaigns/"+minC+"/standings", admin.Tok, nil)
+	require.Equal(t, http.StatusOK, sr.Status, sr.Raw)
+	var ms []struct {
+		ptStanding
+		Eligible    bool `json:"eligible"`
+		OtherCampus int  `json:"otherCampus"`
+	}
+	sr.into(t, &ms)
+	require.Greater(t, len(ms), 3)
+	assert.Equal(t, a.ID, ms[0].User.ID)
+	require.NotNil(t, ms[0].Rank)
+	assert.Equal(t, 1, *ms[0].Rank)
+	assert.True(t, ms[0].Eligible)
+	assert.Equal(t, 2, ms[0].OtherCampus)
+	assert.Equal(t, c.ID, ms[1].User.ID, "then by points: Chandni (32)")
+	for _, s := range ms[1:] {
+		assert.Nil(t, s.Rank)
+		assert.False(t, s.Eligible)
+		if s.User.ID == g.ID {
+			assert.Equal(t, 1, s.OtherCampus)
+			assert.Equal(t, 15, s.Score)
+		}
+	}
+
+	// ---- announce: a winner must be eligible ----
+	h.advance(18 * 24 * time.Hour)
+	h.gwRefresh(admin)
+	for _, picks := range [][]map[string]any{{{"userId": c.ID, "rank": 1}}, {{"userId": a.ID, "rank": 1}, {"userId": g.ID, "rank": 2}}} {
+		nr := h.do("POST", "/admin/campaigns/"+minC+"/announce", admin.Tok, map[string]any{"winners": picks})
+		assert.Equal(t, "NOT_ELIGIBLE", nr.code())
+		assert.Equal(t, http.StatusUnprocessableEntity, nr.Status)
+	}
+	assert.Equal(t, "CAMPAIGN_WINNERS", h.do("POST", "/admin/campaigns/"+minC+"/announce", admin.Tok,
+		map[string]any{"winners": []map[string]any{{"userId": admin.ID, "rank": 1}}}).code(), "not a participant at all")
+	ok := h.do("POST", "/admin/campaigns/"+minC+"/announce", admin.Tok, map[string]any{"winners": []map[string]any{{"userId": a.ID, "rank": 1}}})
+	assert.Equal(t, http.StatusOK, ok.Status, ok.Raw)
 }
 
 func ptInt(n int) *int { return &n }

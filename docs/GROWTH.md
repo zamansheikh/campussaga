@@ -511,8 +511,25 @@ Paths, fields and error codes are as in §5. Where the spec left a choice:
   campaign that is no longer a draft is `CAMPAIGN_LOCKED` (409), like the other
   locked fields.
 - **`scoring`** on every campaign JSON (student list and detail, public, admin
-  list and detail): all eleven keys,
-  `{invite, otherCampus, pioneer, friendSection, joinSection, bloodDonor, busShare, busShareDays, sectionSetup, sectionSetupMax, pioneerFirst}`.
+  list and detail): all twelve keys,
+  `{invite, otherCampus, pioneer, friendSection, joinSection, bloodDonor, busShare, busShareDays, sectionSetup, sectionSetupMax, pioneerFirst, minOtherCampus}`.
+- **Eligibility (§8.5):** `minOtherCampus` (default 2, 0–20, draft-only like the
+  rest; in the 00760 column default) counts the same invites as `otherCampus`
+  (counted invites whose friend is at another university), whatever the point
+  values: they are counted even when every invite key is worth 0, and then add
+  no tie-break time. One query ranks only the eligible (`row_number` per
+  eligibility), eligible first; the rest come back with rank 0.
+  - Student list and detail: `myOtherCampus` (int) and `eligible` (bool,
+    `myOtherCampus >= minOtherCampus`, so true for anyone when the minimum is
+    0, even without points); `myRank` is null when not eligible, `myScore` and
+    `missions` still show the points.
+  - Leaderboards (both scopes) list only the eligible, and `me` is null when
+    I'm not.
+  - Admin standings: up to 100 eligible (ranked), then up to 100 not eligible
+    by points (`rank: null`); every row adds `eligible` and `otherCampus`
+    (disqualified rows: false and 0).
+  - Announce: a winner who isn't a participant is still `CAMPAIGN_WINNERS`; a
+    participant who isn't eligible is `NOT_ELIGIBLE` (422).
 - **One query** (`standingsSQL` in `campaigns.go`) scores everyone. Thresholds
   are constants in `scoring.go`: a section needs 5 routine slots and 5 verified
   members besides the CR (any member, `courses_only` ones too); a bus share needs

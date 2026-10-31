@@ -125,10 +125,13 @@ func (c campaign) prizeFor(rank int) (Prize, bool) {
 // The score is points (docs/GROWTH.md §8): counted invites (created inside
 // the campaign, qualified by settles_at, not disqualified, not on the same
 // phone) with their bonuses, plus the missions. Only verified, non-team
-// students take part; anyone with a point is ranked. Ranks go by points,
-// then by who reached them first (the latest counted event), then by id.
+// students take part; anyone with a point has a row. Only the eligible
+// (at least minOtherCampus counted friends at other universities, §8.5) are
+// ranked, first; the rest follow with rank 0. Ranks go by points, then by who
+// reached them first (the latest counted event), then by id.
 type standing struct {
-	Rank      int
+	Rank      int // 0: not eligible
+	Eligible  bool
 	UserID    uuid.UUID
 	Name      string
 	Hidden    bool
@@ -142,10 +145,12 @@ type standing struct {
 
 // standingsSQL: $1 campaign, $2 starts, $3 ends, $4 settles, $5 its
 // universities, $6 one university (leaderboard scope), $7 limit, $8 count
-// invites at all, $9 pioneerFirst, $10 count sections joined, $11 count
-// donors, $12 bus days that count (0: off), $13 CR sections that count (0:
-// off), $14 routine slots and $15 verified members a section needs, $16 a
-// bus share's minimum minutes, $17..$24 the points per key.
+// invites at all (worth points, or needed for eligibility), $9 pioneerFirst,
+// $10 count sections joined, $11 count donors, $12 bus days that count (0:
+// off), $13 CR sections that count (0: off), $14 routine slots and $15
+// verified members a section needs, $16 a bus share's minimum minutes,
+// $17..$24 the points per key, $25 invites worth points (their time breaks
+// ties), $26 minOtherCampus.
 //
 // Bus: a Dhaka day counts when I shared a live bus that day that ran at least
 // $16 minutes (by its last ping), didn't end off the route, and another
@@ -179,7 +184,8 @@ cr_sections AS (
 parts AS (
 	SELECT user_id, count(*)::int AS invites, (count(*) FILTER (WHERE other_campus))::int AS other_campus,
 	       (count(*) FILTER (WHERE pioneer))::int AS pioneer, (count(*) FILTER (WHERE in_section))::int AS friend_section,
-	       0 AS join_section, 0 AS blood_donor, 0 AS bus_days, 0 AS sections, max(qualified_at) AS reached_at
+	       0 AS join_section, 0 AS blood_donor, 0 AS bus_days, 0 AS sections,
+	       CASE WHEN $25::bool THEN max(qualified_at) END AS reached_at
 	FROM counted GROUP BY user_id
 	UNION ALL
 	SELECT user_id, 0, 0, 0, 0, 1, 0, 0, 0, min(joined_at) FROM class_group_members WHERE $10::bool GROUP BY user_id
@@ -203,14 +209,18 @@ scored AS (
 ranked AS (
 	SELECT s.user_id, s.score, s.reached_at, coalesce(u.display_name, '') AS name, u.leaderboard_hidden, u.university_id, un.name AS uni_name,
 	       fb.badge, fb.tier, s.invites, s.other_campus, s.pioneer, s.friend_section, s.join_section, s.blood_donor, s.bus_days, s.sections,
-	       row_number() OVER (ORDER BY s.score DESC, s.reached_at NULLS LAST, s.user_id)::int AS rank
+	       s.other_campus >= $26::int AS eligible,
+	       row_number() OVER (PARTITION BY s.other_campus >= $26::int ORDER BY s.score DESC, s.reached_at NULLS LAST, s.user_id)::int AS k
 	FROM scored s JOIN users u ON u.id = s.user_id JOIN universities un ON un.id = u.university_id
 	LEFT JOIN user_badges fb ON fb.user_id = u.id AND fb.badge = u.featured_badge AND NOT fb.private
 	WHERE s.score > 0 AND u.verified_at IS NOT NULL AND u.role NOT IN ('admin', 'moderator') AND u.blocked_at IS NULL
 	  AND ($5::uuid[] IS NULL OR u.university_id = ANY($5))
 	  AND ($6::uuid IS NULL OR u.university_id = $6)
 	  AND NOT EXISTS (SELECT 1 FROM campaign_disqualified d WHERE d.campaign_id = $1 AND d.user_id = u.id))
-SELECT * FROM ranked ORDER BY rank LIMIT $7`
+SELECT user_id, score, reached_at, name, leaderboard_hidden, university_id, uni_name, badge, tier,
+       invites, other_campus, pioneer, friend_section, join_section, blood_donor, bus_days, sections,
+       eligible, CASE WHEN eligible THEN k ELSE 0 END
+FROM ranked ORDER BY eligible DESC, k LIMIT $7`
 
 func (s *Service) standings(ctx context.Context, c campaign, scopeUni *uuid.UUID, limit int) ([]standing, error) {
 	sc := c.Scoring
@@ -221,11 +231,13 @@ func (s *Service) standings(ctx context.Context, c campaign, scopeUni *uuid.UUID
 	if sc.SectionSetup == 0 {
 		sections = 0
 	}
+	invitesWorth := sc.Invite+sc.OtherCampus+sc.Pioneer+sc.FriendSection > 0
 	rows, err := s.d.Q(ctx).Query(ctx, standingsSQL,
 		c.ID, c.StartsAt, c.EndsAt, c.SettlesAt, c.UniversityIDs, scopeUni, limit,
-		sc.Invite+sc.OtherCampus+sc.Pioneer+sc.FriendSection > 0, sc.PioneerFirst, sc.JoinSection > 0, sc.BloodDonor > 0,
+		invitesWorth || sc.MinOtherCampus > 0, sc.PioneerFirst, sc.JoinSection > 0, sc.BloodDonor > 0,
 		busDays, sections, SectionSlotsNeed, SectionMembersNeed, BusShareMinMinutes,
-		sc.Invite, sc.OtherCampus, sc.Pioneer, sc.FriendSection, sc.JoinSection, sc.BloodDonor, sc.BusShare, sc.SectionSetup)
+		sc.Invite, sc.OtherCampus, sc.Pioneer, sc.FriendSection, sc.JoinSection, sc.BloodDonor, sc.BusShare, sc.SectionSetup,
+		invitesWorth, sc.MinOtherCampus)
 	if err != nil {
 		return nil, err
 	}
@@ -237,7 +249,8 @@ func (s *Service) standings(ctx context.Context, c campaign, scopeUni *uuid.UUID
 		var tier *int16
 		t := &x.Tally
 		if err := rows.Scan(&x.UserID, &x.Score, &x.ReachedAt, &x.Name, &x.Hidden, &x.UniID, &x.UniName, &badge, &tier,
-			&t.Invites, &t.OtherCampus, &t.Pioneer, &t.FriendSection, &t.JoinSection, &t.BloodDonor, &t.BusDays, &t.Sections, &x.Rank); err != nil {
+			&t.Invites, &t.OtherCampus, &t.Pioneer, &t.FriendSection, &t.JoinSection, &t.BloodDonor, &t.BusDays, &t.Sections,
+			&x.Eligible, &x.Rank); err != nil {
 			return nil, err
 		}
 		if badge != nil && tier != nil {
@@ -331,10 +344,14 @@ type CampaignView struct {
 	Status    string      `json:"status"`
 	Prizes    []PrizeView `json:"prizes"`
 	MyScore   int         `json:"myScore"`
-	MyRank    *int        `json:"myRank"`
-	RulesURL  string      `json:"rulesUrl"`
-	BannerURL *string     `json:"bannerUrl"`
-	Scoring   Scoring     `json:"scoring"`
+	MyRank    *int        `json:"myRank"` // null: no points, or not eligible
+	// MyOtherCampus: my counted friends at other universities; Eligible:
+	// at least scoring.minOtherCampus of them, so I'm ranked (§8.5).
+	MyOtherCampus int     `json:"myOtherCampus"`
+	Eligible      bool    `json:"eligible"`
+	RulesURL      string  `json:"rulesUrl"`
+	BannerURL     *string `json:"bannerUrl"`
+	Scoring       Scoring `json:"scoring"`
 }
 
 // CampaignDetail adds whether the student won, the ways to earn points with
@@ -361,6 +378,8 @@ func (s *Service) view(ctx context.Context, c campaign, uid uuid.UUID) (Campaign
 		return v, me, err
 	}
 	v.MyScore = me.Score
+	v.MyOtherCampus = me.Tally.OtherCampus
+	v.Eligible = me.Tally.OtherCampus >= c.Scoring.MinOtherCampus
 	if me.Rank > 0 {
 		rank := me.Rank
 		v.MyRank = &rank
@@ -527,7 +546,11 @@ func (s *Service) handleLeaderboard(ctx context.Context, in *leaderboardReq) (*L
 	}
 	l := lang(ctx)
 	out := &Leaderboard{Rows: []LBRow{}, UpdatedAt: s.now().UTC()}
+	// Only the eligible are ranked (they come first); my row too.
 	for i, x := range all {
+		if !x.Eligible {
+			break
+		}
 		if i < leaderboardSize {
 			out.Rows = append(out.Rows, s.lbRow(l, x, me.UserID))
 		}
