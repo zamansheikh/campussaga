@@ -95,7 +95,7 @@ export default async function UniversityHealthPage({ searchParams }: { searchPar
                       </Link>
                     </TableCell>
                     <TableCell className="text-end tabular-nums">{formatNumber(u.students)}</TableCell>
-                    <TableCell className="text-end tabular-nums">{Math.round(u.verifiedPct)}%</TableCell>
+                    <TableCell className="text-end tabular-nums">{u.students === 0 ? "—" : `${Math.round(u.verifiedPct)}%`}</TableCell>
                     <TableCell className="text-end tabular-nums">{formatNumber(u.campusAdmins)}</TableCell>
                     <TableCell className="text-end tabular-nums">{formatNumber(u.sections)}</TableCell>
                     <TableCell className="text-end tabular-nums">{formatNumber(u.sectionsWithCr)}</TableCell>
@@ -105,7 +105,7 @@ export default async function UniversityHealthPage({ searchParams }: { searchPar
                     <TableCell className="min-w-44 whitespace-normal">
                       <div className="flex flex-wrap gap-1">
                         {(u.attention ?? []).length === 0 ? (
-                          <span className="text-xs text-muted-foreground">Fine</span>
+                          <span className="text-xs text-muted-foreground">{u.students === 0 ? "No students yet" : "Fine"}</span>
                         ) : (
                           u.attention.map((a) => (
                             <Badge key={a} variant="warning">
