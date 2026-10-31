@@ -16,6 +16,7 @@ import (
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/accounts"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/admin"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/appconfig"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/blood"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/classgroups"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/photos"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/push"
@@ -44,6 +45,7 @@ type App struct {
 	ClassGroups  *classgroups.Service
 	Push         *push.Service
 	Voice        *voice.Service
+	Blood        *blood.Service
 
 	handler http.Handler
 }
@@ -188,7 +190,16 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
 	})
 
-	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc}
+	bloodSvc := blood.NewService(d, now)
+	bloodSvc.SetNotifier(func(userIDs []uuid.UUID, n blood.Notice) {
+		texts := make(map[string]push.Text, len(n.Texts))
+		for lang, t := range n.Texts {
+			texts[lang] = push.Text{Title: t.Title, Body: t.Body}
+		}
+		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
+	})
+
+	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc, Blood: bloodSvc}
 
 	root := chi.NewRouter()
 	root.NotFound(httpx.NotFoundHandler)
@@ -206,6 +217,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		adminSvc.Routes(r)
 		voiceSvc.Routes(r)
 		transport.NewService(d, now, roads, log).Routes(r)
+		bloodSvc.Routes(r)
 		photoSvc.Routes(r)
 	})
 
