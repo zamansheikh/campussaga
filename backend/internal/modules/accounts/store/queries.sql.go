@@ -135,27 +135,6 @@ func (q *Queries) EmailInUse(ctx context.Context, arg EmailInUseParams) (bool, e
 	return exists, err
 }
 
-const findSessionByPrevious = `-- name: FindSessionByPrevious :one
-SELECT id, user_id, refresh_hash, previous_hash, user_agent, created_at, last_used_at, expires_at, revoked_at FROM sessions WHERE previous_hash = $1 ORDER BY last_used_at DESC LIMIT 1
-`
-
-func (q *Queries) FindSessionByPrevious(ctx context.Context, previousHash []byte) (Session, error) {
-	row := q.db.QueryRow(ctx, findSessionByPrevious, previousHash)
-	var i Session
-	err := row.Scan(
-		&i.ID,
-		&i.UserID,
-		&i.RefreshHash,
-		&i.PreviousHash,
-		&i.UserAgent,
-		&i.CreatedAt,
-		&i.LastUsedAt,
-		&i.ExpiresAt,
-		&i.RevokedAt,
-	)
-	return i, err
-}
-
 const getUser = `-- name: GetUser :one
 SELECT id, email, university_id, display_name, department, batch, role, verified_at, created_at, updated_at, university_email, blocked_at, google_photo_url, photo_key FROM users WHERE id = $1
 `
@@ -303,6 +282,29 @@ SELECT pg_advisory_xact_lock(hashtextextended($1::text, 0))
 func (q *Queries) LockEmail(ctx context.Context, email string) error {
 	_, err := q.db.Exec(ctx, lockEmail, email)
 	return err
+}
+
+const lockSessionByPrevious = `-- name: LockSessionByPrevious :one
+SELECT id, user_id, refresh_hash, previous_hash, user_agent, created_at, last_used_at, expires_at, revoked_at FROM sessions WHERE previous_hash = $1
+ORDER BY last_used_at DESC LIMIT 1 FOR UPDATE
+`
+
+// The session a refresh token was rotated out of (a retry or a replay).
+func (q *Queries) LockSessionByPrevious(ctx context.Context, previousHash []byte) (Session, error) {
+	row := q.db.QueryRow(ctx, lockSessionByPrevious, previousHash)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.RefreshHash,
+		&i.PreviousHash,
+		&i.UserAgent,
+		&i.CreatedAt,
+		&i.LastUsedAt,
+		&i.ExpiresAt,
+		&i.RevokedAt,
+	)
+	return i, err
 }
 
 const lockSessionByRefresh = `-- name: LockSessionByRefresh :one

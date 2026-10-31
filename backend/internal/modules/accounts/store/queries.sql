@@ -100,8 +100,10 @@ RETURNING *;
 -- name: LockSessionByRefresh :one
 SELECT * FROM sessions WHERE refresh_hash = @refresh_hash FOR UPDATE;
 
--- name: FindSessionByPrevious :one
-SELECT * FROM sessions WHERE previous_hash = @previous_hash ORDER BY last_used_at DESC LIMIT 1;
+-- The session a refresh token was rotated out of (a retry or a replay).
+-- name: LockSessionByPrevious :one
+SELECT * FROM sessions WHERE previous_hash = @previous_hash
+ORDER BY last_used_at DESC LIMIT 1 FOR UPDATE;
 
 -- Sliding expiry: a session stays alive while the app is used.
 -- name: RotateSession :exec

@@ -467,8 +467,15 @@ func (s *Service) issue(u store.User, sessionID uuid.UUID, refresh string, refre
 	return &Tokens{AccessToken: access, AccessTokenExpiresAt: exp, RefreshToken: refresh, RefreshTokenExpiresAt: refreshExp}, nil
 }
 
+// RefreshRetryWindow is how long a rotated refresh token still works after
+// it was replaced. The app can lose a fresh token: Android may restart it
+// right after a refresh, and the new copy reads the old token from storage.
+// Within the window that retry gets new tokens; after it, a replay is
+// treated as theft and ends the session.
+const RefreshRetryWindow = time.Minute
+
 // Refresh rotates the refresh token. The app must send one refresh at a
-// time: replaying a rotated token is treated as theft and ends the session.
+// time; see [RefreshRetryWindow] for a rotated token sent again.
 func (s *Service) Refresh(ctx context.Context, refresh string) (*Tokens, error) {
 	h := auth.HashToken(refresh)
 	now := s.now()
@@ -481,14 +488,20 @@ func (s *Service) Refresh(ctx context.Context, refresh string) (*Tokens, error) 
 		q := store.New(s.d.Q(ctx))
 		sess, err := q.LockSessionByRefresh(ctx, h)
 		if db.IsNoRows(err) {
-			prev, perr := q.FindSessionByPrevious(ctx, h)
+			prev, perr := q.LockSessionByPrevious(ctx, h)
+			if perr != nil && !db.IsNoRows(perr) {
+				return perr
+			}
 			if perr == nil && prev.RevokedAt == nil {
+				if now.Sub(prev.LastUsedAt) <= RefreshRetryWindow {
+					httpx.Logger(ctx).Info("rotated refresh token retried; new tokens issued", "sessionId", prev.ID)
+					out, err = s.rotate(ctx, q, prev, now)
+					return err
+				}
 				if _, err := q.RevokeSession(ctx, store.RevokeSessionParams{ID: prev.ID, UserID: prev.UserID, Now: now}); err != nil {
 					return err
 				}
 				httpx.Logger(ctx).Warn("refresh token reused; session revoked", "sessionId", prev.ID, "userId", prev.UserID)
-			} else if perr != nil && !db.IsNoRows(perr) {
-				return perr
 			}
 			failure = ErrRefreshInvalid
 			return nil // commit the revocation
@@ -496,25 +509,7 @@ func (s *Service) Refresh(ctx context.Context, refresh string) (*Tokens, error) 
 		if err != nil {
 			return err
 		}
-		if sess.RevokedAt != nil || !now.Before(sess.ExpiresAt) {
-			return ErrRefreshInvalid
-		}
-		user, err := q.GetUser(ctx, sess.UserID)
-		if db.IsNoRows(err) {
-			return ErrRefreshInvalid
-		}
-		if err != nil {
-			return err
-		}
-		if user.BlockedAt != nil {
-			return ErrAccountBlocked
-		}
-		next := auth.RandomToken(32)
-		exp := now.Add(s.cfg.RefreshTTL)
-		if err := q.RotateSession(ctx, store.RotateSessionParams{ID: sess.ID, NewHash: auth.HashToken(next), Now: now, ExpiresAt: exp}); err != nil {
-			return err
-		}
-		out, err = s.issue(user, sess.ID, next, exp)
+		out, err = s.rotate(ctx, q, sess, now)
 		return err
 	})
 	if err != nil {
@@ -524,6 +519,30 @@ func (s *Service) Refresh(ctx context.Context, refresh string) (*Tokens, error) 
 		return nil, failure
 	}
 	return out, nil
+}
+
+// rotate gives the locked session a new refresh token (sliding expiry) and
+// issues tokens for it.
+func (s *Service) rotate(ctx context.Context, q *store.Queries, sess store.Session, now time.Time) (*Tokens, error) {
+	if sess.RevokedAt != nil || !now.Before(sess.ExpiresAt) {
+		return nil, ErrRefreshInvalid
+	}
+	user, err := q.GetUser(ctx, sess.UserID)
+	if db.IsNoRows(err) {
+		return nil, ErrRefreshInvalid
+	}
+	if err != nil {
+		return nil, err
+	}
+	if user.BlockedAt != nil {
+		return nil, ErrAccountBlocked
+	}
+	next := auth.RandomToken(32)
+	exp := now.Add(s.cfg.RefreshTTL)
+	if err := q.RotateSession(ctx, store.RotateSessionParams{ID: sess.ID, NewHash: auth.HashToken(next), Now: now, ExpiresAt: exp}); err != nil {
+		return nil, err
+	}
+	return s.issue(user, sess.ID, next, exp)
 }
 
 // CheckSession runs on every signed-in request, so signing out, signing out

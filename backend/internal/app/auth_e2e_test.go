@@ -226,13 +226,45 @@ func TestStolenRefreshTokenEndsTheSession(t *testing.T) {
 	var next tokens
 	r.into(t, &next)
 
-	// Someone replays the old (already rotated) refresh token.
+	// Someone replays the old (already rotated) refresh token, after the
+	// minute a lost-token retry gets.
+	h.advance(61 * time.Second)
 	r = h.do("POST", "/auth/refresh", "", map[string]string{"refreshToken": s.Tokens.RefreshToken})
 	assert.Equal(t, "REFRESH_INVALID", r.code())
 
 	// The whole session is now dead, for the thief and the real device.
 	assert.Equal(t, "REFRESH_INVALID", h.do("POST", "/auth/refresh", "", map[string]string{"refreshToken": next.RefreshToken}).code())
 	assert.Equal(t, "SESSION_ENDED", h.do("GET", "/me", next.AccessToken, nil).code())
+}
+
+// The app refreshed, but Android restarted it before the new tokens were
+// saved; the restarted app sends the old refresh token again seconds later.
+// It stays signed in.
+func TestRefreshRetryAfterLostTokens(t *testing.T) {
+	h := newHarness(t)
+	s := h.signIn("faye@test.ac.bd")
+	refresh := func(tok string) *response {
+		return h.do("POST", "/auth/refresh", "", map[string]string{"refreshToken": tok})
+	}
+
+	r := refresh(s.Tokens.RefreshToken)
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+
+	h.advance(5 * time.Second)
+	r = refresh(s.Tokens.RefreshToken)
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	var again tokens
+	r.into(t, &again)
+	assert.NotEqual(t, s.Tokens.RefreshToken, again.RefreshToken)
+	assert.Equal(t, http.StatusOK, h.do("GET", "/me", again.AccessToken, nil).Status, "still signed in")
+
+	// And it goes on as usual.
+	h.advance(16 * time.Minute)
+	r = refresh(again.RefreshToken)
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	var later tokens
+	r.into(t, &later)
+	assert.Equal(t, http.StatusOK, h.do("GET", "/me", later.AccessToken, nil).Status)
 }
 
 func TestLogout(t *testing.T) {
