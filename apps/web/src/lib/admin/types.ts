@@ -160,8 +160,20 @@ export type ReportReason = "spam" | "abuse" | "personal_info" | "false_info" | "
  */
 export type VoiceAuthor = { name: string | null; verified: boolean } | null;
 
+/** issue | post | question | poll (docs/CAMPUS_SOCIAL.md). Older items: issue. */
+export type PostKind = "issue" | "post" | "question" | "poll";
+
+export type Poll = {
+  options: { id: string; label: string; votes: number | null }[];
+  totalVotes: number;
+  myVote: string | null;
+  closesAt: string;
+  closed: boolean;
+};
+
 export type IssueCard = {
   id: string;
+  kind?: PostKind | string;
   category: IssueCategory | string;
   private: boolean;
   title: string;
@@ -179,6 +191,8 @@ export type IssueCard = {
   locationLabel: string;
   createdAt: string;
   statusChangedAt: string;
+  reactions?: Record<string, number>;
+  poll?: Poll | null;
 };
 
 export type TimelineEntry = {
@@ -210,6 +224,8 @@ export type VoiceComment = {
   body: string;
   visibility: Visibility | string;
   removedReason: string;
+  parentId?: string | null;
+  likeCount?: number;
   createdAt: string;
 };
 

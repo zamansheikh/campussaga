@@ -13,7 +13,9 @@ import {
   categoryLabel,
   holdReasonLabel,
   isQueueKind,
+  kindLabel,
   label,
+  postHeadline,
   queueTabs,
   reportReasonLabel,
   statusLabel,
@@ -138,7 +140,11 @@ function QueueRow({ item, now }: { item: QueueItem; now: number }) {
           {visibility === "hidden" ? <EyeOff aria-hidden /> : null}
           {label(visibilityLabel, visibility)}
         </Badge>
-        {!isComment ? <Badge variant={statusTone[issue.status] ?? "outline"}>{label(statusLabel, issue.status)}</Badge> : null}
+        {issue.kind && issue.kind !== "issue" ? (
+          <Badge variant="outline">{label(kindLabel, issue.kind)}</Badge>
+        ) : !isComment ? (
+          <Badge variant={statusTone[issue.status] ?? "outline"}>{label(statusLabel, issue.status)}</Badge>
+        ) : null}
         <span className="ms-auto text-xs text-muted-foreground">
           {item.university.name} · {timeAgo(item.createdAt, now)}
         </span>
@@ -148,9 +154,13 @@ function QueueRow({ item, now }: { item: QueueItem; now: number }) {
         href={`/admin/moderation/issues/${issue.id}${isComment ? `#comment-${comment.id}` : ""}`}
         className="mt-2 block font-medium after:absolute after:inset-0 hover:underline focus-visible:outline-none"
       >
-        {issue.title}
+        {postHeadline(issue)}
       </Link>
-      {isComment ? <p className="text-xs text-muted-foreground">Comment on this issue:</p> : null}
+      {isComment ? (
+        <p className="text-xs text-muted-foreground">
+          Comment on this {label(kindLabel, issue.kind ?? "issue").toLowerCase()}:
+        </p>
+      ) : null}
       <p className="mt-1 line-clamp-2 text-sm text-muted-foreground whitespace-pre-line">{text}</p>
 
       {item.holdReason || reasons.length > 0 ? (

@@ -18,6 +18,7 @@ import {
   categoryLabel,
   handleText,
   holdReasonLabel,
+  kindLabel,
   label,
   reportReasonLabel,
   reportStateLabel,
@@ -84,17 +85,20 @@ function IssueView({ issue, now }: { issue: ModerationIssue; now: number }) {
         <div className="min-w-0 space-y-6">
           <section aria-labelledby="issue-title">
             <div className="flex flex-wrap items-center gap-1.5">
+              <Badge variant="outline">{label(kindLabel, issue.kind ?? "issue")}</Badge>
               <Badge variant="soft">{label(categoryLabel, issue.category)}</Badge>
               {issue.private ? (
                 <Badge variant="warning">
                   <Lock aria-hidden /> Private safety report
                 </Badge>
               ) : null}
-              <Badge variant={statusTone[issue.status] ?? "outline"}>{label(statusLabel, issue.status)}</Badge>
+              {(issue.kind ?? "issue") === "issue" ? (
+                <Badge variant={statusTone[issue.status] ?? "outline"}>{label(statusLabel, issue.status)}</Badge>
+              ) : null}
               <Badge variant={visibilityTone[issue.visibility] ?? "outline"}>{label(visibilityLabel, issue.visibility)}</Badge>
             </div>
             <h1 id="issue-title" className="mt-3 text-2xl font-semibold tracking-tight">
-              {issue.title}
+              {issue.title || `${label(kindLabel, issue.kind ?? "post")} by ${issue.author ? authorName(issue.author) : "Anonymous"}`}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {issue.author ? `Posted with a name: ${authorName(issue.author)}` : "Anonymous"} · about{" "}
@@ -120,6 +124,21 @@ function IssueView({ issue, now }: { issue: ModerationIssue; now: number }) {
               </p>
             ) : null}
             <p className="mt-4 text-[15px] leading-relaxed whitespace-pre-line">{issue.body}</p>
+            {issue.poll ? (
+              <div className="mt-4 space-y-2 rounded-lg border p-3">
+                <p className="text-sm font-medium">
+                  Poll · {issue.poll.totalVotes} votes · {issue.poll.closed ? "closed" : "open"}
+                </p>
+                <ul className="space-y-1 text-sm">
+                  {issue.poll.options.map((o) => (
+                    <li key={o.id} className="flex justify-between gap-3">
+                      <span>{o.label}</span>
+                      <span className="text-muted-foreground tabular-nums">{o.votes ?? "–"}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </section>
 
           {issue.images.length > 0 ? (

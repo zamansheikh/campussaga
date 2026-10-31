@@ -13,7 +13,26 @@ export const categoryLabel: Record<string, string> = {
   food: "Food",
   it: "IT / Wi-Fi",
   other: "Other",
+  general: "General",
+  event: "Events",
+  lost_found: "Lost & found",
+  buy_sell: "Buy & sell",
+  fun: "Fun",
 };
+
+export const kindLabel: Record<string, string> = {
+  issue: "Issue",
+  post: "Post",
+  question: "Question",
+  poll: "Poll",
+};
+
+/** What a post is called in a list: the title of an issue, else its text. */
+export function postHeadline(issue: { kind?: string; title: string; preview: string }): string {
+  if (issue.title) return issue.title;
+  const t = issue.preview.trim();
+  return t.length > 120 ? `${t.slice(0, 119)}…` : t || "(photo post)";
+}
 
 export const statusLabel: Record<string, string> = {
   open: "Open",
