@@ -1832,5 +1832,10 @@
   "claimAddressRequired": "Write where to deliver the prize.",
   "claimDone": "We'll contact you",
   "claimDoneBody": "Thanks! We have your details and will contact you about the prize.",
-  "claimNotWinner": "Only winners can claim a prize."
+  "claimNotWinner": "Only winners can claim a prize.",
+  "badgesSeeAll": "See all · {earned}/{total}",
+  "@badgesSeeAll": {"placeholders": {"earned": {"type": "int", "format": "decimalPattern"}, "total": {"type": "int", "format": "decimalPattern"}}},
+  "badgesToEarn": "{count} to earn",
+  "@badgesToEarn": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}},
+  "badgesPageTitle": "Badges"
 }

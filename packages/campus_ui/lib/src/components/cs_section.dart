@@ -163,7 +163,8 @@ class CsSectionTitle extends StatelessWidget {
           : Row(
               children: [
                 Expanded(child: text),
-                action!,
+                // A long action (e.g. in Bangla) shrinks instead of overflowing.
+                Flexible(child: action!),
               ],
             ),
     );

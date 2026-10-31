@@ -112,7 +112,7 @@ void main() {
       expect(find.text('Rafi · verified · 2 of 3 days'), findsOneWidget);
       expect(find.text('Mim · not verified yet · 0 of 3 days'), findsOneWidget);
 
-      await scrollAndTap(tester, find.text('Share your link'));
+      await scrollAndTap(tester, find.widgetWithText(FilledButton, 'Share'));
       await tester.pumpAndSettle();
       expect(shared, hasLength(1));
       expect(shared.single, contains('https://varsitykotha.com/r/abcd1234'));
@@ -138,7 +138,12 @@ void main() {
       await start(tester);
       await openProfileTab(tester);
       expect(find.text('BADGES'), findsOneWidget);
-      // Earned: name, with the tier under it.
+      // Profile: one compact row of earned badges, and See all.
+      expect(find.text('Connector'), findsOneWidget);
+      expect(find.text('NOT EARNED YET'), findsNothing);
+      await scrollAndTap(tester, find.textContaining('See all'));
+      await tester.pumpAndSettle();
+      // The Badges page: earned ones with the tier under the name.
       expect(find.text('Connector'), findsOneWidget);
       expect(find.text('Silver'), findsOneWidget);
       // Private: only the owner sees it.
@@ -385,7 +390,7 @@ void main() {
       await start(tester);
       expect(find.text('Invite and win'), findsOneWidget);
       expect(find.text('Top prize: A phone'), findsOneWidget);
-      expect(find.text('5d 3h left'), findsOneWidget);
+      expect(find.text('LIVE · 5d 3h left'), findsOneWidget);
       expect(find.text('Rank 12 · 4 invites'), findsOneWidget);
       await tester.tap(find.widgetWithText(FilledButton, 'Invite friends'));
       await tester.pumpAndSettle();
@@ -409,7 +414,7 @@ void main() {
         ),
       ];
       await start(tester);
-      expect(find.text('2h 10m left'), findsOneWidget);
+      expect(find.text('LIVE · 2h 10m left'), findsOneWidget);
       expect(
         find.text('Not ranked yet · invite friends to climb'),
         findsOneWidget,
@@ -634,7 +639,7 @@ void main() {
       push.openedNotes.add(const PushNote(data: {'type': 'referral_joined'}));
       await tester.pumpAndSettle();
       expect(find.text('INVITE FRIENDS'), findsOneWidget);
-      expect(find.text('Share your link'), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Share'), findsOneWidget);
     });
 
     testWidgets('badge_earned opens Badges', (tester) async {

@@ -5,20 +5,25 @@ import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/di.dart';
+import '../../../../app/router.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../growth_text.dart';
 
-/// On Profile: the badges I earned (a grid, with their tier), and the ones
-/// still to earn, greyed, saying how. Tap one for the details and to show
-/// it by my name. Nothing shows when it can't load.
+/// My badges. [compact] (Profile): one row of the earned ones and "See
+/// all", which opens the full list. Full (the Badges page): every earned
+/// badge with its tier, and the ones still to earn, greyed, saying how.
+/// Tap one for the details and to show it by my name. Nothing shows when
+/// it can't load.
 class BadgesSection extends StatefulWidget {
-  const BadgesSection({super.key, this.reveal = false});
+  const BadgesSection({super.key, this.reveal = false, this.compact = false});
 
   /// Scroll to it once it shows (opened from a push).
   final bool reveal;
+  final bool compact;
 
   @override
   State<BadgesSection> createState() => _BadgesSectionState();
@@ -91,10 +96,90 @@ class _BadgesSectionState extends State<BadgesSection> {
     }
   }
 
+  Future<void> _seeAll() async {
+    await context.push(Routes.badges);
+    if (mounted) await _load(); // the shown badge may have changed
+  }
+
+  Widget _compact(BuildContext context, MyBadges badges) {
+    final l10n = AppLocalizations.of(context);
+    final cs = context.cs;
+    final locked = badges.locked.length;
+    final total = badges.badges.length + locked;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: CsSpace.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          CsSectionTitle(
+            title: l10n.badgesTitle,
+            action: TextButton(
+              onPressed: _seeAll,
+              child: Text(l10n.badgesSeeAll(badges.badges.length, total)),
+            ),
+          ),
+          Material(
+            color: cs.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(CsRadius.lg),
+              side: BorderSide(color: cs.border),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox(
+              height: 104,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: CsSpace.sm,
+                  vertical: 10,
+                ),
+                children: [
+                  for (final b in badges.badges)
+                    _MiniBadge(
+                      icon: CsBadgeIcon(
+                        badgeKey: b.key,
+                        tier: b.tier,
+                        size: 46,
+                        semanticLabel: badgeName(l10n, b.key),
+                      ),
+                      label: badgeName(l10n, b.key),
+                      shown: badges.featured?.key == b.key,
+                      onTap: () => _open(b, badges.info(b.key), b.key),
+                    ),
+                  if (locked > 0)
+                    _MiniBadge(
+                      icon: Container(
+                        width: 46,
+                        height: 46,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: cs.border, width: 2),
+                        ),
+                        child: Icon(
+                          CsIcons.lock,
+                          size: 20,
+                          color: cs.textSecondary,
+                        ),
+                      ),
+                      label: l10n.badgesToEarn(locked),
+                      muted: true,
+                      onTap: _seeAll,
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final badges = _badges;
     if (badges == null) return const SizedBox.shrink();
+    if (widget.compact) return _compact(context, badges);
     final l10n = AppLocalizations.of(context);
     final cs = context.cs;
     final locked = badges.locked;
@@ -153,6 +238,54 @@ class _BadgesSectionState extends State<BadgesSection> {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// One badge in the Profile row: the icon and its name under it.
+class _MiniBadge extends StatelessWidget {
+  const _MiniBadge({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.shown = false,
+    this.muted = false,
+  });
+
+  final Widget icon;
+  final String label;
+  final VoidCallback onTap;
+
+  /// Shown by my name: the label is bold.
+  final bool shown;
+  final bool muted;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = context.cs;
+    return InkWell(
+      borderRadius: BorderRadius.circular(CsRadius.md),
+      onTap: onTap,
+      child: SizedBox(
+        width: 76,
+        child: Column(
+          children: [
+            icon,
+            const SizedBox(height: 6),
+            Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: context.text.labelSmall?.copyWith(
+                height: 1.15,
+                color: muted ? cs.textSecondary : cs.textPrimary,
+                fontWeight: shown ? FontWeight.w800 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

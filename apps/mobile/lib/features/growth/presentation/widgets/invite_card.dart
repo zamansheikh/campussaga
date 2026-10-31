@@ -61,27 +61,39 @@ class _InviteCardState extends State<InviteCard> {
       child: CsSection(
         title: l10n.inviteFriendsTitle,
         children: [
+          // One row: the counts, the rule, and a small Share button.
           Padding(
-            padding: const EdgeInsets.all(CsSpace.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.fromLTRB(CsSpace.md, 12, 12, 12),
+            child: Row(
               children: [
-                Text(
-                  l10n.inviteStats(stats.invited, stats.joined),
-                  style: context.text.titleMedium,
-                ),
-                const SizedBox(height: CsSpace.xs),
-                Text(
-                  l10n.inviteCountsRule,
-                  style: context.text.bodySmall?.copyWith(
-                    color: cs.textSecondary,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.inviteStats(stats.invited, stats.joined),
+                        style: context.text.titleSmall,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.inviteCountsRule,
+                        style: context.text.bodySmall?.copyWith(
+                          color: cs.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: CsSpace.md),
+                const SizedBox(width: CsSpace.sm),
                 FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(0, 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    visualDensity: VisualDensity.compact,
+                  ),
                   onPressed: () => shareMyInvite(context, stats: stats),
-                  icon: const Icon(CsIcons.share),
-                  label: Text(l10n.inviteShareButton),
+                  icon: const Icon(CsIcons.share, size: 18),
+                  label: Text(l10n.campusShare),
                 ),
               ],
             ),

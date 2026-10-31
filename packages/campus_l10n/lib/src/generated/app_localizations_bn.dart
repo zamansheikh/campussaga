@@ -4921,4 +4921,28 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get claimNotWinner => 'শুধু বিজয়ীরা পুরস্কার নিতে পারে।';
+
+  @override
+  String badgesSeeAll(int earned, int total) {
+    final intl.NumberFormat earnedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String earnedString = earnedNumberFormat.format(earned);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return 'সব দেখো · $earnedString/$totalString';
+  }
+
+  @override
+  String badgesToEarn(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'আরও $countStringটি';
+  }
+
+  @override
+  String get badgesPageTitle => 'ব্যাজ';
 }

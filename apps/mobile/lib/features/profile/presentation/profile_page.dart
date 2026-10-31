@@ -104,7 +104,7 @@ class ProfilePage extends StatelessWidget {
             ],
             InviteCard(reveal: show == 'invites'),
             const CampaignsSection(),
-            BadgesSection(reveal: show == 'badges'),
+            BadgesSection(compact: true, reveal: show == 'badges'),
             CsSection(
               title: l10n.preferences,
               children: [

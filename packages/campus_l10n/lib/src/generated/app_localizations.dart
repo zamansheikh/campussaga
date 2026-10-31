@@ -7987,6 +7987,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only winners can claim a prize.'**
   String get claimNotWinner;
+
+  /// No description provided for @badgesSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all · {earned}/{total}'**
+  String badgesSeeAll(int earned, int total);
+
+  /// No description provided for @badgesToEarn.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} to earn'**
+  String badgesToEarn(int count);
+
+  /// No description provided for @badgesPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Badges'**
+  String get badgesPageTitle;
 }
 
 class _AppLocalizationsDelegate

@@ -1314,5 +1314,8 @@
   "claimAddressRequired": "কোথায় পৌঁছে দেব, সেটা লেখো।",
   "claimDone": "আমরা তোমার সাথে যোগাযোগ করব",
   "claimDoneBody": "ধন্যবাদ! তোমার তথ্য পেয়েছি। পুরস্কারের জন্য তোমার সাথে যোগাযোগ করব।",
-  "claimNotWinner": "শুধু বিজয়ীরা পুরস্কার নিতে পারে।"
+  "claimNotWinner": "শুধু বিজয়ীরা পুরস্কার নিতে পারে।",
+  "badgesSeeAll": "সব দেখো · {earned}/{total}",
+  "badgesToEarn": "আরও {count}টি",
+  "badgesPageTitle": "ব্যাজ"
 }

@@ -332,6 +332,7 @@ class Campaign {
     this.myRank,
     this.rulesUrl = '',
     this.won,
+    this.bannerUrl,
   });
 
   factory Campaign.fromJson(Map<String, Object?> json) => Campaign(
@@ -352,6 +353,7 @@ class Campaign {
     won: _map(json['iWon']) == null
         ? null
         : CampaignWin.fromJson(_map(json['iWon'])!),
+    bannerUrl: json['bannerUrl'] as String?,
   );
 
   final String id;
@@ -370,6 +372,10 @@ class Campaign {
 
   /// Set on `GET /campaigns/{id}` for a winner.
   final CampaignWin? won;
+
+  /// The team's banner photo, a path under the API base
+  /// ("/campaigns/{id}/banner?v=…"); null: the app draws its own.
+  final String? bannerUrl;
 
   /// Running at [now].
   bool isLive(DateTime now) =>
@@ -398,6 +404,7 @@ class Campaign {
     myRank: myRank,
     rulesUrl: rulesUrl,
     won: won ?? this.won,
+    bannerUrl: bannerUrl,
   );
 }
 

@@ -42,6 +42,7 @@ import '../features/feedback/presentation/pages/feedback_thread_page.dart';
 import '../features/feedback/presentation/pages/help_feedback_page.dart';
 import '../features/feedback/presentation/pages/my_feedback_page.dart';
 import '../features/growth/data/referral_claim.dart';
+import '../features/growth/presentation/pages/badges_page.dart';
 import '../features/growth/presentation/pages/campaign_page.dart';
 import '../features/growth/presentation/pages/student_profile_page.dart';
 import '../features/onboarding/presentation/onboarding_page.dart';
@@ -123,6 +124,9 @@ abstract final class Routes {
   static String campusAdminTab(String tab) => '/campus-admin/$tab';
   static String campusStudent(String id) => '/campus-admin/students/$id';
   static String campusSection(String id) => '/campus-admin/sections/$id';
+
+  /// Every badge, earned and still to earn.
+  static const badges = '/profile/badges';
 
   /// Help & feedback.
   static const help = '/profile/help';
@@ -596,6 +600,10 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
                   GoRoute(
                     path: 'verify',
                     builder: (context, state) => const VerifyEmailPage(),
+                  ),
+                  GoRoute(
+                    path: 'badges',
+                    builder: (context, state) => const BadgesPage(),
                   ),
                   GoRoute(
                     path: 'help',

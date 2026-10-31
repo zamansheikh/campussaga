@@ -7,12 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../app/clock.dart';
 import '../../../../app/di.dart';
 import '../../../../app/env.dart';
 import '../../../../app/router.dart';
 import '../growth_text.dart';
-import '../invite_share.dart';
+import '../widgets/campaign_banner.dart';
 import '../widgets/prize_claim_card.dart';
 
 /// One prize campaign: prizes, the leaderboard (Bangladesh or my
@@ -162,53 +161,31 @@ class _CampaignPageState extends State<CampaignPage> {
   Widget _content(BuildContext context, Campaign c) {
     final l10n = AppLocalizations.of(context);
     final cs = context.cs;
-    final now = appNow();
-    final left = c.endsAt == null ? null : timeLeftText(l10n, c.endsAt!, now);
-    final live = c.isLive(now);
     final board = _board;
     final muted = context.text.bodyMedium?.copyWith(color: cs.textSecondary);
     return CsPage(
       children: [
         Card(
-          child: Padding(
-            padding: const EdgeInsets.all(CsSpace.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(c.title, style: context.text.titleLarge),
-                if (c.body.isNotEmpty) ...[
-                  const SizedBox(height: CsSpace.sm),
-                  Text(c.body, style: context.text.bodyMedium),
-                ],
-                const SizedBox(height: CsSpace.md),
-                Wrap(
-                  spacing: CsSpace.sm,
-                  runSpacing: CsSpace.sm,
+          clipBehavior: Clip.antiAlias,
+          margin: EdgeInsets.zero,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              CampaignBanner(campaign: c, height: 176),
+              Padding(
+                padding: const EdgeInsets.all(CsSpace.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CsPill(
-                      icon: CsIcons.timer,
-                      label: live
-                          ? (left ?? l10n.campaignEnded)
-                          : c.status == CampaignStatus.announced
-                          ? l10n.campaignAnnounced
-                          : l10n.campaignEnded,
-                    ),
-                    CsPill(
-                      icon: CsIcons.rankings,
-                      label: campaignStanding(l10n, c),
-                    ),
+                    if (c.body.isNotEmpty) ...[
+                      Text(c.body, style: context.text.bodyMedium),
+                      const SizedBox(height: CsSpace.md),
+                    ],
+                    CampaignStandingRow(campaign: c),
                   ],
                 ),
-                if (live) ...[
-                  const SizedBox(height: CsSpace.md),
-                  FilledButton.icon(
-                    onPressed: () => shareMyInvite(context),
-                    icon: const Icon(CsIcons.invite),
-                    label: Text(l10n.inviteFriendsTitle),
-                  ),
-                ],
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         if (c.won case final win?) ...[
