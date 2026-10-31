@@ -647,3 +647,83 @@ Paths, fields and error codes are as in §5. Where the spec left a choice:
   friend is verified by people (`verified_via` cr, vouch or campus_admin) and the
   inviter has a live verification event for them or a vouch that isn't void.
   `/admin/referrals?flag=self_vouched` filters on it.
+
+## As implemented (low-cost rewards, migration `00770_growth_rewards.sql`)
+
+- **Columns:** `campaigns.section_prize_en/_bn`, `finisher_reward_en/_bn` (text
+  ≤ 120, default `''`) and `finisher_reward_count` (0–10000, default 0); table
+  `campaign_finishers` as in §9.2 (plus an index on `user_id`). Code:
+  `rewards.go`.
+- **Admin campaign fields** (create, PATCH, list, detail): `sectionPrizeEn`,
+  `sectionPrizeBn`, `finisherRewardEn`, `finisherRewardBn` (strings, `""` when
+  not set) and `finisherRewardCount` (int). Too long or out of range:
+  `VALIDATION_FAILED`; a count above 0 needs `finisherRewardEn`
+  (`VALIDATION_FAILED`, field `finisherRewardEn`). Once live, all are
+  `CAMPAIGN_LOCKED` except `finisherRewardCount`, which may stay or go up.
+- **Section challenge:** constants 25 verified members / 5 routine slots
+  (`ChampionMembers`, `ChampionSlots`). "Verified member" = any member
+  (CR included) with `verified_at` set and not blocked.
+  - Detail: `sectionChallenge: {members: 25, slots: 5}`.
+  - List and detail: `sectionPrize` (my language, Bangla falling back to
+    English) or **null** when not set. Public: `sectionPrizeEn`,
+    `sectionPrizeBn` (`""` when not set).
+  - `GET /campaigns/{id}/sections` (student, the campaign must be visible to
+    me): `{rows: [{rank, groupId, name, university, members, slots, champion}],
+    mine}`. Groups with at least one verified member in the campaign's
+    universities (all when it covers all), by verified members, then the
+    earlier `max(joined_at)` of the current verified members (when the group
+    reached its count), then id. `rows`: the top 20; `mine`: my best-ranked
+    group, with its rank, also outside the top 20, or null. `name` like the
+    other group names (`CSE 40 · A`); `university` the full name.
+  - `GET /admin/campaigns/{id}/sections` (admin): `{rows: [...]}`, the same rows
+    plus `cr: {id, name, email}` (the earliest-joined CR) or null, top 50, no
+    `mine` field.
+  - Badge `champion_section` (no tiers, stays): any member of a champion
+    section, computed at the usual recomputes.
+- **Finishers:** positions are given by `recordFinishers` under `SELECT … FOR
+  UPDATE` on the campaign row (plus `UNIQUE (campaign_id, position)`), only
+  while the campaign is `live` and inside `[starts_at, ends_at]`. It runs right
+  after an invite qualifies (for the inviter, in each live campaign covering
+  their university) and in the hourly sweep (everyone). Several new finishers
+  in one pass take positions in standings order (points). Positions are never
+  reused: after a disqualification the next finisher gets `max + 1`. Restoring
+  a disqualified participant doesn't bring their old place back; if they're
+  still in the race while live, the sweep gives them a new one.
+  - Push `race_finished` once, after the commit, `data: {type, campaignId}`.
+    Title "You're in the prize race!" / "তুমি পুরস্কারের দৌড়ে!" with body
+    "You're finisher #{n}: {reward}. Add your number to get it." / "তুমি #{n}
+    নম্বর: {reward}। পেতে তোমার নম্বর দাও।" in the reward; otherwise title
+    "You're in the prize race!" / "তুমি পুরস্কারের দৌড়ে আছ!" and the campaign
+    title as body.
+  - Badge `race_finisher` (no tiers, stays, also after a disqualification):
+    a finisher row in any campaign. It sends no `badge_earned` push
+    (`race_finished` already told them).
+  - Detail: `finisherReward: {title, count, left}` (null when the count is 0;
+    `left` = count minus finishers at positions ≤ count, never below 0) and
+    `finisher: {position, inReward, claimed, sent}` or null. Raising the count
+    puts later positions in the reward.
+  - `POST /campaigns/{id}/finisher-claim {phone}` → 204, checked in this order:
+    `NOT_A_FINISHER` (403), `NO_REWARD` (422), `ALREADY_CLAIMED` (409),
+    `INVALID_PHONE` (400). The phone drops spaces, dashes, dots and brackets,
+    reads Bangla digits, turns `+880…` and `880…` (13 digits) into `0…`, and must
+    then be `01[3-9]` + 8 digits. Rate-limited per student (20 an hour).
+  - Admin: `GET /admin/campaigns/{id}/finishers` → by position, `[{position,
+    user: {id, name, email, university}, finishedAt, inReward, phone|null,
+    claimedAt|null, sentAt|null}]`; `POST
+    /admin/campaigns/{id}/finishers/{userId}/sent` → 204 (keeps the first
+    `sent_at`/`sent_by`; audited `campaign.finisher_sent` with `userId` and
+    `position`), `FINISHER_NOT_FOUND` (404) when they aren't a finisher.
+  - Disqualifying a participant deletes their finisher row in the same
+    transaction. The sweep clears `phone` 90 days after `sent_at`.
+- **Ambassador:** per university, the verified, not blocked, non-team (role
+  not admin/moderator) student with the most counted invites (qualified, not
+  disqualified, not same phone) of friends at the same university, at least 5
+  (`AmbassadorMin`); ties: the earlier latest `qualified_at`, then id. A role
+  badge: computed at every recompute; the hourly sweep also recomputes every
+  current holder and every university's leader, even if inactive, so it moves.
+  - `GET /admin/universities/{id}/growth` → `{ambassador: {id, name, email,
+    invites}|null}` (there is no admin university detail endpoint, so this one
+    sits next to `/admin/users/{id}/growth`); `UNIVERSITY_NOT_FOUND` (404).
+- **Badge catalog** (`all` in `/me/badges`) ends with `champion_section`,
+  `race_finisher`, `ambassador`: all public, no tiers.
+- **Audit actions** add `campaign.finisher_sent`.

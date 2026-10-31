@@ -49,6 +49,12 @@ type AdminCampaign struct {
 	UpdatedAt     time.Time   `json:"updatedAt"`
 	BannerURL     *string     `json:"bannerUrl"`
 	Scoring       Scoring     `json:"scoring"`
+	// §9: empty strings and 0 when not set.
+	SectionPrizeEn      string `json:"sectionPrizeEn"`
+	SectionPrizeBn      string `json:"sectionPrizeBn"`
+	FinisherRewardEn    string `json:"finisherRewardEn"`
+	FinisherRewardBn    string `json:"finisherRewardBn"`
+	FinisherRewardCount int    `json:"finisherRewardCount"`
 }
 
 func (s *Service) adminView(c campaign) AdminCampaign {
@@ -57,10 +63,18 @@ func (s *Service) adminView(c campaign) AdminCampaign {
 		StartsAt: c.StartsAt.UTC(), EndsAt: c.EndsAt.UTC(), SettlesAt: c.SettlesAt.UTC(), UniversityIDs: c.UniversityIDs,
 		Prizes: c.Prizes, Status: c.state(s.now()), CreatedAt: c.CreatedAt.UTC(), UpdatedAt: c.UpdatedAt.UTC(),
 		BannerURL: c.bannerURL(), Scoring: c.Scoring,
+		SectionPrizeEn: c.SectionPrizeEn, SectionPrizeBn: c.SectionPrizeBn,
+		FinisherRewardEn: c.FinisherRewardEn, FinisherRewardBn: c.FinisherRewardBn, FinisherRewardCount: c.FinisherRewardCount,
 	}
 }
 
 type campaignInput struct {
+	// §9: an optional section prize; the reward for the first N finishers.
+	SectionPrizeEn      string `json:"sectionPrizeEn" validate:"max=120"`
+	SectionPrizeBn      string `json:"sectionPrizeBn" validate:"max=120"`
+	FinisherRewardEn    string `json:"finisherRewardEn" validate:"max=120"`
+	FinisherRewardBn    string `json:"finisherRewardBn" validate:"max=120"`
+	FinisherRewardCount int    `json:"finisherRewardCount" validate:"min=0,max=10000"`
 	// Scoring: point values merged over the defaults (§8.1).
 	Scoring       *ScoringInput `json:"scoring"`
 	TitleEn       string        `json:"titleEn" validate:"required,max=120"`
@@ -135,15 +149,21 @@ func (s *Service) handleAdminCreate(ctx context.Context, in *campaignInput) (*Ad
 	if err != nil {
 		return nil, err
 	}
+	trim := strings.TrimSpace
+	if in.FinisherRewardCount > 0 && trim(in.FinisherRewardEn) == "" {
+		return nil, ErrFinisherRewardTitle
+	}
 	prizes, _ := json.Marshal(append([]Prize{}, in.Prizes...))
 	scoring, _ := json.Marshal(sc)
 	var out *AdminCampaign
 	err = s.d.InTx(ctx, func(ctx context.Context) error {
 		c, err := scanCampaign(s.d.Q(ctx).QueryRow(ctx, `INSERT INTO campaigns AS c (title_en, title_bn, body_en, body_bn, rules_en, rules_bn,
-				starts_at, ends_at, settles_at, university_ids, prizes, created_by, scoring)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING `+campaignCols,
+				starts_at, ends_at, settles_at, university_ids, prizes, created_by, scoring,
+				section_prize_en, section_prize_bn, finisher_reward_en, finisher_reward_bn, finisher_reward_count)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING `+campaignCols,
 			in.TitleEn, in.TitleBn, in.BodyEn, in.BodyBn, in.RulesEn, in.RulesBn, in.StartsAt, in.EndsAt, settles,
-			universitiesOrNil(in.UniversityIDs), prizes, auth.MustUser(ctx).UserID, scoring))
+			universitiesOrNil(in.UniversityIDs), prizes, auth.MustUser(ctx).UserID, scoring,
+			trim(in.SectionPrizeEn), trim(in.SectionPrizeBn), trim(in.FinisherRewardEn), trim(in.FinisherRewardBn), in.FinisherRewardCount))
 		if err != nil {
 			return err
 		}
@@ -227,6 +247,12 @@ type patchReq struct {
 	Status        *string      `json:"status" validate:"omitnil,oneof=live"`
 	// Scoring: point values merged over the current ones; draft only.
 	Scoring *ScoringInput `json:"scoring"`
+	// §9: draft only, except the finisher count, which may go up while live.
+	SectionPrizeEn      *string `json:"sectionPrizeEn" validate:"omitnil,max=120"`
+	SectionPrizeBn      *string `json:"sectionPrizeBn" validate:"omitnil,max=120"`
+	FinisherRewardEn    *string `json:"finisherRewardEn" validate:"omitnil,max=120"`
+	FinisherRewardBn    *string `json:"finisherRewardBn" validate:"omitnil,max=120"`
+	FinisherRewardCount *int    `json:"finisherRewardCount" validate:"omitnil,min=0,max=10000"`
 }
 
 func (s *Service) handleAdminPatch(ctx context.Context, in *patchReq) (*AdminCampaign, error) {
@@ -243,7 +269,9 @@ func (s *Service) handleAdminPatch(ctx context.Context, in *patchReq) (*AdminCam
 		// date, the rules and the prizes can (never the point values).
 		if c.Status != "draft" {
 			if in.TitleEn != nil || in.TitleBn != nil || in.BodyEn != nil || in.BodyBn != nil || in.StartsAt != nil ||
-				in.UniversityIDs != nil || in.Status != nil || in.Scoring != nil {
+				in.UniversityIDs != nil || in.Status != nil || in.Scoring != nil ||
+				in.SectionPrizeEn != nil || in.SectionPrizeBn != nil || in.FinisherRewardEn != nil || in.FinisherRewardBn != nil ||
+				(in.FinisherRewardCount != nil && *in.FinisherRewardCount < c.FinisherRewardCount) {
 				return ErrCampaignLocked
 			}
 		}
@@ -261,6 +289,16 @@ func (s *Service) handleAdminPatch(ctx context.Context, in *patchReq) (*AdminCam
 		set(&c.BodyBn, in.BodyBn)
 		set(&c.RulesEn, in.RulesEn)
 		set(&c.RulesBn, in.RulesBn)
+		set(&c.SectionPrizeEn, in.SectionPrizeEn)
+		set(&c.SectionPrizeBn, in.SectionPrizeBn)
+		set(&c.FinisherRewardEn, in.FinisherRewardEn)
+		set(&c.FinisherRewardBn, in.FinisherRewardBn)
+		if in.FinisherRewardCount != nil {
+			c.FinisherRewardCount = *in.FinisherRewardCount
+		}
+		if c.FinisherRewardCount > 0 && c.FinisherRewardEn == "" {
+			return ErrFinisherRewardTitle
+		}
 		if in.StartsAt != nil {
 			c.StartsAt = *in.StartsAt
 		}
@@ -301,9 +339,12 @@ func (s *Service) handleAdminPatch(ctx context.Context, in *patchReq) (*AdminCam
 		prizes, _ := json.Marshal(c.Prizes)
 		scoring, _ := json.Marshal(c.Scoring)
 		if _, err := s.d.Q(ctx).Exec(ctx, `UPDATE campaigns SET title_en = $2, title_bn = $3, body_en = $4, body_bn = $5, rules_en = $6, rules_bn = $7,
-				starts_at = $8, ends_at = $9, settles_at = $10, university_ids = $11, prizes = $12, status = $13, scoring = $14 WHERE id = $1`,
+				starts_at = $8, ends_at = $9, settles_at = $10, university_ids = $11, prizes = $12, status = $13, scoring = $14,
+				section_prize_en = $15, section_prize_bn = $16, finisher_reward_en = $17, finisher_reward_bn = $18, finisher_reward_count = $19
+			WHERE id = $1`,
 			c.ID, c.TitleEn, c.TitleBn, c.BodyEn, c.BodyBn, c.RulesEn, c.RulesBn, c.StartsAt, c.EndsAt, c.SettlesAt,
-			c.UniversityIDs, prizes, c.Status, scoring); err != nil {
+			c.UniversityIDs, prizes, c.Status, scoring,
+			c.SectionPrizeEn, c.SectionPrizeBn, c.FinisherRewardEn, c.FinisherRewardBn, c.FinisherRewardCount); err != nil {
 			return err
 		}
 		action := "campaign.update"
@@ -633,6 +674,11 @@ func (s *Service) handleAdminDisqualifyUser(ctx context.Context, in *reasonReq) 
 		if _, err := s.d.Q(ctx).Exec(ctx, `INSERT INTO campaign_disqualified (campaign_id, user_id, reason, disqualified_by) VALUES ($1, $2, $3, $4)
 			ON CONFLICT (campaign_id, user_id) DO UPDATE SET reason = EXCLUDED.reason, disqualified_by = EXCLUDED.disqualified_by`,
 			cid, uid, strings.TrimSpace(in.Reason), auth.MustUser(ctx).UserID); err != nil {
+			return err
+		}
+		// A disqualified student loses their finisher place (§9.2); the
+		// others keep theirs.
+		if _, err := s.d.Q(ctx).Exec(ctx, `DELETE FROM campaign_finishers WHERE campaign_id = $1 AND user_id = $2`, cid, uid); err != nil {
 			return err
 		}
 		return s.audit(ctx, "campaign.disqualify", "campaign", cid.String(), map[string]any{"userId": uid, "reason": in.Reason})

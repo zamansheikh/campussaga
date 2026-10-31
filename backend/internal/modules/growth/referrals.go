@@ -175,6 +175,8 @@ func (s *Service) Qualify(ctx context.Context, referred uuid.UUID) error {
 	if err := s.Recompute(ctx, referrer); err != nil {
 		s.log.Warn("growth: badges after an invite", "err", err)
 	}
+	// This invite may put them in a live campaign's prize race (§9.2).
+	s.finishersFor(ctx, referrer)
 	return nil
 }
 

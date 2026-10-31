@@ -20,7 +20,9 @@ type badgeDef struct {
 	Private bool  // only the owner sees it; it can't be featured
 	// Role badges follow the role: they disappear when it ends. The others
 	// keep their best tier.
-	Role   bool
+	Role bool
+	// Quiet: no badge_earned push (another push already tells the student).
+	Quiet  bool
 	NameEn string
 	NameBn string
 }
@@ -40,6 +42,11 @@ var catalog = []badgeDef{
 	{Key: "bug_hunter", Tiers: []int{1, 3, 10}, NameEn: "Bug hunter", NameBn: "বাগ শিকারি"},
 	{Key: "helper", Tiers: []int{10, 50, 200}, Private: true, NameEn: "Helper", NameBn: "সহায়ক"},
 	{Key: "campus_voice", Tiers: []int{1, 3, 10}, Private: true, NameEn: "Campus voice", NameBn: "ক্যাম্পাস ভয়েস"},
+	// §9: a member of a champion section (stays); entered a prize race
+	// (stays; race_finished tells them); the campus ambassador (moves).
+	{Key: "champion_section", NameEn: "Champion section", NameBn: "চ্যাম্পিয়ন সেকশন"},
+	{Key: "race_finisher", Quiet: true, NameEn: "Race finisher", NameBn: "রেস ফিনিশার"},
+	{Key: "ambassador", Role: true, NameEn: "Campus ambassador", NameBn: "ক্যাম্পাস অ্যাম্বাসেডর"},
 }
 
 func badgeByKey(key string) (badgeDef, bool) {
@@ -81,6 +88,8 @@ func (s *Service) computed(ctx context.Context, id uuid.UUID) (map[string]int, e
 		verified, founding, cr, admin, rep, official, donor bool
 		donations, trips, sectionMembers, qualified, bugs   int
 		helper, solved                                      int
+		champion, finisher                                  bool
+		uni                                                 *uuid.UUID
 	)
 	err := q.QueryRow(ctx, `SELECT
 		u.verified_at IS NOT NULL,
@@ -102,15 +111,28 @@ func (s *Service) computed(ctx context.Context, id uuid.UUID) (map[string]int, e
 		(SELECT count(*)::int FROM comment_authors ca JOIN comments c ON c.id = ca.comment_id AND c.visibility = 'visible'
 			JOIN comment_likes l ON l.comment_id = c.id AND l.user_id <> ca.user_id WHERE ca.user_id = u.id),
 		(SELECT count(*)::int FROM issue_authors ia JOIN issues i ON i.id = ia.issue_id
-			WHERE ia.user_id = u.id AND i.kind = 'issue' AND i.status = 'solved' AND i.visibility = 'visible')
-		FROM users u WHERE u.id = $1`, id, foundingBefore).
-		Scan(&verified, &founding, &cr, &admin, &rep, &official, &donor, &donations, &trips, &sectionMembers, &qualified, &bugs, &helper, &solved)
+			WHERE ia.user_id = u.id AND i.kind = 'issue' AND i.status = 'solved' AND i.visibility = 'visible'),
+		-- A member of a champion section (§9.1).
+		EXISTS (SELECT 1 FROM class_group_members m WHERE m.user_id = u.id
+			AND (SELECT count(*) FROM class_group_members o JOIN users ou ON ou.id = o.user_id
+			     WHERE o.group_id = m.group_id AND ou.verified_at IS NOT NULL AND ou.blocked_at IS NULL) >= $3
+			AND (SELECT count(*) FROM routine_slots rs WHERE rs.group_id = m.group_id) >= $4),
+		EXISTS (SELECT 1 FROM campaign_finishers f WHERE f.user_id = u.id),
+		u.university_id
+		FROM users u WHERE u.id = $1`, id, foundingBefore, ChampionMembers, ChampionSlots).
+		Scan(&verified, &founding, &cr, &admin, &rep, &official, &donor, &donations, &trips, &sectionMembers, &qualified, &bugs, &helper, &solved,
+			&champion, &finisher, &uni)
+	if err != nil {
+		return nil, err
+	}
+	ambassador, err := s.isAmbassador(ctx, uni, id)
 	if err != nil {
 		return nil, err
 	}
 	out := map[string]int{}
 	for key, on := range map[string]bool{"verified": verified, "founding": founding, "cr": cr, "campus_admin": admin,
-		"bus_rep": rep, "official": official, "blood_donor": donor} {
+		"bus_rep": rep, "official": official, "blood_donor": donor,
+		"champion_section": champion, "race_finisher": finisher, "ambassador": ambassador} {
 		if on {
 			out[key] = 0
 		}
@@ -180,7 +202,7 @@ func (s *Service) Recompute(ctx context.Context, id uuid.UUID) error {
 					id, def.Key, tier, def.Private, now); err != nil {
 					return err
 				}
-				if !first {
+				if !first && !def.Quiet {
 					earned = append(earned, change{def.Key, tier})
 				}
 			}

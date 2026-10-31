@@ -67,7 +67,7 @@ func TestGrowthBadges(t *testing.T) {
 	assert.Nil(t, first.Featured)
 	assert.Empty(t, h.pushes())
 	// The catalog, for locked badges.
-	require.Len(t, first.All, 14)
+	require.Len(t, first.All, 17)
 	byKey := map[string]struct {
 		Tiers   []int
 		Private bool
@@ -89,6 +89,11 @@ func TestGrowthBadges(t *testing.T) {
 	assert.True(t, byKey["campus_voice"].Private)
 	assert.False(t, byKey["cr"].Private)
 	assert.Empty(t, byKey["cr"].Tiers)
+	for _, k := range []string{"champion_section", "race_finisher", "ambassador"} { // §9: public, no tiers
+		assert.Contains(t, byKey, k)
+		assert.False(t, byKey[k].Private, k)
+		assert.Empty(t, byKey[k].Tiers, k)
+	}
 
 	// ---- role badges appear and disappear, with a push each time they appear ----
 	g := h.createGroup(a.Tok)

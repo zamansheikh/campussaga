@@ -42,10 +42,17 @@ type campaign struct {
 	BannerKey     *string
 	BannerVersion *string
 	Scoring       Scoring
+	// §9: an optional section prize and the reward for the first finishers.
+	SectionPrizeEn      string
+	SectionPrizeBn      string
+	FinisherRewardEn    string
+	FinisherRewardBn    string
+	FinisherRewardCount int
 }
 
 const campaignCols = `c.id, c.title_en, c.title_bn, c.body_en, c.body_bn, c.rules_en, c.rules_bn, c.starts_at, c.ends_at, c.settles_at,
-	c.university_ids, c.prizes, c.status, c.created_at, c.updated_at, c.banner_key, c.banner_version, c.scoring`
+	c.university_ids, c.prizes, c.status, c.created_at, c.updated_at, c.banner_key, c.banner_version, c.scoring,
+	c.section_prize_en, c.section_prize_bn, c.finisher_reward_en, c.finisher_reward_bn, c.finisher_reward_count`
 
 type scanner interface{ Scan(dest ...any) error }
 
@@ -63,7 +70,8 @@ func scanCampaign(r scanner) (campaign, error) {
 	var c campaign
 	var prizes, scoring []byte
 	err := r.Scan(&c.ID, &c.TitleEn, &c.TitleBn, &c.BodyEn, &c.BodyBn, &c.RulesEn, &c.RulesBn, &c.StartsAt, &c.EndsAt, &c.SettlesAt,
-		&c.UniversityIDs, &prizes, &c.Status, &c.CreatedAt, &c.UpdatedAt, &c.BannerKey, &c.BannerVersion, &scoring)
+		&c.UniversityIDs, &prizes, &c.Status, &c.CreatedAt, &c.UpdatedAt, &c.BannerKey, &c.BannerVersion, &scoring,
+		&c.SectionPrizeEn, &c.SectionPrizeBn, &c.FinisherRewardEn, &c.FinisherRewardBn, &c.FinisherRewardCount)
 	if err != nil {
 		return c, err
 	}
@@ -358,15 +366,22 @@ type CampaignView struct {
 	RulesURL      string  `json:"rulesUrl"`
 	BannerURL     *string `json:"bannerUrl"`
 	Scoring       Scoring `json:"scoring"`
+	// SectionPrize: the prize for the section the team picks from the board
+	// (§9.1), in my language; null without one.
+	SectionPrize *string `json:"sectionPrize"`
 }
 
 // CampaignDetail adds whether the student won, the ways to earn points with
-// my progress, and my CR section that doesn't count yet.
+// my progress, my CR section that doesn't count yet, the section challenge
+// goal and the finisher reward with my place (§9).
 type CampaignDetail struct {
 	CampaignView
-	IWon     *IWon            `json:"iWon"`
-	Missions []Mission        `json:"missions"`
-	Section  *SectionProgress `json:"section"`
+	IWon             *IWon            `json:"iWon"`
+	Missions         []Mission        `json:"missions"`
+	Section          *SectionProgress `json:"section"`
+	SectionChallenge SectionChallenge `json:"sectionChallenge"`
+	FinisherReward   *FinisherReward  `json:"finisherReward"`
+	Finisher         *MyFinisher      `json:"finisher"`
 }
 
 func (s *Service) view(ctx context.Context, c campaign, uid uuid.UUID) (CampaignView, standing, error) {
@@ -375,6 +390,9 @@ func (s *Service) view(ctx context.Context, c campaign, uid uuid.UUID) (Campaign
 		ID: c.ID, Title: pick(l, c.TitleEn, c.TitleBn), Body: pick(l, c.BodyEn, c.BodyBn),
 		StartsAt: c.StartsAt.UTC(), EndsAt: c.EndsAt.UTC(), SettlesAt: c.SettlesAt.UTC(), Status: c.state(s.now()),
 		Prizes: []PrizeView{}, RulesURL: RulesBase + c.ID.String(), BannerURL: c.bannerURL(), Scoring: c.Scoring,
+	}
+	if sp := pick(l, c.SectionPrizeEn, c.SectionPrizeBn); sp != "" {
+		v.SectionPrize = &sp
 	}
 	for _, p := range c.Prizes {
 		v.Prizes = append(v.Prizes, PrizeView{RankFrom: p.RankFrom, RankTo: p.RankTo, Title: pick(l, p.TitleEn, p.TitleBn)})
@@ -475,8 +493,12 @@ func (s *Service) handleCampaign(ctx context.Context, in *campaignReq) (*Campaig
 	if err != nil {
 		return nil, err
 	}
-	out := &CampaignDetail{CampaignView: v, Missions: missions(c.Scoring, mine.Tally)}
+	out := &CampaignDetail{CampaignView: v, Missions: missions(c.Scoring, mine.Tally),
+		SectionChallenge: SectionChallenge{Members: ChampionMembers, Slots: ChampionSlots}}
 	if out.Section, err = s.sectionProgress(ctx, c.Scoring, mine.Tally.Sections, me.UserID); err != nil {
+		return nil, err
+	}
+	if out.FinisherReward, out.Finisher, err = s.myFinisher(ctx, c, me.UserID); err != nil {
 		return nil, err
 	}
 	var rank int
@@ -621,6 +643,12 @@ type PublicCampaign struct {
 	Prizes    []Prize   `json:"prizes"`
 	BannerURL *string   `json:"bannerUrl"`
 	Scoring   Scoring   `json:"scoring"`
+	// §9: empty strings and 0 when not set.
+	SectionPrizeEn      string `json:"sectionPrizeEn"`
+	SectionPrizeBn      string `json:"sectionPrizeBn"`
+	FinisherRewardEn    string `json:"finisherRewardEn"`
+	FinisherRewardBn    string `json:"finisherRewardBn"`
+	FinisherRewardCount int    `json:"finisherRewardCount"`
 }
 
 func (s *Service) handlePublicCampaign(ctx context.Context, in *campaignReq) (*PublicCampaign, error) {
@@ -636,5 +664,7 @@ func (s *Service) handlePublicCampaign(ctx context.Context, in *campaignReq) (*P
 		ID: c.ID, TitleEn: c.TitleEn, TitleBn: c.TitleBn, BodyEn: c.BodyEn, BodyBn: c.BodyBn, RulesEn: c.RulesEn, RulesBn: c.RulesBn,
 		StartsAt: c.StartsAt.UTC(), EndsAt: c.EndsAt.UTC(), SettlesAt: c.SettlesAt.UTC(), Status: c.state(s.now()), Prizes: c.Prizes,
 		BannerURL: c.bannerURL(), Scoring: c.Scoring,
+		SectionPrizeEn: c.SectionPrizeEn, SectionPrizeBn: c.SectionPrizeBn,
+		FinisherRewardEn: c.FinisherRewardEn, FinisherRewardBn: c.FinisherRewardBn, FinisherRewardCount: c.FinisherRewardCount,
 	}, nil
 }
