@@ -5321,4 +5321,48 @@ class AppLocalizationsBn extends AppLocalizations {
 
     return '$countString/$minString';
   }
+
+  @override
+  String get missionInviteShort => 'যোগ দেওয়া প্রতি বন্ধুর জন্য';
+
+  @override
+  String missionBusShort(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return 'কেউ দেখলে প্রতিদিন · সর্বোচ্চ $daysString দিন';
+  }
+
+  @override
+  String missionSectionShort(int max) {
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return '৫+ ক্লাস আর ৫+ ভেরিফায়েড সদস্য · সর্বোচ্চ $maxStringটি';
+  }
+
+  @override
+  String get missionOnceShort => 'একবার';
+
+  @override
+  String get bonusShortOther => 'অন্য বিশ্ববিদ্যালয়';
+
+  @override
+  String bonusShortPioneer(int first) {
+    final intl.NumberFormat firstNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String firstString = firstNumberFormat.format(first);
+
+    return 'ক্যাম্পাসের প্রথম $firstString';
+  }
+
+  @override
+  String get bonusShortSection => 'সেকশনে যোগ';
+
+  @override
+  String get raceNeeded => 'পুরস্কার জিততে লাগবে';
 }

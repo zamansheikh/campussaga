@@ -1915,5 +1915,16 @@
   "raceOwnLabel": "Your university",
   "raceOtherLabel": "Other universities",
   "raceCount": "{count}/{min}",
-  "@raceCount": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}, "min": {"type": "int", "format": "decimalPattern"}}}
+  "@raceCount": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}, "min": {"type": "int", "format": "decimalPattern"}}},
+  "missionInviteShort": "For each friend who joins",
+  "missionBusShort": "Each day someone watches · up to {days} days",
+  "@missionBusShort": {"placeholders": {"days": {"type": "int", "format": "decimalPattern"}}},
+  "missionSectionShort": "5+ classes and 5+ verified members · up to {max}",
+  "@missionSectionShort": {"placeholders": {"max": {"type": "int", "format": "decimalPattern"}}},
+  "missionOnceShort": "Once",
+  "bonusShortOther": "Other university",
+  "bonusShortPioneer": "First {first} on campus",
+  "@bonusShortPioneer": {"placeholders": {"first": {"type": "int", "format": "decimalPattern"}}},
+  "bonusShortSection": "Joins a section",
+  "raceNeeded": "Needed to win a prize"
 }

@@ -5504,4 +5504,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
     return '$countString/$minString';
   }
+
+  @override
+  String get missionInviteShort => 'For each friend who joins';
+
+  @override
+  String missionBusShort(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return 'Each day someone watches · up to $daysString days';
+  }
+
+  @override
+  String missionSectionShort(int max) {
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return '5+ classes and 5+ verified members · up to $maxString';
+  }
+
+  @override
+  String get missionOnceShort => 'Once';
+
+  @override
+  String get bonusShortOther => 'Other university';
+
+  @override
+  String bonusShortPioneer(int first) {
+    final intl.NumberFormat firstNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String firstString = firstNumberFormat.format(first);
+
+    return 'First $firstString on campus';
+  }
+
+  @override
+  String get bonusShortSection => 'Joins a section';
+
+  @override
+  String get raceNeeded => 'Needed to win a prize';
 }

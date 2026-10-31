@@ -577,19 +577,25 @@ void main() {
       expect(find.text('WAYS TO EARN POINTS'), findsOneWidget);
       expect(find.text("You're in the race"), findsOneWidget);
       expect(find.text('42 points'), findsOneWidget);
-      expect(find.text('+10 for each friend who joins'), findsOneWidget);
-      expect(find.text('3 friends · +35'), findsOneWidget);
-      expect(find.text('Extra for each friend'), findsOneWidget);
-      expect(find.text('At another university'), findsOneWidget);
-      expect(find.text('A friend from another university'), findsNothing);
-      expect(find.text('Done · +2'), findsOneWidget);
-      expect(find.text('+3, once'), findsOneWidget);
       expect(
-        find.text('+2 a day when someone watches · up to 10 days'),
+        find.text('For each friend who joins · 3 friends · +35'),
         findsOneWidget,
       );
-      expect(find.text('2/10 days · +4'), findsOneWidget);
-      expect(find.text('CSE 40 A: 3/5 classes · 5/5 members'), findsOneWidget);
+      expect(find.text('Extra for each friend'), findsOneWidget);
+      expect(find.text('Other university'), findsOneWidget);
+      expect(find.text('A friend from another university'), findsNothing);
+      expect(find.text('Done · +2'), findsOneWidget);
+      expect(find.text('Once'), findsOneWidget);
+      expect(
+        find.text('Each day someone watches · up to 10 days · 2/10 days · +4'),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          '5+ classes and 5+ verified members · up to 2 · CSE 40 A: 3/5 classes · 5/5 members',
+        ),
+        findsOneWidget,
+      );
 
       await scrollAndTap(tester, find.text('Invite a friend'));
       await tester.pumpAndSettle();
@@ -621,12 +627,7 @@ void main() {
       );
       await open(tester, Routes.campaign('c1'));
       expect(find.text('Enter the prize race'), findsOneWidget);
-      expect(
-        find.text(
-          'To win: 3 friends from your university and 2 from other universities',
-        ),
-        findsOneWidget,
-      );
+      expect(find.text('Needed to win a prize'), findsOneWidget);
       expect(find.text('Your university'), findsOneWidget);
       expect(find.text('1/3'), findsOneWidget);
       expect(find.text('Other universities'), findsOneWidget);

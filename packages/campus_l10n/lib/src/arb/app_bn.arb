@@ -1365,5 +1365,13 @@
   "missionBonusSectionDesc": "নিজের সেকশনে যোগ দেয়",
   "raceOwnLabel": "নিজের বিশ্ববিদ্যালয়",
   "raceOtherLabel": "অন্য বিশ্ববিদ্যালয়",
-  "raceCount": "{count}/{min}"
+  "raceCount": "{count}/{min}",
+  "missionInviteShort": "যোগ দেওয়া প্রতি বন্ধুর জন্য",
+  "missionBusShort": "কেউ দেখলে প্রতিদিন · সর্বোচ্চ {days} দিন",
+  "missionSectionShort": "৫+ ক্লাস আর ৫+ ভেরিফায়েড সদস্য · সর্বোচ্চ {max}টি",
+  "missionOnceShort": "একবার",
+  "bonusShortOther": "অন্য বিশ্ববিদ্যালয়",
+  "bonusShortPioneer": "ক্যাম্পাসের প্রথম {first}",
+  "bonusShortSection": "সেকশনে যোগ",
+  "raceNeeded": "পুরস্কার জিততে লাগবে"
 }

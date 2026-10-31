@@ -8293,6 +8293,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count}/{min}'**
   String raceCount(int count, int min);
+
+  /// No description provided for @missionInviteShort.
+  ///
+  /// In en, this message translates to:
+  /// **'For each friend who joins'**
+  String get missionInviteShort;
+
+  /// No description provided for @missionBusShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Each day someone watches · up to {days} days'**
+  String missionBusShort(int days);
+
+  /// No description provided for @missionSectionShort.
+  ///
+  /// In en, this message translates to:
+  /// **'5+ classes and 5+ verified members · up to {max}'**
+  String missionSectionShort(int max);
+
+  /// No description provided for @missionOnceShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Once'**
+  String get missionOnceShort;
+
+  /// No description provided for @bonusShortOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other university'**
+  String get bonusShortOther;
+
+  /// No description provided for @bonusShortPioneer.
+  ///
+  /// In en, this message translates to:
+  /// **'First {first} on campus'**
+  String bonusShortPioneer(int first);
+
+  /// No description provided for @bonusShortSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Joins a section'**
+  String get bonusShortSection;
+
+  /// No description provided for @raceNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed to win a prize'**
+  String get raceNeeded;
 }
 
 class _AppLocalizationsDelegate
