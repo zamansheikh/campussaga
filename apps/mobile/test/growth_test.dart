@@ -606,6 +606,7 @@ void main() {
           score: 23,
           eligible: false,
           myOtherCampus: 1,
+          myOwnCampus: 1,
         ),
       ];
       await start(tester);
@@ -613,17 +614,21 @@ void main() {
         find.text('23 points · not in the prize race yet'),
         findsOneWidget,
       );
+      // My own university comes first.
       expect(
-        find.text('Next: 1 more friend from another university'),
+        find.text('Next: 2 more friends from your university'),
         findsOneWidget,
       );
       await open(tester, Routes.campaign('c1'));
       expect(find.text('Enter the prize race'), findsOneWidget);
       expect(
-        find.text('To win, bring 2 friends from other universities'),
+        find.text(
+          'To win: 3 friends from your university and 2 from other universities',
+        ),
         findsOneWidget,
       );
-      expect(find.text('1/2 friends from other universities'), findsOneWidget);
+      expect(find.text('Your university 1/3'), findsOneWidget);
+      expect(find.text('Other universities 1/2'), findsOneWidget);
       await scrollAndTap(tester, find.text('Enter the prize race'));
       await tester.pumpAndSettle();
       expect(shared.single, contains('/r/abcd1234'));

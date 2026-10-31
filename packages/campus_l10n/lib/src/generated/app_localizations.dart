@@ -8227,6 +8227,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next: {count, plural, =1{1 more friend} other{{count} more friends}} from another university'**
   String campaignNextRace(int count);
+
+  /// No description provided for @raceRuleBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'To win: {own} friends from your university and {other} from other universities'**
+  String raceRuleBoth(int own, int other);
+
+  /// No description provided for @raceRuleOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'To win, bring {min, plural, =1{1 friend} other{{min} friends}} from your university'**
+  String raceRuleOwn(int min);
+
+  /// No description provided for @raceOwnProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Your university {count}/{min}'**
+  String raceOwnProgress(int count, int min);
+
+  /// No description provided for @raceOtherProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Other universities {count}/{min}'**
+  String raceOtherProgress(int count, int min);
+
+  /// No description provided for @campaignNextRaceOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {count, plural, =1{1 more friend} other{{count} more friends}} from your university'**
+  String campaignNextRaceOwn(int count);
 }
 
 class _AppLocalizationsDelegate

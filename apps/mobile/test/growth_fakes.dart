@@ -121,6 +121,7 @@ Campaign sampleCampaign({
   CampaignSectionProgress? section,
   bool eligible = true,
   int myOtherCampus = 2,
+  int myOwnCampus = 3,
 }) => Campaign(
   id: 'c1',
   title: 'Invite and win',
@@ -140,4 +141,5 @@ Campaign sampleCampaign({
   section: section,
   eligible: eligible,
   myOtherCampus: myOtherCampus,
+  myOwnCampus: myOwnCampus,
 );

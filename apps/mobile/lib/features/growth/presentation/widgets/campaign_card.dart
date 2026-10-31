@@ -88,12 +88,16 @@ class _CampaignCardState extends State<CampaignCard> {
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
                 child: CampaignStandingRow(campaign: c),
               ),
-              if (c.otherCampusNeeded > 0) ...[
-                // Not in the prize race yet: that comes first.
+              if (c.outOfRace) ...[
+                // Not in the prize race yet: that comes first, my own
+                // university before others.
                 Divider(height: 1, color: cs.border),
                 _Nudge(
-                  text: AppLocalizations.of(context)
-                      .campaignNextRace(c.otherCampusNeeded),
+                  text: c.ownCampusNeeded > 0
+                      ? AppLocalizations.of(context)
+                            .campaignNextRaceOwn(c.ownCampusNeeded)
+                      : AppLocalizations.of(context)
+                            .campaignNextRace(c.otherCampusNeeded),
                   onTap: () => shareMyInvite(context),
                 ),
               ] else if (nextMission(c) case final m?) ...[

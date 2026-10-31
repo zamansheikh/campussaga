@@ -62,7 +62,7 @@ class MissionsSection extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: Column(
             children: [
-              if (campaign.scoring.minOtherCampus > 0) ...[
+              if (campaign.scoring.hasRace) ...[
                 _RaceRow(
                   campaign: campaign,
                   onTap: live ? () => unawaited(shareMyInvite(context)) : null,
@@ -438,8 +438,14 @@ class _RaceRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cs = context.cs;
-    final min = campaign.scoring.minOtherCampus;
-    final inRace = campaign.otherCampusNeeded == 0;
+    final own = campaign.scoring.minOwnCampus;
+    final other = campaign.scoring.minOtherCampus;
+    final inRace = !campaign.outOfRace;
+    final rule = own > 0 && other > 0
+        ? l10n.raceRuleBoth(own, other)
+        : own > 0
+        ? l10n.raceRuleOwn(own)
+        : l10n.raceRule(other);
     return Material(
       color: inRace ? Colors.transparent : const Color(0x14F59E0B),
       child: InkWell(
@@ -480,7 +486,7 @@ class _RaceRow extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      l10n.raceRule(min),
+                      rule,
                       style: context.text.bodySmall?.copyWith(
                         color: cs.textSecondary,
                       ),
@@ -494,8 +500,27 @@ class _RaceRow extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       )
-                    else
-                      _Steps(have: campaign.myOtherCampus, need: min),
+                    else ...[
+                      if (own > 0)
+                        _Steps(
+                          have: campaign.myOwnCampus,
+                          need: own,
+                          label: l10n.raceOwnProgress(
+                            campaign.myOwnCampus.clamp(0, own),
+                            own,
+                          ),
+                        ),
+                      if (own > 0 && other > 0) const SizedBox(height: 4),
+                      if (other > 0)
+                        _Steps(
+                          have: campaign.myOtherCampus,
+                          need: other,
+                          label: l10n.raceOtherProgress(
+                            campaign.myOtherCampus.clamp(0, other),
+                            other,
+                          ),
+                        ),
+                    ],
                   ],
                 ),
               ),
@@ -511,16 +536,17 @@ class _RaceRow extends StatelessWidget {
   }
 }
 
-/// "1/2 friends from other universities" with a dot per friend needed.
+/// A dot per friend needed, filled for the ones I have, and [label]
+/// ("Your university 1/3").
 class _Steps extends StatelessWidget {
-  const _Steps({required this.have, required this.need});
+  const _Steps({required this.have, required this.need, required this.label});
 
   final int have;
   final int need;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final cs = context.cs;
     return Row(
       children: [
@@ -540,7 +566,7 @@ class _Steps extends StatelessWidget {
         const SizedBox(width: 4),
         Flexible(
           child: Text(
-            l10n.raceProgress(have.clamp(0, need), need),
+            label,
             style: context.text.labelMedium?.copyWith(
               color: cs.primary,
               fontWeight: FontWeight.w700,

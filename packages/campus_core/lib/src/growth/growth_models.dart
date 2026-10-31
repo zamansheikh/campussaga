@@ -331,6 +331,7 @@ class CampaignScoring {
     this.sectionSetupMax = 2,
     this.pioneerFirst = 20,
     this.minOtherCampus = 2,
+    this.minOwnCampus = 3,
   });
 
   /// Missing keys (or an older server) take the defaults.
@@ -350,6 +351,7 @@ class CampaignScoring {
       sectionSetupMax: v('sectionSetupMax', d.sectionSetupMax),
       pioneerFirst: v('pioneerFirst', d.pioneerFirst),
       minOtherCampus: v('minOtherCampus', d.minOtherCampus),
+      minOwnCampus: v('minOwnCampus', d.minOwnCampus),
     );
   }
 
@@ -367,6 +369,12 @@ class CampaignScoring {
 
   /// Friends from other universities needed to be ranked and win (0: none).
   final int minOtherCampus;
+
+  /// Friends from my own university needed to be ranked and win (0: none).
+  final int minOwnCampus;
+
+  /// The prize race has an entry rule.
+  bool get hasRace => minOtherCampus > 0 || minOwnCampus > 0;
 }
 
 /// How a mission's points come: per friend, once, per day, per section.
@@ -469,6 +477,7 @@ class Campaign {
     this.missions = const [],
     this.section,
     this.myOtherCampus = 0,
+    this.myOwnCampus = 0,
     this.eligible = true,
   });
 
@@ -500,6 +509,7 @@ class Campaign {
         ? null
         : CampaignSectionProgress.fromJson(_map(json['section'])!),
     myOtherCampus: _int(json['myOtherCampus']),
+    myOwnCampus: _int(json['myOwnCampus']),
     eligible: json['eligible'] as bool? ?? true,
   );
 
@@ -535,16 +545,24 @@ class Campaign {
   /// My CR section that doesn't count yet (detail only).
   final CampaignSectionProgress? section;
 
-  /// My counted friends at other universities.
+  /// My counted friends at other universities, and at mine.
   final int myOtherCampus;
+  final int myOwnCampus;
 
-  /// I have the friends from other universities needed to be ranked (an
-  /// older server: always).
+  /// I have the friends (from mine and other universities) needed to be
+  /// ranked: in the prize race (an older server: always).
   final bool eligible;
 
   /// Friends from other universities I still need to be ranked.
   int get otherCampusNeeded =>
       eligible ? 0 : (scoring.minOtherCampus - myOtherCampus).clamp(0, 999);
+
+  /// Friends from my university I still need to be ranked.
+  int get ownCampusNeeded =>
+      eligible ? 0 : (scoring.minOwnCampus - myOwnCampus).clamp(0, 999);
+
+  /// Not in the prize race yet.
+  bool get outOfRace => ownCampusNeeded > 0 || otherCampusNeeded > 0;
 
   /// Running at [now].
   bool isLive(DateTime now) =>
@@ -578,6 +596,7 @@ class Campaign {
     missions: missions,
     section: section,
     myOtherCampus: myOtherCampus,
+    myOwnCampus: myOwnCampus,
     eligible: eligible,
   );
 }

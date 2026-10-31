@@ -1354,5 +1354,10 @@
   "raceProgress": "অন্য বিশ্ববিদ্যালয়ের বন্ধু {count}/{min}",
   "raceDone": "তুমি দৌড়ে আছ",
   "campaignNotInRace": "{points} · এখনো দৌড়ে নেই",
-  "campaignNextRace": "পরের ধাপ: অন্য বিশ্ববিদ্যালয়ের আরও {count} জন বন্ধু"
+  "campaignNextRace": "পরের ধাপ: অন্য বিশ্ববিদ্যালয়ের আরও {count} জন বন্ধু",
+  "raceRuleBoth": "জিততে: নিজের বিশ্ববিদ্যালয়ের {own} জন আর অন্য বিশ্ববিদ্যালয়ের {other} জন বন্ধু",
+  "raceRuleOwn": "জিততে নিজের বিশ্ববিদ্যালয়ের {min} জন বন্ধু আনো",
+  "raceOwnProgress": "নিজের বিশ্ববিদ্যালয় {count}/{min}",
+  "raceOtherProgress": "অন্য বিশ্ববিদ্যালয় {count}/{min}",
+  "campaignNextRaceOwn": "পরের ধাপ: নিজের বিশ্ববিদ্যালয়ের আরও {count} জন বন্ধু"
 }

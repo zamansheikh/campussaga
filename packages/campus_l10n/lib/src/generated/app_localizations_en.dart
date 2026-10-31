@@ -5400,4 +5400,74 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return 'Next: $_temp0 from another university';
   }
+
+  @override
+  String raceRuleBoth(int own, int other) {
+    final intl.NumberFormat ownNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String ownString = ownNumberFormat.format(own);
+    final intl.NumberFormat otherNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String otherString = otherNumberFormat.format(other);
+
+    return 'To win: $ownString friends from your university and $otherString from other universities';
+  }
+
+  @override
+  String raceRuleOwn(int min) {
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      min,
+      locale: localeName,
+      other: '$minString friends',
+      one: '1 friend',
+    );
+    return 'To win, bring $_temp0 from your university';
+  }
+
+  @override
+  String raceOwnProgress(int count, int min) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return 'Your university $countString/$minString';
+  }
+
+  @override
+  String raceOtherProgress(int count, int min) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return 'Other universities $countString/$minString';
+  }
+
+  @override
+  String campaignNextRaceOwn(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString more friends',
+      one: '1 more friend',
+    );
+    return 'Next: $_temp0 from your university';
+  }
 }

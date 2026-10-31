@@ -5229,4 +5229,62 @@ class AppLocalizationsBn extends AppLocalizations {
 
     return 'পরের ধাপ: অন্য বিশ্ববিদ্যালয়ের আরও $countString জন বন্ধু';
   }
+
+  @override
+  String raceRuleBoth(int own, int other) {
+    final intl.NumberFormat ownNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String ownString = ownNumberFormat.format(own);
+    final intl.NumberFormat otherNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String otherString = otherNumberFormat.format(other);
+
+    return 'জিততে: নিজের বিশ্ববিদ্যালয়ের $ownString জন আর অন্য বিশ্ববিদ্যালয়ের $otherString জন বন্ধু';
+  }
+
+  @override
+  String raceRuleOwn(int min) {
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return 'জিততে নিজের বিশ্ববিদ্যালয়ের $minString জন বন্ধু আনো';
+  }
+
+  @override
+  String raceOwnProgress(int count, int min) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return 'নিজের বিশ্ববিদ্যালয় $countString/$minString';
+  }
+
+  @override
+  String raceOtherProgress(int count, int min) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return 'অন্য বিশ্ববিদ্যালয় $countString/$minString';
+  }
+
+  @override
+  String campaignNextRaceOwn(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'পরের ধাপ: নিজের বিশ্ববিদ্যালয়ের আরও $countString জন বন্ধু';
+  }
 }

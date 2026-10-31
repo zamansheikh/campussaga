@@ -94,7 +94,7 @@ String? timeLeftText(AppLocalizations l10n, DateTime end, DateTime now) {
 
 /// "Rank 3 · 12 invites" or the nudge to invite when not ranked.
 String campaignStanding(AppLocalizations l10n, Campaign c) {
-  if (c.otherCampusNeeded > 0) {
+  if (c.outOfRace) {
     // Points, but not in the prize race yet.
     return l10n.campaignNotInRace(l10n.campaignScore(c.myScore));
   }

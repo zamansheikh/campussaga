@@ -1897,5 +1897,15 @@
   "campaignNotInRace": "{points} · not in the prize race yet",
   "@campaignNotInRace": {"placeholders": {"points": {"type": "String"}}},
   "campaignNextRace": "Next: {count, plural, =1{1 more friend} other{{count} more friends}} from another university",
-  "@campaignNextRace": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}}
+  "@campaignNextRace": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}},
+  "raceRuleBoth": "To win: {own} friends from your university and {other} from other universities",
+  "@raceRuleBoth": {"placeholders": {"own": {"type": "int", "format": "decimalPattern"}, "other": {"type": "int", "format": "decimalPattern"}}},
+  "raceRuleOwn": "To win, bring {min, plural, =1{1 friend} other{{min} friends}} from your university",
+  "@raceRuleOwn": {"placeholders": {"min": {"type": "int", "format": "decimalPattern"}}},
+  "raceOwnProgress": "Your university {count}/{min}",
+  "@raceOwnProgress": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}, "min": {"type": "int", "format": "decimalPattern"}}},
+  "raceOtherProgress": "Other universities {count}/{min}",
+  "@raceOtherProgress": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}, "min": {"type": "int", "format": "decimalPattern"}}},
+  "campaignNextRaceOwn": "Next: {count, plural, =1{1 more friend} other{{count} more friends}} from your university",
+  "@campaignNextRaceOwn": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}}
 }
