@@ -196,6 +196,7 @@ class _SectionViewState extends State<_SectionView> {
                   title: c.name,
                   trailing: CsPill(
                     label: l10n.caRemoveCr,
+                    icon: CsIcons.undo,
                     trailing: null,
                     onTap: () => _change(
                       () => repo.removeCr(section.id, c.id),
