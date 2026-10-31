@@ -206,21 +206,10 @@ class _ComposeViewState extends State<_ComposeView> {
           ),
           title: Text(l10n.campusCreateTitle),
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: CsSpace.sm),
-              child: FilledButton(
-                onPressed: s.canPost ? cubit.post : null,
-                child: s.posting
-                    ? const SizedBox.square(
-                        dimension: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(
-                        s.uploading
-                            ? l10n.voiceUploading
-                            : l10n.campusPostAction,
-                      ),
-              ),
+            CsBarButton(
+              label: s.uploading ? l10n.voiceUploading : l10n.campusPostAction,
+              busy: s.posting,
+              onPressed: s.canPost ? cubit.post : null,
             ),
           ],
         ),

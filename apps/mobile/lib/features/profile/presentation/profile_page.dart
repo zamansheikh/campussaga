@@ -477,9 +477,14 @@ class _DeleteAccountRow extends StatelessWidget {
               child: Text(l10n.cancel),
             ),
             FilledButton(
+              // Dialog-sized, like the Cancel next to it.
               style: FilledButton.styleFrom(
+                minimumSize: const Size(64, 40),
+                padding: const EdgeInsets.symmetric(horizontal: CsSpace.md),
                 backgroundColor: context.cs.error,
                 foregroundColor: context.cs.onError,
+                disabledBackgroundColor: context.cs.surfaceVariant,
+                disabledForegroundColor: context.cs.textSecondary,
               ),
               onPressed: sure ? () => Navigator.of(context).pop(true) : null,
               child: Text(l10n.deleteAccountConfirm),

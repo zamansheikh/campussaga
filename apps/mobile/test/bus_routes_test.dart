@@ -1,4 +1,5 @@
 import 'package:campus_core/campus_core.dart';
+import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:varsitykotha/app/app.dart';
@@ -301,11 +302,16 @@ void main() {
       find.widgetWithText(TextField, 'Minutes from House Building'),
       '35',
     );
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.widgetWithText(FilledButton, 'Save'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(find.text('+35 min'), findsOneWidget);
     expect(find.text('35 min to campus'), findsOneWidget);
-    await tester.tap(find.widgetWithText(TextButton, 'Save'));
+    await tester.tap(find.widgetWithText(CsBarButton, 'Save'));
     await tester.pumpAndSettle();
     final stops = repo.list.single.stops;
     expect(stops.map((s) => s.name), ['House Building', 'Campus']);
@@ -323,7 +329,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Add 2 departures'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(TextButton, 'Save'));
+    await tester.tap(find.widgetWithText(CsBarButton, 'Save'));
     await tester.pumpAndSettle();
     final trips = repo.list.single.trips;
     expect(trips.map((t) => t.departsMin), [7 * 60 + 30, 8 * 60]);
@@ -381,7 +387,7 @@ void main() {
     await tester.tap(find.text('Keep editing'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(TextButton, 'Save'));
+    await tester.tap(find.widgetWithText(CsBarButton, 'Save'));
     await tester.pumpAndSettle();
     final stops = repo.list.single.stops;
     expect(stops.map((s) => s.name), [

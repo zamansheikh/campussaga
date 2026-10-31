@@ -6,6 +6,7 @@ library;
 
 export 'src/components/cs_avatar.dart';
 export 'src/components/cs_badge.dart';
+export 'src/components/cs_bar_button.dart';
 export 'src/components/cs_brand_mark.dart';
 export 'src/components/cs_code_field.dart';
 export 'src/components/cs_dots.dart';

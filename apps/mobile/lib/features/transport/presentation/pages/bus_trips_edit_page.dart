@@ -155,9 +155,10 @@ class _BusTripsEditPageState extends State<BusTripsEditPage> {
         appBar: AppBar(
           title: Text(l10n.busEditTimetable),
           actions: [
-            TextButton(
-              onPressed: _saving || !_dirty ? null : _save,
-              child: Text(l10n.busSave),
+            CsBarButton(
+              label: l10n.busSave,
+              busy: _saving,
+              onPressed: _dirty ? _save : null,
             ),
           ],
         ),
