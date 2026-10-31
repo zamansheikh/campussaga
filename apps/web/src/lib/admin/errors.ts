@@ -52,6 +52,7 @@ const messages: Record<string, string> = {
   INVALID_IMAGE: "That file isn't a photo we can use. Send a JPEG, PNG or WebP.",
   MEDIA_UNAVAILABLE: "Photos can't be stored right now. Try again later.",
   BANNER_NOT_FOUND: "This campaign has no banner.",
+  NOT_ELIGIBLE: "A winner you chose isn't eligible: they don't have enough friends from other universities. Pick from the ranked students.",
   INVALID_SCORING: "Some points values aren't allowed. Use whole numbers in the range shown under each field; points can only change while the campaign is a draft.",
   PHOTO_NOT_ALLOWED: "The photo check refused this photo.",
   ISSUE_CLOSED: "This issue is closed.",

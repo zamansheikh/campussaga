@@ -145,6 +145,19 @@ function PointsTable({ scoring, lang }: { scoring: CampaignScoring; lang: "en" |
   );
 }
 
+/** Bangla digits. */
+function bn(v: number): string {
+  return num(v, "bn");
+}
+
+/** "1 friend from another university who counts" / "2 friends from other universities who count". */
+function otherFriends(n: number): string {
+  return n === 1 ? "1 friend from another university who counts" : `${n} friends from other universities who count`;
+}
+
+/** The first sentence of a text (up to "." or "।" and the space after it). */
+const firstSentence = /^[^.।]*[.।]/;
+
 /** Text from the API with its line breaks, as plain text (React escapes it; no HTML is ever injected). */
 function Text({ children }: { children: string }) {
   if (!children.trim()) return null;
@@ -163,7 +176,12 @@ const copy = {
       "Open VarsityKotha, go to your profile and share your personal invite link with friends who study at a university in Bangladesh. You also earn points for things that make the app useful for other students, listed below. It is free to take part. There is nothing to buy, and you do not need to rate or review the app.",
     count: "How to earn points",
     countBody:
-      "The extras are bonus points on top of a friend's points: you do not need any friends from other universities, and every friend counts. Only invites made between the start and end dates count, and they must qualify before the date above. Live bus days count only between the start and end dates. Being in a section, being a blood donor and the sections you run as CR count as they are when we choose the winners. Invites from the same phone, fake or repeated accounts, and points we find were gained unfairly are removed.",
+      "The extras are bonus points for that friend, added to the points for the invite. Only invites made between the start and end dates count, and they must qualify before the date above. Live bus days count only between the start and end dates. Being in a section, being a blood donor and the sections you run as CR count as they are when we choose the winners. Invites from the same phone, fake or repeated accounts, and points we find were gained unfairly are removed.",
+    min: "To win a prize",
+    minBody: (n: number) =>
+      `To win a prize you need at least ${otherFriends(n)}: they joined with your link and qualified, as above. Only students who reach this are ranked for prizes. Until then your points still add up, and you join the ranking as soon as you reach it.`,
+    whoMin: (n: number) => ` To be ranked for a prize you also need ${otherFriends(n)} (see "To win a prize").`,
+    chooseMin: (n: number) => `Winners are the people with the most points, by rank, among those with at least ${otherFriends(n)}.`,
     who: "Who can take part",
     whoBody:
       "Verified VarsityKotha students in Bangladesh, at the universities this campaign covers. People who work on VarsityKotha (the team) cannot take part.",
@@ -188,7 +206,14 @@ const copy = {
       "ভার্সিটি কথা খুলে প্রোফাইলে গিয়ে বাংলাদেশের বিশ্ববিদ্যালয়ে পড়া বন্ধুদের তোমার নিজের আমন্ত্রণ লিংক পাঠাও। অ্যাপকে অন্য শিক্ষার্থীদের কাজে লাগে এমন কিছু করলেও পয়েন্ট পাবে, নিচে দেওয়া আছে। অংশ নেওয়া বিনামূল্যে। কিছু কিনতে হবে না, অ্যাপে রেটিং বা রিভিউও দিতে হবে না।",
     count: "কীভাবে পয়েন্ট পাবে",
     countBody:
-      "বাড়তি পয়েন্টগুলো বন্ধুর পয়েন্টের ওপর বোনাস: অন্য বিশ্ববিদ্যালয়ের কোনো বন্ধু লাগবেই এমন নয়, প্রত্যেক বন্ধুই গোনা হয়। শুধু শুরু ও শেষ তারিখের মধ্যে করা আমন্ত্রণ গোনা হয়, আর সেগুলো ওপরের তারিখের মধ্যে যোগ্য হতে হবে। লাইভ বাসের দিন শুধু শুরু ও শেষ তারিখের মধ্যে গোনা হয়। সেকশনে থাকা, রক্তদাতা হওয়া এবং সিআর হিসেবে তোমার সেকশনগুলো বিজয়ী বাছাইয়ের সময় যেমন থাকে, সেভাবে গোনা হয়। একই ফোন থেকে আমন্ত্রণ, ভুয়া বা বারবার খোলা অ্যাকাউন্ট এবং অন্যায়ভাবে পাওয়া পয়েন্ট বাদ দেওয়া হয়।",
+      "বাড়তি পয়েন্টগুলো সেই বন্ধুর জন্য বোনাস, আমন্ত্রণের পয়েন্টের সাথে যোগ হয়। শুধু শুরু ও শেষ তারিখের মধ্যে করা আমন্ত্রণ গোনা হয়, আর সেগুলো ওপরের তারিখের মধ্যে যোগ্য হতে হবে। লাইভ বাসের দিন শুধু শুরু ও শেষ তারিখের মধ্যে গোনা হয়। সেকশনে থাকা, রক্তদাতা হওয়া এবং সিআর হিসেবে তোমার সেকশনগুলো বিজয়ী বাছাইয়ের সময় যেমন থাকে, সেভাবে গোনা হয়। একই ফোন থেকে আমন্ত্রণ, ভুয়া বা বারবার খোলা অ্যাকাউন্ট এবং অন্যায়ভাবে পাওয়া পয়েন্ট বাদ দেওয়া হয়।",
+    min: "পুরস্কার জিততে হলে",
+    minBody: (n: number) =>
+      `পুরস্কার জিততে হলে অন্য বিশ্ববিদ্যালয়ের অন্তত ${bn(n)} জন বন্ধু লাগবে, যারা গণনায় এসেছে: তোমার লিংক দিয়ে যোগ দিয়েছে এবং ওপরের নিয়মে যোগ্য হয়েছে। শুধু যারা এটা পূরণ করে, তারাই পুরস্কারের র‍্যাংকে থাকে। তার আগেও তোমার পয়েন্ট জমতে থাকে, আর পূরণ করার সঙ্গে সঙ্গেই তুমি র‍্যাংকে চলে আসবে।`,
+    whoMin: (n: number) =>
+      ` পুরস্কারের র‍্যাংকে থাকতে হলে অন্য বিশ্ববিদ্যালয়ের অন্তত ${bn(n)} জন গণনায় আসা বন্ধুও লাগবে ("পুরস্কার জিততে হলে" দেখো)।`,
+    chooseMin: (n: number) =>
+      `অন্য বিশ্ববিদ্যালয়ের অন্তত ${bn(n)} জন গণনায় আসা বন্ধু যাদের আছে, তাদের মধ্যে সবচেয়ে বেশি পয়েন্ট যাদের, তারাই র‍্যাংক অনুযায়ী বিজয়ী।`,
     who: "কারা অংশ নিতে পারবে",
     whoBody:
       "এই ক্যাম্পেইন যেসব বিশ্ববিদ্যালয়ের জন্য, বাংলাদেশের সেসবের ভেরিফায়েড ভার্সিটি কথা শিক্ষার্থীরা। ভার্সিটি কথার টিমের সদস্যরা অংশ নিতে পারবে না।",
@@ -210,6 +235,8 @@ function Version({ c, lang }: { c: PublicCampaign; lang: "en" | "bn" }) {
   const body = lang === "bn" ? c.bodyBn || c.bodyEn : c.bodyEn || c.bodyBn;
   const rules = lang === "bn" ? c.rulesBn || c.rulesEn : c.rulesEn || c.rulesBn;
   const prizes = c.prizes ?? [];
+  const scoring = withDefaults(c.scoring);
+  const min = scoring.minOtherCampus;
   return (
     <section lang={lang} id={lang === "bn" ? "bn" : undefined} className={lang === "bn" ? "mt-16 border-t-2 pt-10" : undefined}>
       <h1>{title}</h1>
@@ -250,12 +277,23 @@ function Version({ c, lang }: { c: PublicCampaign; lang: "en" | "bn" }) {
       <h2>{t.take}</h2>
       <p>{t.takeBody}</p>
       <h2>{t.count}</h2>
-      <PointsTable scoring={withDefaults(c.scoring)} lang={lang} />
+      <PointsTable scoring={scoring} lang={lang} />
       <p>{t.countBody}</p>
+      {min > 0 ? (
+        <>
+          <h2>{t.min}</h2>
+          <p>
+            <strong>{t.minBody(min)}</strong>
+          </p>
+        </>
+      ) : null}
       <h2>{t.who}</h2>
-      <p>{t.whoBody}</p>
+      <p>
+        {t.whoBody}
+        {min > 0 ? t.whoMin(min) : null}
+      </p>
       <h2>{t.choose}</h2>
-      <p>{t.chooseBody}</p>
+      <p>{min > 0 ? t.chooseBody.replace(firstSentence, t.chooseMin(min)) : t.chooseBody}</p>
       <h2>{t.deliver}</h2>
       <p>{t.deliverBody}</p>
 

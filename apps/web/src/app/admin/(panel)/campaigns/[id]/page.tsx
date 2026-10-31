@@ -140,7 +140,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
               <div>
                 <h2 className="text-lg font-semibold">Standings</h2>
                 <p className="text-sm text-muted-foreground">
-                  The top 100 by points. Open a row to see the invites; disqualify one that looks like cheating.
+                  The top 100 by points, then those not eligible yet. Open a row to see the invites; disqualify one that looks like cheating.
                 </p>
               </div>
               {standings?.error ? (
@@ -148,7 +148,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
               ) : standings?.data && standings.data.length === 0 ? (
                 <EmptyState title="No participants yet" />
               ) : standings?.data ? (
-                <StandingsTable campaignId={c.id} rows={standings.data} />
+                <StandingsTable campaignId={c.id} rows={standings.data} minOtherCampus={withDefaults(c.scoring).minOtherCampus} />
               ) : null}
             </section>
           ) : null}
@@ -169,7 +169,13 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
                 <AnnounceWinners
                   campaignId={c.id}
                   prizes={c.prizes ?? []}
-                  candidates={standings.data.map((s) => ({ id: s.user.id, name: s.user.name || s.user.email || "No name", rank: s.rank, disqualified: s.disqualified }))}
+                  candidates={standings.data.map((s) => ({
+                    id: s.user.id,
+                    name: s.user.name || s.user.email || "No name",
+                    rank: s.rank,
+                    disqualified: s.disqualified,
+                    eligible: s.eligible,
+                  }))}
                 />
               ) : null}
             </section>
@@ -243,12 +249,13 @@ function pointsSummary(s: CampaignScoring): string {
     [s.busShareDays > 0 ? s.busShare : 0, `${s.busShare} a live bus day (up to ${s.busShareDays})`],
     [s.sectionSetupMax > 0 ? s.sectionSetup : 0, `${s.sectionSetup} a section set up (up to ${s.sectionSetupMax})`],
   ];
-  return (
+  const earn =
     parts
       .filter(([v]) => v > 0)
       .map(([, t]) => t)
-      .join(" · ") || "Nothing earns points"
-  );
+      .join(" · ") || "Nothing earns points";
+  const min = s.minOtherCampus;
+  return min > 0 ? `${earn}. To win: at least ${min} ${min === 1 ? "friend" : "friends"} from other universities.` : earn;
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

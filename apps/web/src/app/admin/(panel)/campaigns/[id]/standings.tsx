@@ -13,7 +13,7 @@ import { formatDateTime } from "@/lib/format";
 import { InviteActions, ParticipantActions } from "../invite-actions";
 
 /** The top of the standings; a row opens to the participant's invites. */
-export function StandingsTable({ campaignId, rows }: { campaignId: string; rows: Standing[] }) {
+export function StandingsTable({ campaignId, rows, minOtherCampus }: { campaignId: string; rows: Standing[]; minOtherCampus: number }) {
   const [open, setOpen] = useState<string | null>(null);
   return (
     <div className="overflow-hidden rounded-xl border bg-card">
@@ -27,10 +27,22 @@ export function StandingsTable({ campaignId, rows }: { campaignId: string; rows:
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((r) => {
+          {rows.map((r, i) => {
             const isOpen = open === r.user.id;
+            // The not-eligible come after the ranked ones; a divider marks where they start.
+            const firstNotEligible = r.eligible === false && rows[i - 1]?.eligible !== false;
             return (
-              <StandingRow key={r.user.id} campaignId={campaignId} r={r} isOpen={isOpen} toggle={() => setOpen(isOpen ? null : r.user.id)} />
+              <Fragment key={r.user.id}>
+                {firstNotEligible ? (
+                  <TableRow className="bg-muted/40 hover:bg-muted/40">
+                    <TableCell colSpan={4} className="py-2 text-xs font-medium whitespace-normal text-muted-foreground">
+                      Not eligible yet: fewer than {minOtherCampus} counted {minOtherCampus === 1 ? "friend" : "friends"} from other universities. Not ranked, so
+                      they can&apos;t win.
+                    </TableCell>
+                  </TableRow>
+                ) : null}
+                <StandingRow campaignId={campaignId} r={r} min={minOtherCampus} isOpen={isOpen} toggle={() => setOpen(isOpen ? null : r.user.id)} />
+              </Fragment>
             );
           })}
         </TableBody>
@@ -39,12 +51,12 @@ export function StandingsTable({ campaignId, rows }: { campaignId: string; rows:
   );
 }
 
-function StandingRow({ campaignId, r, isOpen, toggle }: { campaignId: string; r: Standing; isOpen: boolean; toggle: () => void }) {
+function StandingRow({ campaignId, r, min, isOpen, toggle }: { campaignId: string; r: Standing; min: number; isOpen: boolean; toggle: () => void }) {
   const Chevron = isOpen ? ChevronDown : ChevronRight;
   return (
     <>
       <TableRow className={r.disqualified ? "opacity-60" : undefined}>
-        <TableCell className="font-semibold tabular-nums">{r.rank}</TableCell>
+        <TableCell className="font-semibold tabular-nums">{r.rank ?? <span className="text-muted-foreground">—</span>}</TableCell>
         <TableCell className="max-w-72 whitespace-normal">
           <button
             type="button"
@@ -71,6 +83,11 @@ function StandingRow({ campaignId, r, isOpen, toggle }: { campaignId: string; r:
               </Badge>
             ) : null}
             {r.disqualified ? <Badge variant="destructive">Disqualified</Badge> : null}
+            {r.eligible === false ? (
+              <Badge variant="secondary">
+                Not eligible: {r.otherCampus ?? 0}/{min} other-university friends
+              </Badge>
+            ) : null}
             {(r.flags ?? []).map((f) => (
               <Flag key={f} flag={f} />
             ))}

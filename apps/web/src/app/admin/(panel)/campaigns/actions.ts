@@ -31,6 +31,7 @@ const scoringNames: Record<ScoringKey, string> = {
   sectionSetup: "Points per section set up",
   sectionSetupMax: "Sections that count",
   pioneerFirst: "Pioneer: first how many",
+  minOtherCampus: "Minimum friends from other universities",
 };
 
 /** A whole number in the key's range, with a message that names the field. */

@@ -56,7 +56,13 @@ export function DeliveredButton({ campaignId, userId, name }: { campaignId: stri
   );
 }
 
-type Candidate = { id: string; name: string; rank: number; disqualified?: boolean };
+/** `eligible` false: too few friends from other universities, no rank, can't win. */
+type Candidate = { id: string; name: string; rank: number | null; disqualified?: boolean; eligible?: boolean };
+
+/** Can win: ranked, eligible and not disqualified. */
+function canWin(c: Candidate): c is Candidate & { rank: number } {
+  return c.rank !== null && c.eligible !== false && !c.disqualified;
+}
 type Row = { key: number; userId: string; rank: string };
 
 /**
@@ -67,13 +73,15 @@ type Row = { key: number; userId: string; rank: string };
 export function AnnounceWinners({ campaignId, prizes, candidates }: { campaignId: string; prizes: CampaignPrize[]; candidates: Candidate[] }) {
   const router = useRouter();
   const [rows, setRows] = useState<Row[]>(() =>
-    candidates.filter((c) => !c.disqualified && prizeForRank(prizes, c.rank)).map((c, i) => ({ key: i, userId: c.id, rank: String(c.rank) })),
+    candidates.filter((c) => canWin(c) && prizeForRank(prizes, c.rank)).map((c, i) => ({ key: i, userId: c.id, rank: String(c.rank) })),
   );
   const [nextKey, setNextKey] = useState(candidates.length + 1);
   const byId = new Map(candidates.map((c) => [c.id, c]));
   const winners = rows.map((r) => ({ userId: r.userId, rank: Number(r.rank) }));
+  const notEligible = rows.filter((r) => byId.get(r.userId)?.eligible === false);
   const valid =
     winners.length > 0 &&
+    notEligible.length === 0 &&
     winners.every((w) => w.userId && Number.isInteger(w.rank) && w.rank >= 1) &&
     new Set(winners.map((w) => w.userId)).size === winners.length &&
     new Set(winners.map((w) => w.rank)).size === winners.length;
@@ -106,9 +114,10 @@ export function AnnounceWinners({ campaignId, prizes, candidates }: { campaignId
                 onChange={(e) => patch(r.key, { userId: e.target.value })}
               >
                 {candidates.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    #{c.rank} {c.name}
+                  <option key={c.id} value={c.id} disabled={c.eligible === false}>
+                    {c.rank === null ? "—" : `#${c.rank}`} {c.name}
                     {c.disqualified ? " (disqualified)" : ""}
+                    {c.eligible === false ? " (not eligible)" : ""}
                   </option>
                 ))}
               </select>
@@ -126,9 +135,9 @@ export function AnnounceWinners({ campaignId, prizes, candidates }: { campaignId
           disabled={candidates.length === 0}
           onClick={() => {
             const used = new Set(rows.map((r) => r.userId));
-            const next = candidates.find((c) => !used.has(c.id) && !c.disqualified) ?? candidates[0];
+            const next = candidates.find((c) => !used.has(c.id) && canWin(c)) ?? candidates.find(canWin);
             if (!next) return;
-            setRows((rs) => [...rs, { key: nextKey, userId: next.id, rank: String(next.rank) }]);
+            setRows((rs) => [...rs, { key: nextKey, userId: next.id, rank: String(next.rank ?? "") }]);
             setNextKey(nextKey + 1);
           }}
         >
@@ -159,7 +168,11 @@ export function AnnounceWinners({ campaignId, prizes, candidates }: { campaignId
           onDone={() => router.refresh()}
         />
       </div>
-      {!valid && rows.length > 0 ? <p className="text-xs text-destructive">Each winner needs a different person and a different rank.</p> : null}
+      {notEligible.length > 0 ? (
+        <p className="text-xs text-destructive">Not eligible, so they can&apos;t win: {notEligible.map((r) => byId.get(r.userId)?.name ?? "?").join(", ")}.</p>
+      ) : !valid && rows.length > 0 ? (
+        <p className="text-xs text-destructive">Each winner needs a different person and a different rank.</p>
+      ) : null}
     </div>
   );
 }

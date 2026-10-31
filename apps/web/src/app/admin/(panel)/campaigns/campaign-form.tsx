@@ -39,6 +39,16 @@ const pointFields: { title: string; fields: { key: ScoringKey; label: string; hi
     ],
   },
   {
+    title: "To win",
+    fields: [
+      {
+        key: "minOtherCampus",
+        label: "Minimum friends from other universities to win",
+        hint: "Counted friends at other universities needed to be ranked. 0: no minimum.",
+      },
+    ],
+  },
+  {
     title: "Missions",
     fields: [
       { key: "joinSection", label: "Joined a section", hint: "Once." },

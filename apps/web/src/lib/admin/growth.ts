@@ -5,9 +5,9 @@ export type CampaignStatus = "draft" | "live" | "ended" | "announced";
 export type CampaignPrize = { rankFrom: number; rankTo: number; titleEn: string; titleBn: string };
 
 /**
- * A campaign's point values (docs/GROWTH.md §8.1). `busShareDays`,
- * `sectionSetupMax` and `pioneerFirst` are limits, the rest are points
- * (0 turns that one off).
+ * A campaign's point values (docs/GROWTH.md §8.1, §8.5). `busShareDays`,
+ * `sectionSetupMax`, `pioneerFirst` and `minOtherCampus` are limits, the
+ * rest are points (0 turns that one off).
  */
 export type CampaignScoring = {
   invite: number;
@@ -21,6 +21,8 @@ export type CampaignScoring = {
   sectionSetup: number;
   sectionSetupMax: number;
   pioneerFirst: number;
+  /** Counted friends at other universities needed to be ranked for a prize (0: no minimum). */
+  minOtherCampus: number;
 };
 
 export type ScoringKey = keyof CampaignScoring;
@@ -37,6 +39,7 @@ export const defaultScoring: CampaignScoring = {
   sectionSetup: 15,
   sectionSetupMax: 2,
   pioneerFirst: 20,
+  minOtherCampus: 2,
 };
 
 /** Allowed range of each value (the API refuses others with INVALID_SCORING). */
@@ -52,6 +55,7 @@ export const scoringRange: Record<ScoringKey, { min: number; max: number }> = {
   sectionSetup: { min: 0, max: 100 },
   sectionSetupMax: { min: 0, max: 10 },
   pioneerFirst: { min: 1, max: 1000 },
+  minOtherCampus: { min: 0, max: 20 },
 };
 
 /** The campaign's values over the defaults (an older API sends none). */
@@ -131,13 +135,18 @@ export type StandingInvite = {
 export type InviteFlag = "same_device" | "burst" | "new_account" | "self_vouched";
 
 export type Standing = {
-  rank: number;
+  /** Null for a participant who isn't eligible (too few friends from other universities); they come after the ranked ones. */
+  rank: number | null;
   user: PersonRef;
   /** Points. */
   score: number;
   /** Points per key; missing on an older API. */
   points?: Partial<Record<PointKey, number>> | null;
   hidden: boolean;
+  /** Has the campaign's minimum of counted friends at other universities (missing on an older API: treat as eligible). */
+  eligible?: boolean;
+  /** Counted friends at other universities. */
+  otherCampus?: number;
   invites: StandingInvite[];
   flags: InviteFlag[];
   /** Set when the participant is removed from this campaign (if the API lists them). */
