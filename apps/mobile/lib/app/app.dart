@@ -141,6 +141,7 @@ class _CampusAppState extends State<CampusApp> {
     'referral_joined',
     'badge_earned',
     'campaign_won',
+    'race_finished',
   };
 
   /// A push while the app is open: show it, and fetch what changed.
@@ -231,7 +232,8 @@ class _CampusAppState extends State<CampusApp> {
       WidgetsBinding.instance
         ..addPostFrameCallback((_) {
           if (_auth.state.status == AuthStatus.signedIn) {
-            if (type == 'campaign_won' && campaign is String) {
+            if ((type == 'campaign_won' || type == 'race_finished') &&
+                campaign is String) {
               unawaited(_router.push(route));
             } else {
               _router.go(route);

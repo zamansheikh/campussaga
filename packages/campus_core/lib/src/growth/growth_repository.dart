@@ -32,4 +32,12 @@ abstract interface class GrowthRepository {
   /// A winner sends where to deliver the prize. Rejected with
   /// `NOT_A_WINNER` or `ALREADY_CLAIMED`.
   Future<void> claimPrize(String id, PrizeClaim claim);
+
+  /// The section challenge board: top sections and mine.
+  Future<SectionBoard> sections(String id);
+
+  /// A finisher in the reward sends the mobile number to get it. Rejected
+  /// with `NOT_A_FINISHER`, `NO_REWARD`, `ALREADY_CLAIMED` or
+  /// `INVALID_PHONE`.
+  Future<void> claimFinisherReward(String id, String phone);
 }

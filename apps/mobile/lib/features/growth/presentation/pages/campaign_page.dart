@@ -12,9 +12,12 @@ import '../../../../app/di.dart';
 import '../../../../app/env.dart';
 import '../../../../app/router.dart';
 import '../growth_text.dart';
+import '../share_card.dart';
 import '../widgets/campaign_banner.dart';
+import '../widgets/finisher_card.dart';
 import '../widgets/missions_section.dart';
 import '../widgets/prize_claim_card.dart';
+import '../widgets/section_challenge.dart';
 
 /// One prize campaign: prizes, the leaderboard (Bangladesh or my
 /// university, my own row pinned), how invites count, the rules, and, for a
@@ -120,8 +123,14 @@ class _CampaignPageState extends State<CampaignPage> {
       appBar: AppBar(
         title: Text(c?.title ?? l10n.campaignsTitle),
         actions: [
-          if (c != null)
+          if (c != null) ...[
+            IconButton(
+              tooltip: l10n.shareCardAction,
+              icon: const Icon(CsIcons.share),
+              onPressed: () => showShareCard(context, c),
+            ),
             CsBarButton(label: l10n.campaignRules, onPressed: () => _rules(c)),
+          ],
         ],
       ),
       body: SafeArea(
@@ -194,8 +203,11 @@ class _CampaignPageState extends State<CampaignPage> {
           const SizedBox(height: CsSpace.lg),
           PrizeClaimCard(campaignId: c.id, win: win),
         ],
+        FinisherCard(key: ValueKey(c.finisher?.position), campaign: c),
         const SizedBox(height: CsSpace.lg),
         MissionsSection(campaign: c, live: c.isLive(appNow())),
+        const SizedBox(height: CsSpace.lg),
+        SectionChallengeSection(campaign: c),
         if (c.prizes.isNotEmpty) ...[
           const SizedBox(height: CsSpace.lg),
           CsSection(

@@ -8341,6 +8341,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Needed to win a prize'**
   String get raceNeeded;
+
+  /// No description provided for @badgeNameChampionSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Champion section'**
+  String get badgeNameChampionSection;
+
+  /// No description provided for @badgeHowChampionSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Be in a section with 25+ verified members and 5+ classes.'**
+  String get badgeHowChampionSection;
+
+  /// No description provided for @badgeNameRaceFinisher.
+  ///
+  /// In en, this message translates to:
+  /// **'Race finisher'**
+  String get badgeNameRaceFinisher;
+
+  /// No description provided for @badgeHowRaceFinisher.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a campaign\'s prize race.'**
+  String get badgeHowRaceFinisher;
+
+  /// No description provided for @badgeNameAmbassador.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus ambassador'**
+  String get badgeNameAmbassador;
+
+  /// No description provided for @badgeHowAmbassador.
+  ///
+  /// In en, this message translates to:
+  /// **'Bring the most friends from your own university (at least 5).'**
+  String get badgeHowAmbassador;
+
+  /// No description provided for @sectionChallengeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Section challenge'**
+  String get sectionChallengeTitle;
+
+  /// No description provided for @sectionChallengeGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'{members} verified members and {slots} classes: the whole section gets the Champion section badge'**
+  String sectionChallengeGoal(int members, int slots);
+
+  /// No description provided for @sectionChallengePrize.
+  ///
+  /// In en, this message translates to:
+  /// **'Top section wins: {prize}'**
+  String sectionChallengePrize(String prize);
+
+  /// No description provided for @sectionMembersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get sectionMembersLabel;
+
+  /// No description provided for @sectionClassesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Classes'**
+  String get sectionClassesLabel;
+
+  /// No description provided for @sectionMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Your section'**
+  String get sectionMine;
+
+  /// No description provided for @sectionNoneYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Join your section to take part'**
+  String get sectionNoneYet;
+
+  /// No description provided for @sectionMembersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 member} other{{count} members}}'**
+  String sectionMembersCount(int count);
+
+  /// No description provided for @sectionShowAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all'**
+  String get sectionShowAll;
+
+  /// No description provided for @sectionShowLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get sectionShowLess;
+
+  /// No description provided for @finisherRewardLine.
+  ///
+  /// In en, this message translates to:
+  /// **'First {count} in the race get {reward} · {left} left'**
+  String finisherRewardLine(int count, String reward, int left);
+
+  /// No description provided for @finisherYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re finisher #{position}'**
+  String finisherYou(int position);
+
+  /// No description provided for @finisherClaimTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get your reward'**
+  String get finisherClaimTitle;
+
+  /// No description provided for @finisherClaimBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re finisher #{position}: {reward}. Add your mobile number and we\'ll send it.'**
+  String finisherClaimBody(int position, String reward);
+
+  /// No description provided for @finisherPhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile number'**
+  String get finisherPhoneLabel;
+
+  /// No description provided for @finisherPhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an 11-digit number starting with 01'**
+  String get finisherPhoneInvalid;
+
+  /// No description provided for @finisherClaimed.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it. We\'ll send {reward} to your number.'**
+  String finisherClaimed(String reward);
+
+  /// No description provided for @finisherSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent: {reward}'**
+  String finisherSent(String reward);
+
+  /// No description provided for @shareCardAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Share my card'**
+  String get shareCardAction;
+
+  /// No description provided for @shareCardInRace.
+  ///
+  /// In en, this message translates to:
+  /// **'In the prize race'**
+  String get shareCardInRace;
+
+  /// No description provided for @shareCardJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Join me on VarsityKotha'**
+  String get shareCardJoin;
+
+  /// No description provided for @shareCardScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to join'**
+  String get shareCardScan;
+
+  /// No description provided for @inviteQrTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your invite QR'**
+  String get inviteQrTitle;
+
+  /// No description provided for @inviteQrHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Classmates scan this with their camera to get the app with your link.'**
+  String get inviteQrHint;
+
+  /// No description provided for @inviteQrAction.
+  ///
+  /// In en, this message translates to:
+  /// **'QR'**
+  String get inviteQrAction;
+
+  /// No description provided for @shareCardPitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Class routine, live bus, blood donors and your campus, in one app.'**
+  String get shareCardPitch;
 }
 
 class _AppLocalizationsDelegate

@@ -456,6 +456,129 @@ class CampaignSectionProgress {
   static const need = 5;
 }
 
+/// What makes a champion section (`sectionChallenge`): verified members
+/// and routine classes.
+class SectionChallenge {
+  const SectionChallenge({this.members = 25, this.slots = 5});
+
+  factory SectionChallenge.fromJson(Map<String, Object?>? json) =>
+      SectionChallenge(
+        members: (json?['members'] as num?)?.toInt() ?? 25,
+        slots: (json?['slots'] as num?)?.toInt() ?? 5,
+      );
+
+  final int members;
+  final int slots;
+}
+
+/// The reward for the first students who enter the prize race
+/// (`finisherReward`).
+class FinisherReward {
+  const FinisherReward({
+    required this.title,
+    required this.count,
+    this.left = 0,
+  });
+
+  factory FinisherReward.fromJson(Map<String, Object?> json) => FinisherReward(
+    title: json['title'] as String? ?? '',
+    count: _int(json['count']),
+    left: _int(json['left']),
+  );
+
+  /// "20 TK mobile recharge".
+  final String title;
+
+  /// For the first [count] finishers; [left] still free.
+  final int count;
+  final int left;
+}
+
+/// My place among the finishers (`finisher`).
+class CampaignFinisher {
+  const CampaignFinisher({
+    required this.position,
+    this.inReward = false,
+    this.claimed = false,
+    this.sent = false,
+  });
+
+  factory CampaignFinisher.fromJson(Map<String, Object?> json) =>
+      CampaignFinisher(
+        position: _int(json['position']),
+        inReward: json['inReward'] as bool? ?? false,
+        claimed: json['claimed'] as bool? ?? false,
+        sent: json['sent'] as bool? ?? false,
+      );
+
+  final int position;
+
+  /// Among the first who get the reward.
+  final bool inReward;
+
+  /// I sent my number; the team sent the reward.
+  final bool claimed;
+  final bool sent;
+
+  CampaignFinisher copyWith({bool? claimed}) => CampaignFinisher(
+    position: position,
+    inReward: inReward,
+    claimed: claimed ?? this.claimed,
+    sent: sent,
+  );
+}
+
+/// A section on the section challenge board.
+class SectionRow {
+  const SectionRow({
+    required this.rank,
+    required this.groupId,
+    required this.name,
+    this.university = '',
+    this.members = 0,
+    this.slots = 0,
+    this.champion = false,
+  });
+
+  factory SectionRow.fromJson(Map<String, Object?> json) => SectionRow(
+    rank: _int(json['rank']),
+    groupId: json['groupId'] as String? ?? '',
+    name: json['name'] as String? ?? '',
+    university: json['university'] as String? ?? '',
+    members: _int(json['members']),
+    slots: _int(json['slots']),
+    champion: json['champion'] as bool? ?? false,
+  );
+
+  final int rank;
+  final String groupId;
+  final String name;
+  final String university;
+
+  /// Verified members, and classes in the routine.
+  final int members;
+  final int slots;
+  final bool champion;
+}
+
+/// The top sections of a campaign, and mine (`GET /campaigns/{id}/sections`).
+class SectionBoard {
+  const SectionBoard({this.rows = const [], this.mine});
+
+  factory SectionBoard.fromJson(Map<String, Object?> json) => SectionBoard(
+    rows: [
+      for (final r in (json['rows'] as List<Object?>?) ?? const [])
+        SectionRow.fromJson(r! as Map<String, Object?>),
+    ],
+    mine: _map(json['mine']) == null
+        ? null
+        : SectionRow.fromJson(_map(json['mine'])!),
+  );
+
+  final List<SectionRow> rows;
+  final SectionRow? mine;
+}
+
 /// A prize campaign (`GET /campaigns`, `GET /campaigns/{id}`). Text is in
 /// the student's language.
 class Campaign {
@@ -479,6 +602,10 @@ class Campaign {
     this.myOtherCampus = 0,
     this.myOwnCampus = 0,
     this.eligible = true,
+    this.sectionPrize = '',
+    this.sectionChallenge = const SectionChallenge(),
+    this.finisherReward,
+    this.finisher,
   });
 
   factory Campaign.fromJson(Map<String, Object?> json) => Campaign(
@@ -511,6 +638,14 @@ class Campaign {
     myOtherCampus: _int(json['myOtherCampus']),
     myOwnCampus: _int(json['myOwnCampus']),
     eligible: json['eligible'] as bool? ?? true,
+    sectionPrize: json['sectionPrize'] as String? ?? '',
+    sectionChallenge: SectionChallenge.fromJson(_map(json['sectionChallenge'])),
+    finisherReward: _map(json['finisherReward']) == null
+        ? null
+        : FinisherReward.fromJson(_map(json['finisherReward'])!),
+    finisher: _map(json['finisher']) == null
+        ? null
+        : CampaignFinisher.fromJson(_map(json['finisher'])!),
   );
 
   final String id;
@@ -564,6 +699,16 @@ class Campaign {
   /// Not in the prize race yet.
   bool get outOfRace => ownCampusNeeded > 0 || otherCampusNeeded > 0;
 
+  /// The team's prize for the top section; empty: badges only.
+  final String sectionPrize;
+  final SectionChallenge sectionChallenge;
+
+  /// For the first students in the prize race; null: none.
+  final FinisherReward? finisherReward;
+
+  /// My finisher place, once I'm in the race (detail only).
+  final CampaignFinisher? finisher;
+
   /// Running at [now].
   bool isLive(DateTime now) =>
       status == CampaignStatus.live &&
@@ -578,7 +723,7 @@ class Campaign {
     ]..sort((a, b) => a.rankFrom.compareTo(b.rankFrom))).first;
   }
 
-  Campaign copyWith({CampaignWin? won}) => Campaign(
+  Campaign copyWith({CampaignWin? won, CampaignFinisher? finisher}) => Campaign(
     id: id,
     title: title,
     body: body,
@@ -598,6 +743,10 @@ class Campaign {
     myOtherCampus: myOtherCampus,
     myOwnCampus: myOwnCampus,
     eligible: eligible,
+    sectionPrize: sectionPrize,
+    sectionChallenge: sectionChallenge,
+    finisherReward: finisherReward,
+    finisher: finisher ?? this.finisher,
   );
 }
 

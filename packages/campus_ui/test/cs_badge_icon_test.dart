@@ -26,6 +26,9 @@ void main() {
       'bug_hunter',
       'helper',
       'campus_voice',
+      'champion_section',
+      'race_finisher',
+      'ambassador',
     ]) {
       expect(CsIcons.badge(k), isNot(CsIcons.badge('unknown')), reason: k);
     }

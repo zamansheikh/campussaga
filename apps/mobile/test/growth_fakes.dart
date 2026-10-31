@@ -22,6 +22,8 @@ class FakeGrowthRepository implements GrowthRepository {
   final featureCalls = <String?>[];
   final prizeClaims = <(String, PrizeClaim)>[];
   final scopesAsked = <LeaderboardScope>[];
+  final finisherClaims = <(String, String)>[];
+  SectionBoard sectionBoard = const SectionBoard();
   int referralsCalls = 0;
 
   @override
@@ -85,6 +87,18 @@ class FakeGrowthRepository implements GrowthRepository {
   Future<void> claimPrize(String id, PrizeClaim claim) async {
     if (claimFailure != null) throw claimFailure!;
     prizeClaims.add((id, claim));
+  }
+
+  @override
+  Future<SectionBoard> sections(String id) async {
+    if (failure != null) throw failure!;
+    return sectionBoard;
+  }
+
+  @override
+  Future<void> claimFinisherReward(String id, String phone) async {
+    if (claimFailure != null) throw claimFailure!;
+    finisherClaims.add((id, phone));
   }
 }
 

@@ -5548,4 +5548,154 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get raceNeeded => 'Needed to win a prize';
+
+  @override
+  String get badgeNameChampionSection => 'Champion section';
+
+  @override
+  String get badgeHowChampionSection =>
+      'Be in a section with 25+ verified members and 5+ classes.';
+
+  @override
+  String get badgeNameRaceFinisher => 'Race finisher';
+
+  @override
+  String get badgeHowRaceFinisher => 'Enter a campaign\'s prize race.';
+
+  @override
+  String get badgeNameAmbassador => 'Campus ambassador';
+
+  @override
+  String get badgeHowAmbassador =>
+      'Bring the most friends from your own university (at least 5).';
+
+  @override
+  String get sectionChallengeTitle => 'Section challenge';
+
+  @override
+  String sectionChallengeGoal(int members, int slots) {
+    final intl.NumberFormat membersNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String membersString = membersNumberFormat.format(members);
+    final intl.NumberFormat slotsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String slotsString = slotsNumberFormat.format(slots);
+
+    return '$membersString verified members and $slotsString classes: the whole section gets the Champion section badge';
+  }
+
+  @override
+  String sectionChallengePrize(String prize) {
+    return 'Top section wins: $prize';
+  }
+
+  @override
+  String get sectionMembersLabel => 'Members';
+
+  @override
+  String get sectionClassesLabel => 'Classes';
+
+  @override
+  String get sectionMine => 'Your section';
+
+  @override
+  String get sectionNoneYet => 'Join your section to take part';
+
+  @override
+  String sectionMembersCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString members',
+      one: '1 member',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sectionShowAll => 'Show all';
+
+  @override
+  String get sectionShowLess => 'Show less';
+
+  @override
+  String finisherRewardLine(int count, String reward, int left) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat leftNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String leftString = leftNumberFormat.format(left);
+
+    return 'First $countString in the race get $reward · $leftString left';
+  }
+
+  @override
+  String finisherYou(int position) {
+    final intl.NumberFormat positionNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String positionString = positionNumberFormat.format(position);
+
+    return 'You\'re finisher #$positionString';
+  }
+
+  @override
+  String get finisherClaimTitle => 'Get your reward';
+
+  @override
+  String finisherClaimBody(int position, String reward) {
+    final intl.NumberFormat positionNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String positionString = positionNumberFormat.format(position);
+
+    return 'You\'re finisher #$positionString: $reward. Add your mobile number and we\'ll send it.';
+  }
+
+  @override
+  String get finisherPhoneLabel => 'Mobile number';
+
+  @override
+  String get finisherPhoneInvalid =>
+      'Enter an 11-digit number starting with 01';
+
+  @override
+  String finisherClaimed(String reward) {
+    return 'Got it. We\'ll send $reward to your number.';
+  }
+
+  @override
+  String finisherSent(String reward) {
+    return 'Sent: $reward';
+  }
+
+  @override
+  String get shareCardAction => 'Share my card';
+
+  @override
+  String get shareCardInRace => 'In the prize race';
+
+  @override
+  String get shareCardJoin => 'Join me on VarsityKotha';
+
+  @override
+  String get shareCardScan => 'Scan to join';
+
+  @override
+  String get inviteQrTitle => 'Your invite QR';
+
+  @override
+  String get inviteQrHint =>
+      'Classmates scan this with their camera to get the app with your link.';
+
+  @override
+  String get inviteQrAction => 'QR';
+
+  @override
+  String get shareCardPitch =>
+      'Class routine, live bus, blood donors and your campus, in one app.';
 }

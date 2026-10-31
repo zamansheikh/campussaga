@@ -48,6 +48,9 @@ abstract final class CsBadgeColors {
     'bug_hunter' => (const Color(0xFFA3E635), const Color(0xFF3F6212)),
     'helper' => (const Color(0xFF67E8F9), const Color(0xFF0E7490)),
     'campus_voice' => (const Color(0xFF60A5FA), const Color(0xFF1E40AF)),
+    'champion_section' => (const Color(0xFFFCD34D), const Color(0xFFB45309)),
+    'race_finisher' => (const Color(0xFF4ADE80), const Color(0xFF15803D)),
+    'ambassador' => (const Color(0xFFF472B6), const Color(0xFF9D174D)),
     _ => (const Color(0xFF2DD4BF), const Color(0xFF0F766E)),
   };
 
@@ -60,6 +63,7 @@ abstract final class CsBadgeColors {
     'bus_rep',
     'official',
     'section_builder',
+    'ambassador',
   }.contains(key);
 }
 

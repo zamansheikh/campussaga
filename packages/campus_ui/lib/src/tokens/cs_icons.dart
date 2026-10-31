@@ -155,6 +155,7 @@ abstract final class CsIcons {
   static const IconData question = PhosphorIconsRegular.sealQuestion;
   static const IconData reply = PhosphorIconsRegular.arrowBendUpLeft;
   static const IconData share = PhosphorIconsRegular.shareFat;
+  static const IconData qr = PhosphorIconsRegular.qrCode;
   static const IconData folder = PhosphorIconsRegular.folderOpen;
   static const IconData blood = PhosphorIconsRegular.drop;
   static const IconData bloodFill = PhosphorIconsFill.drop;
@@ -188,6 +189,9 @@ abstract final class CsIcons {
     'bug_hunter' => PhosphorIconsRegular.bug,
     'helper' => PhosphorIconsRegular.handHeart,
     'campus_voice' => PhosphorIconsRegular.megaphone,
+    'champion_section' => PhosphorIconsRegular.trophy,
+    'race_finisher' => PhosphorIconsRegular.flagCheckered,
+    'ambassador' => PhosphorIconsRegular.star,
     _ => PhosphorIconsRegular.medal,
   };
 
@@ -207,6 +211,9 @@ abstract final class CsIcons {
     'bug_hunter' => PhosphorIconsFill.bug,
     'helper' => PhosphorIconsFill.handHeart,
     'campus_voice' => PhosphorIconsFill.megaphone,
+    'champion_section' => PhosphorIconsFill.trophy,
+    'race_finisher' => PhosphorIconsFill.flagCheckered,
+    'ambassador' => PhosphorIconsFill.star,
     _ => PhosphorIconsFill.medal,
   };
 }

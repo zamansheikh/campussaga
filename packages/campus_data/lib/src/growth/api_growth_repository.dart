@@ -70,4 +70,14 @@ class ApiGrowthRepository implements GrowthRepository {
   Future<void> claimPrize(String id, PrizeClaim claim) async {
     await _api.post('/campaigns/${_seg(id)}/claim', claim.toJson());
   }
+
+  @override
+  Future<SectionBoard> sections(String id) async => SectionBoard.fromJson(
+    _map(await _api.get('/campaigns/${_seg(id)}/sections')),
+  );
+
+  @override
+  Future<void> claimFinisherReward(String id, String phone) async {
+    await _api.post('/campaigns/${_seg(id)}/finisher-claim', {'phone': phone});
+  }
 }

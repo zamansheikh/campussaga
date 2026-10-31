@@ -5,6 +5,7 @@ import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:varsitykotha/app/app.dart';
 import 'package:varsitykotha/app/clock.dart';
@@ -121,6 +122,13 @@ void main() {
       );
       expect(find.text('Rafi · verified · 2 of 3 days'), findsOneWidget);
       expect(find.text('Mim · not verified yet · 0 of 3 days'), findsOneWidget);
+
+      await scrollAndTap(tester, find.byTooltip('Your invite QR'));
+      await tester.pumpAndSettle();
+      expect(find.text('Your invite QR'), findsOneWidget);
+      expect(find.byType(QrImageView), findsOneWidget);
+      await tester.tapAt(const Offset(20, 20)); // close the sheet
+      await tester.pumpAndSettle();
 
       await scrollAndTap(tester, find.widgetWithText(FilledButton, 'Share'));
       await tester.pumpAndSettle();
@@ -635,6 +643,146 @@ void main() {
       await scrollAndTap(tester, find.text('Enter the prize race'));
       await tester.pumpAndSettle();
       expect(shared.single, contains('/r/abcd1234'));
+    });
+
+    testWidgets('section challenge: goal, prize, my section, the board', (
+      tester,
+    ) async {
+      growth.campaignList = [
+        Campaign(
+          id: 'c1',
+          title: 'Invite and win',
+          status: CampaignStatus.live,
+          startsAt: now.subtract(const Duration(days: 1)),
+          endsAt: now.add(const Duration(days: 5)),
+          sectionPrize: 'Tea for the class',
+        ),
+      ];
+      growth.sectionBoard = const SectionBoard(
+        rows: [
+          SectionRow(
+            rank: 1,
+            groupId: 'g1',
+            name: 'EEE 52 B',
+            university: 'BUET',
+            members: 31,
+            slots: 9,
+            champion: true,
+          ),
+          SectionRow(
+            rank: 2,
+            groupId: 'g-cse',
+            name: 'CSE 40 A',
+            university: 'Demo University',
+            members: 12,
+            slots: 3,
+          ),
+        ],
+        mine: SectionRow(
+          rank: 2,
+          groupId: 'g-cse',
+          name: 'CSE 40 A',
+          members: 12,
+          slots: 3,
+        ),
+      );
+      await start(tester);
+      await open(tester, Routes.campaign('c1'));
+      await tester.scrollUntilVisible(find.text('EEE 52 B'), 200);
+      expect(find.text('SECTION CHALLENGE'), findsOneWidget);
+      expect(
+        find.text(
+          '25 verified members and 5 classes: the whole section gets the '
+          'Champion section badge',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Top section wins: Tea for the class'), findsOneWidget);
+      expect(find.text('Your section · CSE 40 A'), findsOneWidget);
+      expect(find.text('12/25'), findsOneWidget);
+      expect(find.text('3/5'), findsOneWidget);
+      expect(find.text('31 members'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is CsBadgeIcon && w.badgeKey == 'champion_section',
+        ),
+        findsNWidgets(2),
+        reason: 'the goal medal and the champion row',
+      );
+    });
+
+    testWidgets('finisher reward: number checked, then sent', (tester) async {
+      growth.campaignList = [
+        Campaign(
+          id: 'c1',
+          title: 'Invite and win',
+          status: CampaignStatus.live,
+          startsAt: now.subtract(const Duration(days: 1)),
+          endsAt: now.add(const Duration(days: 5)),
+          finisherReward: const FinisherReward(
+            title: '20 TK recharge',
+            count: 50,
+            left: 13,
+          ),
+          finisher: const CampaignFinisher(position: 37, inReward: true),
+        ),
+      ];
+      await start(tester);
+      await open(tester, Routes.campaign('c1'));
+      expect(find.text("You're finisher #37"), findsNWidgets(2));
+      await tester.enterText(find.byType(TextFormField), '12345');
+      await tester.tap(find.widgetWithText(FilledButton, 'Get your reward'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Enter an 11-digit number starting with 01'),
+        findsOneWidget,
+      );
+      expect(growth.finisherClaims, isEmpty);
+      await tester.enterText(find.byType(TextFormField), '01712345678');
+      await tester.tap(find.widgetWithText(FilledButton, 'Get your reward'));
+      await tester.pumpAndSettle();
+      expect(growth.finisherClaims, [('c1', '01712345678')]);
+      expect(
+        find.text("Got it. We'll send 20 TK recharge to your number."),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('finisher reward line before I finish', (tester) async {
+      growth.campaignList = [
+        sampleCampaign(now: now, eligible: false, myOtherCampus: 0).copyWith(),
+      ];
+      growth.campaignsById['c1'] = Campaign(
+        id: 'c1',
+        title: 'Invite and win',
+        status: CampaignStatus.live,
+        startsAt: now.subtract(const Duration(days: 1)),
+        endsAt: now.add(const Duration(days: 5)),
+        eligible: false,
+        finisherReward: const FinisherReward(
+          title: '20 TK recharge',
+          count: 50,
+          left: 13,
+        ),
+      );
+      await start(tester);
+      await open(tester, Routes.campaign('c1'));
+      expect(
+        find.text('First 50 in the race get 20 TK recharge · 13 left'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('share card: my place and a QR of my link', (tester) async {
+      growth.campaignList = [sampleCampaign(now: now, rank: 3, score: 42)];
+      await start(tester);
+      await open(tester, Routes.campaign('c1'));
+      await tester.tap(find.byTooltip('Share my card'));
+      await tester.pumpAndSettle();
+      expect(find.text('Rank 3 · 42 points'), findsWidgets);
+      expect(find.text('Scan to join'), findsOneWidget);
+      expect(find.byType(QrImageView), findsOneWidget);
+      expect(find.text('varsitykotha.com/r/abcd1234'), findsOneWidget);
     });
 
     testWidgets('winner: the claim form checks the fields, then sends', (

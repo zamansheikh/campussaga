@@ -20,6 +20,9 @@ String badgeName(AppLocalizations l10n, String key) => switch (key) {
   'bug_hunter' => l10n.badgeNameBugHunter,
   'helper' => l10n.badgeNameHelper,
   'campus_voice' => l10n.badgeNameCampusVoice,
+  'champion_section' => l10n.badgeNameChampionSection,
+  'race_finisher' => l10n.badgeNameRaceFinisher,
+  'ambassador' => l10n.badgeNameAmbassador,
   _ => key.replaceAll('_', ' '),
 };
 
@@ -39,6 +42,9 @@ String badgeHow(AppLocalizations l10n, String key) => switch (key) {
   'bug_hunter' => l10n.badgeHowBugHunter,
   'helper' => l10n.badgeHowHelper,
   'campus_voice' => l10n.badgeHowCampusVoice,
+  'champion_section' => l10n.badgeHowChampionSection,
+  'race_finisher' => l10n.badgeHowRaceFinisher,
+  'ambassador' => l10n.badgeHowAmbassador,
   _ => '',
 };
 

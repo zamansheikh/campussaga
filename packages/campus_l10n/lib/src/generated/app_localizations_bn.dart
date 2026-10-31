@@ -5365,4 +5365,147 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get raceNeeded => 'পুরস্কার জিততে লাগবে';
+
+  @override
+  String get badgeNameChampionSection => 'চ্যাম্পিয়ন সেকশন';
+
+  @override
+  String get badgeHowChampionSection =>
+      '২৫+ ভেরিফায়েড সদস্য আর ৫+ ক্লাসের সেকশনে থাকো।';
+
+  @override
+  String get badgeNameRaceFinisher => 'রেস ফিনিশার';
+
+  @override
+  String get badgeHowRaceFinisher => 'কোনো ক্যাম্পেইনের পুরস্কারের দৌড়ে নামো।';
+
+  @override
+  String get badgeNameAmbassador => 'ক্যাম্পাস অ্যাম্বাসেডর';
+
+  @override
+  String get badgeHowAmbassador =>
+      'নিজের বিশ্ববিদ্যালয় থেকে সবচেয়ে বেশি বন্ধু আনো (অন্তত ৫ জন)।';
+
+  @override
+  String get sectionChallengeTitle => 'সেকশন চ্যালেঞ্জ';
+
+  @override
+  String sectionChallengeGoal(int members, int slots) {
+    final intl.NumberFormat membersNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String membersString = membersNumberFormat.format(members);
+    final intl.NumberFormat slotsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String slotsString = slotsNumberFormat.format(slots);
+
+    return '$membersString জন ভেরিফায়েড সদস্য আর $slotsStringটি ক্লাস হলে পুরো সেকশন পাবে চ্যাম্পিয়ন সেকশন ব্যাজ';
+  }
+
+  @override
+  String sectionChallengePrize(String prize) {
+    return 'সেরা সেকশন পাবে: $prize';
+  }
+
+  @override
+  String get sectionMembersLabel => 'সদস্য';
+
+  @override
+  String get sectionClassesLabel => 'ক্লাস';
+
+  @override
+  String get sectionMine => 'তোমার সেকশন';
+
+  @override
+  String get sectionNoneYet => 'অংশ নিতে তোমার সেকশনে যোগ দাও';
+
+  @override
+  String sectionMembersCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString জন সদস্য';
+  }
+
+  @override
+  String get sectionShowAll => 'সব দেখো';
+
+  @override
+  String get sectionShowLess => 'কম দেখো';
+
+  @override
+  String finisherRewardLine(int count, String reward, int left) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat leftNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String leftString = leftNumberFormat.format(left);
+
+    return 'দৌড়ে প্রথম $countString জন পাবে $reward · বাকি $leftStringটি';
+  }
+
+  @override
+  String finisherYou(int position) {
+    final intl.NumberFormat positionNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String positionString = positionNumberFormat.format(position);
+
+    return 'তুমি #$positionString নম্বর ফিনিশার';
+  }
+
+  @override
+  String get finisherClaimTitle => 'তোমার পুরস্কার নাও';
+
+  @override
+  String finisherClaimBody(int position, String reward) {
+    final intl.NumberFormat positionNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String positionString = positionNumberFormat.format(position);
+
+    return 'তুমি #$positionString নম্বর ফিনিশার: $reward। মোবাইল নম্বর দাও, আমরা পাঠিয়ে দেব।';
+  }
+
+  @override
+  String get finisherPhoneLabel => 'মোবাইল নম্বর';
+
+  @override
+  String get finisherPhoneInvalid => '০১ দিয়ে শুরু ১১ সংখ্যার নম্বর দাও';
+
+  @override
+  String finisherClaimed(String reward) {
+    return 'পেয়েছি। তোমার নম্বরে $reward পাঠিয়ে দেব।';
+  }
+
+  @override
+  String finisherSent(String reward) {
+    return 'পাঠানো হয়েছে: $reward';
+  }
+
+  @override
+  String get shareCardAction => 'আমার কার্ড শেয়ার করো';
+
+  @override
+  String get shareCardInRace => 'পুরস্কারের দৌড়ে আছি';
+
+  @override
+  String get shareCardJoin => 'ভার্সিটি কথায় আমার সাথে যোগ দাও';
+
+  @override
+  String get shareCardScan => 'স্ক্যান করে যোগ দাও';
+
+  @override
+  String get inviteQrTitle => 'তোমার ইনভাইট QR';
+
+  @override
+  String get inviteQrHint =>
+      'সহপাঠীরা ক্যামেরা দিয়ে স্ক্যান করলে তোমার লিংকে অ্যাপ পাবে।';
+
+  @override
+  String get inviteQrAction => 'QR';
+
+  @override
+  String get shareCardPitch =>
+      'ক্লাস রুটিন, লাইভ বাস, রক্তদাতা আর তোমার ক্যাম্পাস, এক অ্যাপে।';
 }

@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router.dart';
 import '../invite_share.dart';
+import 'goal_tile.dart';
 
 /// The ways to earn points in a campaign, with my progress: invites first,
 /// then the things that make the app useful (my section, blood donors,
@@ -523,19 +524,35 @@ class _RaceRow extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      inRace ? l10n.raceDone : l10n.raceNeeded,
+                      inRace
+                          ? (campaign.finisher == null
+                                ? l10n.raceDone
+                                : l10n.finisherYou(campaign.finisher!.position))
+                          : l10n.raceNeeded,
                       style: context.text.bodySmall?.copyWith(
                         color: inRace ? cs.primary : cs.textSecondary,
                         fontWeight: inRace ? FontWeight.w700 : null,
                       ),
                     ),
+                    // "First 50 in the race get 20 TK recharge · 13 left".
+                    if (campaign.finisherReward case final r?
+                        when r.count > 0 && campaign.finisher == null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.finisherRewardLine(r.count, r.title, r.left),
+                        style: context.text.bodySmall?.copyWith(
+                          color: const Color(0xFFF59E0B),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                     if (!inRace) ...[
                       const SizedBox(height: 6),
                       Row(
                         children: [
                           if (own > 0)
                             Expanded(
-                              child: _RaceTile(
+                              child: GoalTile(
                                 label: l10n.raceOwnLabel,
                                 have: campaign.myOwnCampus,
                                 need: own,
@@ -544,7 +561,7 @@ class _RaceRow extends StatelessWidget {
                           if (own > 0 && other > 0) const SizedBox(width: 6),
                           if (other > 0)
                             Expanded(
-                              child: _RaceTile(
+                              child: GoalTile(
                                 label: l10n.raceOtherLabel,
                                 have: campaign.myOtherCampus,
                                 need: other,
@@ -564,80 +581,6 @@ class _RaceRow extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// One part of the race entry in a single line, "Your university  2/3",
-/// over a bar with a segment per friend needed.
-class _RaceTile extends StatelessWidget {
-  const _RaceTile({
-    required this.label,
-    required this.have,
-    required this.need,
-  });
-
-  final String label;
-  final int have;
-  final int need;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final cs = context.cs;
-    final got = have.clamp(0, need);
-    final done = got >= need;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(8, 6, 8, 7),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(CsRadius.sm),
-        border: Border.all(color: cs.border),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.text.labelSmall?.copyWith(
-                    color: cs.textSecondary,
-                  ),
-                ),
-              ),
-              Text(
-                l10n.raceCount(got, need),
-                style: context.text.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: done ? cs.primary : cs.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 5),
-          Row(
-            children: [
-              for (var i = 0; i < need.clamp(1, 10); i++) ...[
-                if (i > 0) const SizedBox(width: 3),
-                Expanded(
-                  child: Container(
-                    height: 4,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(99),
-                      color: i < got
-                          ? const Color(0xFFF59E0B)
-                          : cs.surfaceVariant,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
       ),
     );
   }

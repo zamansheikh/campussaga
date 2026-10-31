@@ -12,6 +12,7 @@ import '../../../../app/di.dart';
 import '../../../../app/router.dart';
 import '../growth_text.dart';
 import '../invite_share.dart';
+import '../share_card.dart';
 
 /// On Profile: "Invite friends". The friends who joined (faces) and the
 /// counts, a Share button with my personal link, progress to the next
@@ -112,6 +113,13 @@ class _InviteCardState extends State<InviteCard> {
                   ),
                 ),
                 const SizedBox(width: CsSpace.sm),
+                IconButton.filledTonal(
+                  tooltip: l10n.inviteQrTitle,
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => showInviteQr(context, stats: stats),
+                  icon: const Icon(CsIcons.qr, size: 18),
+                ),
+                const SizedBox(width: 4),
                 FilledButton.icon(
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(0, 36),
