@@ -160,6 +160,7 @@ class ClassGroup {
     this.announcements = const [],
     this.assessments = const [],
     this.hiddenCourses = const {},
+    this.courses = const {},
   });
 
   /// The student's own classes, shown in the routine like a group.
@@ -204,6 +205,11 @@ class ClassGroup {
       for (final c in json['hiddenCourses'] as List<Object?>? ?? const [])
         c! as String,
     },
+    courses: {
+      for (final c in json['courses'] as List<Object?>? ?? const [])
+        if (c case final Map<String, Object?> m)
+          courseKey(m['courseKey'] as String? ?? ''): CourseInfo.fromJson(m),
+    },
   );
 
   final String id;
@@ -231,6 +237,13 @@ class ClassGroup {
 
   /// Course keys (see [courseKey]) the student doesn't take in this group.
   final Set<String> hiddenCourses;
+
+  /// Extras the CR added to courses, by course key (see [courseKey]).
+  final Map<String, CourseInfo> courses;
+
+  /// The extras of [courseCode] (empty when none were added).
+  CourseInfo courseInfo(String courseCode) =>
+      courses[courseKey(courseCode)] ?? const CourseInfo();
 
   bool get isCr => role == GroupRole.cr;
 
@@ -267,6 +280,10 @@ class ClassGroup {
     'announcements': [for (final a in announcements) a.toJson()],
     'assessments': [for (final a in assessments) a.toJson()],
     'hiddenCourses': hiddenCourses.toList()..sort(),
+    'courses': [
+      for (final e in courses.entries)
+        {'courseKey': e.key, ...e.value.toJson()},
+    ],
   };
 
   ClassGroup copyWith({
@@ -275,6 +292,7 @@ class ClassGroup {
     List<Announcement>? announcements,
     List<Assessment>? assessments,
     Set<String>? hiddenCourses,
+    Map<String, CourseInfo>? courses,
     String? semester,
     GroupRole? role,
     int? memberCount,
@@ -293,7 +311,53 @@ class ClassGroup {
     announcements: announcements ?? this.announcements,
     assessments: assessments ?? this.assessments,
     hiddenCourses: hiddenCourses ?? this.hiddenCourses,
+    courses: courses ?? this.courses,
   );
+}
+
+/// Optional extras of a course, set by the CR; every field may be empty.
+class CourseInfo {
+  const CourseInfo({
+    this.chatLink = '',
+    this.classroomCode = '',
+    this.materialsLink = '',
+    this.teacherEmail = '',
+    this.notes = '',
+  });
+
+  factory CourseInfo.fromJson(Map<String, Object?> json) => CourseInfo(
+    chatLink: json['chatLink'] as String? ?? '',
+    classroomCode: json['classroomCode'] as String? ?? '',
+    materialsLink: json['materialsLink'] as String? ?? '',
+    teacherEmail: json['teacherEmail'] as String? ?? '',
+    notes: json['notes'] as String? ?? '',
+  );
+
+  /// The class chat group (WhatsApp, Messenger, Telegram, Discord…).
+  final String chatLink;
+
+  /// The Google Classroom (or other class site) code.
+  final String classroomCode;
+
+  /// A folder or page with slides and notes.
+  final String materialsLink;
+  final String teacherEmail;
+  final String notes;
+
+  bool get isEmpty =>
+      chatLink.isEmpty &&
+      classroomCode.isEmpty &&
+      materialsLink.isEmpty &&
+      teacherEmail.isEmpty &&
+      notes.isEmpty;
+
+  Map<String, Object?> toJson() => {
+    'chatLink': chatLink,
+    'classroomCode': classroomCode,
+    'materialsLink': materialsLink,
+    'teacherEmail': teacherEmail,
+    'notes': notes,
+  };
 }
 
 /// A message from the CR to the group.

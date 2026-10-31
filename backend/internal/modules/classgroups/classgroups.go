@@ -93,8 +93,10 @@ type Group struct {
 	// Tests and deadlines from yesterday on, earliest first.
 	Assessments []Assessment `json:"assessments"`
 	// Course keys the caller doesn't take here (hidden from their routine).
-	HiddenCourses []string  `json:"hiddenCourses"`
-	UpdatedAt     time.Time `json:"updatedAt"`
+	HiddenCourses []string `json:"hiddenCourses"`
+	// Extras the CR added to courses (chat group, Classroom code…).
+	Courses   []CourseInfo `json:"courses"`
+	UpdatedAt time.Time    `json:"updatedAt"`
 }
 
 // Slot is one weekly class. Weekday is ISO (1 = Monday ... 7 = Sunday);
@@ -212,6 +214,14 @@ func (s *Service) MyGroups(ctx context.Context) ([]Group, error) {
 	for _, h := range hiddenRows {
 		hidden[h.GroupID] = append(hidden[h.GroupID], h.CourseKey)
 	}
+	infoRows, err := q.ListCourseInfoForUser(ctx, c.UserID)
+	if err != nil {
+		return nil, err
+	}
+	infos := map[uuid.UUID][]CourseInfo{}
+	for _, ci := range infoRows {
+		infos[ci.GroupID] = append(infos[ci.GroupID], courseInfoView(ci))
+	}
 	out := make([]Group, 0, len(rows))
 	for _, r := range rows {
 		g := groupView(r.ClassGroup, r.Role, r.MemberCount, byGroup[r.ClassGroup.ID])
@@ -226,6 +236,9 @@ func (s *Service) MyGroups(ctx context.Context) ([]Group, error) {
 		}
 		if hs := hidden[r.ClassGroup.ID]; hs != nil {
 			g.HiddenCourses = hs
+		}
+		if ci := infos[r.ClassGroup.ID]; ci != nil {
+			g.Courses = ci
 		}
 		out = append(out, g)
 	}
@@ -607,7 +620,7 @@ func groupView(g store.ClassGroup, role string, members int64, slots []Slot) Gro
 	return Group{
 		ID: g.ID, Department: g.Department, Batch: g.Batch, Section: g.Section, Semester: g.Semester,
 		JoinCode: g.JoinCode, Role: role, MemberCount: members, Discoverable: g.Discoverable, Slots: slots, Changes: []Change{},
-		Announcements: []Announcement{}, Assessments: []Assessment{}, HiddenCourses: []string{}, UpdatedAt: g.UpdatedAt,
+		Announcements: []Announcement{}, Assessments: []Assessment{}, HiddenCourses: []string{}, Courses: []CourseInfo{}, UpdatedAt: g.UpdatedAt,
 	}
 }
 

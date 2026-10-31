@@ -204,6 +204,20 @@ class ApiClassGroupRepository implements ClassGroupRepository {
   );
 
   @override
+  Future<ClassGroup> setCourseInfo(
+    String groupId,
+    String courseCode,
+    CourseInfo info,
+  ) async => ClassGroup.fromJson(
+    _map(
+      await _api.put(
+        '/groups/${_id(groupId)}/courses/${Uri.encodeComponent(courseKey(courseCode))}',
+        info.toJson(),
+      ),
+    ),
+  );
+
+  @override
   Future<Announcement> editAnnouncement(
     String groupId,
     String announcementId,

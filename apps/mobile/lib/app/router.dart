@@ -20,6 +20,7 @@ import '../features/cgpa/presentation/semester_page.dart';
 import '../features/classes/data/invite_link.dart';
 import '../features/classes/presentation/pages/change_editor_page.dart';
 import '../features/classes/presentation/pages/class_preview_page.dart';
+import '../features/classes/presentation/pages/course_info_page.dart';
 import '../features/classes/presentation/pages/find_class_page.dart';
 import '../features/classes/presentation/pages/group_form_page.dart';
 import '../features/classes/presentation/pages/group_page.dart';
@@ -78,6 +79,10 @@ abstract final class Routes {
   static const newPersonal = '/personal/new';
   static String editPersonal(String id) => '/personal/$id';
   static String groupCourses(String id) => '/groups/$id/courses';
+
+  /// A course's links (chat group, Classroom code…): the CR edits them.
+  static String courseInfo(String groupId, String courseCode) =>
+      '/groups/$groupId/courses/${Uri.encodeComponent(courseCode)}';
   static String groupMembers(String id) => '/groups/$id/members';
   static String group(String id) => '/groups/$id';
   static String editGroup(String id) => '/groups/$id/edit';
@@ -322,6 +327,15 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
                 path: 'courses',
                 builder: (context, state) =>
                     MyCoursesPage(groupId: state.pathParameters['id']!),
+                routes: [
+                  GoRoute(
+                    path: ':code',
+                    builder: (context, state) => CourseInfoPage(
+                      groupId: state.pathParameters['id']!,
+                      courseCode: state.pathParameters['code']!,
+                    ),
+                  ),
+                ],
               ),
               GoRoute(
                 path: 'members',

@@ -895,6 +895,25 @@ class FakeClassGroupRepository implements ClassGroupRepository {
   }
 
   @override
+  Future<ClassGroup> setCourseInfo(
+    String groupId,
+    String courseCode,
+    CourseInfo info,
+  ) async {
+    _check();
+    final g0 = _mine(groupId);
+    final courses = {...g0.courses};
+    if (info.isEmpty) {
+      courses.remove(courseKey(courseCode));
+    } else {
+      courses[courseKey(courseCode)] = info;
+    }
+    final g = g0.copyWith(courses: courses);
+    _put(g);
+    return g;
+  }
+
+  @override
   Future<ClassGroup> newSemester(String groupId, String semester) async {
     _check();
     final g = _mine(groupId)

@@ -3119,4 +3119,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showLess => 'Show less';
+
+  @override
+  String get courseLinks => 'Course links';
+
+  @override
+  String get courseLinksAdd => 'Add chat group, Classroom code…';
+
+  @override
+  String get courseLinksEdit => 'Edit course links';
+
+  @override
+  String get courseLinksOptional =>
+      'All optional. Everyone in the group sees them.';
+
+  @override
+  String get courseLinksSaved =>
+      'Saved. Classmates see them in the class details.';
+
+  @override
+  String get courseChat => 'Class chat group';
+
+  @override
+  String get courseChatHint => 'chat.whatsapp.com/… or m.me/j/…';
+
+  @override
+  String get courseClassroom => 'Google Classroom';
+
+  @override
+  String get courseClassroomCode => 'Classroom code';
+
+  @override
+  String get courseClassroomCodeHint => 'e.g. ab3x9kq';
+
+  @override
+  String courseCodeLine(String code) {
+    return 'Code: $code · tap to copy';
+  }
+
+  @override
+  String get courseCodeCopied => 'Classroom code copied';
+
+  @override
+  String get courseOpenClassroom => 'Open Classroom';
+
+  @override
+  String get courseMaterials => 'Course materials';
+
+  @override
+  String get courseMaterialsHint => 'drive.google.com/…';
+
+  @override
+  String get courseTeacherEmail => 'Teacher\'s email';
+
+  @override
+  String get courseNotes => 'Notes';
+
+  @override
+  String get courseNotesHint => 'Office hours, how to submit assignments…';
+
+  @override
+  String get courseLinkInvalid => 'Enter a web link, like chat.whatsapp.com/…';
+
+  @override
+  String get courseEmailInvalid => 'Enter an email address.';
+
+  @override
+  String get courseCodeInvalid => 'Letters and numbers only (3–20).';
 }

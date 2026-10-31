@@ -154,4 +154,5 @@ abstract final class CsIcons {
   static const IconData question = PhosphorIconsRegular.sealQuestion;
   static const IconData reply = PhosphorIconsRegular.arrowBendUpLeft;
   static const IconData share = PhosphorIconsRegular.shareFat;
+  static const IconData folder = PhosphorIconsRegular.folderOpen;
 }

@@ -12,6 +12,7 @@ import '../../../assessments/presentation/assessment_widgets.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
 import 'class_tile.dart';
+import 'course_links.dart';
 
 String dateText(BuildContext context, DateTime d) =>
     DateFormat.MMMMEEEEd(Localizations.localeOf(context).toLanguageTag())
@@ -73,7 +74,8 @@ class _ClassSheet extends StatelessWidget {
     );
 
     return SafeArea(
-      child: Padding(
+      // Course links can make it tall: it scrolls.
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(
           CsSpace.lg,
           0,
@@ -160,6 +162,19 @@ class _ClassSheet extends StatelessWidget {
                   style: context.text.bodyMedium,
                 ),
               ),
+            if (!personal) ...[
+              const SizedBox(height: CsSpace.sm),
+              CourseLinks(
+                info: item.group.courseInfo(s.courseCode),
+                onEdit: item.group.isCr
+                    ? () => close(
+                        () => host.push(
+                          Routes.courseInfo(item.group.id, s.courseCode),
+                        ),
+                      )
+                    : null,
+              ),
+            ],
             if (tests.isNotEmpty) ...[
               const SizedBox(height: CsSpace.sm),
               for (final t in tests)

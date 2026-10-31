@@ -182,6 +182,31 @@ DELETE FROM class_member_hidden_courses WHERE group_id = @group_id AND user_id =
 INSERT INTO class_member_hidden_courses (group_id, user_id, course_key)
 VALUES (@group_id, @user_id, @course_key) ON CONFLICT DO NOTHING;
 
+-- ---- course info (chat group, Classroom code, …) --------------------------------
+
+-- name: ListCourseInfoForUser :many
+SELECT ci.* FROM group_courses ci
+JOIN class_group_members m ON m.group_id = ci.group_id
+WHERE m.user_id = @user_id
+ORDER BY ci.group_id, ci.course_key;
+
+-- name: UpsertCourseInfo :one
+INSERT INTO group_courses (group_id, course_key, chat_link, classroom_code, materials_link,
+                           teacher_email, notes, updated_at)
+VALUES (@group_id, @course_key, @chat_link, @classroom_code, @materials_link,
+        @teacher_email, @notes, @now::timestamptz)
+ON CONFLICT (group_id, course_key) DO UPDATE SET
+  chat_link = EXCLUDED.chat_link, classroom_code = EXCLUDED.classroom_code,
+  materials_link = EXCLUDED.materials_link, teacher_email = EXCLUDED.teacher_email,
+  notes = EXCLUDED.notes, updated_at = EXCLUDED.updated_at
+RETURNING *;
+
+-- name: DeleteCourseInfo :exec
+DELETE FROM group_courses WHERE group_id = @group_id AND course_key = @course_key;
+
+-- name: DeleteGroupCourseInfo :exec
+DELETE FROM group_courses WHERE group_id = @group_id;
+
 -- ---- new semester ------------------------------------------------------------
 
 -- name: DeleteGroupSlots :exec

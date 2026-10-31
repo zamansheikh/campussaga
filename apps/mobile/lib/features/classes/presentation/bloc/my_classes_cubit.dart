@@ -309,6 +309,13 @@ class MyClassesCubit extends Cubit<MyClassesState> {
   Future<void> setHiddenCourses(String groupId, Set<String> courses) async =>
       _replace(await _repo.setHiddenCourses(groupId, courses));
 
+  /// The CR saves a course's extras (chat group, Classroom code…).
+  Future<void> setCourseInfo(
+    String groupId,
+    String courseCode,
+    CourseInfo info,
+  ) async => _replace(await _repo.setCourseInfo(groupId, courseCode, info));
+
   Future<void> newSemester(String groupId, String semester) async =>
       _replace(await _repo.newSemester(groupId, semester));
 

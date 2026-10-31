@@ -103,6 +103,13 @@ abstract interface class ClassGroupRepository {
   /// own routine and reminders only).
   Future<ClassGroup> setHiddenCourses(String groupId, Set<String> courses);
 
+  /// Saves a course's extras (CR); all empty removes them.
+  Future<ClassGroup> setCourseInfo(
+    String groupId,
+    String courseCode,
+    CourseInfo info,
+  );
+
   /// Clears the weekly routine and renames the semester (CR).
   Future<ClassGroup> newSemester(String groupId, String semester);
 

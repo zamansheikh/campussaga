@@ -3030,4 +3030,72 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get showLess => 'কম দেখাও';
+
+  @override
+  String get courseLinks => 'কোর্সের লিংক';
+
+  @override
+  String get courseLinksAdd => 'চ্যাট গ্রুপ, ক্লাসরুম কোড… যোগ করো';
+
+  @override
+  String get courseLinksEdit => 'কোর্সের লিংক সম্পাদনা';
+
+  @override
+  String get courseLinksOptional => 'সবই ঐচ্ছিক। গ্রুপের সবাই এগুলো দেখবে।';
+
+  @override
+  String get courseLinksSaved =>
+      'সংরক্ষণ হয়েছে। সহপাঠীরা ক্লাসের বিবরণে দেখবে।';
+
+  @override
+  String get courseChat => 'ক্লাসের চ্যাট গ্রুপ';
+
+  @override
+  String get courseChatHint => 'chat.whatsapp.com/… বা m.me/j/…';
+
+  @override
+  String get courseClassroom => 'গুগল ক্লাসরুম';
+
+  @override
+  String get courseClassroomCode => 'ক্লাসরুম কোড';
+
+  @override
+  String get courseClassroomCodeHint => 'যেমন ab3x9kq';
+
+  @override
+  String courseCodeLine(String code) {
+    return 'কোড: $code · কপি করতে চাপো';
+  }
+
+  @override
+  String get courseCodeCopied => 'ক্লাসরুম কোড কপি হয়েছে';
+
+  @override
+  String get courseOpenClassroom => 'ক্লাসরুম খোলো';
+
+  @override
+  String get courseMaterials => 'কোর্সের ম্যাটেরিয়াল';
+
+  @override
+  String get courseMaterialsHint => 'drive.google.com/…';
+
+  @override
+  String get courseTeacherEmail => 'শিক্ষকের ইমেইল';
+
+  @override
+  String get courseNotes => 'নোট';
+
+  @override
+  String get courseNotesHint =>
+      'অফিস আওয়ার, অ্যাসাইনমেন্ট কীভাবে জমা দিতে হয়…';
+
+  @override
+  String get courseLinkInvalid =>
+      'একটি ওয়েব লিংক দাও, যেমন chat.whatsapp.com/…';
+
+  @override
+  String get courseEmailInvalid => 'একটি ইমেইল ঠিকানা দাও।';
+
+  @override
+  String get courseCodeInvalid => 'শুধু অক্ষর ও সংখ্যা (৩–২০টি)।';
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../theme/cs_tokens.dart';
-import 'cs_link_text.dart';
 import '../tokens/cs_icons.dart';
 import '../tokens/dimensions.dart';
+import 'cs_link_text.dart';
 
 /// A titled group of rows on one rounded card, like a settings section.
 class CsSection extends StatelessWidget {

@@ -5227,6 +5227,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show less'**
   String get showLess;
+
+  /// No description provided for @courseLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'Course links'**
+  String get courseLinks;
+
+  /// No description provided for @courseLinksAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add chat group, Classroom code…'**
+  String get courseLinksAdd;
+
+  /// No description provided for @courseLinksEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit course links'**
+  String get courseLinksEdit;
+
+  /// No description provided for @courseLinksOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'All optional. Everyone in the group sees them.'**
+  String get courseLinksOptional;
+
+  /// No description provided for @courseLinksSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved. Classmates see them in the class details.'**
+  String get courseLinksSaved;
+
+  /// No description provided for @courseChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Class chat group'**
+  String get courseChat;
+
+  /// No description provided for @courseChatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'chat.whatsapp.com/… or m.me/j/…'**
+  String get courseChatHint;
+
+  /// No description provided for @courseClassroom.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Classroom'**
+  String get courseClassroom;
+
+  /// No description provided for @courseClassroomCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Classroom code'**
+  String get courseClassroomCode;
+
+  /// No description provided for @courseClassroomCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. ab3x9kq'**
+  String get courseClassroomCodeHint;
+
+  /// No description provided for @courseCodeLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Code: {code} · tap to copy'**
+  String courseCodeLine(String code);
+
+  /// No description provided for @courseCodeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Classroom code copied'**
+  String get courseCodeCopied;
+
+  /// No description provided for @courseOpenClassroom.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Classroom'**
+  String get courseOpenClassroom;
+
+  /// No description provided for @courseMaterials.
+  ///
+  /// In en, this message translates to:
+  /// **'Course materials'**
+  String get courseMaterials;
+
+  /// No description provided for @courseMaterialsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'drive.google.com/…'**
+  String get courseMaterialsHint;
+
+  /// No description provided for @courseTeacherEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Teacher\'s email'**
+  String get courseTeacherEmail;
+
+  /// No description provided for @courseNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get courseNotes;
+
+  /// No description provided for @courseNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Office hours, how to submit assignments…'**
+  String get courseNotesHint;
+
+  /// No description provided for @courseLinkInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a web link, like chat.whatsapp.com/…'**
+  String get courseLinkInvalid;
+
+  /// No description provided for @courseEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an email address.'**
+  String get courseEmailInvalid;
+
+  /// No description provided for @courseCodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Letters and numbers only (3–20).'**
+  String get courseCodeInvalid;
 }
 
 class _AppLocalizationsDelegate

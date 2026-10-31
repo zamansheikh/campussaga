@@ -50,6 +50,7 @@ func (s *Service) Routes(r *httpx.Router) {
 	r.Student().Put("/groups/{id}/members/{user}", httpx.Handle(s.handleSetRole, httpx.NoContent()))
 	r.Student().Delete("/groups/{id}/members/{user}", httpx.Handle(s.handleRemoveMember, httpx.NoContent()))
 	r.Student().Put("/groups/{id}/hidden", httpx.Handle(s.handleHidden))
+	r.Student().Put("/groups/{id}/courses/{course}", httpx.Handle(s.handleCourseInfo))
 	r.Student().Post("/groups/{id}/new-semester", httpx.Handle(s.handleNewSemester))
 	r.Student().Get("/me/classes", httpx.Handle(s.handleMyPersonal))
 	r.Student().Post("/me/classes", httpx.Handle(s.handleAddPersonal, httpx.Status(http.StatusCreated)))
@@ -237,6 +238,16 @@ type hiddenReq struct {
 
 func (s *Service) handleHidden(ctx context.Context, in *hiddenReq) (*Group, error) {
 	return s.SetHidden(ctx, uuid.MustParse(in.ID), in.Courses)
+}
+
+type courseInfoReq struct {
+	groupPath
+	Course string `json:"-" path:"course" validate:"required,max=40"`
+	CourseInfoInput
+}
+
+func (s *Service) handleCourseInfo(ctx context.Context, in *courseInfoReq) (*Group, error) {
+	return s.SetCourseInfo(ctx, uuid.MustParse(in.ID), in.Course, &in.CourseInfoInput)
 }
 
 type semesterReq struct {

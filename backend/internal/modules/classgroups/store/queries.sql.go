@@ -487,12 +487,35 @@ func (q *Queries) DeleteChange(ctx context.Context, arg DeleteChangeParams) (int
 	return result.RowsAffected(), nil
 }
 
+const deleteCourseInfo = `-- name: DeleteCourseInfo :exec
+DELETE FROM group_courses WHERE group_id = $1 AND course_key = $2
+`
+
+type DeleteCourseInfoParams struct {
+	GroupID   uuid.UUID
+	CourseKey string
+}
+
+func (q *Queries) DeleteCourseInfo(ctx context.Context, arg DeleteCourseInfoParams) error {
+	_, err := q.db.Exec(ctx, deleteCourseInfo, arg.GroupID, arg.CourseKey)
+	return err
+}
+
 const deleteGroup = `-- name: DeleteGroup :exec
 DELETE FROM class_groups WHERE id = $1
 `
 
 func (q *Queries) DeleteGroup(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, deleteGroup, id)
+	return err
+}
+
+const deleteGroupCourseInfo = `-- name: DeleteGroupCourseInfo :exec
+DELETE FROM group_courses WHERE group_id = $1
+`
+
+func (q *Queries) DeleteGroupCourseInfo(ctx context.Context, groupID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteGroupCourseInfo, groupID)
 	return err
 }
 
@@ -1032,6 +1055,44 @@ func (q *Queries) ListChangesForUser(ctx context.Context, arg ListChangesForUser
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.NewDate,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCourseInfoForUser = `-- name: ListCourseInfoForUser :many
+
+SELECT ci.group_id, ci.course_key, ci.chat_link, ci.classroom_code, ci.materials_link, ci.teacher_email, ci.notes, ci.updated_at FROM group_courses ci
+JOIN class_group_members m ON m.group_id = ci.group_id
+WHERE m.user_id = $1
+ORDER BY ci.group_id, ci.course_key
+`
+
+// ---- course info (chat group, Classroom code, …) --------------------------------
+func (q *Queries) ListCourseInfoForUser(ctx context.Context, userID uuid.UUID) ([]GroupCourse, error) {
+	rows, err := q.db.Query(ctx, listCourseInfoForUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GroupCourse{}
+	for rows.Next() {
+		var i GroupCourse
+		if err := rows.Scan(
+			&i.GroupID,
+			&i.CourseKey,
+			&i.ChatLink,
+			&i.ClassroomCode,
+			&i.MaterialsLink,
+			&i.TeacherEmail,
+			&i.Notes,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -1794,6 +1855,54 @@ func (q *Queries) UpdateSlot(ctx context.Context, arg UpdateSlotParams) (Routine
 		&i.EndsMin,
 		&i.Kind,
 		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const upsertCourseInfo = `-- name: UpsertCourseInfo :one
+INSERT INTO group_courses (group_id, course_key, chat_link, classroom_code, materials_link,
+                           teacher_email, notes, updated_at)
+VALUES ($1, $2, $3, $4, $5,
+        $6, $7, $8::timestamptz)
+ON CONFLICT (group_id, course_key) DO UPDATE SET
+  chat_link = EXCLUDED.chat_link, classroom_code = EXCLUDED.classroom_code,
+  materials_link = EXCLUDED.materials_link, teacher_email = EXCLUDED.teacher_email,
+  notes = EXCLUDED.notes, updated_at = EXCLUDED.updated_at
+RETURNING group_id, course_key, chat_link, classroom_code, materials_link, teacher_email, notes, updated_at
+`
+
+type UpsertCourseInfoParams struct {
+	GroupID       uuid.UUID
+	CourseKey     string
+	ChatLink      string
+	ClassroomCode string
+	MaterialsLink string
+	TeacherEmail  string
+	Notes         string
+	Now           time.Time
+}
+
+func (q *Queries) UpsertCourseInfo(ctx context.Context, arg UpsertCourseInfoParams) (GroupCourse, error) {
+	row := q.db.QueryRow(ctx, upsertCourseInfo,
+		arg.GroupID,
+		arg.CourseKey,
+		arg.ChatLink,
+		arg.ClassroomCode,
+		arg.MaterialsLink,
+		arg.TeacherEmail,
+		arg.Notes,
+		arg.Now,
+	)
+	var i GroupCourse
+	err := row.Scan(
+		&i.GroupID,
+		&i.CourseKey,
+		&i.ChatLink,
+		&i.ClassroomCode,
+		&i.MaterialsLink,
+		&i.TeacherEmail,
+		&i.Notes,
 		&i.UpdatedAt,
 	)
 	return i, err

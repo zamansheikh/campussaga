@@ -170,6 +170,10 @@ func (s *Service) NewSemester(ctx context.Context, groupID uuid.UUID, semester s
 		if err := s.requireCR(ctx, q, groupID, c.UserID); err != nil {
 			return err
 		}
+		// A new semester has new courses: their extras go too.
+		if err := q.DeleteGroupCourseInfo(ctx, groupID); err != nil {
+			return err
+		}
 		if err := q.DeleteGroupSlots(ctx, groupID); err != nil {
 			return err
 		}

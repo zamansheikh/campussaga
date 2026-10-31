@@ -52,6 +52,17 @@ type ClassGroup struct {
 	KeepWhenEmpty bool
 }
 
+type GroupCourse struct {
+	GroupID       uuid.UUID
+	CourseKey     string
+	ChatLink      string
+	ClassroomCode string
+	MaterialsLink string
+	TeacherEmail  string
+	Notes         string
+	UpdatedAt     time.Time
+}
+
 type PersonalSlot struct {
 	ID        uuid.UUID
 	UserID    uuid.UUID
