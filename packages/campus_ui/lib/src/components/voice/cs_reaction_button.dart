@@ -169,7 +169,7 @@ class _TrayGeometry {
     );
     final above = anchor.top - height - CsSpace.sm;
     // Room for the grown emoji and its name above the tray.
-    final top = above > topInset + 72 ? above : anchor.bottom + CsSpace.sm;
+    final top = above > topInset + 100 ? above : anchor.bottom + CsSpace.sm;
     return _TrayGeometry(Rect.fromLTWH(left, top, width, height), count);
   }
 
@@ -377,9 +377,9 @@ class _Face extends StatelessWidget {
                   ),
                 ),
               ),
-              // The name, above the grown emoji.
+              // The name, clear above the grown emoji.
               Positioned(
-                top: -44,
+                top: -74,
                 child: IgnorePointer(
                   child: AnimatedOpacity(
                     opacity: hovered ? 1 : 0,
@@ -389,15 +389,25 @@ class _Face extends StatelessWidget {
                         horizontal: CsSpace.sm,
                         vertical: 3,
                       ),
+                      // A dark pill with white text reads on light and dark.
                       decoration: BoxDecoration(
-                        color: cs.textPrimary.withValues(alpha: 0.88),
+                        color: const Color(0xF2111827),
                         borderRadius: BorderRadius.circular(CsRadius.full),
+                        border: Border.all(color: const Color(0x33FFFFFF)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x40000000),
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Text(
                         label,
                         maxLines: 1,
-                        style: context.text.labelSmall?.copyWith(
-                          color: cs.background,
+                        softWrap: false,
+                        style: context.text.labelMedium?.copyWith(
+                          color: Colors.white,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
