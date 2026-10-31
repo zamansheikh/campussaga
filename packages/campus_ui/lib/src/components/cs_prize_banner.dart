@@ -93,20 +93,15 @@ class CsPrizeBanner extends StatelessWidget {
               children: [
                 if (tag != null || topRight != null)
                   Row(
+                    // The tag at the left, [topRight] at the right edge;
+                    // each gets up to half and shrinks (ellipsis) on a
+                    // narrow poster or in long Bangla.
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Both shrink (ellipsis) on a narrow poster or in
-                      // long Bangla; the tag keeps more of the room.
-                      if (tag != null)
-                        Flexible(flex: 3, child: _Tag(text: tag!)),
+                      if (tag != null) Flexible(child: _Tag(text: tag!)),
                       if (topRight != null) ...[
                         const SizedBox(width: CsSpace.sm),
-                        Expanded(
-                          flex: 2,
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: topRight,
-                          ),
-                        ),
+                        Flexible(child: topRight!),
                       ],
                     ],
                   ),

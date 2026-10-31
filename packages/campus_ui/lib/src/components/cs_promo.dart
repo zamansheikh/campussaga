@@ -682,7 +682,9 @@ class CsSponsorLine extends StatelessWidget {
   }
 }
 
-/// "Powered by [logo] Brand", a small glass chip for a campaign's poster.
+/// "Powered by" a brand, a small glass chip for a campaign's poster: the
+/// logo, and "POWERED BY" in small capitals over the brand's name, so the
+/// name keeps its room on a phone-width poster.
 class CsPoweredBy extends StatelessWidget {
   const CsPoweredBy({
     super.key,
@@ -697,41 +699,52 @@ class CsPoweredBy extends StatelessWidget {
   final ImageProvider? logo;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.fromLTRB(8, 4, 10, 4),
-    decoration: BoxDecoration(
-      color: const Color(0x66020617),
-      borderRadius: BorderRadius.circular(CsRadius.full),
-      border: Border.all(color: const Color(0x40FFFFFF)),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: context.text.labelSmall?.copyWith(
-              color: Colors.white.withValues(alpha: 0.8),
+  Widget build(BuildContext context) => Semantics(
+    label: '$label $brand',
+    excludeSemantics: true,
+    child: Container(
+      padding: const EdgeInsets.fromLTRB(5, 4, 10, 4),
+      decoration: BoxDecoration(
+        color: const Color(0x73020617),
+        borderRadius: BorderRadius.circular(CsRadius.md),
+        border: Border.all(color: const Color(0x40FFFFFF)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CsBrandLogo(name: brand, logo: logo, size: 22, round: true),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.text.labelSmall?.copyWith(
+                    fontSize: 8.5,
+                    height: 1.1,
+                    letterSpacing: 0.6,
+                    color: Colors.white.withValues(alpha: 0.75),
+                  ),
+                ),
+                Text(
+                  brand,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.text.labelSmall?.copyWith(
+                    height: 1.15,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        const SizedBox(width: 5),
-        CsBrandLogo(name: brand, logo: logo, size: 16, round: true),
-        const SizedBox(width: 4),
-        Flexible(
-          child: Text(
-            brand,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: context.text.labelSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }

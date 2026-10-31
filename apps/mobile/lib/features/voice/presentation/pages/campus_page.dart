@@ -120,8 +120,8 @@ class _CampusViewState extends State<_CampusView> {
     }
   }
 
-  /// The feed with sponsored posts after every 12th post (not while
-  /// searching or offline).
+  /// The feed with sponsored posts after every 12th post, or one at the
+  /// end of a short feed (not while searching or offline).
   List<Object> _entries(FeedState s) {
     final promos = s.query.isNotEmpty || s.offline
         ? const <Promo>[]
@@ -133,6 +133,11 @@ class _CampusViewState extends State<_CampusView> {
       if ((i + 1) % _promoEvery == 0 && next < promos.length) {
         out.add(promos[next++]);
       }
+    }
+    // A short feed that has ended (a small campus) gets one at its end.
+    final ended = s.nextCursor == null && !s.loadingMore;
+    if (next == 0 && ended && s.items.length >= 3 && promos.isNotEmpty) {
+      out.add(promos.first);
     }
     return out;
   }

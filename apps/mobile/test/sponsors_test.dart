@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:varsitykotha/app/app.dart';
 import 'package:varsitykotha/app/router.dart';
 import 'package:varsitykotha/features/sponsors/deals_page.dart';
+import 'package:varsitykotha/features/sponsors/promo_actions.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import 'growth_fakes.dart';
@@ -84,6 +85,7 @@ void main() {
     voice = FakeVoiceRepository();
     growth = FakeGrowthRepository()..failure = const NetworkFailure();
     VisibilityDetectorController.instance.updateInterval = Duration.zero;
+    phoneShowsCopy = () async => false;
   });
 
   Future<void> start(WidgetTester tester) async {
@@ -271,6 +273,33 @@ void main() {
     expect(ad, isNotNull);
   });
 
+  testWidgets('a short feed shows its one sponsored post at the end', (
+    tester,
+  ) async {
+    voice.issues.addAll([
+      for (var i = 0; i < 4; i++)
+        sampleIssue(id: 'i$i', kind: PostKind.post, body: 'Post number $i'),
+    ]);
+    sponsors.byPlacement[PromoPlacement.campus] = [
+      const Promo(
+        id: 'f1',
+        kind: PromoKind.feed,
+        placement: PromoPlacement.campus,
+        sponsor: PromoSponsor(name: 'Book Corner'),
+        title: 'Second-hand textbooks',
+      ),
+    ];
+    await start(tester);
+    await tester.tap(find.text('Campus'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Second-hand textbooks'),
+      300,
+      scrollable: _vertical.first,
+    );
+    expect(find.text('Book Corner'), findsOneWidget);
+  });
+
   testWidgets('a quiet sponsor line at the bottom of Class groups', (
     tester,
   ) async {
@@ -307,7 +336,7 @@ void main() {
         ),
       ];
     await start(tester);
-    expect(find.text('Powered by'), findsOneWidget);
+    expect(find.text('POWERED BY'), findsOneWidget);
     expect(find.text('Gadget Hub'), findsOneWidget);
     expect(find.byType(CsPoweredBy), findsOneWidget);
   });

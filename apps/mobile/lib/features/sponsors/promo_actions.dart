@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -59,9 +61,30 @@ Future<void> copyPromoCode(BuildContext context, Promo promo) async {
   final messenger = ScaffoldMessenger.of(context);
   await Clipboard.setData(ClipboardData(text: code));
   _tracker?.log(promo.id, PromoEventType.copy);
+  // Android 13+ shows its own "copied" preview; don't say it twice.
+  if (await phoneShowsCopy()) return;
   messenger
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(content: Text(l10n.dealCopied(code))));
+}
+
+bool? _systemCopyNotice;
+
+/// Whether the phone itself says "copied" (Android 13+). A variable so
+/// tests can choose.
+Future<bool> Function() phoneShowsCopy = _androidShowsCopy;
+
+Future<bool> _androidShowsCopy() async {
+  if (_systemCopyNotice != null) return _systemCopyNotice!;
+  if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+    return _systemCopyNotice = false;
+  }
+  try {
+    final info = await DeviceInfoPlugin().androidInfo;
+    return _systemCopyNotice = info.version.sdkInt >= 33;
+  } on Object {
+    return _systemCopyNotice = false;
+  }
 }
 
 /// "Why am I seeing this?": who it's shown to, that sponsors never see who
