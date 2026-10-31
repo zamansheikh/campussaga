@@ -1291,9 +1291,6 @@
   "courseClassroom": "Google Classroom",
   "courseClassroomCode": "Classroom code",
   "courseClassroomCodeHint": "e.g. ab3x9kq",
-  "courseCodeLine": "Code: {code} · tap to copy",
-  "@courseCodeLine": {"placeholders": {"code": {"type": "String"}}},
-  "courseCodeCopied": "Classroom code copied",
   "courseOpenClassroom": "Open Classroom",
   "courseMaterials": "Course materials",
   "courseMaterialsHint": "drive.google.com/…",
@@ -1302,5 +1299,9 @@
   "courseNotesHint": "Office hours, how to submit assignments…",
   "courseLinkInvalid": "Enter a web link, like chat.whatsapp.com/…",
   "courseEmailInvalid": "Enter an email address.",
-  "courseCodeInvalid": "Letters and numbers only (3–20)."
+  "courseCodeInvalid": "Letters and numbers only (3–20).",
+  "courseClassroomChip": "Classroom: {code}",
+  "@courseClassroomChip": {"placeholders": {"code": {"type": "String"}}},
+  "courseMaterialsShort": "Materials",
+  "courseCopied": "Copied"
 }

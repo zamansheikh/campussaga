@@ -3063,14 +3063,6 @@ class AppLocalizationsBn extends AppLocalizations {
   String get courseClassroomCodeHint => 'যেমন ab3x9kq';
 
   @override
-  String courseCodeLine(String code) {
-    return 'কোড: $code · কপি করতে চাপো';
-  }
-
-  @override
-  String get courseCodeCopied => 'ক্লাসরুম কোড কপি হয়েছে';
-
-  @override
   String get courseOpenClassroom => 'ক্লাসরুম খোলো';
 
   @override
@@ -3098,4 +3090,15 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get courseCodeInvalid => 'শুধু অক্ষর ও সংখ্যা (৩–২০টি)।';
+
+  @override
+  String courseClassroomChip(String code) {
+    return 'ক্লাসরুম: $code';
+  }
+
+  @override
+  String get courseMaterialsShort => 'ম্যাটেরিয়াল';
+
+  @override
+  String get courseCopied => 'কপি হয়েছে';
 }

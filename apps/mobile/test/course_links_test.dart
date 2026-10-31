@@ -109,10 +109,14 @@ void main() {
     expect(find.text('Messenger'), findsOneWidget);
     expect(find.text('sir@ju.ac.bd'), findsOneWidget);
     expect(find.text('Edit'), findsNothing, reason: 'members only read');
-    await tester.tap(find.text('Code: ab3x9kq · tap to copy'));
+    await tester.tap(find.text('Classroom: ab3x9kq'));
     await tester.pumpAndSettle();
     expect(copied, ['ab3x9kq']);
-    expect(find.text('Classroom code copied'), findsOneWidget);
+    expect(find.text('Copied · Open Classroom'), findsOneWidget);
+    // After a moment the code is back.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(find.text('Classroom: ab3x9kq'), findsOneWidget);
   });
 
   test('chat apps by name', () {

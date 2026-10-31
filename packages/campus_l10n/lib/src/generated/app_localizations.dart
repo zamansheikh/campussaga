@@ -5288,18 +5288,6 @@ abstract class AppLocalizations {
   /// **'e.g. ab3x9kq'**
   String get courseClassroomCodeHint;
 
-  /// No description provided for @courseCodeLine.
-  ///
-  /// In en, this message translates to:
-  /// **'Code: {code} · tap to copy'**
-  String courseCodeLine(String code);
-
-  /// No description provided for @courseCodeCopied.
-  ///
-  /// In en, this message translates to:
-  /// **'Classroom code copied'**
-  String get courseCodeCopied;
-
   /// No description provided for @courseOpenClassroom.
   ///
   /// In en, this message translates to:
@@ -5353,6 +5341,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Letters and numbers only (3–20).'**
   String get courseCodeInvalid;
+
+  /// No description provided for @courseClassroomChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Classroom: {code}'**
+  String courseClassroomChip(String code);
+
+  /// No description provided for @courseMaterialsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Materials'**
+  String get courseMaterialsShort;
+
+  /// No description provided for @courseCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get courseCopied;
 }
 
 class _AppLocalizationsDelegate

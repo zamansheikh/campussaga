@@ -865,8 +865,6 @@
   "courseClassroom": "গুগল ক্লাসরুম",
   "courseClassroomCode": "ক্লাসরুম কোড",
   "courseClassroomCodeHint": "যেমন ab3x9kq",
-  "courseCodeLine": "কোড: {code} · কপি করতে চাপো",
-  "courseCodeCopied": "ক্লাসরুম কোড কপি হয়েছে",
   "courseOpenClassroom": "ক্লাসরুম খোলো",
   "courseMaterials": "কোর্সের ম্যাটেরিয়াল",
   "courseMaterialsHint": "drive.google.com/…",
@@ -875,5 +873,8 @@
   "courseNotesHint": "অফিস আওয়ার, অ্যাসাইনমেন্ট কীভাবে জমা দিতে হয়…",
   "courseLinkInvalid": "একটি ওয়েব লিংক দাও, যেমন chat.whatsapp.com/…",
   "courseEmailInvalid": "একটি ইমেইল ঠিকানা দাও।",
-  "courseCodeInvalid": "শুধু অক্ষর ও সংখ্যা (৩–২০টি)।"
+  "courseCodeInvalid": "শুধু অক্ষর ও সংখ্যা (৩–২০টি)।",
+  "courseClassroomChip": "ক্লাসরুম: {code}",
+  "courseMaterialsShort": "ম্যাটেরিয়াল",
+  "courseCopied": "কপি হয়েছে"
 }

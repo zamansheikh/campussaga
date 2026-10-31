@@ -1,13 +1,15 @@
+import 'dart:async';
+
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// The extras of a course in the class details: the class chat group, the
-/// Google Classroom code (tap to copy), the materials folder, the teacher's
-/// email and notes. Only what the CR added shows; the CR also gets a button
-/// to add or edit them ([onEdit]).
+/// The extras of a course in the class details, compact: one row of chips
+/// (the chat group, the Classroom code, materials, the teacher's email)
+/// and the notes under them. Only what the CR added shows; the CR also
+/// gets a button to add or edit them ([onEdit]).
 class CourseLinks extends StatelessWidget {
   const CourseLinks({super.key, required this.info, this.onEdit});
 
@@ -20,15 +22,6 @@ class CourseLinks extends StatelessWidget {
 
   void _open(BuildContext context, Uri uri) =>
       CsLinkText.onOpen?.call(context, uri);
-
-  Future<void> _copyCode(BuildContext context) async {
-    final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    await Clipboard.setData(ClipboardData(text: info.classroomCode));
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(l10n.courseCodeCopied)));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,65 +39,63 @@ class CourseLinks extends StatelessWidget {
               ),
             );
     }
-    return CsSection(
-      title: l10n.courseLinks,
-      action: onEdit == null
-          ? null
-          : TextButton(onPressed: onEdit, child: Text(l10n.editAction)),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (i.chatLink.isNotEmpty)
-          CsRow(
-            icon: CsIcons.campus,
-            title: l10n.courseChat,
-            subtitle: chatAppName(i.chatLink),
-            trailing: const _OpenIcon(),
-            showChevron: false,
-            onTap: () => _open(context, Uri.parse(i.chatLink)),
-          ),
-        if (i.classroomCode.isNotEmpty)
-          CsRow(
-            icon: CsIcons.academic,
-            title: l10n.courseClassroom,
-            subtitle: l10n.courseCodeLine(i.classroomCode),
-            showChevron: false,
-            onTap: () => _copyCode(context),
-            trailing: IconButton(
-              tooltip: l10n.courseOpenClassroom,
-              icon: const Icon(CsIcons.openExternal, size: 18),
-              onPressed: () => _open(context, classroomUrl),
-            ),
-          ),
-        if (i.materialsLink.isNotEmpty)
-          CsRow(
-            icon: CsIcons.folder,
-            title: l10n.courseMaterials,
-            subtitle: linkHost(i.materialsLink),
-            trailing: const _OpenIcon(),
-            showChevron: false,
-            onTap: () => _open(context, Uri.parse(i.materialsLink)),
-          ),
-        if (i.teacherEmail.isNotEmpty)
-          CsRow(
-            icon: CsIcons.email,
-            title: l10n.courseTeacherEmail,
-            subtitle: i.teacherEmail,
-            showChevron: false,
-            onTap: () =>
-                _open(context, Uri(scheme: 'mailto', path: i.teacherEmail)),
-          ),
+        CsSectionTitle(
+          title: l10n.courseLinks,
+          action: onEdit == null
+              ? null
+              : TextButton(onPressed: onEdit, child: Text(l10n.editAction)),
+        ),
+        Wrap(
+          spacing: CsSpace.sm,
+          runSpacing: CsSpace.sm,
+          children: [
+            if (i.chatLink.isNotEmpty)
+              _LinkChip(
+                icon: CsIcons.campus,
+                label: chatAppName(i.chatLink),
+                tooltip: l10n.courseChat,
+                onTap: () => _open(context, Uri.parse(i.chatLink)),
+              ),
+            if (i.classroomCode.isNotEmpty)
+              _ClassroomChip(
+                code: i.classroomCode,
+                onOpen: () => _open(context, classroomUrl),
+              ),
+            if (i.materialsLink.isNotEmpty)
+              _LinkChip(
+                icon: CsIcons.folder,
+                label: l10n.courseMaterialsShort,
+                tooltip: l10n.courseMaterials,
+                onTap: () => _open(context, Uri.parse(i.materialsLink)),
+              ),
+            if (i.teacherEmail.isNotEmpty)
+              _LinkChip(
+                icon: CsIcons.email,
+                label: i.teacherEmail,
+                tooltip: l10n.courseTeacherEmail,
+                onTap: () =>
+                    _open(context, Uri(scheme: 'mailto', path: i.teacherEmail)),
+              ),
+          ],
+        ),
         if (i.notes.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              CsSpace.md,
-              CsSpace.sm + 4,
-              CsSpace.md,
-              CsSpace.sm + 4,
-            ),
+            padding: const EdgeInsets.only(top: CsSpace.sm + 2),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(CsIcons.note, size: 20, color: context.cs.textSecondary),
-                const SizedBox(width: CsSpace.sm + 4),
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Icon(
+                    CsIcons.note,
+                    size: 18,
+                    color: context.cs.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: CsSpace.sm),
                 Expanded(
                   child: CsLinkText(
                     i.notes,
@@ -116,6 +107,127 @@ class CourseLinks extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// A small tappable pill: icon and a short label.
+class _LinkChip extends StatelessWidget {
+  const _LinkChip({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.tooltip,
+    required this.onTap,
+    this.trailing,
+  });
+
+  final IconData icon;
+  final String label;
+  final String tooltip;
+  final VoidCallback onTap;
+  final IconData? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = context.cs;
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: cs.primaryContainer.withValues(alpha: 0.55),
+        shape: StadiumBorder(side: BorderSide(color: cs.border)),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: CsSpace.sm + 4,
+              vertical: CsSpace.sm,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 16, color: cs.primary),
+                const SizedBox(width: 6),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 200),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.text.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                if (trailing != null) ...[
+                  const SizedBox(width: 6),
+                  Icon(trailing, size: 14, color: cs.textSecondary),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The Classroom code: a tap copies it; for a few seconds the chip then
+/// says "Copied · Open Classroom" and a tap opens Classroom to paste it.
+class _ClassroomChip extends StatefulWidget {
+  const _ClassroomChip({required this.code, required this.onOpen});
+
+  final String code;
+  final VoidCallback onOpen;
+
+  @override
+  State<_ClassroomChip> createState() => _ClassroomChipState();
+}
+
+class _ClassroomChipState extends State<_ClassroomChip> {
+  Timer? _reset;
+  bool _copied = false;
+
+  @override
+  void dispose() {
+    _reset?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _copy() async {
+    await Clipboard.setData(ClipboardData(text: widget.code));
+    if (!mounted) return;
+    unawaited(HapticFeedback.selectionClick());
+    setState(() => _copied = true);
+    _reset?.cancel();
+    _reset = Timer(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _copied = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return AnimatedSwitcher(
+      duration: CsMotion.fast,
+      child: _copied
+          ? _LinkChip(
+              key: const ValueKey('copied'),
+              icon: CsIcons.checkCircle,
+              label: '${l10n.courseCopied} · ${l10n.courseOpenClassroom}',
+              tooltip: l10n.courseOpenClassroom,
+              trailing: CsIcons.openExternal,
+              onTap: widget.onOpen,
+            )
+          : _LinkChip(
+              key: const ValueKey('code'),
+              icon: CsIcons.academic,
+              label: l10n.courseClassroomChip(widget.code),
+              tooltip: l10n.courseClassroom,
+              trailing: CsIcons.copy,
+              onTap: _copy,
+            ),
     );
   }
 }
@@ -139,14 +251,4 @@ String chatAppName(String link) {
 String linkHost(String link) {
   final host = Uri.tryParse(link)?.host.toLowerCase() ?? '';
   return host.startsWith('www.') ? host.substring(4) : host;
-}
-
-/// The "opens elsewhere" mark, in the same place as the Classroom row's
-/// open button.
-class _OpenIcon extends StatelessWidget {
-  const _OpenIcon();
-
-  @override
-  Widget build(BuildContext context) =>
-      const SizedBox(width: 48, child: Icon(CsIcons.openExternal, size: 18));
 }

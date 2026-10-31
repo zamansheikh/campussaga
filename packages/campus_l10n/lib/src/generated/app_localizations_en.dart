@@ -3153,14 +3153,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get courseClassroomCodeHint => 'e.g. ab3x9kq';
 
   @override
-  String courseCodeLine(String code) {
-    return 'Code: $code · tap to copy';
-  }
-
-  @override
-  String get courseCodeCopied => 'Classroom code copied';
-
-  @override
   String get courseOpenClassroom => 'Open Classroom';
 
   @override
@@ -3186,4 +3178,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get courseCodeInvalid => 'Letters and numbers only (3–20).';
+
+  @override
+  String courseClassroomChip(String code) {
+    return 'Classroom: $code';
+  }
+
+  @override
+  String get courseMaterialsShort => 'Materials';
+
+  @override
+  String get courseCopied => 'Copied';
 }
