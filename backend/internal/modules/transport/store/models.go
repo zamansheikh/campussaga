@@ -8,7 +8,37 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type BusAlert struct {
+	UserID    uuid.UUID
+	RouteID   uuid.UUID
+	Direction string
+	StopID    uuid.UUID
+	LeadMin   int16
+	CreatedAt time.Time
+}
+
+type BusLiveSession struct {
+	ID           uuid.UUID
+	RouteID      uuid.UUID
+	UserID       uuid.UUID
+	Direction    string
+	ServiceDate  pgtype.Date
+	Departs      int16
+	StartedAt    time.Time
+	LastAt       time.Time
+	EndedAt      *time.Time
+	EndReason    *string
+	LastLat      *float64
+	LastLng      *float64
+	LastAccuracy *float32
+	LastProgress *float32
+	LastOff      *float32
+	Speed        *float32
+	Pings        int32
+}
 
 type BusRoute struct {
 	ID           uuid.UUID

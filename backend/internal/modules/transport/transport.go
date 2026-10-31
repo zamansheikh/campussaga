@@ -1,6 +1,8 @@
 // Package transport serves university bus routes and timetables. Students
 // read their university's routes; transport reps (students an admin names
-// for one university) and admins edit them. No live tracking.
+// for one university) and admins edit them. Students on a bus can share where
+// it is (live.go): others see it move, get ETAs and "bus near" pushes
+// (alerts.go), and rate the trip afterwards (feedback.go).
 //
 // Timetable model: a stop has a minute offset from the start of a trip in
 // each direction; a trip is a departure time, a direction and weekdays. The
@@ -17,6 +19,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -50,6 +53,9 @@ type Service struct {
 	now   func() time.Time
 	roads RoadRouter // nil: maps draw straight lines between stops
 	log   *slog.Logger
+
+	notify Notifier // nil: no pushes
+	geos   sync.Map // route id -> *routeGeo
 }
 
 func NewService(d *db.DB, now func() time.Time, roads RoadRouter, log *slog.Logger) *Service {
@@ -69,6 +75,7 @@ func (s *Service) Routes(r *httpx.Router) {
 	e.Delete("/transport/routes/{id}", httpx.Handle(s.handleDelete, httpx.NoContent()))
 	e.Put("/transport/routes/{id}/stops", httpx.Handle(s.handleStops))
 	e.Put("/transport/routes/{id}/trips", httpx.Handle(s.handleTrips))
+	s.liveRoutes(r)
 	a := r.Admin()
 	a.Get("/admin/transport/routes", httpx.Handle(s.handleAdminList))
 	a.Post("/admin/transport/routes", httpx.Handle(s.handleAdminCreate, httpx.Status(201)))
@@ -266,23 +273,33 @@ type routeReq struct {
 }
 
 func (s *Service) handleGet(ctx context.Context, in *routeReq) (*Route, error) {
-	c := auth.MustUser(ctx)
 	q := store.New(s.d.Q(ctx))
-	r, err := q.GetRoute(ctx, uuid.MustParse(in.ID))
-	if db.IsNoRows(err) {
-		return nil, ErrRouteNotFound
-	}
+	r, err := s.readableRoute(ctx, q, uuid.MustParse(in.ID))
 	if err != nil {
 		return nil, err
 	}
+	return s.one(ctx, q, r)
+}
+
+// readableRoute: a route of the caller's university, or of one they edit as
+// its rep (or an admin). Other universities' routes don't exist for them.
+func (s *Service) readableRoute(ctx context.Context, q *store.Queries, id uuid.UUID) (store.BusRoute, error) {
+	c := auth.MustUser(ctx)
+	r, err := q.GetRoute(ctx, id)
+	if db.IsNoRows(err) {
+		return r, ErrRouteNotFound
+	}
+	if err != nil {
+		return r, err
+	}
 	if r.UniversityID != c.UniversityID {
 		if ok, err := s.editsUniversity(ctx, q, r.UniversityID); err != nil {
-			return nil, err
+			return r, err
 		} else if !ok {
-			return nil, ErrRouteNotFound
+			return r, ErrRouteNotFound
 		}
 	}
-	return s.one(ctx, q, r)
+	return r, nil
 }
 
 func (s *Service) one(ctx context.Context, q *store.Queries, r store.BusRoute) (*Route, error) {

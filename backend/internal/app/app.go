@@ -46,6 +46,7 @@ type App struct {
 	Push         *push.Service
 	Voice        *voice.Service
 	Blood        *blood.Service
+	Transport    *transport.Service
 
 	handler http.Handler
 }
@@ -200,7 +201,16 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
 	})
 
-	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc, Blood: bloodSvc}
+	transportSvc := transport.NewService(d, now, roads, log)
+	transportSvc.SetNotifier(func(userIDs []uuid.UUID, n transport.Notice) {
+		texts := make(map[string]push.Text, len(n.Texts))
+		for lang, t := range n.Texts {
+			texts[lang] = push.Text{Title: t.Title, Body: t.Body}
+		}
+		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
+	})
+
+	a := &App{Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc, Blood: bloodSvc, Transport: transportSvc}
 
 	root := chi.NewRouter()
 	root.NotFound(httpx.NotFoundHandler)
@@ -217,7 +227,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		pushSvc.Routes(r)
 		adminSvc.Routes(r)
 		voiceSvc.Routes(r)
-		transport.NewService(d, now, roads, log).Routes(r)
+		transportSvc.Routes(r)
 		bloodSvc.Routes(r)
 		photoSvc.Routes(r)
 	})
@@ -271,6 +281,7 @@ func (a *App) Serve(ctx context.Context) error {
 	defer stopBG()
 	go a.Accounts.PurgeLoop(bg, time.Hour)
 	go a.Voice.CleanupLoop(bg, time.Hour)
+	go a.Transport.SweepLoop(bg, 5*time.Minute)
 
 	errc := make(chan error, 1)
 	go func() {

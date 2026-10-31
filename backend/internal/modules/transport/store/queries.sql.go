@@ -11,7 +11,51 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+const addShareStats = `-- name: AddShareStats :one
+INSERT INTO bus_share_stats (user_id, trips, helped) VALUES ($1, 1, $2::int)
+ON CONFLICT (user_id) DO UPDATE SET trips = bus_share_stats.trips + 1,
+    helped = bus_share_stats.helped + EXCLUDED.helped, updated_at = now()
+RETURNING trips, helped
+`
+
+type AddShareStatsParams struct {
+	UserID uuid.UUID
+	Helped int32
+}
+
+type AddShareStatsRow struct {
+	Trips  int32
+	Helped int32
+}
+
+func (q *Queries) AddShareStats(ctx context.Context, arg AddShareStatsParams) (AddShareStatsRow, error) {
+	row := q.db.QueryRow(ctx, addShareStats, arg.UserID, arg.Helped)
+	var i AddShareStatsRow
+	err := row.Scan(&i.Trips, &i.Helped)
+	return i, err
+}
+
+const countPingsOnLine = `-- name: CountPingsOnLine :one
+SELECT count(*) FROM bus_live_pings
+WHERE session_id = $1 AND at > $2 AND off IS NOT NULL AND off <= $3::real
+`
+
+type CountPingsOnLineParams struct {
+	SessionID uuid.UUID
+	Since     time.Time
+	MaxOff    float32
+}
+
+// Pings of a session within max_off metres of the line since a time.
+func (q *Queries) CountPingsOnLine(ctx context.Context, arg CountPingsOnLineParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countPingsOnLine, arg.SessionID, arg.Since, arg.MaxOff)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
 
 const countRoutes = `-- name: CountRoutes :one
 SELECT count(*) FROM bus_routes WHERE university_id = $1
@@ -19,6 +63,54 @@ SELECT count(*) FROM bus_routes WHERE university_id = $1
 
 func (q *Queries) CountRoutes(ctx context.Context, universityID uuid.UUID) (int64, error) {
 	row := q.db.QueryRow(ctx, countRoutes, universityID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countSessionsSince = `-- name: CountSessionsSince :one
+SELECT count(*) FROM bus_live_sessions WHERE user_id = $1 AND started_at >= $2
+`
+
+type CountSessionsSinceParams struct {
+	UserID uuid.UUID
+	Since  time.Time
+}
+
+func (q *Queries) CountSessionsSince(ctx context.Context, arg CountSessionsSinceParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countSessionsSince, arg.UserID, arg.Since)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countViewers = `-- name: CountViewers :one
+SELECT count(*) FROM bus_live_views
+WHERE route_id = $1 AND direction = $2 AND service_date = $3 AND departs = $4
+  AND user_id <> $5 AND first_at >= $6 AND first_at <= $7
+`
+
+type CountViewersParams struct {
+	RouteID     uuid.UUID
+	Direction   string
+	ServiceDate pgtype.Date
+	Departs     int16
+	Sharer      uuid.UUID
+	FromAt      time.Time
+	ToAt        time.Time
+}
+
+// Distinct students other than the sharer who looked at the run while the session was open.
+func (q *Queries) CountViewers(ctx context.Context, arg CountViewersParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countViewers,
+		arg.RouteID,
+		arg.Direction,
+		arg.ServiceDate,
+		arg.Departs,
+		arg.Sharer,
+		arg.FromAt,
+		arg.ToAt,
+	)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -68,6 +160,21 @@ func (q *Queries) CreateRoute(ctx context.Context, arg CreateRouteParams) (BusRo
 	return i, err
 }
 
+const deleteAlert = `-- name: DeleteAlert :exec
+DELETE FROM bus_alerts WHERE user_id = $1 AND route_id = $2 AND direction = $3
+`
+
+type DeleteAlertParams struct {
+	UserID    uuid.UUID
+	RouteID   uuid.UUID
+	Direction string
+}
+
+func (q *Queries) DeleteAlert(ctx context.Context, arg DeleteAlertParams) error {
+	_, err := q.db.Exec(ctx, deleteAlert, arg.UserID, arg.RouteID, arg.Direction)
+	return err
+}
+
 const deleteRep = `-- name: DeleteRep :execrows
 DELETE FROM transport_reps WHERE user_id = $1
 `
@@ -110,6 +217,226 @@ func (q *Queries) DeleteTrips(ctx context.Context, routeID uuid.UUID) error {
 	return err
 }
 
+const endLiveSession = `-- name: EndLiveSession :one
+UPDATE bus_live_sessions SET ended_at = $1, end_reason = $2
+WHERE id = $3 AND ended_at IS NULL
+RETURNING id, route_id, user_id, direction, service_date, departs, started_at, last_at, ended_at, end_reason, last_lat, last_lng, last_accuracy, last_progress, last_off, speed, pings
+`
+
+type EndLiveSessionParams struct {
+	Now    *time.Time
+	Reason *string
+	ID     uuid.UUID
+}
+
+func (q *Queries) EndLiveSession(ctx context.Context, arg EndLiveSessionParams) (BusLiveSession, error) {
+	row := q.db.QueryRow(ctx, endLiveSession, arg.Now, arg.Reason, arg.ID)
+	var i BusLiveSession
+	err := row.Scan(
+		&i.ID,
+		&i.RouteID,
+		&i.UserID,
+		&i.Direction,
+		&i.ServiceDate,
+		&i.Departs,
+		&i.StartedAt,
+		&i.LastAt,
+		&i.EndedAt,
+		&i.EndReason,
+		&i.LastLat,
+		&i.LastLng,
+		&i.LastAccuracy,
+		&i.LastProgress,
+		&i.LastOff,
+		&i.Speed,
+		&i.Pings,
+	)
+	return i, err
+}
+
+const feedbackTotals = `-- name: FeedbackTotals :many
+SELECT direction, departs, count(*)::int AS votes,
+    (count(*) FILTER (WHERE status = 'on_time'))::int AS on_time,
+    (count(*) FILTER (WHERE status = 'late'))::int AS late,
+    (count(*) FILTER (WHERE status = 'no_show'))::int AS no_show,
+    (count(*) FILTER (WHERE crowded))::int AS crowded
+FROM bus_trip_feedback
+WHERE route_id = $1 AND service_date >= $2
+GROUP BY direction, departs
+`
+
+type FeedbackTotalsParams struct {
+	RouteID uuid.UUID
+	Since   pgtype.Date
+}
+
+type FeedbackTotalsRow struct {
+	Direction string
+	Departs   int16
+	Votes     int32
+	OnTime    int32
+	Late      int32
+	NoShow    int32
+	Crowded   int32
+}
+
+func (q *Queries) FeedbackTotals(ctx context.Context, arg FeedbackTotalsParams) ([]FeedbackTotalsRow, error) {
+	rows, err := q.db.Query(ctx, feedbackTotals, arg.RouteID, arg.Since)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []FeedbackTotalsRow{}
+	for rows.Next() {
+		var i FeedbackTotalsRow
+		if err := rows.Scan(
+			&i.Direction,
+			&i.Departs,
+			&i.Votes,
+			&i.OnTime,
+			&i.Late,
+			&i.NoShow,
+			&i.Crowded,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const freshSessions = `-- name: FreshSessions :many
+SELECT id, route_id, user_id, direction, service_date, departs, started_at, last_at, ended_at, end_reason, last_lat, last_lng, last_accuracy, last_progress, last_off, speed, pings FROM bus_live_sessions
+WHERE ended_at IS NULL AND last_at >= $1 AND ($2::uuid IS NULL OR route_id = $2)
+ORDER BY started_at, id
+`
+
+type FreshSessionsParams struct {
+	Since   time.Time
+	RouteID *uuid.UUID
+}
+
+// Open sessions heard from since a time, of one route (or of every route: null).
+func (q *Queries) FreshSessions(ctx context.Context, arg FreshSessionsParams) ([]BusLiveSession, error) {
+	rows, err := q.db.Query(ctx, freshSessions, arg.Since, arg.RouteID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BusLiveSession{}
+	for rows.Next() {
+		var i BusLiveSession
+		if err := rows.Scan(
+			&i.ID,
+			&i.RouteID,
+			&i.UserID,
+			&i.Direction,
+			&i.ServiceDate,
+			&i.Departs,
+			&i.StartedAt,
+			&i.LastAt,
+			&i.EndedAt,
+			&i.EndReason,
+			&i.LastLat,
+			&i.LastLng,
+			&i.LastAccuracy,
+			&i.LastProgress,
+			&i.LastOff,
+			&i.Speed,
+			&i.Pings,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const freshSessionsOfUniversity = `-- name: FreshSessionsOfUniversity :many
+SELECT s.id, s.route_id, s.user_id, s.direction, s.service_date, s.departs, s.started_at, s.last_at, s.ended_at, s.end_reason, s.last_lat, s.last_lng, s.last_accuracy, s.last_progress, s.last_off, s.speed, s.pings FROM bus_live_sessions s
+JOIN bus_routes r ON r.id = s.route_id
+WHERE s.ended_at IS NULL AND s.last_at >= $1 AND r.active AND r.university_id = $2
+ORDER BY s.started_at, s.id
+`
+
+type FreshSessionsOfUniversityParams struct {
+	Since        time.Time
+	UniversityID uuid.UUID
+}
+
+func (q *Queries) FreshSessionsOfUniversity(ctx context.Context, arg FreshSessionsOfUniversityParams) ([]BusLiveSession, error) {
+	rows, err := q.db.Query(ctx, freshSessionsOfUniversity, arg.Since, arg.UniversityID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BusLiveSession{}
+	for rows.Next() {
+		var i BusLiveSession
+		if err := rows.Scan(
+			&i.ID,
+			&i.RouteID,
+			&i.UserID,
+			&i.Direction,
+			&i.ServiceDate,
+			&i.Departs,
+			&i.StartedAt,
+			&i.LastAt,
+			&i.EndedAt,
+			&i.EndReason,
+			&i.LastLat,
+			&i.LastLng,
+			&i.LastAccuracy,
+			&i.LastProgress,
+			&i.LastOff,
+			&i.Speed,
+			&i.Pings,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getLiveSessionForUpdate = `-- name: GetLiveSessionForUpdate :one
+SELECT id, route_id, user_id, direction, service_date, departs, started_at, last_at, ended_at, end_reason, last_lat, last_lng, last_accuracy, last_progress, last_off, speed, pings FROM bus_live_sessions WHERE id = $1 FOR UPDATE
+`
+
+func (q *Queries) GetLiveSessionForUpdate(ctx context.Context, id uuid.UUID) (BusLiveSession, error) {
+	row := q.db.QueryRow(ctx, getLiveSessionForUpdate, id)
+	var i BusLiveSession
+	err := row.Scan(
+		&i.ID,
+		&i.RouteID,
+		&i.UserID,
+		&i.Direction,
+		&i.ServiceDate,
+		&i.Departs,
+		&i.StartedAt,
+		&i.LastAt,
+		&i.EndedAt,
+		&i.EndReason,
+		&i.LastLat,
+		&i.LastLng,
+		&i.LastAccuracy,
+		&i.LastProgress,
+		&i.LastOff,
+		&i.Speed,
+		&i.Pings,
+	)
+	return i, err
+}
+
 const getRoute = `-- name: GetRoute :one
 SELECT id, university_id, name, color, notes, active, created_at, updated_at, path, path_key, driver_name, driver_phone FROM bus_routes WHERE id = $1
 `
@@ -134,6 +461,22 @@ func (q *Queries) GetRoute(ctx context.Context, id uuid.UUID) (BusRoute, error) 
 	return i, err
 }
 
+const getShareStats = `-- name: GetShareStats :one
+SELECT trips, helped FROM bus_share_stats WHERE user_id = $1
+`
+
+type GetShareStatsRow struct {
+	Trips  int32
+	Helped int32
+}
+
+func (q *Queries) GetShareStats(ctx context.Context, userID uuid.UUID) (GetShareStatsRow, error) {
+	row := q.db.QueryRow(ctx, getShareStats, userID)
+	var i GetShareStatsRow
+	err := row.Scan(&i.Trips, &i.Helped)
+	return i, err
+}
+
 const insertAudit = `-- name: InsertAudit :exec
 INSERT INTO audit_log (actor_id, action, target_type, target_id, meta)
 VALUES ($1, $2, $3, $4, $5)
@@ -154,6 +497,130 @@ func (q *Queries) InsertAudit(ctx context.Context, arg InsertAuditParams) error 
 		arg.TargetType,
 		arg.TargetID,
 		arg.Meta,
+	)
+	return err
+}
+
+const insertLivePing = `-- name: InsertLivePing :exec
+INSERT INTO bus_live_pings (session_id, at, lat, lng, accuracy, speed, heading, progress, off)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+`
+
+type InsertLivePingParams struct {
+	SessionID uuid.UUID
+	At        time.Time
+	Lat       float64
+	Lng       float64
+	Accuracy  *float32
+	Speed     *float32
+	Heading   *float32
+	Progress  *float32
+	Off       *float32
+}
+
+func (q *Queries) InsertLivePing(ctx context.Context, arg InsertLivePingParams) error {
+	_, err := q.db.Exec(ctx, insertLivePing,
+		arg.SessionID,
+		arg.At,
+		arg.Lat,
+		arg.Lng,
+		arg.Accuracy,
+		arg.Speed,
+		arg.Heading,
+		arg.Progress,
+		arg.Off,
+	)
+	return err
+}
+
+const insertLiveSession = `-- name: InsertLiveSession :one
+
+INSERT INTO bus_live_sessions (route_id, user_id, direction, service_date, departs, started_at, last_at,
+    last_lat, last_lng, last_accuracy, last_progress, last_off, pings)
+VALUES ($1, $2, $3, $4, $5, $6, $6,
+    $7, $8, $9, $10, $11, 1)
+RETURNING id, route_id, user_id, direction, service_date, departs, started_at, last_at, ended_at, end_reason, last_lat, last_lng, last_accuracy, last_progress, last_off, speed, pings
+`
+
+type InsertLiveSessionParams struct {
+	RouteID     uuid.UUID
+	UserID      uuid.UUID
+	Direction   string
+	ServiceDate pgtype.Date
+	Departs     int16
+	Now         time.Time
+	Lat         *float64
+	Lng         *float64
+	Accuracy    *float32
+	Progress    *float32
+	Off         *float32
+}
+
+// ---- live buses (docs/BUS_LIVE.md) -------------------------------------------
+func (q *Queries) InsertLiveSession(ctx context.Context, arg InsertLiveSessionParams) (BusLiveSession, error) {
+	row := q.db.QueryRow(ctx, insertLiveSession,
+		arg.RouteID,
+		arg.UserID,
+		arg.Direction,
+		arg.ServiceDate,
+		arg.Departs,
+		arg.Now,
+		arg.Lat,
+		arg.Lng,
+		arg.Accuracy,
+		arg.Progress,
+		arg.Off,
+	)
+	var i BusLiveSession
+	err := row.Scan(
+		&i.ID,
+		&i.RouteID,
+		&i.UserID,
+		&i.Direction,
+		&i.ServiceDate,
+		&i.Departs,
+		&i.StartedAt,
+		&i.LastAt,
+		&i.EndedAt,
+		&i.EndReason,
+		&i.LastLat,
+		&i.LastLng,
+		&i.LastAccuracy,
+		&i.LastProgress,
+		&i.LastOff,
+		&i.Speed,
+		&i.Pings,
+	)
+	return i, err
+}
+
+const insertRunStop = `-- name: InsertRunStop :exec
+INSERT INTO bus_run_stops (route_id, direction, service_date, departs, stop_id, passed_at, scheduled_at, riders)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+ON CONFLICT DO NOTHING
+`
+
+type InsertRunStopParams struct {
+	RouteID     uuid.UUID
+	Direction   string
+	ServiceDate pgtype.Date
+	Departs     int16
+	StopID      uuid.UUID
+	PassedAt    time.Time
+	ScheduledAt *time.Time
+	Riders      int16
+}
+
+func (q *Queries) InsertRunStop(ctx context.Context, arg InsertRunStopParams) error {
+	_, err := q.db.Exec(ctx, insertRunStop,
+		arg.RouteID,
+		arg.Direction,
+		arg.ServiceDate,
+		arg.Departs,
+		arg.StopID,
+		arg.PassedAt,
+		arg.ScheduledAt,
+		arg.Riders,
 	)
 	return err
 }
@@ -210,6 +677,37 @@ func (q *Queries) InsertTrip(ctx context.Context, arg InsertTripParams) error {
 		arg.Note,
 	)
 	return err
+}
+
+const listAlerts = `-- name: ListAlerts :many
+SELECT user_id, route_id, direction, stop_id, lead_min, created_at FROM bus_alerts WHERE user_id = $1 ORDER BY created_at, route_id
+`
+
+func (q *Queries) ListAlerts(ctx context.Context, userID uuid.UUID) ([]BusAlert, error) {
+	rows, err := q.db.Query(ctx, listAlerts, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BusAlert{}
+	for rows.Next() {
+		var i BusAlert
+		if err := rows.Scan(
+			&i.UserID,
+			&i.RouteID,
+			&i.Direction,
+			&i.StopID,
+			&i.LeadMin,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listAllRoutes = `-- name: ListAllRoutes :many
@@ -344,6 +842,209 @@ func (q *Queries) ListRoutes(ctx context.Context, arg ListRoutesParams) ([]BusRo
 	return items, nil
 }
 
+const markAlertSent = `-- name: MarkAlertSent :execrows
+INSERT INTO bus_alerts_sent (user_id, route_id, direction, service_date, departs, sent_at)
+VALUES ($1, $2, $3, $4, $5, $6)
+ON CONFLICT DO NOTHING
+`
+
+type MarkAlertSentParams struct {
+	UserID      uuid.UUID
+	RouteID     uuid.UUID
+	Direction   string
+	ServiceDate pgtype.Date
+	Departs     int16
+	Now         time.Time
+}
+
+// One row when this call recorded the push, none when it was already sent.
+func (q *Queries) MarkAlertSent(ctx context.Context, arg MarkAlertSentParams) (int64, error) {
+	result, err := q.db.Exec(ctx, markAlertSent,
+		arg.UserID,
+		arg.RouteID,
+		arg.Direction,
+		arg.ServiceDate,
+		arg.Departs,
+		arg.Now,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const myOpenSession = `-- name: MyOpenSession :one
+SELECT id, route_id, user_id, direction, service_date, departs, started_at, last_at, ended_at, end_reason, last_lat, last_lng, last_accuracy, last_progress, last_off, speed, pings FROM bus_live_sessions WHERE user_id = $1 AND route_id = $2 AND ended_at IS NULL
+`
+
+type MyOpenSessionParams struct {
+	UserID  uuid.UUID
+	RouteID uuid.UUID
+}
+
+func (q *Queries) MyOpenSession(ctx context.Context, arg MyOpenSessionParams) (BusLiveSession, error) {
+	row := q.db.QueryRow(ctx, myOpenSession, arg.UserID, arg.RouteID)
+	var i BusLiveSession
+	err := row.Scan(
+		&i.ID,
+		&i.RouteID,
+		&i.UserID,
+		&i.Direction,
+		&i.ServiceDate,
+		&i.Departs,
+		&i.StartedAt,
+		&i.LastAt,
+		&i.EndedAt,
+		&i.EndReason,
+		&i.LastLat,
+		&i.LastLng,
+		&i.LastAccuracy,
+		&i.LastProgress,
+		&i.LastOff,
+		&i.Speed,
+		&i.Pings,
+	)
+	return i, err
+}
+
+const openSessionOfUser = `-- name: OpenSessionOfUser :one
+SELECT id, route_id, user_id, direction, service_date, departs, started_at, last_at, ended_at, end_reason, last_lat, last_lng, last_accuracy, last_progress, last_off, speed, pings FROM bus_live_sessions WHERE user_id = $1 AND ended_at IS NULL FOR UPDATE
+`
+
+func (q *Queries) OpenSessionOfUser(ctx context.Context, userID uuid.UUID) (BusLiveSession, error) {
+	row := q.db.QueryRow(ctx, openSessionOfUser, userID)
+	var i BusLiveSession
+	err := row.Scan(
+		&i.ID,
+		&i.RouteID,
+		&i.UserID,
+		&i.Direction,
+		&i.ServiceDate,
+		&i.Departs,
+		&i.StartedAt,
+		&i.LastAt,
+		&i.EndedAt,
+		&i.EndReason,
+		&i.LastLat,
+		&i.LastLng,
+		&i.LastAccuracy,
+		&i.LastProgress,
+		&i.LastOff,
+		&i.Speed,
+		&i.Pings,
+	)
+	return i, err
+}
+
+const pendingAlerts = `-- name: PendingAlerts :many
+SELECT a.user_id, a.route_id, a.direction, a.stop_id, a.lead_min, a.created_at FROM bus_alerts a
+WHERE a.route_id = $1 AND a.direction = $2
+  AND NOT EXISTS (SELECT 1 FROM bus_alerts_sent t WHERE t.user_id = a.user_id AND t.route_id = a.route_id
+        AND t.direction = a.direction AND t.service_date = $3 AND t.departs = $4)
+  AND NOT EXISTS (SELECT 1 FROM bus_live_sessions s WHERE s.user_id = a.user_id AND s.ended_at IS NULL
+        AND s.route_id = a.route_id AND s.direction = a.direction AND s.service_date = $3 AND s.departs = $4)
+`
+
+type PendingAlertsParams struct {
+	RouteID     uuid.UUID
+	Direction   string
+	ServiceDate pgtype.Date
+	Departs     int16
+}
+
+// Alerts on a route and direction not yet sent for the run, whose owner is not sharing it.
+func (q *Queries) PendingAlerts(ctx context.Context, arg PendingAlertsParams) ([]BusAlert, error) {
+	rows, err := q.db.Query(ctx, pendingAlerts,
+		arg.RouteID,
+		arg.Direction,
+		arg.ServiceDate,
+		arg.Departs,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BusAlert{}
+	for rows.Next() {
+		var i BusAlert
+		if err := rows.Scan(
+			&i.UserID,
+			&i.RouteID,
+			&i.Direction,
+			&i.StopID,
+			&i.LeadMin,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const purgeAlertsSent = `-- name: PurgeAlertsSent :execrows
+DELETE FROM bus_alerts_sent WHERE sent_at < $1
+`
+
+func (q *Queries) PurgeAlertsSent(ctx context.Context, before time.Time) (int64, error) {
+	result, err := q.db.Exec(ctx, purgeAlertsSent, before)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const purgeFeedback = `-- name: PurgeFeedback :execrows
+DELETE FROM bus_trip_feedback WHERE created_at < $1
+`
+
+func (q *Queries) PurgeFeedback(ctx context.Context, before time.Time) (int64, error) {
+	result, err := q.db.Exec(ctx, purgeFeedback, before)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const purgeLiveSessions = `-- name: PurgeLiveSessions :execrows
+DELETE FROM bus_live_sessions WHERE ended_at IS NOT NULL AND ended_at < $1
+`
+
+func (q *Queries) PurgeLiveSessions(ctx context.Context, before *time.Time) (int64, error) {
+	result, err := q.db.Exec(ctx, purgeLiveSessions, before)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const purgeLiveViews = `-- name: PurgeLiveViews :execrows
+DELETE FROM bus_live_views WHERE first_at < $1
+`
+
+func (q *Queries) PurgeLiveViews(ctx context.Context, before time.Time) (int64, error) {
+	result, err := q.db.Exec(ctx, purgeLiveViews, before)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const purgeRunStops = `-- name: PurgeRunStops :execrows
+DELETE FROM bus_run_stops WHERE passed_at < $1
+`
+
+func (q *Queries) PurgeRunStops(ctx context.Context, before time.Time) (int64, error) {
+	result, err := q.db.Exec(ctx, purgeRunStops, before)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const repUniversity = `-- name: RepUniversity :one
 SELECT university_id FROM transport_reps WHERE user_id = $1
 `
@@ -353,6 +1054,94 @@ func (q *Queries) RepUniversity(ctx context.Context, userID uuid.UUID) (uuid.UUI
 	var university_id uuid.UUID
 	err := row.Scan(&university_id)
 	return university_id, err
+}
+
+const runDelays = `-- name: RunDelays :many
+SELECT direction, departs, service_date, (count(scheduled_at))::int AS timed,
+    COALESCE(percentile_cont(0.5) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (passed_at - scheduled_at)) / 60.0)
+        FILTER (WHERE scheduled_at IS NOT NULL), 0)::float8 AS delay_min
+FROM bus_run_stops
+WHERE route_id = $1 AND service_date >= $2 AND departs >= 0
+GROUP BY direction, departs, service_date
+`
+
+type RunDelaysParams struct {
+	RouteID uuid.UUID
+	Since   pgtype.Date
+}
+
+type RunDelaysRow struct {
+	Direction   string
+	Departs     int16
+	ServiceDate pgtype.Date
+	Timed       int32
+	DelayMin    float64
+}
+
+// One row per measured run: its median delay in minutes, and how many of its
+// stops had a scheduled time (0: the delay is not known).
+func (q *Queries) RunDelays(ctx context.Context, arg RunDelaysParams) ([]RunDelaysRow, error) {
+	rows, err := q.db.Query(ctx, runDelays, arg.RouteID, arg.Since)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []RunDelaysRow{}
+	for rows.Next() {
+		var i RunDelaysRow
+		if err := rows.Scan(
+			&i.Direction,
+			&i.Departs,
+			&i.ServiceDate,
+			&i.Timed,
+			&i.DelayMin,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const runStopIDs = `-- name: RunStopIDs :many
+SELECT stop_id FROM bus_run_stops
+WHERE route_id = $1 AND direction = $2 AND service_date = $3 AND departs = $4
+`
+
+type RunStopIDsParams struct {
+	RouteID     uuid.UUID
+	Direction   string
+	ServiceDate pgtype.Date
+	Departs     int16
+}
+
+// Stops a run has already been recorded passing.
+func (q *Queries) RunStopIDs(ctx context.Context, arg RunStopIDsParams) ([]uuid.UUID, error) {
+	rows, err := q.db.Query(ctx, runStopIDs,
+		arg.RouteID,
+		arg.Direction,
+		arg.ServiceDate,
+		arg.Departs,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []uuid.UUID{}
+	for rows.Next() {
+		var stop_id uuid.UUID
+		if err := rows.Scan(&stop_id); err != nil {
+			return nil, err
+		}
+		items = append(items, stop_id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const setRoutePath = `-- name: SetRoutePath :exec
@@ -368,6 +1157,49 @@ type SetRoutePathParams struct {
 func (q *Queries) SetRoutePath(ctx context.Context, arg SetRoutePathParams) error {
 	_, err := q.db.Exec(ctx, setRoutePath, arg.Path, arg.PathKey, arg.ID)
 	return err
+}
+
+const staleSessions = `-- name: StaleSessions :many
+SELECT id, route_id, user_id, direction, service_date, departs, started_at, last_at, ended_at, end_reason, last_lat, last_lng, last_accuracy, last_progress, last_off, speed, pings FROM bus_live_sessions WHERE ended_at IS NULL AND last_at < $1 FOR UPDATE SKIP LOCKED
+`
+
+// Housekeeping (sweep.go).
+func (q *Queries) StaleSessions(ctx context.Context, before time.Time) ([]BusLiveSession, error) {
+	rows, err := q.db.Query(ctx, staleSessions, before)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BusLiveSession{}
+	for rows.Next() {
+		var i BusLiveSession
+		if err := rows.Scan(
+			&i.ID,
+			&i.RouteID,
+			&i.UserID,
+			&i.Direction,
+			&i.ServiceDate,
+			&i.Departs,
+			&i.StartedAt,
+			&i.LastAt,
+			&i.EndedAt,
+			&i.EndReason,
+			&i.LastLat,
+			&i.LastLng,
+			&i.LastAccuracy,
+			&i.LastProgress,
+			&i.LastOff,
+			&i.Speed,
+			&i.Pings,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const stopsForRoutes = `-- name: StopsForRoutes :many
@@ -489,6 +1321,40 @@ func (q *Queries) UniversityExists(ctx context.Context, id uuid.UUID) (bool, err
 	return exists, err
 }
 
+const updateLiveSession = `-- name: UpdateLiveSession :exec
+UPDATE bus_live_sessions SET last_at = $1, last_lat = $2, last_lng = $3, last_accuracy = $4,
+    last_progress = $5, last_off = $6, speed = $7,
+    pings = pings + $8::int
+WHERE id = $9
+`
+
+type UpdateLiveSessionParams struct {
+	LastAt   time.Time
+	Lat      *float64
+	Lng      *float64
+	Accuracy *float32
+	Progress *float32
+	Off      *float32
+	Speed    *float32
+	Added    int32
+	ID       uuid.UUID
+}
+
+func (q *Queries) UpdateLiveSession(ctx context.Context, arg UpdateLiveSessionParams) error {
+	_, err := q.db.Exec(ctx, updateLiveSession,
+		arg.LastAt,
+		arg.Lat,
+		arg.Lng,
+		arg.Accuracy,
+		arg.Progress,
+		arg.Off,
+		arg.Speed,
+		arg.Added,
+		arg.ID,
+	)
+	return err
+}
+
 const updateRoute = `-- name: UpdateRoute :one
 UPDATE bus_routes SET name = $1, color = $2, notes = $3, active = $4,
     driver_name = $5, driver_phone = $6
@@ -532,6 +1398,98 @@ func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) (BusRo
 		&i.DriverPhone,
 	)
 	return i, err
+}
+
+const upsertAlert = `-- name: UpsertAlert :one
+INSERT INTO bus_alerts (user_id, route_id, direction, stop_id, lead_min)
+VALUES ($1, $2, $3, $4, $5)
+ON CONFLICT (user_id, route_id, direction) DO UPDATE SET stop_id = EXCLUDED.stop_id, lead_min = EXCLUDED.lead_min
+RETURNING user_id, route_id, direction, stop_id, lead_min, created_at
+`
+
+type UpsertAlertParams struct {
+	UserID    uuid.UUID
+	RouteID   uuid.UUID
+	Direction string
+	StopID    uuid.UUID
+	LeadMin   int16
+}
+
+func (q *Queries) UpsertAlert(ctx context.Context, arg UpsertAlertParams) (BusAlert, error) {
+	row := q.db.QueryRow(ctx, upsertAlert,
+		arg.UserID,
+		arg.RouteID,
+		arg.Direction,
+		arg.StopID,
+		arg.LeadMin,
+	)
+	var i BusAlert
+	err := row.Scan(
+		&i.UserID,
+		&i.RouteID,
+		&i.Direction,
+		&i.StopID,
+		&i.LeadMin,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const upsertFeedback = `-- name: UpsertFeedback :exec
+INSERT INTO bus_trip_feedback (route_id, user_id, direction, service_date, departs, status, crowded)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+ON CONFLICT (route_id, user_id, direction, service_date, departs)
+DO UPDATE SET status = EXCLUDED.status, crowded = EXCLUDED.crowded, created_at = now()
+`
+
+type UpsertFeedbackParams struct {
+	RouteID     uuid.UUID
+	UserID      uuid.UUID
+	Direction   string
+	ServiceDate pgtype.Date
+	Departs     int16
+	Status      string
+	Crowded     bool
+}
+
+func (q *Queries) UpsertFeedback(ctx context.Context, arg UpsertFeedbackParams) error {
+	_, err := q.db.Exec(ctx, upsertFeedback,
+		arg.RouteID,
+		arg.UserID,
+		arg.Direction,
+		arg.ServiceDate,
+		arg.Departs,
+		arg.Status,
+		arg.Crowded,
+	)
+	return err
+}
+
+const upsertLiveView = `-- name: UpsertLiveView :exec
+INSERT INTO bus_live_views (route_id, direction, service_date, departs, user_id, first_at)
+VALUES ($1, $2, $3, $4, $5, $6)
+ON CONFLICT DO NOTHING
+`
+
+type UpsertLiveViewParams struct {
+	RouteID     uuid.UUID
+	Direction   string
+	ServiceDate pgtype.Date
+	Departs     int16
+	UserID      uuid.UUID
+	Now         time.Time
+}
+
+func (q *Queries) UpsertLiveView(ctx context.Context, arg UpsertLiveViewParams) error {
+	_, err := q.db.Exec(ctx, upsertLiveView,
+		arg.RouteID,
+		arg.Direction,
+		arg.ServiceDate,
+		arg.Departs,
+		arg.UserID,
+		arg.Now,
+	)
+	return err
 }
 
 const upsertRep = `-- name: UpsertRep :exec
