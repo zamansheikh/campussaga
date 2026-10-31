@@ -194,7 +194,20 @@ export default function PrivacyPage() {
           with the route.
         </p>
         <p>
-          We do not collect your contacts or location history, we have your phone number only if you add it for
+          <strong>Sharing a bus live (optional).</strong> If you are on a university bus and tap &quot;I&apos;m on
+          this bus&quot;, the app sends your phone&apos;s location to us every few seconds while you share, also with
+          the screen off, and shows a notification the whole time. Students on that route see where the bus is and how
+          many students are sharing it, never who. Sharing stops when you stop it, when the bus reaches the end of the
+          route, if you leave the route, or after 3 hours. We delete the points you sent, and the record that you
+          shared, 24 hours after sharing ends. We keep, without your name, when the bus passed each stop (to learn how
+          the timetable really runs), and a count of the trips you have shared. If you rate a trip (on time, late,
+          crowded, didn&apos;t come), we keep your rating for up to 180 days, one per trip, and show only totals. If you
+          turn on &quot;Alert me&quot;, we keep which stop and how many minutes ahead, to send you a notification when
+          a live bus is near.
+        </p>
+        <p>
+          We do not collect your contacts or a location history beyond the bus trips you choose to share (deleted
+          after a day), we have your phone number only if you add it for
           blood donation, and we never see photos or files you don&apos;t choose to attach. The app does not use advertising identifiers.
         </p>
 
