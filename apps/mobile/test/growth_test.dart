@@ -575,6 +575,7 @@ void main() {
       await open(tester, Routes.campaign('c1'));
 
       expect(find.text('WAYS TO EARN POINTS'), findsOneWidget);
+      expect(find.text("You're in the race"), findsOneWidget);
       expect(find.text('42 points'), findsOneWidget);
       expect(find.text('+10 for each friend who joins'), findsOneWidget);
       expect(find.text('3 friends · +35'), findsOneWidget);
@@ -591,6 +592,39 @@ void main() {
       expect(find.text('CSE 40 A: 3/5 classes · 5/5 members'), findsOneWidget);
 
       await scrollAndTap(tester, find.text('Invite a friend'));
+      await tester.pumpAndSettle();
+      expect(shared.single, contains('/r/abcd1234'));
+    });
+
+    testWidgets('not in the prize race: points, friends still needed', (
+      tester,
+    ) async {
+      growth.campaignList = [
+        sampleCampaign(
+          now: now,
+          rank: null,
+          score: 23,
+          eligible: false,
+          myOtherCampus: 1,
+        ),
+      ];
+      await start(tester);
+      expect(
+        find.text('23 points · 1 more friend from other universities to enter'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Next: 1 more friend from another university'),
+        findsOneWidget,
+      );
+      await open(tester, Routes.campaign('c1'));
+      expect(find.text('Enter the prize race'), findsOneWidget);
+      expect(
+        find.text('To win, bring 2 friends from other universities'),
+        findsOneWidget,
+      );
+      expect(find.text('1/2 friends from other universities'), findsOneWidget);
+      await scrollAndTap(tester, find.text('Enter the prize race'));
       await tester.pumpAndSettle();
       expect(shared.single, contains('/r/abcd1234'));
     });

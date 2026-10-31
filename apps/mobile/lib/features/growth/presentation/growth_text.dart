@@ -93,9 +93,18 @@ String? timeLeftText(AppLocalizations l10n, DateTime end, DateTime now) {
 }
 
 /// "Rank 3 · 12 invites" or the nudge to invite when not ranked.
-String campaignStanding(AppLocalizations l10n, Campaign c) => c.myRank == null
-    ? l10n.campaignNoRank
-    : l10n.campaignMyRank(c.myRank!, l10n.campaignScore(c.myScore));
+String campaignStanding(AppLocalizations l10n, Campaign c) {
+  if (c.otherCampusNeeded > 0) {
+    // Points, but not in the prize race yet.
+    return l10n.campaignNotInRace(
+      l10n.campaignScore(c.myScore),
+      c.otherCampusNeeded,
+    );
+  }
+  return c.myRank == null
+      ? l10n.campaignNoRank
+      : l10n.campaignMyRank(c.myRank!, l10n.campaignScore(c.myScore));
+}
 
 /// A prize's rank or range ("Rank 1", "Ranks 4–10").
 String prizeRankText(AppLocalizations l10n, CampaignPrize p) => p.isRange

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/clock.dart';
 import '../../../../app/di.dart';
 import '../../../../app/router.dart';
+import '../invite_share.dart';
 import 'campaign_banner.dart';
 import 'missions_section.dart';
 
@@ -87,9 +88,23 @@ class _CampaignCardState extends State<CampaignCard> {
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
                 child: CampaignStandingRow(campaign: c),
               ),
-              if (nextMission(c) case final m?) ...[
+              if (c.otherCampusNeeded > 0) ...[
+                // Not in the prize race yet: that comes first.
                 Divider(height: 1, color: cs.border),
-                _NextMission(campaign: c, mission: m),
+                _Nudge(
+                  text: AppLocalizations.of(context)
+                      .campaignNextRace(c.otherCampusNeeded),
+                  onTap: () => shareMyInvite(context),
+                ),
+              ] else if (nextMission(c) case final m?) ...[
+                Divider(height: 1, color: cs.border),
+                _Nudge(
+                  text: AppLocalizations.of(context).campaignNext(
+                    missionTitle(AppLocalizations.of(context), m.key),
+                    m.points,
+                  ),
+                  onTap: () => openMission(context, c, m),
+                ),
               ],
             ],
           ),
@@ -99,19 +114,18 @@ class _CampaignCardState extends State<CampaignCard> {
   }
 }
 
-/// "Next: Join your section · +2", opening where it's done.
-class _NextMission extends StatelessWidget {
-  const _NextMission({required this.campaign, required this.mission});
+/// "Next: …", opening where it's done.
+class _Nudge extends StatelessWidget {
+  const _Nudge({required this.text, required this.onTap});
 
-  final Campaign campaign;
-  final CampaignMission mission;
+  final String text;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final cs = context.cs;
     return InkWell(
-      onTap: () => openMission(context, campaign, mission),
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
         child: Row(
@@ -120,10 +134,7 @@ class _NextMission extends StatelessWidget {
             const SizedBox(width: CsSpace.sm),
             Expanded(
               child: Text(
-                l10n.campaignNext(
-                  missionTitle(l10n, mission.key),
-                  mission.points,
-                ),
+                text,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: context.text.bodyMedium?.copyWith(

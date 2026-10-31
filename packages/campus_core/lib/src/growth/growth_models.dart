@@ -330,6 +330,7 @@ class CampaignScoring {
     this.sectionSetup = 15,
     this.sectionSetupMax = 2,
     this.pioneerFirst = 20,
+    this.minOtherCampus = 2,
   });
 
   /// Missing keys (or an older server) take the defaults.
@@ -348,6 +349,7 @@ class CampaignScoring {
       sectionSetup: v('sectionSetup', d.sectionSetup),
       sectionSetupMax: v('sectionSetupMax', d.sectionSetupMax),
       pioneerFirst: v('pioneerFirst', d.pioneerFirst),
+      minOtherCampus: v('minOtherCampus', d.minOtherCampus),
     );
   }
 
@@ -362,6 +364,9 @@ class CampaignScoring {
   final int sectionSetup;
   final int sectionSetupMax;
   final int pioneerFirst;
+
+  /// Friends from other universities needed to be ranked and win (0: none).
+  final int minOtherCampus;
 }
 
 /// How a mission's points come: per friend, once, per day, per section.
@@ -463,6 +468,8 @@ class Campaign {
     this.scoring = const CampaignScoring(),
     this.missions = const [],
     this.section,
+    this.myOtherCampus = 0,
+    this.eligible = true,
   });
 
   factory Campaign.fromJson(Map<String, Object?> json) => Campaign(
@@ -492,6 +499,8 @@ class Campaign {
     section: _map(json['section']) == null
         ? null
         : CampaignSectionProgress.fromJson(_map(json['section'])!),
+    myOtherCampus: _int(json['myOtherCampus']),
+    eligible: json['eligible'] as bool? ?? true,
   );
 
   final String id;
@@ -526,6 +535,17 @@ class Campaign {
   /// My CR section that doesn't count yet (detail only).
   final CampaignSectionProgress? section;
 
+  /// My counted friends at other universities.
+  final int myOtherCampus;
+
+  /// I have the friends from other universities needed to be ranked (an
+  /// older server: always).
+  final bool eligible;
+
+  /// Friends from other universities I still need to be ranked.
+  int get otherCampusNeeded =>
+      eligible ? 0 : (scoring.minOtherCampus - myOtherCampus).clamp(0, 999);
+
   /// Running at [now].
   bool isLive(DateTime now) =>
       status == CampaignStatus.live &&
@@ -557,6 +577,8 @@ class Campaign {
     scoring: scoring,
     missions: missions,
     section: section,
+    myOtherCampus: myOtherCampus,
+    eligible: eligible,
   );
 }
 

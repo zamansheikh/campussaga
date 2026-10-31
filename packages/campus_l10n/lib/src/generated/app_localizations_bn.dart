@@ -5186,4 +5186,51 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get missionInviteBonuses => 'প্রতি বন্ধুতে বাড়তি:';
+
+  @override
+  String get raceTitle => 'পুরস্কারের দৌড়ে নামো';
+
+  @override
+  String raceRule(int min) {
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return 'জিততে অন্য বিশ্ববিদ্যালয়ের $minString জন বন্ধু আনো';
+  }
+
+  @override
+  String raceProgress(int count, int min) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return 'অন্য বিশ্ববিদ্যালয়ের বন্ধু $countString/$minString';
+  }
+
+  @override
+  String get raceDone => 'তুমি দৌড়ে আছ';
+
+  @override
+  String campaignNotInRace(String points, int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$points · দৌড়ে নামতে অন্য বিশ্ববিদ্যালয়ের আরও $countString জন';
+  }
+
+  @override
+  String campaignNextRace(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'পরের ধাপ: অন্য বিশ্ববিদ্যালয়ের আরও $countString জন বন্ধু';
+  }
 }

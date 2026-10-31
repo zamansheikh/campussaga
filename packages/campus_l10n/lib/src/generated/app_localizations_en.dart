@@ -5345,4 +5345,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get missionInviteBonuses => 'Extra for each friend:';
+
+  @override
+  String get raceTitle => 'Enter the prize race';
+
+  @override
+  String raceRule(int min) {
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      min,
+      locale: localeName,
+      other: '$minString friends',
+      one: '1 friend',
+    );
+    return 'To win, bring $_temp0 from other universities';
+  }
+
+  @override
+  String raceProgress(int count, int min) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return '$countString/$minString friends from other universities';
+  }
+
+  @override
+  String get raceDone => 'You\'re in the race';
+
+  @override
+  String campaignNotInRace(String points, int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString more friends',
+      one: '1 more friend',
+    );
+    return '$points · $_temp0 from other universities to enter';
+  }
+
+  @override
+  String campaignNextRace(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString more friends',
+      one: '1 more friend',
+    );
+    return 'Next: $_temp0 from another university';
+  }
 }

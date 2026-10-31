@@ -119,6 +119,8 @@ Campaign sampleCampaign({
   CampaignWin? won,
   List<CampaignMission> missions = const [],
   CampaignSectionProgress? section,
+  bool eligible = true,
+  int myOtherCampus = 2,
 }) => Campaign(
   id: 'c1',
   title: 'Invite and win',
@@ -136,4 +138,6 @@ Campaign sampleCampaign({
   won: won,
   missions: missions,
   section: section,
+  eligible: eligible,
+  myOtherCampus: myOtherCampus,
 );

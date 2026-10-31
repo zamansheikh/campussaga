@@ -8191,6 +8191,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Extra for each friend:'**
   String get missionInviteBonuses;
+
+  /// No description provided for @raceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the prize race'**
+  String get raceTitle;
+
+  /// No description provided for @raceRule.
+  ///
+  /// In en, this message translates to:
+  /// **'To win, bring {min, plural, =1{1 friend} other{{min} friends}} from other universities'**
+  String raceRule(int min);
+
+  /// No description provided for @raceProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}/{min} friends from other universities'**
+  String raceProgress(int count, int min);
+
+  /// No description provided for @raceDone.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re in the race'**
+  String get raceDone;
+
+  /// No description provided for @campaignNotInRace.
+  ///
+  /// In en, this message translates to:
+  /// **'{points} · {count, plural, =1{1 more friend} other{{count} more friends}} from other universities to enter'**
+  String campaignNotInRace(String points, int count);
+
+  /// No description provided for @campaignNextRace.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {count, plural, =1{1 more friend} other{{count} more friends}} from another university'**
+  String campaignNextRace(int count);
 }
 
 class _AppLocalizationsDelegate

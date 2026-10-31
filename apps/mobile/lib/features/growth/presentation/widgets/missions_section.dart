@@ -62,6 +62,13 @@ class MissionsSection extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: Column(
             children: [
+              if (campaign.scoring.minOtherCampus > 0) ...[
+                _RaceRow(
+                  campaign: campaign,
+                  onTap: live ? () => unawaited(shareMyInvite(context)) : null,
+                ),
+                const Divider(indent: 70),
+              ],
               for (var i = 0; i < rows.length; i++) ...[
                 if (i > 0) const Divider(indent: 70),
                 _MissionRow(
@@ -417,4 +424,130 @@ class _BonusChip extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// "Enter the prize race": the friends from other universities needed to
+/// be ranked, and how many I have. Tinted gold until I'm in.
+class _RaceRow extends StatelessWidget {
+  const _RaceRow({required this.campaign, required this.onTap});
+
+  final Campaign campaign;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cs = context.cs;
+    final min = campaign.scoring.minOtherCampus;
+    final inRace = campaign.otherCampusNeeded == 0;
+    return Material(
+      color: inRace ? Colors.transparent : const Color(0x14F59E0B),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(CsSpace.md, 12, 12, 12),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: inRace
+                        ? const [Color(0xFF5EEAD4), Color(0xFF0F766E)]
+                        : const [Color(0xFF818CF8), Color(0xFF3730A3)],
+                  ),
+                ),
+                child: Icon(
+                  inRace ? CsIcons.check : CsIcons.lock,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.raceTitle,
+                      style: context.text.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.raceRule(min),
+                      style: context.text.bodySmall?.copyWith(
+                        color: cs.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    if (inRace)
+                      Text(
+                        l10n.raceDone,
+                        style: context.text.labelMedium?.copyWith(
+                          color: cs.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )
+                    else
+                      _Steps(have: campaign.myOtherCampus, need: min),
+                  ],
+                ),
+              ),
+              if (onTap != null && !inRace) ...[
+                const SizedBox(width: CsSpace.xs),
+                Icon(CsIcons.chevronRight, color: cs.textSecondary),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "1/2 friends from other universities" with a dot per friend needed.
+class _Steps extends StatelessWidget {
+  const _Steps({required this.have, required this.need});
+
+  final int have;
+  final int need;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cs = context.cs;
+    return Row(
+      children: [
+        for (var i = 0; i < need.clamp(0, 6); i++)
+          Container(
+            width: 14,
+            height: 14,
+            margin: const EdgeInsets.only(right: 4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: i < have ? const Color(0xFFF59E0B) : cs.surfaceVariant,
+              border: Border.all(
+                color: i < have ? const Color(0xFFFDE68A) : cs.border,
+              ),
+            ),
+          ),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            l10n.raceProgress(have.clamp(0, need), need),
+            style: context.text.labelMedium?.copyWith(
+              color: cs.primary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
