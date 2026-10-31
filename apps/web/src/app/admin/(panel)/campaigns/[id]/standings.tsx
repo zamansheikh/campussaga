@@ -7,13 +7,23 @@ import { Fragment, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { flagHelp, flagLabel, pointKeys, pointLabel, type Standing, uniName } from "@/lib/admin/growth";
+import { flagHelp, flagLabel, pointKeys, pointLabel, raceProgress, raceRule, type Standing, uniName } from "@/lib/admin/growth";
 import { formatDateTime } from "@/lib/format";
 
 import { InviteActions, ParticipantActions } from "../invite-actions";
 
 /** The top of the standings; a row opens to the participant's invites. */
-export function StandingsTable({ campaignId, rows, minOtherCampus }: { campaignId: string; rows: Standing[]; minOtherCampus: number }) {
+export function StandingsTable({
+  campaignId,
+  rows,
+  minOwnCampus,
+  minOtherCampus,
+}: {
+  campaignId: string;
+  rows: Standing[];
+  minOwnCampus: number;
+  minOtherCampus: number;
+}) {
   const [open, setOpen] = useState<string | null>(null);
   return (
     <div className="overflow-hidden rounded-xl border bg-card">
@@ -36,12 +46,18 @@ export function StandingsTable({ campaignId, rows, minOtherCampus }: { campaignI
                 {firstNotEligible ? (
                   <TableRow className="bg-muted/40 hover:bg-muted/40">
                     <TableCell colSpan={4} className="py-2 text-xs font-medium whitespace-normal text-muted-foreground">
-                      Not eligible yet: fewer than {minOtherCampus} counted {minOtherCampus === 1 ? "friend" : "friends"} from other universities. Not ranked, so
-                      they can&apos;t win.
+                      Not eligible yet: they need counted friends: {raceRule(minOwnCampus, minOtherCampus) || "per the campaign's minimums"}. Not
+                      ranked, so they can&apos;t win.
                     </TableCell>
                   </TableRow>
                 ) : null}
-                <StandingRow campaignId={campaignId} r={r} min={minOtherCampus} isOpen={isOpen} toggle={() => setOpen(isOpen ? null : r.user.id)} />
+                <StandingRow
+                  campaignId={campaignId}
+                  r={r}
+                  race={raceProgress(r, minOwnCampus, minOtherCampus)}
+                  isOpen={isOpen}
+                  toggle={() => setOpen(isOpen ? null : r.user.id)}
+                />
               </Fragment>
             );
           })}
@@ -51,7 +67,7 @@ export function StandingsTable({ campaignId, rows, minOtherCampus }: { campaignI
   );
 }
 
-function StandingRow({ campaignId, r, min, isOpen, toggle }: { campaignId: string; r: Standing; min: number; isOpen: boolean; toggle: () => void }) {
+function StandingRow({ campaignId, r, race, isOpen, toggle }: { campaignId: string; r: Standing; race: string; isOpen: boolean; toggle: () => void }) {
   const Chevron = isOpen ? ChevronDown : ChevronRight;
   return (
     <>
@@ -84,9 +100,7 @@ function StandingRow({ campaignId, r, min, isOpen, toggle }: { campaignId: strin
             ) : null}
             {r.disqualified ? <Badge variant="destructive">Disqualified</Badge> : null}
             {r.eligible === false ? (
-              <Badge variant="secondary">
-                Not eligible: {r.otherCampus ?? 0}/{min} other-university friends
-              </Badge>
+              <Badge variant="secondary">Not eligible{race ? `: ${race}` : ""}</Badge>
             ) : null}
             {(r.flags ?? []).map((f) => (
               <Flag key={f} flag={f} />

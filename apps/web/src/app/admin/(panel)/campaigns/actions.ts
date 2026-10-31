@@ -31,6 +31,7 @@ const scoringNames: Record<ScoringKey, string> = {
   sectionSetup: "Points per section set up",
   sectionSetupMax: "Sections that count",
   pioneerFirst: "Pioneer: first how many",
+  minOwnCampus: "Minimum friends from their own university",
   minOtherCampus: "Minimum friends from other universities",
 };
 

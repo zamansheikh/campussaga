@@ -12,6 +12,7 @@ import {
   type CampaignWinner,
   normalizeWinner,
   prizeForRank,
+  raceRule,
   type Standing,
   statusLabel,
   statusTone,
@@ -148,7 +149,12 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
               ) : standings?.data && standings.data.length === 0 ? (
                 <EmptyState title="No participants yet" />
               ) : standings?.data ? (
-                <StandingsTable campaignId={c.id} rows={standings.data} minOtherCampus={withDefaults(c.scoring).minOtherCampus} />
+                <StandingsTable
+                  campaignId={c.id}
+                  rows={standings.data}
+                  minOwnCampus={withDefaults(c.scoring).minOwnCampus}
+                  minOtherCampus={withDefaults(c.scoring).minOtherCampus}
+                />
               ) : null}
             </section>
           ) : null}
@@ -254,8 +260,8 @@ function pointsSummary(s: CampaignScoring): string {
       .filter(([v]) => v > 0)
       .map(([, t]) => t)
       .join(" · ") || "Nothing earns points";
-  const min = s.minOtherCampus;
-  return min > 0 ? `${earn}. To win: at least ${min} ${min === 1 ? "friend" : "friends"} from other universities.` : earn;
+  const race = raceRule(s.minOwnCampus, s.minOtherCampus);
+  return race ? `${earn}. To win, counted friends: ${race}.` : earn;
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

@@ -42,6 +42,11 @@ const pointFields: { title: string; fields: { key: ScoringKey; label: string; hi
     title: "To win",
     fields: [
       {
+        key: "minOwnCampus",
+        label: "Minimum friends from their own university to win",
+        hint: "Counted friends at the student's own university needed to be ranked. 0: no minimum.",
+      },
+      {
         key: "minOtherCampus",
         label: "Minimum friends from other universities to win",
         hint: "Counted friends at other universities needed to be ranked. 0: no minimum.",

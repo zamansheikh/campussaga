@@ -6,8 +6,8 @@ export type CampaignPrize = { rankFrom: number; rankTo: number; titleEn: string;
 
 /**
  * A campaign's point values (docs/GROWTH.md §8.1, §8.5). `busShareDays`,
- * `sectionSetupMax`, `pioneerFirst` and `minOtherCampus` are limits, the
- * rest are points (0 turns that one off).
+ * `sectionSetupMax`, `pioneerFirst`, `minOwnCampus` and `minOtherCampus`
+ * are limits, the rest are points (0 turns that one off).
  */
 export type CampaignScoring = {
   invite: number;
@@ -21,6 +21,8 @@ export type CampaignScoring = {
   sectionSetup: number;
   sectionSetupMax: number;
   pioneerFirst: number;
+  /** Counted friends at the student's own university needed to be ranked for a prize (0: no minimum). */
+  minOwnCampus: number;
   /** Counted friends at other universities needed to be ranked for a prize (0: no minimum). */
   minOtherCampus: number;
 };
@@ -39,6 +41,7 @@ export const defaultScoring: CampaignScoring = {
   sectionSetup: 15,
   sectionSetupMax: 2,
   pioneerFirst: 20,
+  minOwnCampus: 3,
   minOtherCampus: 2,
 };
 
@@ -55,6 +58,7 @@ export const scoringRange: Record<ScoringKey, { min: number; max: number }> = {
   sectionSetup: { min: 0, max: 100 },
   sectionSetupMax: { min: 0, max: 10 },
   pioneerFirst: { min: 1, max: 1000 },
+  minOwnCampus: { min: 0, max: 20 },
   minOtherCampus: { min: 0, max: 20 },
 };
 
@@ -143,8 +147,10 @@ export type Standing = {
   /** Points per key; missing on an older API. */
   points?: Partial<Record<PointKey, number>> | null;
   hidden: boolean;
-  /** Has the campaign's minimum of counted friends at other universities (missing on an older API: treat as eligible). */
+  /** In the prize race: has both minimums of counted friends (missing on an older API: treat as eligible). */
   eligible?: boolean;
+  /** Counted friends at the student's own university. */
+  ownCampus?: number;
   /** Counted friends at other universities. */
   otherCampus?: number;
   invites: StandingInvite[];
@@ -258,4 +264,19 @@ export function toDhakaInput(iso: string): string {
 export function fromDhakaInput(v: string): string {
   const t = Date.parse(`${v}:00Z`);
   return Number.isNaN(t) ? "" : new Date(t - DHAKA_MS).toISOString();
+}
+
+/** "own 1/3 · other 0/2": a participant's progress to the prize race, leaving out a part without a minimum. */
+export function raceProgress(r: { ownCampus?: number; otherCampus?: number }, minOwn: number, minOther: number): string {
+  const parts = [minOwn > 0 ? `own ${r.ownCampus ?? 0}/${minOwn}` : "", minOther > 0 ? `other ${r.otherCampus ?? 0}/${minOther}` : ""];
+  return parts.filter(Boolean).join(" · ");
+}
+
+/** "3 from their own university and 2 from other universities" (admin wording), or "" with no minimum. */
+export function raceRule(minOwn: number, minOther: number): string {
+  const parts = [
+    minOwn > 0 ? `${minOwn} from their own university` : "",
+    minOther > 0 ? `${minOther} from ${minOther === 1 ? "another university" : "other universities"}` : "",
+  ];
+  return parts.filter(Boolean).join(" and ");
 }
