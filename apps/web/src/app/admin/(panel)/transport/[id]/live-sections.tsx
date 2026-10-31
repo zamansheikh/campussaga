@@ -55,7 +55,7 @@ export function RouteActivitySections({
             </CardTitle>
             <CardDescription>
               {runs.length === 0 ? "No bus is being shared" : `${formatNumber(runs.length)} on the road`} ·{" "}
-              {formatNumber(activity.sharesLast7Days ?? 0)} shares in the last 7 days
+              {formatNumber(activity.sharesLast7Days ?? 0)} shares in the last day
             </CardDescription>
           </div>
           {runs.length > 0 ? <EndSharingButton routeId={route.id} name={route.name} /> : null}
@@ -104,7 +104,7 @@ export function RouteActivitySections({
         <CardHeader>
           <CardTitle className="text-base">What riders say</CardTitle>
           <CardDescription>
-            Ratings from the last 180 days · {formatNumber(activity.ratingsLast30Days ?? 0)} in the last 30 days
+            Ratings and live timings from the last 30 days · {formatNumber(activity.ratingsLast30Days ?? 0)} ratings
           </CardDescription>
         </CardHeader>
         <CardContent>

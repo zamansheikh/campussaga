@@ -157,8 +157,10 @@ every change writes an audit row.
 - `campus.postsLast7Days`: items created in the last 7 days, by kind.
 - `blood.donors`: donor profiles; `available` of them can donate now.
 - `bus.liveNow`: open sharing sessions with a point in the last 2 minutes.
-  `sharesLast7Days` counts sessions started. `tripsShared` is the sum of
-  `bus_share_stats.trips`, which survives the 24-hour purge.
+  `sharesLast7Days` counts sessions started, but sessions are deleted
+  24 hours after they end, so in practice it covers about the last day (the
+  panel labels it so). `tripsShared` is the sum of `bus_share_stats.trips`,
+  which survives the purge.
 
 Existing keys are unchanged; the dashboard shows the new ones as three new
 sections.

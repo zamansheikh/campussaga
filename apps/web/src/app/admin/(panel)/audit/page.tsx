@@ -55,6 +55,8 @@ function targetHref(
   if (type === "user") return `/admin/users/${id}`;
   if (type === "group") return `/admin/groups/${id}`;
   if (type === "issue") return `/admin/moderation/issues/${id}`;
+  if (type === "bus_route") return `/admin/transport/${id}`;
+  if (type === "blood_request") return "/admin/blood?status=all";
   return undefined;
 }
 

@@ -184,8 +184,9 @@ function BloodCard({ b }: { b: BloodStats }) {
           <Droplet className="size-4 text-muted-foreground" /> Blood donation
         </CardTitle>
         <CardDescription>
-          {formatNumber(b.requestsLast7Days ?? 0)} requests and {formatNumber(b.responsesLast7Days ?? 0)} responses in
-          the last 7 days
+          {formatNumber(b.requestsLast7Days ?? 0)} {(b.requestsLast7Days ?? 0) === 1 ? "request" : "requests"} and{" "}
+          {formatNumber(b.responsesLast7Days ?? 0)} {(b.responsesLast7Days ?? 0) === 1 ? "response" : "responses"} in the
+          last 7 days
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-3">
@@ -208,7 +209,7 @@ function BusCard({ b }: { b: BusStats }) {
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-4">
         <MiniStat label="Live now" value={b.liveNow ?? 0} href="/admin/transport" />
-        <MiniStat label="Shares, 7 days" value={b.sharesLast7Days ?? 0} />
+        <MiniStat label="Shares, last day" value={b.sharesLast7Days ?? 0} />
         <MiniStat label="Trips shared, all time" value={b.tripsShared ?? 0} />
         <MiniStat label="Ratings, 30 days" value={b.ratingsLast30Days ?? 0} />
       </CardContent>

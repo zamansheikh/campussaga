@@ -16,7 +16,7 @@ export function CloseRequestButton({ requestId, summary }: { requestId: string; 
     <ConfirmAction
       trigger={
         <Button variant="outline" size="sm">
-          Close request
+          Close
         </Button>
       }
       title="Close this blood request?"

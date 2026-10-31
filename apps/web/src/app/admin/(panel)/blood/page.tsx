@@ -83,7 +83,7 @@ export default async function BloodPage({ searchParams }: { searchParams: Promis
         <EmptyState title="No blood requests found">Try a different tab, search or university.</EmptyState>
       ) : res.data ? (
         <>
-          <div className="overflow-hidden rounded-xl border bg-card">
+          <div className="overflow-x-auto rounded-xl border bg-card">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -93,11 +93,9 @@ export default async function BloodPage({ searchParams }: { searchParams: Promis
                   <TableHead>Needed by</TableHead>
                   <TableHead className="hidden lg:table-cell">University</TableHead>
                   <TableHead className="hidden lg:table-cell">Requester</TableHead>
-                  <TableHead className="hidden xl:table-cell">Contact</TableHead>
                   <TableHead className="hidden text-end md:table-cell">Notified</TableHead>
                   <TableHead className="hidden text-end md:table-cell">Responses</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="hidden xl:table-cell">Created</TableHead>
                   <TableHead className="w-0" />
                 </TableRow>
               </TableHeader>
@@ -108,10 +106,14 @@ export default async function BloodPage({ searchParams }: { searchParams: Promis
                       <Badge variant="destructive">{r.bloodGroup}</Badge>
                     </TableCell>
                     <TableCell className="text-end tabular-nums">{r.units}</TableCell>
-                    <TableCell className="max-w-56 whitespace-normal">
+                    <TableCell className="min-w-56 max-w-72 whitespace-normal">
                       <p className="font-medium">{r.hospital}</p>
                       {r.area ? <p className="text-xs text-muted-foreground">{r.area}</p> : null}
-                      {r.note ? <p className="mt-1 text-xs text-muted-foreground">{r.note}</p> : null}
+                      {r.note ? (
+                        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground" title={r.note}>
+                          {r.note}
+                        </p>
+                      ) : null}
                     </TableCell>
                     <TableCell className="whitespace-normal">
                       <p className="tabular-nums">{formatDateTime(r.neededBy)}</p>
@@ -122,7 +124,7 @@ export default async function BloodPage({ searchParams }: { searchParams: Promis
                       ) : null}
                     </TableCell>
                     <TableCell className="hidden max-w-44 truncate lg:table-cell">{r.university?.name}</TableCell>
-                    <TableCell className="hidden max-w-48 lg:table-cell">
+                    <TableCell className="hidden max-w-56 lg:table-cell">
                       {r.requester ? (
                         <>
                           <Link href={`/admin/users/${r.requester.id}`} className="block truncate font-medium hover:underline">
@@ -135,17 +137,19 @@ export default async function BloodPage({ searchParams }: { searchParams: Promis
                       ) : (
                         <span className="text-muted-foreground">Deleted account</span>
                       )}
-                    </TableCell>
-                    <TableCell className="hidden xl:table-cell">
-                      <p>{r.contactName}</p>
-                      {r.contactPhone ? <p className="text-xs text-muted-foreground">{r.contactPhone}</p> : null}
+                      {/* The contact on the request (often the requester). */}
+                      <p className="mt-1 truncate text-xs text-muted-foreground">
+                        {r.contactName && r.contactName !== r.requester?.name ? `${r.contactName} · ` : ""}
+                        {r.contactPhone}
+                      </p>
                     </TableCell>
                     <TableCell className="hidden text-end tabular-nums md:table-cell">{formatNumber(r.notified)}</TableCell>
                     <TableCell className="hidden text-end tabular-nums md:table-cell">{formatNumber(r.responses)}</TableCell>
                     <TableCell>
                       <Badge variant={statusTone[r.status] ?? "outline"}>{statusLabel[r.status] ?? r.status}</Badge>
+                      <p className="mt-1 text-xs whitespace-nowrap text-muted-foreground">{timeAgo(r.createdAt, now)}</p>
                     </TableCell>
-                    <TableCell className="hidden text-muted-foreground xl:table-cell">{timeAgo(r.createdAt, now)}</TableCell>
+
                     <TableCell>
                       {r.status === "open" ? (
                         <CloseRequestButton requestId={r.id} summary={`The ${r.bloodGroup} request at ${r.hospital}`} />
