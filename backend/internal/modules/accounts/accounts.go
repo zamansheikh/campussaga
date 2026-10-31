@@ -92,7 +92,22 @@ type Service struct {
 	log    *slog.Logger
 	// photoGone deletes a profile photo file once its account is deleted.
 	photoGone func(key *string)
+	growth    Growth
 }
+
+// Growth connects invites and badges (docs/GROWTH.md); every field may be nil.
+type Growth struct {
+	// Active: the student used the app (once per request; the callee keeps
+	// it to one write per student and day).
+	Active func(ctx context.Context, id uuid.UUID)
+	// Verified: the student has just become verified.
+	Verified func(ctx context.Context, id uuid.UUID)
+	// ReferralCode makes the student's invite code on first use.
+	ReferralCode func(ctx context.Context, id uuid.UUID) (string, error)
+}
+
+// SetGrowth wires invites and badges.
+func (s *Service) SetGrowth(g Growth) { s.growth = g }
 
 // OnPhotoGone sets what deletes a deleted account's profile photo file.
 func (s *Service) OnPhotoGone(f func(key *string)) { s.photoGone = f }
@@ -559,6 +574,9 @@ func (s *Service) CheckSession(ctx context.Context, c *auth.Claims) error {
 	// Fresh from the database, not the token: picking a university or
 	// verifying applies to the very next request.
 	c.UniversityID, c.Verified, c.Role = deref(u.UniversityID), u.Verified, string(u.Role)
+	if s.growth.Active != nil {
+		s.growth.Active(ctx, c.UserID)
+	}
 	return nil
 }
 

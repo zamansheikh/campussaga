@@ -74,6 +74,12 @@ type Stats struct {
 		Open      int `json:"open"`
 		Last7Days int `json:"last7Days"`
 	} `json:"feedback"`
+	// Growth: invites and campaigns (docs/GROWTH.md), counts only.
+	Growth struct {
+		InvitesLast7Days   int `json:"invitesLast7Days"`
+		QualifiedLast7Days int `json:"qualifiedLast7Days"`
+		LiveCampaigns      int `json:"liveCampaigns"`
+	} `json:"growth"`
 	SignupsByDay    []DayCount      `json:"signupsByDay"`
 	TopUniversities []UniversityUse `json:"topUniversities"`
 }
@@ -150,6 +156,14 @@ func (s *Service) handleStats(ctx context.Context, _ *httpx.Empty) (*Stats, erro
 		       count(*) FILTER (WHERE status IN ('new', 'seen', 'planned', 'in_progress'))::int,
 		       count(*) FILTER (WHERE created_at >= $1)::int
 		FROM feedback`, week).Scan(&out.Feedback.New, &out.Feedback.Open, &out.Feedback.Last7Days); err != nil {
+		return nil, err
+	}
+
+	if err := s.d.Q(ctx).QueryRow(ctx, `
+		SELECT (SELECT count(*) FROM referrals WHERE created_at >= $1)::int,
+		       (SELECT count(*) FROM referrals WHERE qualified_at >= $1)::int,
+		       (SELECT count(*) FROM campaigns WHERE status IN ('live', 'ended') AND starts_at <= $2 AND ends_at >= $2)::int`,
+		week, now).Scan(&out.Growth.InvitesLast7Days, &out.Growth.QualifiedLast7Days, &out.Growth.LiveCampaigns); err != nil {
 		return nil, err
 	}
 

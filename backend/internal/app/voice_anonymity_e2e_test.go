@@ -178,7 +178,8 @@ func TestVoiceAnonymitySweep(t *testing.T) {
 	}
 }
 
-// Test 2: a named post shows the display name only, never the id or email.
+// Test 2: a named post shows the display name (and, since docs/GROWTH.md, the
+// author's id so the name can open their profile), never the email.
 func TestVoiceNamedPost(t *testing.T) {
 	h := newHarness(t)
 	c := newVoiceCast(h)
@@ -190,7 +191,8 @@ func TestVoiceNamedPost(t *testing.T) {
 	require.NotNil(t, got.Author)
 	assert.Equal(t, c.authorName, *got.Author.Name)
 	assert.True(t, got.Author.Verified)
-	assert.NotContains(t, r.Raw, c.authorID)
+	require.NotNil(t, got.Author)
+	assert.Contains(t, r.Raw, c.authorID, "named content carries the author's id")
 	assert.NotContains(t, r.Raw, c.authorEmail)
 
 	// Named comments too; deleted accounts read as an author with no name.

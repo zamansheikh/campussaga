@@ -126,6 +126,9 @@ func (s *Service) VerifyUniversityEmail(ctx context.Context, rawEmail, code stri
 			return err
 		}
 		out, err = s.meView(ctx, u)
+		if err == nil && s.growth.Verified != nil {
+			db.AfterCommit(ctx, func(ctx context.Context) { s.growth.Verified(ctx, u.ID) })
+		}
 		return err
 	})
 	if err != nil {

@@ -30,6 +30,15 @@ type Member struct {
 	// their Google photo, else none (initials).
 	PhotoVersion   *string `json:"photoVersion"`
 	GooglePhotoURL *string `json:"googlePhotoUrl"`
+	// FeaturedBadge: the badge they chose to show by their name (public
+	// badges only), or null.
+	FeaturedBadge *BadgeRef `json:"featuredBadge"`
+}
+
+// BadgeRef is a badge key and its tier (0: the badge has no tiers).
+type BadgeRef struct {
+	Key  string `json:"key"`
+	Tier int    `json:"tier"`
 }
 
 // Members lists the group's students (CR only).
@@ -49,11 +58,15 @@ func (s *Service) Members(ctx context.Context, groupID uuid.UUID) ([]Member, err
 		if r.DisplayName != nil {
 			name = *r.DisplayName
 		}
-		out = append(out, Member{
+		m := Member{
 			UserID: r.UserID, Name: name, Role: r.Role, JoinedAt: r.JoinedAt,
 			IsMe: r.UserID == c.UserID, Verified: r.Verified,
 			PhotoVersion: r.PhotoKey, GooglePhotoURL: r.GooglePhotoUrl,
-		})
+		}
+		if r.Badge != nil && r.BadgeTier != nil {
+			m.FeaturedBadge = &BadgeRef{Key: *r.Badge, Tier: int(*r.BadgeTier)}
+		}
+		out = append(out, m)
 	}
 	return out, nil
 }

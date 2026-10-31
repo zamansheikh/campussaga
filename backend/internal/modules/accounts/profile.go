@@ -35,6 +35,18 @@ type Me struct {
 	// CampusAdmin: appointed by the team for the student's own university
 	// (docs/CAMPUS_ADMINS.md); they stay a student.
 	CampusAdmin bool `json:"campusAdmin"`
+	// LeaderboardHidden: shown on prize leaderboards as "A student at …".
+	LeaderboardHidden bool `json:"leaderboardHidden"`
+	// FeaturedBadge: the badge shown by the name (a public one they hold).
+	FeaturedBadge *BadgeRef `json:"featuredBadge"`
+	// ReferralCode: the student's invite code (made on first use).
+	ReferralCode *string `json:"referralCode"`
+}
+
+// BadgeRef is a badge key and its tier (0: the badge has no tiers).
+type BadgeRef struct {
+	Key  string `json:"key"`
+	Tier int    `json:"tier"`
 }
 
 func (s *Service) meView(ctx context.Context, u store.User) (*Me, error) {
@@ -49,7 +61,25 @@ func (s *Service) meView(ctx context.Context, u store.User) (*Me, error) {
 	if err != nil {
 		return nil, err
 	}
+	var featured *BadgeRef
+	var key *string
+	var tier *int16
+	if err := s.d.Q(ctx).QueryRow(ctx, `SELECT b.badge, b.tier FROM user_badges b
+		WHERE b.user_id = $1 AND b.badge = $2 AND NOT b.private`, u.ID, u.FeaturedBadge).Scan(&key, &tier); err == nil {
+		featured = &BadgeRef{Key: *key, Tier: int(*tier)}
+	} else if !db.IsNoRows(err) {
+		return nil, err
+	}
+	code := u.ReferralCode
+	if code == nil && s.growth.ReferralCode != nil {
+		c, err := s.growth.ReferralCode(ctx, u.ID)
+		if err != nil {
+			return nil, err
+		}
+		code = &c
+	}
 	return &Me{
+		LeaderboardHidden: u.LeaderboardHidden, FeaturedBadge: featured, ReferralCode: code,
 		CampusAdmin: campusAdmin,
 		ID:          u.ID, Email: u.Email, University: uni,
 		DisplayName: u.DisplayName, Department: u.Department, Batch: u.Batch,
@@ -77,6 +107,8 @@ type ProfilePatch struct {
 	DisplayName *string `json:"displayName" validate:"omitnil,max=60"`
 	Department  *string `json:"department" validate:"omitnil,max=80"`
 	Batch       *string `json:"batch" validate:"omitnil,max=20"`
+	// LeaderboardHidden: show me as "A student at …" on prize leaderboards.
+	LeaderboardHidden *bool `json:"leaderboardHidden"`
 }
 
 // UpdateMe edits the caller's own profile. Only these three fields exist in
@@ -101,6 +133,11 @@ func (s *Service) UpdateMe(ctx context.Context, p *ProfilePatch) (*Me, error) {
 		})
 		if err != nil {
 			return err
+		}
+		if p.LeaderboardHidden != nil {
+			if u, err = q.SetLeaderboardHidden(ctx, store.SetLeaderboardHiddenParams{ID: u.ID, Hidden: *p.LeaderboardHidden}); err != nil {
+				return err
+			}
 		}
 		out, err = s.meView(ctx, u)
 		return err

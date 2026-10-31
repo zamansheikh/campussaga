@@ -223,6 +223,9 @@ func (s *Service) handlePatchUser(ctx context.Context, in *patchUserReq) (*UserD
 					return ErrUniversityRequired
 				}
 				err = q.VerifyUserByHand(ctx, store.VerifyUserByHandParams{ID: id, Now: &now})
+				if err == nil && s.onVerified != nil {
+					db.AfterCommit(ctx, func(ctx context.Context) { s.onVerified(ctx, id) })
+				}
 			} else {
 				err = q.UnverifyUser(ctx, id)
 			}

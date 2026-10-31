@@ -80,7 +80,12 @@ type Service struct {
 	ports  Ports
 	notify Notifier
 	mx     MXLookup
+	// onVerified runs after a student is verified (invites, docs/GROWTH.md).
+	onVerified func(ctx context.Context, id uuid.UUID)
 }
+
+// OnVerified sets what runs after a student is verified by CR, vouches or a campus admin.
+func (s *Service) OnVerified(f func(ctx context.Context, id uuid.UUID)) { s.onVerified = f }
 
 func NewService(d *db.DB, now func() time.Time, ports Ports) *Service {
 	return &Service{d: d, now: now, ports: ports, mx: DNSLookup}

@@ -45,7 +45,10 @@ func (s *Service) verifyNow(ctx context.Context, student, uni uuid.UUID, method 
 	if err != nil {
 		return err
 	}
-	db.AfterCommit(ctx, func(context.Context) {
+	db.AfterCommit(ctx, func(ctx context.Context) {
+		if s.onVerified != nil {
+			s.onVerified(ctx, student)
+		}
 		if s.notify == nil {
 			return
 		}

@@ -45,7 +45,12 @@ type Service struct {
 	now    func() time.Time
 	// photoGone deletes a deleted user's profile photo file.
 	photoGone func(key *string)
+	// onVerified runs after a student is verified by hand (invites).
+	onVerified func(ctx context.Context, id uuid.UUID)
 }
+
+// OnVerified sets what runs after an admin verifies a student by hand.
+func (s *Service) OnVerified(f func(ctx context.Context, id uuid.UUID)) { s.onVerified = f }
 
 // OnPhotoGone sets what deletes a deleted user's profile photo file.
 func (s *Service) OnPhotoGone(f func(key *string)) { s.photoGone = f }

@@ -20,6 +20,7 @@ import (
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/campusadmin"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/classgroups"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/feedback"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/growth"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/photos"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/push"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/transport"
@@ -51,6 +52,7 @@ type App struct {
 	Transport    *transport.Service
 	CampusAdmin  *campusadmin.Service
 	Feedback     *feedback.Service
+	Growth       *growth.Service
 
 	handler http.Handler
 }
@@ -244,7 +246,21 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
 	})
 
-	a := &App{CampusAdmin: campusSvc, Feedback: feedbackSvc, Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc, Blood: bloodSvc, Transport: transportSvc}
+	growthSvc := growth.NewService(d, now, growth.Ports{
+		Posts: func(ctx context.Context, author uuid.UUID) (any, error) { return voiceSvc.ProfilePosts(ctx, author) },
+	}, log)
+	growthSvc.SetNotifier(func(userIDs []uuid.UUID, n growth.Notice) {
+		texts := make(map[string]push.Text, len(n.Texts))
+		for lang, t := range n.Texts {
+			texts[lang] = push.Text{Title: t.Title, Body: t.Body}
+		}
+		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
+	})
+	accSvc.SetGrowth(accounts.Growth{Active: growthSvc.Active, Verified: growthSvc.OnVerified, ReferralCode: growthSvc.Code})
+	campusSvc.OnVerified(growthSvc.OnVerified)
+	adminSvc.OnVerified(growthSvc.OnVerified)
+
+	a := &App{Growth: growthSvc, CampusAdmin: campusSvc, Feedback: feedbackSvc, Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc, Blood: bloodSvc, Transport: transportSvc}
 
 	root := chi.NewRouter()
 	root.NotFound(httpx.NotFoundHandler)
@@ -266,6 +282,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		photoSvc.Routes(r)
 		campusSvc.Routes(r)
 		feedbackSvc.Routes(r)
+		growthSvc.Routes(r)
 	})
 
 	var h http.Handler = root
@@ -318,6 +335,7 @@ func (a *App) Serve(ctx context.Context) error {
 	go a.Accounts.PurgeLoop(bg, time.Hour)
 	go a.Voice.CleanupLoop(bg, time.Hour)
 	go a.Transport.SweepLoop(bg, 5*time.Minute)
+	go a.Growth.SweepLoop(bg, time.Hour)
 
 	errc := make(chan error, 1)
 	go func() {

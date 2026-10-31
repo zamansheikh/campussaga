@@ -160,9 +160,11 @@ SELECT * FROM routine_changes WHERE id = @id AND group_id = @group_id;
 -- Names only (no emails): what a CR needs to manage the group.
 -- name: ListMembers :many
 SELECT m.user_id, m.role, m.joined_at, u.display_name,
-       (u.verified_at IS NOT NULL)::bool AS verified, u.photo_key, u.google_photo_url
+       (u.verified_at IS NOT NULL)::bool AS verified, u.photo_key, u.google_photo_url,
+       fb.badge AS badge, fb.tier AS badge_tier
 FROM class_group_members m
 JOIN users u ON u.id = m.user_id
+LEFT JOIN user_badges fb ON fb.user_id = u.id AND fb.badge = u.featured_badge AND NOT fb.private
 WHERE m.group_id = @group_id
 ORDER BY (m.role = 'cr') DESC, m.joined_at, m.user_id;
 

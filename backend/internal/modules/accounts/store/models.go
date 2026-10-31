@@ -80,20 +80,23 @@ type SignInCode struct {
 }
 
 type User struct {
-	ID              uuid.UUID
-	Email           string
-	UniversityID    *uuid.UUID
-	DisplayName     *string
-	Department      *string
-	Batch           *string
-	Role            UserRole
-	VerifiedAt      *time.Time
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	UniversityEmail *string
-	BlockedAt       *time.Time
-	GooglePhotoUrl  *string
-	PhotoKey        *string
-	VerifiedVia     *string
-	VouchCode       *string
+	ID                uuid.UUID
+	Email             string
+	UniversityID      *uuid.UUID
+	DisplayName       *string
+	Department        *string
+	Batch             *string
+	Role              UserRole
+	VerifiedAt        *time.Time
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+	UniversityEmail   *string
+	BlockedAt         *time.Time
+	GooglePhotoUrl    *string
+	PhotoKey          *string
+	VerifiedVia       *string
+	VouchCode         *string
+	ReferralCode      *string
+	FeaturedBadge     *string
+	LeaderboardHidden bool
 }

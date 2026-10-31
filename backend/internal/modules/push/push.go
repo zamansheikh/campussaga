@@ -13,6 +13,8 @@ package push
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"log/slog"
 	"sync"
 	"time"
@@ -79,9 +81,18 @@ func (s *Service) Register(ctx context.Context, in *DeviceInput) error {
 	if lang == "" {
 		lang = "en"
 	}
-	return store.New(s.d.Q(ctx)).UpsertDevice(ctx, store.UpsertDeviceParams{
+	if err := store.New(s.d.Q(ctx)).UpsertDevice(ctx, store.UpsertDeviceParams{
 		Token: in.Token, UserID: c.UserID, SessionID: c.SessionID, Platform: in.Platform, Language: lang,
-	})
+	}); err != nil {
+		return err
+	}
+	// Remember which accounts used this phone's token, even after the token
+	// moves to another account: invites between two accounts on one phone
+	// are flagged (docs/GROWTH.md §2). Only a hash is kept.
+	sum := sha256.Sum256([]byte(in.Token))
+	_, err := s.d.Q(ctx).Exec(ctx, `INSERT INTO device_token_users (token_hash, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+		hex.EncodeToString(sum[:]), c.UserID)
+	return err
 }
 
 // Notify sends m to every phone of userIDs, in the background.

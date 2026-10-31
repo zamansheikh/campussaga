@@ -15,6 +15,17 @@ import (
 type Author struct {
 	Name     *string `json:"name"`
 	Verified bool    `json:"verified"`
+	// ID and FeaturedBadge are set for named content only (docs/GROWTH.md
+	// §4): the UI makes the name tappable when ID is there. Anonymous
+	// content has no Author at all.
+	ID            *uuid.UUID `json:"id"`
+	FeaturedBadge *BadgeRef  `json:"featuredBadge"`
+}
+
+// BadgeRef is a badge key and its tier (0: the badge has no tiers).
+type BadgeRef struct {
+	Key  string `json:"key"`
+	Tier int    `json:"tier"`
 }
 
 type IssueCard struct {
@@ -124,14 +135,18 @@ const (
 	previewPost  = 500 // card preview length, the other kinds
 )
 
-func namedAuthor(named, exists bool, name string, verified bool) *Author {
+func namedAuthor(named, exists bool, name string, verified bool, id *uuid.UUID, badge *string, tier *int16) *Author {
 	if !named {
 		return nil
 	}
 	if !exists {
 		return &Author{} // deleted account
 	}
-	return &Author{Name: &name, Verified: verified}
+	a := &Author{Name: &name, Verified: verified, ID: id}
+	if badge != nil && tier != nil {
+		a.FeaturedBadge = &BadgeRef{Key: *badge, Tier: int(*tier)}
+	}
+	return a
 }
 
 // preview: the first n characters, "…" appended when cut.
@@ -159,7 +174,7 @@ func cardView(v viewer, r store.GetIssueRow, now time.Time) IssueCard {
 		ID: r.ID, Kind: r.Kind, Category: r.Category, Private: r.Private, Title: r.Title, Preview: pv, PreviewCut: cut,
 		Status: r.Status, Visibility: "visible", MeTooCount: int(r.MeTooCount), CommentCount: int(r.CommentCount),
 		ImageCount: int(r.ImageCount), Voted: r.Voted, Following: r.Following, Mine: r.Mine,
-		Author:        namedAuthor(r.Named, r.AuthorExists, r.AuthorName, r.AuthorVerified),
+		Author:        namedAuthor(r.Named, r.AuthorExists, r.AuthorName, r.AuthorVerified, r.AuthorID, r.AuthorBadge, r.AuthorBadgeTier),
 		LocationLabel: r.LocationLabel, CreatedAt: r.CreatedAt.UTC(), StatusChangedAt: r.StatusChangedAt.UTC(),
 		Reactions: map[string]int{}, Images: []Image{},
 	}
@@ -253,7 +268,7 @@ func commentView(v viewer, c store.GetCommentRow) Comment {
 		ParentID: c.ParentID, LikeCount: int(c.LikeCount), Liked: c.Liked,
 	}
 	if c.Kind == "official" || c.Named {
-		out.Author = namedAuthor(true, c.AuthorExists, c.AuthorName, c.Kind == "official" || c.AuthorVerified)
+		out.Author = namedAuthor(true, c.AuthorExists, c.AuthorName, c.Kind == "official" || c.AuthorVerified, c.AuthorID, c.AuthorBadge, c.AuthorBadgeTier)
 	} else {
 		out.CreatedAt = roughTime(c.CreatedAt)
 	}

@@ -1165,9 +1165,11 @@ func (q *Queries) ListMemberIDs(ctx context.Context, groupID uuid.UUID) ([]uuid.
 const listMembers = `-- name: ListMembers :many
 
 SELECT m.user_id, m.role, m.joined_at, u.display_name,
-       (u.verified_at IS NOT NULL)::bool AS verified, u.photo_key, u.google_photo_url
+       (u.verified_at IS NOT NULL)::bool AS verified, u.photo_key, u.google_photo_url,
+       fb.badge AS badge, fb.tier AS badge_tier
 FROM class_group_members m
 JOIN users u ON u.id = m.user_id
+LEFT JOIN user_badges fb ON fb.user_id = u.id AND fb.badge = u.featured_badge AND NOT fb.private
 WHERE m.group_id = $1
 ORDER BY (m.role = 'cr') DESC, m.joined_at, m.user_id
 `
@@ -1180,6 +1182,8 @@ type ListMembersRow struct {
 	Verified       bool
 	PhotoKey       *string
 	GooglePhotoUrl *string
+	Badge          *string
+	BadgeTier      *int16
 }
 
 // ---- members (CR) ----------------------------------------------------------
@@ -1201,6 +1205,8 @@ func (q *Queries) ListMembers(ctx context.Context, groupID uuid.UUID) ([]ListMem
 			&i.Verified,
 			&i.PhotoKey,
 			&i.GooglePhotoUrl,
+			&i.Badge,
+			&i.BadgeTier,
 		); err != nil {
 			return nil, err
 		}

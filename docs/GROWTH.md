@@ -274,3 +274,91 @@ Every admin write is audited (`campaign.*`, `referral.*`).
   - winners' contact details (only winners, deleted 90 days after
     delivery);
   - profiles (what others see; photo rule; anonymous posts never shown).
+
+## As implemented (API, migration `00740_growth.sql`)
+
+Paths, fields and error codes are as in §5. Where the spec left a choice:
+
+- **Language of campaign text:** `?lang=en|bn`, else the first `bn`/`en` tag of
+  `Accept-Language`, else `en`. A missing Bangla text falls back to English.
+  Applies to `/campaigns`, `/campaigns/{id}`, `/campaigns/{id}/leaderboard`.
+  Pushes go out in both languages and each phone gets its registered one.
+- **Active days:** written from the session check (`CheckSession`), once per
+  student and Dhaka day per process (in-memory set), 30 days kept.
+- **Qualification** (`Qualify`): verified (`verified_at` not later than
+  `users.created_at + 14 days`) and 3 distinct Dhaka days in the 14 days from
+  the friend's account creation (`created_at`, not the claim time). Checked
+  when the friend's new active day is written, when they become verified
+  (email verify, CR/vouch/campus-admin verify, admin verify by hand) and in
+  the hourly sweep. Never after the window.
+- **Same device:** there is no Firebase installation id; only push tokens.
+  `device_token_users` keeps a sha256 of every token a student registered, even
+  after the token moves to another account. Two accounts that ever shared a
+  token are `same_device`; checked at claim, again before qualifying and in the
+  sweep. A phone that never registers push can't be detected.
+- **Claim errors:** `ALREADY_REFERRED` 409, `REFERRAL_TOO_LATE` 422,
+  `REFERRAL_SELF` 422, `REFERRAL_NOT_FOUND` 404; checked in that order. The
+  inviter must be role `student` and not blocked. `source` defaults to `link`.
+- **`GET /me/referrals`:** `invited` = invites not disqualified, `joined` =
+  qualified ones; `pending` = friends inside their 14 days, not on the same
+  phone (`activeDays` capped at 3, max 50); `recent` = last 10 qualified.
+- **`GET /referral/{code}`:** 404 `REFERRAL_NOT_FOUND` also when the inviter has
+  no display name or is blocked; `university` is `null` if they have none.
+- **Badges:** the first computation for a student seeds silently, later new
+  badges or higher tiers push `badge_earned` (`data: {type, badge, tier}`; tier
+  is a string, `"0"` for badges without tiers). Role badges (`verified`,
+  `founding`, `cr`, `campus_admin`, `bus_rep`, `official`, `blood_donor`)
+  follow the role; the others keep their best tier. `helper` counts likes by
+  others on the student's visible comments; `campus_voice` counts their solved
+  issues: aggregate counts over the author tables, stored only as private rows
+  that only the owner's endpoints read. A featured badge that is gone or private
+  is cleared on the next recompute and never shown. `GET /me/badges` also
+  recomputes; so does the owner's own profile. Hourly sweep: students active
+  today or yesterday. `bug_hunter` and blood donation aren't hooked on their
+  events; they show at the next `/me/badges` or sweep.
+- **Profile:** `joinedAt` is the first day of the join month in UTC
+  (`2026-10-01T00:00:00Z`). Badge items have an extra `private` flag (true only
+  in the owner's own view). `roles` are read live. `posts` = the latest 20
+  named posts, never anonymous or private (safety) ones: the viewer's own
+  university sees posts and issues (campus-only included); other universities
+  see only non-campus-only posts, only while `features.visitCampus` is on.
+  A blocked or missing student is `404 USER_NOT_FOUND`.
+- **Named authors:** `Author` is `{name, verified, id, featuredBadge}`; `id` and
+  `featuredBadge` are `null` for a deleted account. Official replies are named
+  content too and carry them. Anonymous content still has `author: null`. This
+  replaces the old CAMPUS_VOICE rule that a named post never shows an id.
+- **Class group members** (`GET /groups/{id}/members`) add `featuredBadge`.
+- **Campaigns:** `/campaigns` also lists `ended` campaigns that aren't announced
+  yet (so a student can follow rank until settling); announced ones stay 30 days
+  after the announcement. `status` is derived: a live campaign past `ends_at` is
+  `ended` (the sweep stores it too). Publishing needs a title, English rules, a
+  prize and an `ends_at` in the future (`CAMPAIGN_INCOMPLETE`); a live campaign
+  only takes `endsAt`, `settlesAt`, rules and prizes (`CAMPAIGN_LOCKED`);
+  other errors: `CAMPAIGN_DATES`, `CAMPAIGN_PRIZES` (overlap), `CAMPAIGN_NOT_FOUND`.
+  Editing `endsAt` keeps `settlesAt` unless it falls before the new end.
+- **Leaderboard** rows add `userId` (null for a hidden student, so it can't be
+  opened). Only students with a score appear. The `university` is the full
+  university name (there is no short name); a hidden student reads
+  `A student at {university}` (Bangla: `{university}-এর একজন শিক্ষার্থী`) and
+  shows no badge. `me` is the caller's own row (real name), also when outside
+  the top 50; `null` without a score. Participants: verified, role not
+  `admin`/`moderator`, not blocked, not disqualified; rank by score, then by the
+  latest counted `qualified_at`, then user id.
+- **Admin:** `GET /admin/campaigns` is paged (`?status=draft|live|ended|announced|all`);
+  `standings`, `winners` and `/admin/campaigns` return what §5 shows (arrays for
+  standings and winners). Standings list disqualified participants after the
+  ranked ones (`rank: null`, `disqualified: true`) so they can be restored.
+  Flags: `same_device`; `burst` (some 1-hour window holds 10+ of the inviter's
+  invites); `new_account` (the inviter's first invite came less than 7 days
+  after their own sign-up). `announce` takes the winners from the standings
+  (participants only, unique users and ranks, each rank must have a prize) and
+  returns the winners list (`CAMPAIGN_WINNERS`, `CAMPAIGN_NOT_SETTLED`,
+  `CAMPAIGN_NOT_ANNOUNCEABLE`). Disqualify/restore/delivered answer 204.
+  Extra: `GET /admin/users/{id}/growth` (`referralCode`, `invitedBy`, `invited`,
+  `badges`) for the user page; `/admin/stats.growth.liveCampaigns` counts live
+  campaigns inside their dates.
+- **Audit actions:** `campaign.create|update|publish|disqualify|restore|announce|delivered`,
+  `referral.disqualify|restore`.
+- **Sweeps:** hourly (`Sweep`): re-check pending invites, recompute badges,
+  mark ended campaigns, delete active days older than 30 days and prize claims
+  90 days after delivery.
