@@ -5142,7 +5142,7 @@ class AppLocalizationsBn extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String extraString = extraNumberFormat.format(extra);
 
-    return 'প্রতি বন্ধুতে +$pointsString পয়েন্ট · অন্য বিশ্ববিদ্যালয়ের হলে আরও +$extraString';
+    return 'প্রতি বন্ধুতে +$pointsString পয়েন্ট · অন্য বিশ্ববিদ্যালয়ের বন্ধু হলে আরও +$extraString পয়েন্ট';
   }
 
   @override

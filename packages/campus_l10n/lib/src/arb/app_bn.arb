@@ -1342,7 +1342,7 @@
   "missionDone": "হয়েছে · +{points}",
   "missionSectionProgress": "{name}: {slots}/৫ ক্লাস · {members}/৫ সদস্য",
   "campaignNext": "পরের ধাপ: {mission} · +{points}",
-  "invitePointsHint": "প্রতি বন্ধুতে +{points} পয়েন্ট · অন্য বিশ্ববিদ্যালয়ের হলে আরও +{extra}",
+  "invitePointsHint": "প্রতি বন্ধুতে +{points} পয়েন্ট · অন্য বিশ্ববিদ্যালয়ের বন্ধু হলে আরও +{extra} পয়েন্ট",
   "inviteNextTier": "আর {count} জন হলে {tier} কানেক্টর",
   "inviteJoinedNone": "এখনো কোনো বন্ধু যোগ দেয়নি",
   "missionBonusOtherCampus": "অন্য বিশ্ববিদ্যালয় +{points} পয়েন্ট",

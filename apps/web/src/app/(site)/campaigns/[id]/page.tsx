@@ -64,14 +64,14 @@ function pointRow(key: PointKey, s: CampaignScoring, lang: "en" | "bn"): [string
           `প্রতি বন্ধুর জন্য +${n(p)}`,
         ];
       case "otherCampus":
-        return ["সেই বন্ধু তোমার বিশ্ববিদ্যালয়ের নয়, অন্য বিশ্ববিদ্যালয়ে পড়ে", `প্রতি বন্ধুর জন্য আরও +${n(p)}`];
+        return ["সেই বন্ধু তোমার বিশ্ববিদ্যালয়ের নয়, অন্য বিশ্ববিদ্যালয়ে পড়ে", `সেই বন্ধুর জন্য আরও +${n(p)} পয়েন্ট`];
       case "pioneer":
         return [
           `সেই বন্ধু ভার্সিটি কথায় তার বিশ্ববিদ্যালয়ের প্রথম ${n(s.pioneerFirst)} জন ভেরিফায়েড শিক্ষার্থীর একজন`,
-          `প্রতি বন্ধুর জন্য আরও +${n(p)}`,
+          `সেই বন্ধুর জন্য আরও +${n(p)} পয়েন্ট`,
         ];
       case "friendSection":
-        return ["সেই বন্ধু অ্যাপে তার ক্লাসের সেকশনে যোগ দেয়", `প্রতি বন্ধুর জন্য আরও +${n(p)}`];
+        return ["সেই বন্ধু অ্যাপে তার ক্লাসের সেকশনে যোগ দেয়", `সেই বন্ধুর জন্য আরও +${n(p)} পয়েন্ট`];
       case "joinSection":
         return ["তুমি অ্যাপে নিজের ক্লাসের সেকশনে যোগ দাও", `+${n(p)}, একবার`];
       case "bloodDonor":
@@ -95,11 +95,11 @@ function pointRow(key: PointKey, s: CampaignScoring, lang: "en" | "bn"): [string
         `+${n(p)} per friend`,
       ];
     case "otherCampus":
-      return ["That friend studies at a different university from yours", `+${n(p)} more per friend`];
+      return ["That friend studies at a different university from yours", `+${n(p)} extra points for that friend`];
     case "pioneer":
-      return [`That friend is among the first ${n(s.pioneerFirst)} verified students of their university on VarsityKotha`, `+${n(p)} more per friend`];
+      return [`That friend is among the first ${n(s.pioneerFirst)} verified students of their university on VarsityKotha`, `+${n(p)} extra points for that friend`];
     case "friendSection":
-      return ["That friend joins their class section in the app", `+${n(p)} more per friend`];
+      return ["That friend joins their class section in the app", `+${n(p)} extra points for that friend`];
     case "joinSection":
       return ["You join your own class section in the app", `+${n(p)}, once`];
     case "bloodDonor":
@@ -163,7 +163,7 @@ const copy = {
       "Open VarsityKotha, go to your profile and share your personal invite link with friends who study at a university in Bangladesh. You also earn points for things that make the app useful for other students, listed below. It is free to take part. There is nothing to buy, and you do not need to rate or review the app.",
     count: "How to earn points",
     countBody:
-      "Only invites made between the start and end dates count, and they must qualify before the date above. Live bus days count only between the start and end dates. Being in a section, being a blood donor and the sections you run as CR count as they are when we choose the winners. Invites from the same phone, fake or repeated accounts, and points we find were gained unfairly are removed.",
+      "The extras are bonus points on top of a friend's points: you do not need any friends from other universities, and every friend counts. Only invites made between the start and end dates count, and they must qualify before the date above. Live bus days count only between the start and end dates. Being in a section, being a blood donor and the sections you run as CR count as they are when we choose the winners. Invites from the same phone, fake or repeated accounts, and points we find were gained unfairly are removed.",
     who: "Who can take part",
     whoBody:
       "Verified VarsityKotha students in Bangladesh, at the universities this campaign covers. People who work on VarsityKotha (the team) cannot take part.",
@@ -188,7 +188,7 @@ const copy = {
       "ভার্সিটি কথা খুলে প্রোফাইলে গিয়ে বাংলাদেশের বিশ্ববিদ্যালয়ে পড়া বন্ধুদের তোমার নিজের আমন্ত্রণ লিংক পাঠাও। অ্যাপকে অন্য শিক্ষার্থীদের কাজে লাগে এমন কিছু করলেও পয়েন্ট পাবে, নিচে দেওয়া আছে। অংশ নেওয়া বিনামূল্যে। কিছু কিনতে হবে না, অ্যাপে রেটিং বা রিভিউও দিতে হবে না।",
     count: "কীভাবে পয়েন্ট পাবে",
     countBody:
-      "শুধু শুরু ও শেষ তারিখের মধ্যে করা আমন্ত্রণ গোনা হয়, আর সেগুলো ওপরের তারিখের মধ্যে যোগ্য হতে হবে। লাইভ বাসের দিন শুধু শুরু ও শেষ তারিখের মধ্যে গোনা হয়। সেকশনে থাকা, রক্তদাতা হওয়া এবং সিআর হিসেবে তোমার সেকশনগুলো বিজয়ী বাছাইয়ের সময় যেমন থাকে, সেভাবে গোনা হয়। একই ফোন থেকে আমন্ত্রণ, ভুয়া বা বারবার খোলা অ্যাকাউন্ট এবং অন্যায়ভাবে পাওয়া পয়েন্ট বাদ দেওয়া হয়।",
+      "বাড়তি পয়েন্টগুলো বন্ধুর পয়েন্টের ওপর বোনাস: অন্য বিশ্ববিদ্যালয়ের কোনো বন্ধু লাগবেই এমন নয়, প্রত্যেক বন্ধুই গোনা হয়। শুধু শুরু ও শেষ তারিখের মধ্যে করা আমন্ত্রণ গোনা হয়, আর সেগুলো ওপরের তারিখের মধ্যে যোগ্য হতে হবে। লাইভ বাসের দিন শুধু শুরু ও শেষ তারিখের মধ্যে গোনা হয়। সেকশনে থাকা, রক্তদাতা হওয়া এবং সিআর হিসেবে তোমার সেকশনগুলো বিজয়ী বাছাইয়ের সময় যেমন থাকে, সেভাবে গোনা হয়। একই ফোন থেকে আমন্ত্রণ, ভুয়া বা বারবার খোলা অ্যাকাউন্ট এবং অন্যায়ভাবে পাওয়া পয়েন্ট বাদ দেওয়া হয়।",
     who: "কারা অংশ নিতে পারবে",
     whoBody:
       "এই ক্যাম্পেইন যেসব বিশ্ববিদ্যালয়ের জন্য, বাংলাদেশের সেসবের ভেরিফায়েড ভার্সিটি কথা শিক্ষার্থীরা। ভার্সিটি কথার টিমের সদস্যরা অংশ নিতে পারবে না।",

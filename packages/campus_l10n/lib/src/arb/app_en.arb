@@ -1876,7 +1876,7 @@
   "@missionSectionProgress": {"placeholders": {"name": {"type": "String"}, "slots": {"type": "int", "format": "decimalPattern"}, "members": {"type": "int", "format": "decimalPattern"}}},
   "campaignNext": "Next: {mission} · +{points}",
   "@campaignNext": {"placeholders": {"mission": {"type": "String"}, "points": {"type": "int", "format": "decimalPattern"}}},
-  "invitePointsHint": "+{points} points a friend · +{extra} more from another university",
+  "invitePointsHint": "+{points} points a friend · +{extra} extra points if they're at another university",
   "@invitePointsHint": {"placeholders": {"points": {"type": "int", "format": "decimalPattern"}, "extra": {"type": "int", "format": "decimalPattern"}}},
   "inviteNextTier": "{count, plural, =1{1 more friend} other{{count} more friends}} for {tier} Connector",
   "@inviteNextTier": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}, "tier": {"type": "String"}}},

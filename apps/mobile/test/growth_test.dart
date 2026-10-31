@@ -114,7 +114,9 @@ void main() {
       expect(find.text('TI'), findsOneWidget, reason: 'faces of who joined');
       expect(find.text('17 more friends for Silver Connector'), findsOneWidget);
       expect(
-        find.text('+10 points a friend · +5 more from another university'),
+        find.text(
+          "+10 points a friend · +5 extra points if they're at another university",
+        ),
         findsOneWidget,
       );
       expect(find.text('Rafi · verified · 2 of 3 days'), findsOneWidget);

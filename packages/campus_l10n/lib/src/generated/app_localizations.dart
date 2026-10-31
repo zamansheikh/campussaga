@@ -8153,7 +8153,7 @@ abstract class AppLocalizations {
   /// No description provided for @invitePointsHint.
   ///
   /// In en, this message translates to:
-  /// **'+{points} points a friend · +{extra} more from another university'**
+  /// **'+{points} points a friend · +{extra} extra points if they\'re at another university'**
   String invitePointsHint(int points, int extra);
 
   /// No description provided for @inviteNextTier.

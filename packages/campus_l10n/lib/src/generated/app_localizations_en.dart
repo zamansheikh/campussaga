@@ -5295,7 +5295,7 @@ class AppLocalizationsEn extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String extraString = extraNumberFormat.format(extra);
 
-    return '+$pointsString points a friend · +$extraString more from another university';
+    return '+$pointsString points a friend · +$extraString extra points if they\'re at another university';
   }
 
   @override
