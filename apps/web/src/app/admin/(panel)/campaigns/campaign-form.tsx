@@ -11,12 +11,49 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { type AdminCampaign, fromDhakaInput, toDhakaInput } from "@/lib/admin/growth";
+import {
+  type AdminCampaign,
+  type CampaignScoring,
+  fromDhakaInput,
+  type ScoringKey,
+  scoringRange,
+  toDhakaInput,
+  withDefaults,
+} from "@/lib/admin/growth";
 
 import { saveCampaign } from "./actions";
 import { BannerField } from "./banner-field";
 
 type PrizeRow = { rankFrom: string; rankTo: string; titleEn: string; titleBn: string };
+
+/** The points fields, grouped as on the rules page; `hint` says what earns it. */
+const pointFields: { title: string; fields: { key: ScoringKey; label: string; hint: string }[] }[] = [
+  {
+    title: "Invites",
+    fields: [
+      { key: "invite", label: "Per friend", hint: "Verified and active on 3 days within 14 days." },
+      { key: "otherCampus", label: "Extra: other university", hint: "The friend is at a different university." },
+      { key: "pioneer", label: "Extra: pioneer friend", hint: "The friend is among the first students of their university." },
+      { key: "pioneerFirst", label: "Pioneer: first how many", hint: "Verified students of that university, counted in order." },
+      { key: "friendSection", label: "Extra: friend in a section", hint: "The friend joins a class section." },
+    ],
+  },
+  {
+    title: "Missions",
+    fields: [
+      { key: "joinSection", label: "Joined a section", hint: "Once." },
+      { key: "bloodDonor", label: "Blood donor", hint: "Once, when registered as a donor." },
+      { key: "busShare", label: "Live bus, per day", hint: "10+ minutes, and another student watched." },
+      { key: "busShareDays", label: "Live bus: most days", hint: "Days that count in the campaign." },
+      { key: "sectionSetup", label: "Section set up, as CR", hint: "5+ classes in the routine and 5+ verified members." },
+      { key: "sectionSetupMax", label: "Sections: most that count", hint: "Per CR." },
+    ],
+  },
+];
+
+function scoringText(s: CampaignScoring): Record<ScoringKey, string> {
+  return Object.fromEntries(Object.entries(s).map(([k, v]) => [k, String(v)])) as Record<ScoringKey, string>;
+}
 
 const DAY = 24 * 3600_000;
 
@@ -50,6 +87,7 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
       ? campaign.prizes.map((p) => ({ rankFrom: String(p.rankFrom), rankTo: String(p.rankTo), titleEn: p.titleEn, titleBn: p.titleBn }))
       : [{ rankFrom: "1", rankTo: "1", titleEn: "", titleBn: "" }],
   );
+  const [scoring, setScoring] = useState<Record<ScoringKey, string>>(() => scoringText(withDefaults(campaign?.scoring)));
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
 
@@ -79,6 +117,8 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
           settlesAt: fromDhakaInput(settlesAt),
           universityIds: all ? null : uniIds,
           prizes: prizes.map((p) => ({ rankFrom: Number(p.rankFrom), rankTo: Number(p.rankTo), titleEn: p.titleEn, titleBn: p.titleBn })),
+          // An empty field is NaN, which the check below refuses.
+          scoring: Object.fromEntries(Object.entries(scoring).map(([k, v]) => [k, v.trim() === "" ? Number.NaN : Number(v)])) as CampaignScoring,
         },
         live,
       );
@@ -127,8 +167,8 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
             <Textarea id="c-rules-bn" lang="bn" rows={8} value={rulesBn} onChange={(e) => setRulesBn(e.target.value)} maxLength={8000} />
           </Field>
           <p className="text-xs text-muted-foreground sm:col-span-2">
-            Rules appear on the public rules page as plain text with your line breaks. The fixed sections (how to take part, how invites count, who can
-            take part, winners, Google) are added around them.
+            Rules appear on the public rules page as plain text with your line breaks. The fixed sections (how to take part, how to earn points, who
+            can take part, winners, Google) are added around them.
           </p>
         </CardContent>
       </Card>
@@ -211,6 +251,48 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
               </ul>
             </>
           ) : null}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Points</CardTitle>
+          <CardDescription>
+            What each thing is worth. 0 turns it off. The rules page lists them for students. Points can only change while the campaign is a draft.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {pointFields.map((g) => (
+            <fieldset key={g.title} className="space-y-3">
+              <legend className="text-sm font-medium text-muted-foreground">{g.title}</legend>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {g.fields.map((f) => {
+                  const r = scoringRange[f.key];
+                  const id = `s-${f.key}`;
+                  return (
+                    <div key={f.key} className="space-y-1.5">
+                      <Label htmlFor={id}>{f.label}</Label>
+                      <Input
+                        id={id}
+                        type="number"
+                        inputMode="numeric"
+                        min={r.min}
+                        max={r.max}
+                        step={1}
+                        value={scoring[f.key]}
+                        onChange={(e) => setScoring((s) => ({ ...s, [f.key]: e.target.value }))}
+                        disabled={live}
+                        aria-describedby={`${id}-hint`}
+                      />
+                      <p id={`${id}-hint`} className="text-xs text-muted-foreground">
+                        {f.hint} {r.min}–{r.max}.
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </fieldset>
+          ))}
         </CardContent>
       </Card>
 

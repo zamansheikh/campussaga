@@ -2,11 +2,12 @@
 
 import { ChevronDown, ChevronRight, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { flagLabel, type Standing, uniName } from "@/lib/admin/growth";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { flagHelp, flagLabel, pointKeys, pointLabel, type Standing, uniName } from "@/lib/admin/growth";
 import { formatDateTime } from "@/lib/format";
 
 import { InviteActions, ParticipantActions } from "../invite-actions";
@@ -21,7 +22,7 @@ export function StandingsTable({ campaignId, rows }: { campaignId: string; rows:
           <TableRow>
             <TableHead className="w-12">#</TableHead>
             <TableHead>Student</TableHead>
-            <TableHead className="text-end">Score</TableHead>
+            <TableHead className="text-end">Points</TableHead>
             <TableHead>Flags</TableHead>
           </TableRow>
         </TableHeader>
@@ -58,7 +59,10 @@ function StandingRow({ campaignId, r, isOpen, toggle }: { campaignId: string; r:
             {[r.user.email, uniName(r.user.university)].filter(Boolean).join(" · ")}
           </p>
         </TableCell>
-        <TableCell className="text-end font-semibold tabular-nums">{r.score}</TableCell>
+        <TableCell className="text-end whitespace-normal">
+          <p className="font-semibold tabular-nums">{r.score}</p>
+          <PointsBreakdown points={r.points} />
+        </TableCell>
         <TableCell className="whitespace-normal">
           <div className="flex flex-wrap gap-1">
             {r.hidden ? (
@@ -68,9 +72,7 @@ function StandingRow({ campaignId, r, isOpen, toggle }: { campaignId: string; r:
             ) : null}
             {r.disqualified ? <Badge variant="destructive">Disqualified</Badge> : null}
             {(r.flags ?? []).map((f) => (
-              <Badge key={f} variant="warning">
-                {flagLabel[f] ?? f}
-              </Badge>
+              <Flag key={f} flag={f} />
             ))}
           </div>
         </TableCell>
@@ -104,6 +106,9 @@ function StandingRow({ campaignId, r, isOpen, toggle }: { campaignId: string; r:
                         {i.qualifiedAt ? <Badge variant="success">Qualified {formatDateTime(i.qualifiedAt)}</Badge> : <Badge variant="secondary">Not qualified</Badge>}
                         {i.sameDevice ? <Badge variant="warning">Same phone</Badge> : null}
                         {i.disqualified ? <Badge variant="destructive">Disqualified</Badge> : null}
+                        {i.otherCampus ? <Badge variant="info">Other university</Badge> : null}
+                        {i.pioneer ? <Badge variant="info">Pioneer</Badge> : null}
+                        {i.inSection ? <Badge variant="soft">In a section</Badge> : null}
                       </div>
                     </div>
                     <InviteActions referredId={i.referred.id} referredName={i.referred.name || "this student"} disqualified={i.disqualified} />
@@ -115,5 +120,41 @@ function StandingRow({ campaignId, r, isOpen, toggle }: { campaignId: string; r:
         </TableRow>
       ) : null}
     </>
+  );
+}
+
+/** "Invites 30 · Other university 5 · Live bus 4": only the keys that earned points (nothing on an older API). */
+function PointsBreakdown({ points }: { points: Standing["points"] }) {
+  const parts = pointKeys.filter((k) => (points?.[k] ?? 0) > 0);
+  if (parts.length === 0) return null;
+  return (
+    <p className="mt-0.5 ms-auto max-w-56 text-xs leading-snug text-muted-foreground">
+      {parts.map((k, i) => (
+        <Fragment key={k}>
+          {/* The line breaks between items, never inside one. */}
+          {i > 0 ? " · " : null}
+          <span className="whitespace-nowrap">
+            {pointLabel[k]} <span className="tabular-nums">{points?.[k]}</span>
+          </span>
+        </Fragment>
+      ))}
+    </p>
+  );
+}
+
+/** A flag, with what it means on hover or focus. */
+function Flag({ flag }: { flag: string }) {
+  const help = flagHelp[flag];
+  const badge = (
+    <Badge variant="warning" tabIndex={help ? 0 : undefined}>
+      {flagLabel[flag] ?? flag}
+    </Badge>
+  );
+  if (!help) return badge;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{badge}</TooltipTrigger>
+      <TooltipContent className="max-w-64">{help}</TooltipContent>
+    </Tooltip>
   );
 }

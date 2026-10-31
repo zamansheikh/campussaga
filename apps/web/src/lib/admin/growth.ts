@@ -4,6 +4,82 @@ export type CampaignStatus = "draft" | "live" | "ended" | "announced";
 
 export type CampaignPrize = { rankFrom: number; rankTo: number; titleEn: string; titleBn: string };
 
+/**
+ * A campaign's point values (docs/GROWTH.md §8.1). `busShareDays`,
+ * `sectionSetupMax` and `pioneerFirst` are limits, the rest are points
+ * (0 turns that one off).
+ */
+export type CampaignScoring = {
+  invite: number;
+  otherCampus: number;
+  pioneer: number;
+  friendSection: number;
+  joinSection: number;
+  bloodDonor: number;
+  busShare: number;
+  busShareDays: number;
+  sectionSetup: number;
+  sectionSetupMax: number;
+  pioneerFirst: number;
+};
+
+export type ScoringKey = keyof CampaignScoring;
+
+export const defaultScoring: CampaignScoring = {
+  invite: 10,
+  otherCampus: 5,
+  pioneer: 5,
+  friendSection: 3,
+  joinSection: 2,
+  bloodDonor: 3,
+  busShare: 2,
+  busShareDays: 10,
+  sectionSetup: 15,
+  sectionSetupMax: 2,
+  pioneerFirst: 20,
+};
+
+/** Allowed range of each value (the API refuses others with INVALID_SCORING). */
+export const scoringRange: Record<ScoringKey, { min: number; max: number }> = {
+  invite: { min: 0, max: 100 },
+  otherCampus: { min: 0, max: 100 },
+  pioneer: { min: 0, max: 100 },
+  friendSection: { min: 0, max: 100 },
+  joinSection: { min: 0, max: 100 },
+  bloodDonor: { min: 0, max: 100 },
+  busShare: { min: 0, max: 100 },
+  busShareDays: { min: 0, max: 60 },
+  sectionSetup: { min: 0, max: 100 },
+  sectionSetupMax: { min: 0, max: 10 },
+  pioneerFirst: { min: 1, max: 1000 },
+};
+
+/** The campaign's values over the defaults (an older API sends none). */
+export function withDefaults(s?: Partial<CampaignScoring> | null): CampaignScoring {
+  const out = { ...defaultScoring };
+  for (const k of Object.keys(defaultScoring) as ScoringKey[]) {
+    const v = s?.[k];
+    if (typeof v === "number" && Number.isFinite(v)) out[k] = v;
+  }
+  return out;
+}
+
+/** The keys that earn points, in the rules' order (the others are limits). */
+export const pointKeys = ["invite", "otherCampus", "pioneer", "friendSection", "joinSection", "bloodDonor", "busShare", "sectionSetup"] as const;
+export type PointKey = (typeof pointKeys)[number];
+
+/** Short names for a participant's points breakdown. */
+export const pointLabel: Record<PointKey, string> = {
+  invite: "Invites",
+  otherCampus: "Other university",
+  pioneer: "Pioneer",
+  friendSection: "Friend in a section",
+  joinSection: "Joined a section",
+  bloodDonor: "Blood donor",
+  busShare: "Live bus",
+  sectionSetup: "Section setup",
+};
+
 /** `GET /admin/campaigns[/{id}]`. `universityIds` null means every university. */
 export type AdminCampaign = {
   id: string;
@@ -21,6 +97,8 @@ export type AdminCampaign = {
   status: CampaignStatus;
   /** The banner photo, `/campaigns/{id}/banner?v=…` (the website serves that path too), or null. */
   bannerUrl?: string | null;
+  /** Point values; missing on an older API (use `withDefaults`). */
+  scoring?: Partial<CampaignScoring> | null;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -28,7 +106,7 @@ export type AdminCampaign = {
 /** `GET /campaigns/{id}/public`: both languages, no sign-in. */
 export type PublicCampaign = Pick<
   AdminCampaign,
-  "id" | "titleEn" | "titleBn" | "bodyEn" | "bodyBn" | "rulesEn" | "rulesBn" | "startsAt" | "endsAt" | "settlesAt" | "prizes" | "bannerUrl"
+  "id" | "titleEn" | "titleBn" | "bodyEn" | "bodyBn" | "rulesEn" | "rulesBn" | "startsAt" | "endsAt" | "settlesAt" | "prizes" | "bannerUrl" | "scoring"
 > & { status?: CampaignStatus };
 
 export type PersonRef = { id: string; name: string | null; email?: string | null; university?: string | { id?: string; name: string } | null };
@@ -42,14 +120,23 @@ export type StandingInvite = {
   qualifiedAt: string | null;
   sameDevice: boolean;
   disqualified: boolean;
+  /** The friend is at a different university (earns `otherCampus`). */
+  otherCampus?: boolean;
+  /** The friend was among the first `pioneerFirst` verified students of their university. */
+  pioneer?: boolean;
+  /** The friend is in a class group now (earns `friendSection`). */
+  inSection?: boolean;
 };
 
-export type InviteFlag = "same_device" | "burst" | "new_account";
+export type InviteFlag = "same_device" | "burst" | "new_account" | "self_vouched";
 
 export type Standing = {
   rank: number;
   user: PersonRef;
+  /** Points. */
   score: number;
+  /** Points per key; missing on an older API. */
+  points?: Partial<Record<PointKey, number>> | null;
   hidden: boolean;
   invites: StandingInvite[];
   flags: InviteFlag[];
@@ -110,7 +197,15 @@ export const statusTone: Record<CampaignStatus, "secondary" | "success" | "warni
   announced: "info",
 };
 
-export const flagLabel: Record<string, string> = { same_device: "Same phone", burst: "Burst", new_account: "New account" };
+export const flagLabel: Record<string, string> = { same_device: "Same phone", burst: "Burst", new_account: "New account", self_vouched: "Self-vouched" };
+
+/** What a flag means, for its tooltip. */
+export const flagHelp: Record<string, string> = {
+  same_device: "A friend's account was used on this student's phone.",
+  burst: "10 or more invites within one hour.",
+  new_account: "The inviter's account was under 7 days old when they invited.",
+  self_vouched: "A friend was verified through this student's own vouch, or by them as CR. Check that the friend is a real classmate.",
+};
 
 export const badgeLabel: Record<string, string> = {
   verified: "Verified",

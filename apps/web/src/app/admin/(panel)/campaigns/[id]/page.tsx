@@ -6,7 +6,18 @@ import { EmptyState, ErrorPanel } from "@/components/admin/notice";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { type AdminCampaign, type CampaignWinner, normalizeWinner, prizeForRank, type Standing, statusLabel, statusTone, uniName } from "@/lib/admin/growth";
+import {
+  type AdminCampaign,
+  type CampaignScoring,
+  type CampaignWinner,
+  normalizeWinner,
+  prizeForRank,
+  type Standing,
+  statusLabel,
+  statusTone,
+  uniName,
+  withDefaults,
+} from "@/lib/admin/growth";
 import { load } from "@/lib/admin/load";
 import { api, requestNow, requireAdmin } from "@/lib/admin/session";
 import { allUniversities } from "@/lib/admin/universities";
@@ -99,6 +110,9 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
                   <Field label="Universities">
                     {c.universityIds === null ? "All universities" : c.universityIds.map((u) => uniNames.get(u) ?? u).join(", ") || "None"}
                   </Field>
+                  <div className="sm:col-span-2">
+                    <Field label="Points">{pointsSummary(withDefaults(c.scoring))}</Field>
+                  </div>
                 </dl>
               </CardContent>
             </Card>
@@ -126,7 +140,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
               <div>
                 <h2 className="text-lg font-semibold">Standings</h2>
                 <p className="text-sm text-muted-foreground">
-                  The top 100 by qualified invites. Open a row to see the invites; disqualify one that looks like cheating.
+                  The top 100 by points. Open a row to see the invites; disqualify one that looks like cheating.
                 </p>
               </div>
               {standings?.error ? (
@@ -214,6 +228,26 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
         </div>
       )}
     </>
+  );
+}
+
+/** One line of the campaign's point values, leaving out the ones turned off. */
+function pointsSummary(s: CampaignScoring): string {
+  const parts: [number, string][] = [
+    [s.invite, `${s.invite} per friend`],
+    [s.otherCampus, `+${s.otherCampus} other university`],
+    [s.pioneer, `+${s.pioneer} pioneer (first ${s.pioneerFirst})`],
+    [s.friendSection, `+${s.friendSection} friend in a section`],
+    [s.joinSection, `${s.joinSection} joined a section`],
+    [s.bloodDonor, `${s.bloodDonor} blood donor`],
+    [s.busShareDays > 0 ? s.busShare : 0, `${s.busShare} a live bus day (up to ${s.busShareDays})`],
+    [s.sectionSetupMax > 0 ? s.sectionSetup : 0, `${s.sectionSetup} a section set up (up to ${s.sectionSetupMax})`],
+  ];
+  return (
+    parts
+      .filter(([v]) => v > 0)
+      .map(([, t]) => t)
+      .join(" · ") || "Nothing earns points"
   );
 }
 

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { type ActionResult, failure } from "@/lib/admin/errors";
+import { type ScoringKey, scoringRange } from "@/lib/admin/growth";
 import { api, requireAdmin } from "@/lib/admin/session";
 
 const uuid = z.uuid();
@@ -18,6 +19,31 @@ const prize = z
   })
   .refine((p) => p.rankTo >= p.rankFrom, "A prize's last rank can't be before its first rank.");
 
+const scoringNames: Record<ScoringKey, string> = {
+  invite: "Points per friend",
+  otherCampus: "Extra points for another university",
+  pioneer: "Extra points for a pioneer friend",
+  friendSection: "Extra points for a friend in a section",
+  joinSection: "Points for joining a section",
+  bloodDonor: "Points for a blood donor",
+  busShare: "Points per live bus day",
+  busShareDays: "Live bus days",
+  sectionSetup: "Points per section set up",
+  sectionSetupMax: "Sections that count",
+  pioneerFirst: "Pioneer: first how many",
+};
+
+/** A whole number in the key's range, with a message that names the field. */
+function scoringValue(key: ScoringKey) {
+  const { min, max } = scoringRange[key];
+  const msg = `${scoringNames[key]} must be a whole number from ${min} to ${max}.`;
+  return z.number({ error: msg }).int(msg).min(min, msg).max(max, msg);
+}
+
+const scoring = z.object(
+  Object.fromEntries((Object.keys(scoringRange) as ScoringKey[]).map((k) => [k, scoringValue(k)])) as Record<ScoringKey, ReturnType<typeof scoringValue>>,
+);
+
 const campaign = z
   .object({
     titleEn: z.string().trim().min(1, "Add an English title.").max(120),
@@ -31,6 +57,8 @@ const campaign = z
     settlesAt: iso,
     universityIds: z.array(z.uuid()).nullable(),
     prizes: z.array(prize).min(1, "Add at least one prize.").max(20),
+    // Only drafts send points (they can't change once live).
+    scoring: scoring.optional(),
   })
   .refine((c) => Date.parse(c.endsAt) > Date.parse(c.startsAt), "The end must be after the start.")
   .refine((c) => Date.parse(c.settlesAt) >= Date.parse(c.endsAt), "The settle date can't be before the end.")
@@ -50,7 +78,7 @@ function refresh(id?: string) {
 export async function saveCampaign(id: string | null, input: CampaignInput, live: boolean): Promise<ActionResult<{ id: string }>> {
   await requireAdmin();
   if (id !== null && !uuid.safeParse(id).success) return { ok: false, error: "That campaign isn't valid." };
-  const parsed = campaign.safeParse(input);
+  const parsed = campaign.safeParse(live ? { ...input, scoring: undefined } : input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Some fields are invalid." };
   const c = parsed.data;
   try {
