@@ -10,13 +10,15 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/di.dart';
 import '../../../../app/router.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../profile/presentation/widgets/user_avatar.dart';
 import '../../data/voice_cache.dart';
 import '../bloc/feed_cubit.dart';
 import '../voice_format.dart';
 import '../voice_updates.dart';
-import '../widgets/issue_list_card.dart';
+import '../widgets/post_card.dart';
 
-/// The Campus tab: the university's issues.
+/// The Campus tab: the university's own social feed. Posts, questions,
+/// polls and issues; For you · Latest · Ask · Issues.
 class CampusPage extends StatelessWidget {
   const CampusPage({super.key});
 
@@ -51,13 +53,14 @@ class _CampusViewState extends State<_CampusView> {
   final _search = TextEditingController();
   final _scroll = ScrollController();
   Timer? _debounce;
+  bool _searching = false;
   late final StreamSubscription<VoiceUpdate> _updates;
 
   @override
   void initState() {
     super.initState();
     _scroll.addListener(() {
-      if (_scroll.position.extentAfter < 600) {
+      if (_scroll.position.extentAfter < 800) {
         unawaited(context.read<FeedCubit>().loadMore());
       }
     });
@@ -90,35 +93,63 @@ class _CampusViewState extends State<_CampusView> {
     );
   }
 
+  void _toggleSearch() {
+    setState(() => _searching = !_searching);
+    if (!_searching && _search.text.isNotEmpty) {
+      _search.clear();
+      context.read<FeedCubit>().setQuery('');
+    }
+  }
+
+  Future<void> _compose(PostKind kind, {bool photo = false}) async {
+    final cubit = context.read<FeedCubit>();
+    final posted = await context.push<IssueCard>(
+      Routes.campusCompose(kind, photo: photo),
+    );
+    if (posted != null && mounted) unawaited(cubit.load());
+  }
+
+  void _snack(Failure? f) {
+    if (f == null || !mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(voiceErrorText(context, f))));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cubit = context.read<FeedCubit>();
     final s = context.watch<FeedCubit>().state;
+    final user = context.select((AuthBloc b) => b.state.user);
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.voiceTitle),
+        title: Text(l10n.campusTitle),
         actions: [
+          IconButton(
+            tooltip: l10n.campusSearchHint,
+            isSelected: _searching,
+            icon: const Icon(CsIcons.search),
+            selectedIcon: const Icon(CsIcons.close),
+            onPressed: _toggleSearch,
+          ),
           IconButton(
             tooltip: l10n.voiceHowAnonymity,
             icon: const Icon(CsIcons.privacy),
             onPressed: () => context.push(Routes.campusAnonymity),
           ),
           IconButton(
-            tooltip: l10n.voiceMyIssues,
+            tooltip: l10n.campusMyPosts,
             icon: const Icon(CsIcons.myIssues),
             onPressed: () => context.push(Routes.campusMine),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         heroTag: null, // tabs keep several alive at once
-        onPressed: () async {
-          final posted = await context.push<IssueCard>(Routes.campusNew);
-          if (posted != null && context.mounted) unawaited(cubit.load());
-        },
-        icon: const Icon(CsIcons.raiseIssue),
-        label: Text(l10n.voiceRaiseIssue),
+        tooltip: l10n.campusNewPost,
+        onPressed: () => _compose(PostKind.post),
+        child: const Icon(CsIcons.add),
       ),
       body: RefreshIndicator(
         onRefresh: cubit.load,
@@ -126,94 +157,93 @@ class _CampusViewState extends State<_CampusView> {
           controller: _scroll,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  CsSpace.md,
-                  CsSpace.sm,
-                  CsSpace.md,
-                  0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextField(
-                      controller: _search,
-                      onChanged: _onSearch,
-                      textInputAction: TextInputAction.search,
-                      decoration: InputDecoration(
-                        hintText: l10n.voiceSearchHint,
-                        prefixIcon: const Icon(CsIcons.search),
-                      ),
-                    ),
-                    const SizedBox(height: CsSpace.sm),
-                    SegmentedButton<IssueSort>(
-                      showSelectedIcon: false,
-                      segments: [
-                        ButtonSegment(
-                          value: IssueSort.trending,
-                          label: Text(l10n.voiceSortTrending),
-                        ),
-                        ButtonSegment(
-                          value: IssueSort.newest,
-                          label: Text(l10n.voiceSortNew),
-                        ),
-                        ButtonSegment(
-                          value: IssueSort.solved,
-                          label: Text(l10n.voiceSortSolved),
-                        ),
-                      ],
-                      selected: {s.sort},
-                      onSelectionChanged: (v) => cubit.setSort(v.first),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 56,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: CsSpace.md,
-                    vertical: CsSpace.sm,
+            if (_searching)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    CsSpace.md,
+                    CsSpace.sm,
+                    CsSpace.md,
+                    0,
                   ),
-                  children: [
-                    if (widget.staff) ...[
-                      FilterChip(
-                        avatar: const Icon(CsIcons.lock, size: 18),
-                        label: Text(l10n.voiceSafetyReports),
-                        selected: s.safety,
-                        onSelected: cubit.setSafety,
-                      ),
-                      const SizedBox(width: CsSpace.sm),
-                    ],
-                    ChoiceChip(
-                      label: Text(l10n.voiceAllCategories),
-                      selected: s.category == null,
-                      showCheckmark: false,
-                      onSelected: (_) => cubit.setCategory(null),
+                  child: TextField(
+                    controller: _search,
+                    autofocus: true,
+                    onChanged: _onSearch,
+                    textInputAction: TextInputAction.search,
+                    decoration: InputDecoration(
+                      hintText: l10n.campusSearchHint,
+                      prefixIcon: const Icon(CsIcons.search),
                     ),
-                    for (final c in IssueCategory.values)
-                      if (c != IssueCategory.safety) ...[
-                        const SizedBox(width: CsSpace.sm),
-                        ChoiceChip(
-                          avatar: Icon(CsCategoryStyle.icon(c.wire), size: 18),
-                          label: Text(categoryLabel(l10n, c)),
-                          selected: s.category == c,
-                          showCheckmark: false,
-                          onSelected: (_) => cubit.setCategory(c),
-                        ),
-                      ],
-                  ],
+                  ),
                 ),
               ),
+            if (!_searching && user != null)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    CsSpace.md,
+                    CsSpace.sm,
+                    CsSpace.md,
+                    0,
+                  ),
+                  child: CsComposerPrompt(
+                    avatar: UserAvatar.of(user, size: 40),
+                    hint: l10n.campusPrompt,
+                    onTap: () => _compose(PostKind.post),
+                    actions: [
+                      CsComposerAction(
+                        icon: CsIcons.gallery,
+                        label: l10n.campusQuickPhoto,
+                        color: CsCategoryStyle.color('it'),
+                        onTap: () => _compose(PostKind.post, photo: true),
+                      ),
+                      CsComposerAction(
+                        icon: CsIcons.question,
+                        label: l10n.campusKindQuestion,
+                        color: CsCategoryStyle.color('general'),
+                        onTap: () => _compose(PostKind.question),
+                      ),
+                      CsComposerAction(
+                        icon: CsIcons.poll,
+                        label: l10n.campusKindPoll,
+                        color: CsCategoryStyle.color('hostel'),
+                        onTap: () => _compose(PostKind.poll),
+                      ),
+                      CsComposerAction(
+                        icon: CsIcons.raiseIssue,
+                        label: l10n.campusKindIssue,
+                        color: CsCategoryStyle.color('food'),
+                        onTap: () => _compose(PostKind.issue),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _TabsHeader(
+                tab: s.tab,
+                onTab: cubit.setTab,
+                labels: {
+                  FeedTab.forYou: l10n.campusTabForYou,
+                  FeedTab.latest: l10n.campusTabLatest,
+                  FeedTab.ask: l10n.campusTabAsk,
+                  FeedTab.issues: l10n.campusTabIssues,
+                },
+                background: Theme.of(context).scaffoldBackgroundColor,
+              ),
             ),
+            SliverToBoxAdapter(child: _Topics(staff: widget.staff)),
             if (s.offline)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: CsSpace.md),
+                  padding: const EdgeInsets.fromLTRB(
+                    CsSpace.md,
+                    0,
+                    CsSpace.md,
+                    CsSpace.sm,
+                  ),
                   child: _OfflineNote(text: l10n.errorNetwork),
                 ),
               ),
@@ -227,6 +257,7 @@ class _CampusViewState extends State<_CampusView> {
 
   List<Widget> _list(BuildContext context, FeedState s) {
     final l10n = AppLocalizations.of(context);
+    final cubit = context.read<FeedCubit>();
     if (s.status == FeedStatus.loading && s.items.isEmpty) {
       return const [
         SliverFillRemaining(
@@ -243,21 +274,35 @@ class _CampusViewState extends State<_CampusView> {
             icon: CsIcons.offline,
             title: voiceErrorText(context, s.failure!),
             actionLabel: l10n.tryAgain,
-            onAction: context.read<FeedCubit>().load,
+            onAction: cubit.load,
           ),
         ),
       ];
     }
     if (s.items.isEmpty) {
+      final (title, hint, kind) = switch (s.tab) {
+        _ when s.query.isNotEmpty => (l10n.campusEmptySearch, null, null),
+        FeedTab.ask => (
+          l10n.campusEmptyAsk,
+          l10n.campusEmptyAskHint,
+          PostKind.question,
+        ),
+        FeedTab.issues => (
+          l10n.voiceEmptyFeed,
+          l10n.voiceEmptyFeedHint,
+          PostKind.issue,
+        ),
+        _ => (l10n.campusEmptyFeed, l10n.campusEmptyFeedHint, PostKind.post),
+      };
       return [
         SliverFillRemaining(
           hasScrollBody: false,
           child: CsEmptyState(
             icon: CsIcons.campus,
-            title: s.query.isNotEmpty
-                ? l10n.voiceEmptySearch
-                : l10n.voiceEmptyFeed,
-            message: s.query.isNotEmpty ? null : l10n.voiceEmptyFeedHint,
+            title: title,
+            message: hint,
+            actionLabel: kind == null ? null : kindLabel(l10n, kind),
+            onAction: kind == null ? null : () => _compose(kind),
           ),
         ),
       ];
@@ -267,7 +312,7 @@ class _CampusViewState extends State<_CampusView> {
         padding: const EdgeInsets.symmetric(horizontal: CsSpace.md),
         sliver: SliverList.separated(
           itemCount: s.items.length + (s.loadingMore ? 1 : 0),
-          separatorBuilder: (_, _) => const SizedBox(height: CsSpace.sm),
+          separatorBuilder: (_, _) => const SizedBox(height: CsSpace.sm + 4),
           itemBuilder: (context, i) {
             if (i == s.items.length) {
               return const Padding(
@@ -276,14 +321,184 @@ class _CampusViewState extends State<_CampusView> {
               );
             }
             final card = s.items[i];
-            return IssueListCard(
+            void open({bool comment = false}) => unawaited(
+              context.push(Routes.campusIssue(card.id, comment: comment)),
+            );
+            return PostCard(
               card: card,
-              onTap: () => context.push(Routes.campusIssue(card.id)),
+              offline: s.offline,
+              onOpen: open,
+              onComment: () => open(comment: true),
+              onReact: (r) async => _snack(await cubit.react(card.id, r)),
+              onVote: (o) async => _snack(await cubit.votePoll(card.id, o)),
             );
           },
         ),
       ),
     ];
+  }
+}
+
+/// For you · Latest · Ask · Issues, pinned under the app bar.
+class _TabsHeader extends SliverPersistentHeaderDelegate {
+  _TabsHeader({
+    required this.tab,
+    required this.onTab,
+    required this.labels,
+    required this.background,
+  });
+
+  final FeedTab tab;
+  final void Function(FeedTab) onTab;
+  final Map<FeedTab, String> labels;
+  final Color background;
+
+  static const _height = 60.0;
+
+  @override
+  double get minExtent => _height;
+
+  @override
+  double get maxExtent => _height;
+
+  @override
+  bool shouldRebuild(_TabsHeader old) =>
+      old.tab != tab || old.labels != labels || old.background != background;
+
+  @override
+  Widget build(BuildContext context, double shrink, bool overlaps) {
+    final cs = context.cs;
+    return Container(
+      color: background,
+      padding: const EdgeInsets.fromLTRB(
+        CsSpace.md,
+        CsSpace.sm + 2,
+        CsSpace.md,
+        CsSpace.xs,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: cs.surfaceVariant,
+          borderRadius: BorderRadius.circular(CsRadius.full),
+        ),
+        padding: const EdgeInsets.all(3),
+        child: Row(
+          children: [
+            for (final t in FeedTab.values)
+              Expanded(
+                child: Semantics(
+                  selected: t == tab,
+                  button: true,
+                  child: GestureDetector(
+                    onTap: () => onTab(t),
+                    child: AnimatedContainer(
+                      duration: CsMotion.fast,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: t == tab ? cs.primary : Colors.transparent,
+                        borderRadius: BorderRadius.circular(CsRadius.full),
+                      ),
+                      child: Text(
+                        labels[t]!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.text.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: t == tab ? cs.onPrimary : cs.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Topic chips; on the Issues tab also Open / Solved (and, for officials,
+/// the private safety reports).
+class _Topics extends StatelessWidget {
+  const _Topics({required this.staff});
+
+  final bool staff;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cubit = context.read<FeedCubit>();
+    final s = context.watch<FeedCubit>().state;
+    final issues = s.tab == FeedTab.issues;
+    final topics = issues
+        ? [
+            for (final c in IssueCategory.forIssues)
+              if (c != IssueCategory.safety) c,
+          ]
+        : IssueCategory.forPosts;
+    return SizedBox(
+      height: 52,
+      child: ListView(
+        // Each tab starts at its first chip.
+        key: ValueKey(s.tab),
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(
+          horizontal: CsSpace.md,
+          vertical: CsSpace.sm,
+        ),
+        children: [
+          if (issues) ...[
+            ChoiceChip(
+              label: Text(l10n.campusIssuesOpen),
+              selected: !s.solved,
+              showCheckmark: false,
+              onSelected: (_) => cubit.setSolved(false),
+            ),
+            const SizedBox(width: CsSpace.sm),
+            ChoiceChip(
+              avatar: const Icon(CsIcons.checkCircle, size: 18),
+              label: Text(l10n.voiceSortSolved),
+              selected: s.solved,
+              showCheckmark: false,
+              onSelected: (_) => cubit.setSolved(true),
+            ),
+            if (staff) ...[
+              const SizedBox(width: CsSpace.sm),
+              FilterChip(
+                avatar: const Icon(CsIcons.lock, size: 18),
+                label: Text(l10n.voiceSafetyReports),
+                selected: s.safety,
+                onSelected: cubit.setSafety,
+              ),
+            ],
+            const SizedBox(width: CsSpace.sm),
+            const VerticalDivider(width: CsSpace.sm),
+            const SizedBox(width: CsSpace.sm),
+          ],
+          ChoiceChip(
+            label: Text(l10n.voiceAllCategories),
+            selected: s.category == null,
+            showCheckmark: false,
+            onSelected: (_) => cubit.setCategory(null),
+          ),
+          for (final c in topics) ...[
+            const SizedBox(width: CsSpace.sm),
+            ChoiceChip(
+              avatar: Icon(
+                CsCategoryStyle.icon(c.wire),
+                size: 18,
+                color: CsCategoryStyle.color(c.wire),
+              ),
+              label: Text(categoryLabel(l10n, c)),
+              selected: s.category == c,
+              showCheckmark: false,
+              onSelected: (_) => cubit.setCategory(s.category == c ? null : c),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 }
 

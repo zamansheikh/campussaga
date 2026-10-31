@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../tokens/cs_icons.dart';
 
-/// Icon and muted tint of each issue category (wire names from the API).
+/// Icon and muted tint of each category (wire names from the API).
 /// Safety is the only red one. Each icon colour passes 3:1 on light and
 /// dark cards (test/color_contrast_test.dart).
 abstract final class CsCategoryStyle {
@@ -15,6 +15,11 @@ abstract final class CsCategoryStyle {
     'administration' => CsIcons.university,
     'food' => CsIcons.food,
     'it' => CsIcons.wifi,
+    'general' => CsIcons.general,
+    'event' => CsIcons.event,
+    'lost_found' => CsIcons.lostFound,
+    'buy_sell' => CsIcons.buySell,
+    'fun' => CsIcons.fun,
     _ => CsIcons.campus,
   };
 
@@ -27,6 +32,11 @@ abstract final class CsCategoryStyle {
     'administration' => const Color(0xFF6D6AF0),
     'food' => const Color(0xFFEA580C),
     'it' => const Color(0xFF0D9488),
+    'general' => const Color(0xFF3B82F6),
+    'event' => const Color(0xFFDB2777),
+    'lost_found' => const Color(0xFF059669),
+    'buy_sell' => const Color(0xFFB45309),
+    'fun' => const Color(0xFFC026D3),
     _ => const Color(0xFF64748B),
   };
 }

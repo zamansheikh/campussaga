@@ -45,9 +45,9 @@ import '../features/transport/presentation/pages/bus_stops_edit_page.dart';
 import '../features/transport/presentation/pages/bus_trips_edit_page.dart';
 import '../features/voice/presentation/pages/anonymity_page.dart';
 import '../features/voice/presentation/pages/campus_page.dart';
+import '../features/voice/presentation/pages/compose_page.dart';
 import '../features/voice/presentation/pages/issue_page.dart';
 import '../features/voice/presentation/pages/my_issues_page.dart';
-import '../features/voice/presentation/pages/raise_issue_page.dart';
 import 'di.dart';
 import 'settings/bloc/settings_cubit.dart';
 import 'version/version_gate_cubit.dart';
@@ -111,7 +111,17 @@ abstract final class Routes {
   static const campusNew = '/campus/new';
   static const campusMine = '/campus/mine';
   static const campusAnonymity = '/campus/anonymity';
-  static String campusIssue(String id) => '/campus/issues/$id';
+
+  /// A post; [comment] opens it with the comment box ready.
+  static String campusIssue(String id, {bool comment = false}) =>
+      '/campus/issues/$id${comment ? '?comment=1' : ''}';
+
+  /// The composer, on a kind; [photo] starts by picking a photo.
+  static String campusCompose(PostKind kind, {bool photo = false}) =>
+      '$campusNew?kind=${kind.wire}${photo ? '&photo=1' : ''}';
+
+  /// A shared post link (https://varsitykotha.com/c/{id}).
+  static String postLink(String id) => '/c/$id';
 
   // Find your class (routine discovery).
   static const findClass = '/find-class';
@@ -245,7 +255,16 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
       ),
       GoRoute(
         path: Routes.campusNew,
-        builder: (context, state) => const RaiseIssuePage(),
+        builder: (context, state) => ComposePage(
+          kind: PostKind.parse(state.uri.queryParameters['kind'] ?? 'post'),
+          pickPhoto: state.uri.queryParameters['photo'] == '1',
+        ),
+      ),
+      // A shared post (https://varsitykotha.com/c/{id}): open it.
+      GoRoute(
+        path: '/c/:id',
+        redirect: (context, state) =>
+            Routes.campusIssue(state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.campusMine,
@@ -257,8 +276,10 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
       ),
       GoRoute(
         path: '/campus/issues/:id',
-        builder: (context, state) =>
-            IssuePage(issueId: state.pathParameters['id']!),
+        builder: (context, state) => IssuePage(
+          issueId: state.pathParameters['id']!,
+          focusComment: state.uri.queryParameters['comment'] == '1',
+        ),
       ),
       // Find your class: search, then a group's routine preview.
       GoRoute(

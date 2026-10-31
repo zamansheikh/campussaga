@@ -12,7 +12,7 @@ import '../../../../app/router.dart';
 import '../bloc/my_issues_cubit.dart';
 import '../voice_format.dart';
 import '../voice_updates.dart';
-import '../widgets/issue_list_card.dart';
+import '../widgets/post_card.dart';
 
 /// The student's own issues, including ones under review or removed.
 class MyIssuesPage extends StatelessWidget {
@@ -55,13 +55,20 @@ class _MyIssuesViewState extends State<_MyIssuesView> {
     super.dispose();
   }
 
+  void _snack(Failure? f) {
+    if (f == null || !mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(voiceErrorText(context, f))));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cubit = context.read<MyIssuesCubit>();
     final s = context.watch<MyIssuesCubit>().state;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.voiceMyIssues)),
+      appBar: AppBar(title: Text(l10n.campusMyPosts)),
       body: RefreshIndicator(
         onRefresh: cubit.load,
         child: switch (s) {
@@ -82,9 +89,9 @@ class _MyIssuesViewState extends State<_MyIssuesView> {
             children: [
               CsEmptyState(
                 icon: CsIcons.raiseIssue,
-                title: l10n.voiceEmptyMine,
-                message: l10n.voiceEmptyMineHint,
-                actionLabel: l10n.voiceRaiseIssue,
+                title: l10n.campusEmptyMine,
+                message: l10n.campusEmptyMineHint,
+                actionLabel: l10n.campusNewPost,
                 onAction: () => context.push(Routes.campusNew),
               ),
             ],
@@ -97,11 +104,19 @@ class _MyIssuesViewState extends State<_MyIssuesView> {
             child: ListView.separated(
               padding: const EdgeInsets.all(CsSpace.md),
               itemCount: s.items.length,
-              separatorBuilder: (_, _) => const SizedBox(height: CsSpace.sm),
-              itemBuilder: (context, i) => IssueListCard(
-                card: s.items[i],
-                onTap: () => context.push(Routes.campusIssue(s.items[i].id)),
-              ),
+              separatorBuilder: (_, _) =>
+                  const SizedBox(height: CsSpace.sm + 4),
+              itemBuilder: (context, i) {
+                final card = s.items[i];
+                return PostCard(
+                  card: card,
+                  onOpen: () => context.push(Routes.campusIssue(card.id)),
+                  onComment: () =>
+                      context.push(Routes.campusIssue(card.id, comment: true)),
+                  onReact: (r) async => _snack(await cubit.react(card.id, r)),
+                  onVote: (o) async => _snack(await cubit.votePoll(card.id, o)),
+                );
+              },
             ),
           ),
         },

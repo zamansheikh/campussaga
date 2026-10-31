@@ -75,8 +75,9 @@ final class IssueState extends Equatable {
   ];
 }
 
-/// One issue and its comments. Actions return the failure to show (null =
-/// done); Me too updates at once and rolls back if the server says no.
+/// One post and its comments. Actions return the failure to show (null =
+/// done); reactions and likes update at once and roll back if the server
+/// says no.
 class IssueCubit extends Cubit<IssueState> {
   IssueCubit(this._repo, this._cache, this._userId, this.id, {Issue? cached})
     : super(IssueState(issue: cached, loading: true));
@@ -159,28 +160,78 @@ class IssueCubit extends Cubit<IssueState> {
     _cards.add(card);
   }
 
-  /// Me too on or off, shown at once.
-  Future<Failure?> toggleMeToo() async {
+  /// React (issues: Me too) or take it back (null), shown at once.
+  Future<Failure?> react(Reaction? reaction) async {
     final card = state.issue?.card;
     if (card == null) return null;
-    final on = !card.voted;
-    _setCard(
-      card.copyWith(
-        voted: on,
-        meTooCount: card.meTooCount + (on ? 1 : -1),
-        following: on || card.following,
-      ),
-    );
+    _setCard(card.reacted(reaction));
     try {
-      final r = await _repo.vote(id, on: on);
-      final now = state.issue!.card;
-      _setCard(now.copyWith(voted: r.voted, meTooCount: r.meTooCount));
+      final r = await _repo.react(id, reaction);
+      if (isClosed) return null;
+      _setCard(
+        state.issue!.card.copyWith(
+          voted: r.voted,
+          meTooCount: r.meTooCount,
+          reactions: r.reactions,
+          myReaction: () => r.myReaction,
+        ),
+      );
       return null;
     } on Failure catch (f) {
-      _setCard(card); // roll back
+      if (!isClosed) _setCard(card); // roll back
       return f;
     }
   }
+
+  /// Me too on or off (issues).
+  Future<Failure?> toggleMeToo() {
+    final card = state.issue?.card;
+    return react(card != null && card.voted ? null : Reaction.meToo);
+  }
+
+  /// Vote in the poll; the results show with the answer.
+  Future<Failure?> votePoll(String optionId) async {
+    final card = state.issue?.card;
+    if (card?.poll == null) return null;
+    try {
+      final poll = await _repo.votePoll(id, optionId);
+      if (!isClosed) _setCard(state.issue!.card.copyWith(poll: poll));
+      return null;
+    } on Failure catch (f) {
+      return f;
+    }
+  }
+
+  /// Like a comment on/off, shown at once.
+  Future<Failure?> likeComment(String commentId) async {
+    IssueComment? before;
+    for (final c in state.comments) {
+      if (c.id == commentId) before = c;
+    }
+    if (before == null) return null;
+    final on = !before.liked;
+    _setComment(
+      before.copyWith(
+        liked: on,
+        likeCount: (before.likeCount + (on ? 1 : -1)).clamp(0, 1 << 30),
+      ),
+    );
+    try {
+      final r = await _repo.likeComment(id, commentId, on: on);
+      if (isClosed) return null;
+      _setComment(before.copyWith(liked: r.liked, likeCount: r.likeCount));
+      return null;
+    } on Failure catch (f) {
+      if (!isClosed) _setComment(before);
+      return f;
+    }
+  }
+
+  void _setComment(IssueComment c) => emit(
+    state.copyWith(
+      comments: [for (final x in state.comments) x.id == c.id ? c : x],
+    ),
+  );
 
   Future<Failure?> toggleFollow() async {
     final card = state.issue?.card;
@@ -210,16 +261,25 @@ class IssueCubit extends Cubit<IssueState> {
     }
   }
 
-  Future<Failure?> addComment(String body, {required bool anonymous}) =>
-      _send(() async {
-        final c = await _repo.addComment(id, body, anonymous: anonymous);
-        if (isClosed) return;
-        final card = state.issue!.card;
-        emit(state.copyWith(comments: [...state.comments, c]));
-        _setCard(
-          card.copyWith(commentCount: card.commentCount + 1, following: true),
-        );
-      });
+  /// A comment, or a reply to [parentId].
+  Future<Failure?> addComment(
+    String body, {
+    required bool anonymous,
+    String? parentId,
+  }) => _send(() async {
+    final c = await _repo.addComment(
+      id,
+      body,
+      anonymous: anonymous,
+      parentId: parentId,
+    );
+    if (isClosed) return;
+    final card = state.issue!.card;
+    emit(state.copyWith(comments: [...state.comments, c]));
+    _setCard(
+      card.copyWith(commentCount: card.commentCount + 1, following: true),
+    );
+  });
 
   Future<Failure?> deleteComment(String commentId) => _send(() async {
     await _repo.deleteComment(id, commentId);

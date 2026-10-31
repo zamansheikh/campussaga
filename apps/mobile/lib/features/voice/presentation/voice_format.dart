@@ -2,6 +2,7 @@ import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/widgets.dart';
+
 import 'package:intl/intl.dart';
 
 import '../../auth/presentation/auth_error_text.dart';
@@ -23,7 +24,68 @@ String categoryLabel(AppLocalizations l10n, IssueCategory c) => switch (c) {
   IssueCategory.food => l10n.voiceCatFood,
   IssueCategory.it => l10n.voiceCatIt,
   IssueCategory.other => l10n.voiceCatOther,
+  IssueCategory.general => l10n.voiceCatGeneral,
+  IssueCategory.event => l10n.voiceCatEvent,
+  IssueCategory.lostFound => l10n.voiceCatLostFound,
+  IssueCategory.buySell => l10n.voiceCatBuySell,
+  IssueCategory.fun => l10n.voiceCatFun,
 };
+
+String kindLabel(AppLocalizations l10n, PostKind k) => switch (k) {
+  PostKind.post => l10n.campusKindPost,
+  PostKind.question => l10n.campusKindQuestion,
+  PostKind.poll => l10n.campusKindPoll,
+  PostKind.issue => l10n.campusKindIssue,
+};
+
+IconData kindIcon(PostKind k) => switch (k) {
+  PostKind.post => CsIcons.post,
+  PostKind.question => CsIcons.question,
+  PostKind.poll => CsIcons.poll,
+  PostKind.issue => CsIcons.raiseIssue,
+};
+
+String reactionLabel(AppLocalizations l10n, Reaction r) => switch (r) {
+  Reaction.meToo => l10n.voiceMeToo,
+  Reaction.like => l10n.reactLike,
+  Reaction.haha => l10n.reactHaha,
+  Reaction.wow => l10n.reactWow,
+  Reaction.sad => l10n.reactSad,
+  Reaction.clap => l10n.reactClap,
+};
+
+/// "42%" in the app's language.
+String percentText(BuildContext context, double share) =>
+    NumberFormat.percentPattern(_locale(context)).format(share);
+
+/// What a poll's footer says: votes, and the time left or "Final results".
+String pollFooter(BuildContext context, Poll poll, DateTime now) {
+  final l10n = AppLocalizations.of(context);
+  final votes = l10n.campusPollVotes(poll.totalVotes);
+  final String when;
+  if (poll.isClosed(now)) {
+    when = l10n.campusPollFinal;
+  } else {
+    final left = poll.closesAt.difference(now);
+    when = left.inHours >= 24
+        ? l10n.campusPollDaysLeft((left.inHours / 24).ceil())
+        : left.inHours >= 1
+        ? l10n.campusPollHoursLeft(left.inHours)
+        : l10n.campusPollEndingSoon;
+  }
+  final hint = !poll.resultsShown && !poll.isClosed(now)
+      ? ' · ${l10n.campusPollVoteToSee}'
+      : '';
+  return '$votes · $when$hint';
+}
+
+/// A post's words for sharing and pushes: the title of an issue, else the
+/// start of the text.
+String postSnippet(IssueCard c, {int max = 100}) {
+  final t = (c.isIssue && c.title.isNotEmpty ? c.title : c.preview).trim();
+  final chars = t.characters;
+  return chars.length <= max ? t : '${chars.take(max - 1)}…';
+}
 
 String statusLabel(AppLocalizations l10n, IssueStatus s) => switch (s) {
   IssueStatus.open => l10n.voiceStatusOpen,
@@ -129,6 +191,9 @@ String voiceErrorText(BuildContext context, Failure f) {
     'STATUS_CHANGE_INVALID' => l10n.errorStatusChangeInvalid,
     'NOTE_REQUIRED' => l10n.errorNoteRequired,
     'UNIVERSITY_REQUIRED' => l10n.errorUniversityRequired,
+    'POLL_CLOSED' => l10n.errorPollClosed,
+    'ALREADY_VOTED' => l10n.errorAlreadyVoted,
+    'NOT_AN_ISSUE' => l10n.errorNotAnIssue,
     _ when f is RateLimitedFailure => l10n.errorTooManyRequests,
     _ => authErrorText(l10n, f),
   };

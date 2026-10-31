@@ -84,6 +84,22 @@ void main() {
           ('PUT', '/api/v1/issues/i1/vote') => ok({
             'meTooCount': 13,
             'voted': true,
+            'reactions': {'haha': 4, 'like': 9},
+            'myReaction': 'haha',
+          }),
+          ('POST', '/api/v1/issues/i1/poll-vote') => ok({
+            'options': [
+              {'id': 'o1', 'label': 'Yes', 'votes': 3},
+              {'id': 'o2', 'label': 'No', 'votes': 1},
+            ],
+            'totalVotes': 4,
+            'myVote': 'o1',
+            'closesAt': '2026-11-03T10:00:00Z',
+            'closed': false,
+          }),
+          ('PUT', '/api/v1/issues/i1/comments/c1/like') => ok({
+            'likeCount': 2,
+            'liked': true,
           }),
           ('POST', '/api/v1/issues/i1/comments') => ok({
             'id': 'c1',
@@ -106,19 +122,34 @@ void main() {
     );
     expect(page.items.single.status, IssueStatus.inProgress);
     expect(page.nextCursor, 'c2');
-    expect(seen.last, contains('sort=new&category=hostel&q=water'));
+    expect(seen.last, contains('sort=new&kinds=all&category=hostel&q=water'));
+    await repo.feed(kinds: {PostKind.issue});
+    expect(seen.last, contains('kinds=issue '));
 
     final issue = await repo.issue('i1');
     expect(issue.timeline.single.actorTitle, 'Hall Provost');
     expect(issue.images.single.aspect, closeTo(1.333, 0.01));
     expect(issue.can.changeStatus, isTrue);
 
-    final v = await repo.vote('i1', on: true);
+    final v = await repo.react('i1', Reaction.haha);
     expect(v.meTooCount, 13);
+    expect(v.myReaction, Reaction.haha);
+    expect(v.reactions, {Reaction.haha: 4, Reaction.like: 9});
+    expect(seen.last, endsWith('{"reaction":"haha"}'));
+
+    final poll = await repo.votePoll('i1', 'o1');
+    expect(poll.myVote, 'o1');
+    expect(poll.options.first.votes, 3);
+    expect(poll.resultsShown, isTrue);
 
     final c = await repo.addComment('i1', ' Same here ');
     expect(c.handle, '7KQF');
-    expect(seen.last, contains('"body":"Same here","anonymous":true'));
+    expect(seen.last, contains('"body":"Same here","anonymous":true}'));
+    await repo.addComment('i1', 'Agreed', parentId: 'c1');
+    expect(seen.last, contains('"parentId":"c1"'));
+
+    final like = await repo.likeComment('i1', 'c1', on: true);
+    expect(like, (likeCount: 2, liked: true));
   });
 
   test('uploads photos as multipart and loads images as bytes', () async {

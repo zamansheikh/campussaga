@@ -58,6 +58,11 @@ void main() {
         'food',
         'it',
         'other',
+        'general',
+        'event',
+        'lost_found',
+        'buy_sell',
+        'fun',
       ]) {
         final color = CsCategoryStyle.color(cat);
         final tint = Color.alphaBlend(color.withValues(alpha: 0.13), c.surface);

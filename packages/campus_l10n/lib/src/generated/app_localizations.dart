@@ -4499,7 +4499,7 @@ abstract class AppLocalizations {
   /// No description provided for @voicePostNamedHint.
   ///
   /// In en, this message translates to:
-  /// **'Students will see your name on this issue.'**
+  /// **'Students will see your name on this post.'**
   String get voicePostNamedHint;
 
   /// No description provided for @voiceHowAnonymity.
@@ -4529,7 +4529,7 @@ abstract class AppLocalizations {
   /// No description provided for @voicePosted.
   ///
   /// In en, this message translates to:
-  /// **'Issue posted'**
+  /// **'Posted'**
   String get voicePosted;
 
   /// No description provided for @voicePostedHeld.
@@ -4735,6 +4735,462 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Moderators hid this while they look at it.'**
   String get voiceHeldModerator;
+
+  /// No description provided for @campusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus'**
+  String get campusTitle;
+
+  /// No description provided for @campusPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s happening on campus?'**
+  String get campusPrompt;
+
+  /// No description provided for @campusTabForYou.
+  ///
+  /// In en, this message translates to:
+  /// **'For you'**
+  String get campusTabForYou;
+
+  /// No description provided for @campusTabLatest.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get campusTabLatest;
+
+  /// No description provided for @campusTabAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Q&A'**
+  String get campusTabAsk;
+
+  /// No description provided for @campusTabIssues.
+  ///
+  /// In en, this message translates to:
+  /// **'Issues'**
+  String get campusTabIssues;
+
+  /// No description provided for @campusIssuesOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get campusIssuesOpen;
+
+  /// No description provided for @campusKindPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get campusKindPost;
+
+  /// No description provided for @campusKindQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask'**
+  String get campusKindQuestion;
+
+  /// No description provided for @campusKindPoll.
+  ///
+  /// In en, this message translates to:
+  /// **'Poll'**
+  String get campusKindPoll;
+
+  /// No description provided for @campusKindIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue'**
+  String get campusKindIssue;
+
+  /// No description provided for @campusBadgeQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Question'**
+  String get campusBadgeQuestion;
+
+  /// No description provided for @campusBadgePoll.
+  ///
+  /// In en, this message translates to:
+  /// **'Poll'**
+  String get campusBadgePoll;
+
+  /// No description provided for @campusQuickPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get campusQuickPhoto;
+
+  /// No description provided for @voiceCatGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get voiceCatGeneral;
+
+  /// No description provided for @voiceCatEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get voiceCatEvent;
+
+  /// No description provided for @voiceCatLostFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Lost & found'**
+  String get voiceCatLostFound;
+
+  /// No description provided for @voiceCatBuySell.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy & sell'**
+  String get voiceCatBuySell;
+
+  /// No description provided for @voiceCatFun.
+  ///
+  /// In en, this message translates to:
+  /// **'Fun'**
+  String get voiceCatFun;
+
+  /// No description provided for @reactLike.
+  ///
+  /// In en, this message translates to:
+  /// **'Like'**
+  String get reactLike;
+
+  /// No description provided for @reactHaha.
+  ///
+  /// In en, this message translates to:
+  /// **'Haha'**
+  String get reactHaha;
+
+  /// No description provided for @reactWow.
+  ///
+  /// In en, this message translates to:
+  /// **'Wow'**
+  String get reactWow;
+
+  /// No description provided for @reactSad.
+  ///
+  /// In en, this message translates to:
+  /// **'Sad'**
+  String get reactSad;
+
+  /// No description provided for @reactClap.
+  ///
+  /// In en, this message translates to:
+  /// **'Clap'**
+  String get reactClap;
+
+  /// No description provided for @campusComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get campusComment;
+
+  /// No description provided for @campusAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer'**
+  String get campusAnswer;
+
+  /// No description provided for @campusShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get campusShare;
+
+  /// No description provided for @campusSeeMore.
+  ///
+  /// In en, this message translates to:
+  /// **'See more'**
+  String get campusSeeMore;
+
+  /// No description provided for @campusCommentCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 comment} other{{count} comments}}'**
+  String campusCommentCount(int count);
+
+  /// No description provided for @campusAnswerCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 answer} other{{count} answers}}'**
+  String campusAnswerCount(int count);
+
+  /// No description provided for @campusReactSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'React. {count} reactions'**
+  String campusReactSemantics(int count);
+
+  /// No description provided for @campusLikeSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Like. {count} likes'**
+  String campusLikeSemantics(int count);
+
+  /// No description provided for @campusPollVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 vote} other{{count} votes}}'**
+  String campusPollVotes(int count);
+
+  /// No description provided for @campusPollDaysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day left} other{{count} days left}}'**
+  String campusPollDaysLeft(int count);
+
+  /// No description provided for @campusPollHoursLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 hour left} other{{count} hours left}}'**
+  String campusPollHoursLeft(int count);
+
+  /// No description provided for @campusPollEndingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends soon'**
+  String get campusPollEndingSoon;
+
+  /// No description provided for @campusPollFinal.
+  ///
+  /// In en, this message translates to:
+  /// **'Final results'**
+  String get campusPollFinal;
+
+  /// No description provided for @campusPollVoteToSee.
+  ///
+  /// In en, this message translates to:
+  /// **'Vote to see the results'**
+  String get campusPollVoteToSee;
+
+  /// No description provided for @campusReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get campusReply;
+
+  /// No description provided for @campusReplyingTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Replying to {name}'**
+  String campusReplyingTo(String name);
+
+  /// No description provided for @campusViewReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{View 1 reply} other{View {count} replies}}'**
+  String campusViewReplies(int count);
+
+  /// No description provided for @campusHideReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide replies'**
+  String get campusHideReplies;
+
+  /// No description provided for @campusReplyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a reply…'**
+  String get campusReplyHint;
+
+  /// No description provided for @campusAnswerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write an answer…'**
+  String get campusAnswerHint;
+
+  /// No description provided for @campusNewPost.
+  ///
+  /// In en, this message translates to:
+  /// **'New post'**
+  String get campusNewPost;
+
+  /// No description provided for @campusCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create post'**
+  String get campusCreateTitle;
+
+  /// No description provided for @campusPostAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get campusPostAction;
+
+  /// No description provided for @campusPostHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s on your mind?'**
+  String get campusPostHint;
+
+  /// No description provided for @campusQuestionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the campus anything…'**
+  String get campusQuestionHint;
+
+  /// No description provided for @campusPollHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask a question…'**
+  String get campusPollHint;
+
+  /// No description provided for @campusPollOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Option {n}'**
+  String campusPollOption(int n);
+
+  /// No description provided for @campusPollAddOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Add option'**
+  String get campusPollAddOption;
+
+  /// No description provided for @campusPollLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Poll length'**
+  String get campusPollLength;
+
+  /// No description provided for @campusPollDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String campusPollDays(int count);
+
+  /// No description provided for @campusPostingAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Posting as'**
+  String get campusPostingAs;
+
+  /// No description provided for @campusTopic.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic'**
+  String get campusTopic;
+
+  /// No description provided for @campusIssueNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Issues go to your university\'s officials, who can reply and update the status.'**
+  String get campusIssueNote;
+
+  /// No description provided for @campusShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'{text}\n\nSee it on VarsityKotha: {link}'**
+  String campusShareText(String text, String link);
+
+  /// No description provided for @campusMyPosts.
+  ///
+  /// In en, this message translates to:
+  /// **'My posts'**
+  String get campusMyPosts;
+
+  /// No description provided for @campusEmptyFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet'**
+  String get campusEmptyFeed;
+
+  /// No description provided for @campusEmptyFeedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Start the conversation: share something or ask a question.'**
+  String get campusEmptyFeedHint;
+
+  /// No description provided for @campusEmptyAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'No questions yet'**
+  String get campusEmptyAsk;
+
+  /// No description provided for @campusEmptyAskHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask anything: seniors and classmates here can answer.'**
+  String get campusEmptyAskHint;
+
+  /// No description provided for @campusEmptyMine.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t posted yet'**
+  String get campusEmptyMine;
+
+  /// No description provided for @campusEmptyMineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your posts, questions, polls and issues show here.'**
+  String get campusEmptyMineHint;
+
+  /// No description provided for @campusEmptySearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing matches your search'**
+  String get campusEmptySearch;
+
+  /// No description provided for @campusSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Campus'**
+  String get campusSearchHint;
+
+  /// No description provided for @campusDeletePostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this post?'**
+  String get campusDeletePostTitle;
+
+  /// No description provided for @campusEditPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit post'**
+  String get campusEditPost;
+
+  /// No description provided for @campusTextLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get campusTextLabel;
+
+  /// No description provided for @campusPhotoOrText.
+  ///
+  /// In en, this message translates to:
+  /// **'Write something or add a photo.'**
+  String get campusPhotoOrText;
+
+  /// No description provided for @campusPollNeedsOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least two different options.'**
+  String get campusPollNeedsOptions;
+
+  /// No description provided for @campusQuestionTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Write the question in a few more words.'**
+  String get campusQuestionTooShort;
+
+  /// No description provided for @errorPollClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'This poll has ended.'**
+  String get errorPollClosed;
+
+  /// No description provided for @errorAlreadyVoted.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve already voted in this poll.'**
+  String get errorAlreadyVoted;
+
+  /// No description provided for @errorNotAnIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'This can only be done on issues.'**
+  String get errorNotAnIssue;
 }
 
 class _AppLocalizationsDelegate

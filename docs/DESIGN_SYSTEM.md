@@ -205,7 +205,8 @@ Each component has:
 ## 7. Voice and copy
 
 - Short, calm, respectful. Talk to students like a helpful senior.
-- Say "issue", not "complaint". Say "me too", not "like".
+- Say "issue", not "complaint". On issues say "me too", not "like"; posts,
+  questions and polls take reactions (❤️ 😂 😮 😢 👏, docs/CAMPUS_SOCIAL.md).
 - Bangla copy is written in Bangla, not machine-translated from English.
 - Never blame: "This post was removed because it names a person", not "You broke the rules".
 

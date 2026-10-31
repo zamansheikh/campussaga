@@ -140,4 +140,18 @@ abstract final class CsIcons {
   static const IconData visitCampus = PhosphorIconsRegular.globeHemisphereEast;
   static const IconData warning = PhosphorIconsRegular.warning;
   static const IconData wifi = PhosphorIconsRegular.wifiHigh;
+
+  // Campus social (docs/CAMPUS_SOCIAL.md).
+  static const IconData buySell = PhosphorIconsRegular.tag;
+  static const IconData event = PhosphorIconsRegular.confetti;
+  static const IconData fun = PhosphorIconsRegular.smiley;
+  static const IconData general = PhosphorIconsRegular.chatsCircle;
+  static const IconData heart = PhosphorIconsRegular.heart;
+  static const IconData heartFill = PhosphorIconsFill.heart;
+  static const IconData lostFound = PhosphorIconsRegular.binoculars;
+  static const IconData poll = PhosphorIconsRegular.chartBarHorizontal;
+  static const IconData post = PhosphorIconsRegular.notePencil;
+  static const IconData question = PhosphorIconsRegular.sealQuestion;
+  static const IconData reply = PhosphorIconsRegular.arrowBendUpLeft;
+  static const IconData share = PhosphorIconsRegular.shareFat;
 }

@@ -33,13 +33,15 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <!-- Group invite links (https://varsitykotha.com/join/ABCDEF) open
-                 the app on the join screen. Verified with the site's
-                 /.well-known/assetlinks.json. -->
+                 the app on the join screen, shared Campus posts
+                 (https://varsitykotha.com/c/{id}) on the post. Verified with
+                 the site's /.well-known/assetlinks.json. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="https" android:host="varsitykotha.com" android:pathPrefix="/join/"/>
+                <data android:scheme="https" android:host="varsitykotha.com" android:pathPrefix="/c/"/>
             </intent-filter>
         </activity>
         <!-- Cropping a profile photo (image_cropper / uCrop). -->

@@ -1,5 +1,4 @@
 import 'package:campus_core/campus_core.dart';
-import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:varsitykotha/app/app.dart';
@@ -76,45 +75,58 @@ void main() {
     await tester.pumpWidget(const SizedBox()); // a fresh app
     await start(tester);
     await openCampus(tester);
-    expect(find.text('Campus Voice'), findsOneWidget);
+    expect(find.text("What's happening on campus?"), findsOneWidget);
+    expect(find.text('For you'), findsOneWidget);
     expect(find.text('No water in Hall 2 since Sunday'), findsOneWidget);
     expect(find.text('Bus 4 always late in the morning'), findsOneWidget);
     expect(find.text('In progress'), findsOneWidget);
     // Anonymous posts say so; never anything about the author.
     expect(find.text('Anonymous'), findsNWidgets(2));
+    // Every post has the same three actions.
+    expect(find.text('Me too'), findsNWidgets(2));
+    expect(find.text('Share'), findsNWidgets(2));
+    expect(voice.feedCalls.last.kinds, isNull, reason: 'every kind');
   });
 
-  testWidgets('filters by category and order, and keeps the feed offline', (
-    tester,
-  ) async {
+  testWidgets('tabs, topics and the offline copy', (tester) async {
     await start(tester);
     await openCampus(tester);
-    final chips = find.descendant(
-      of: find.byWidgetPredicate(
+    await tester.dragUntilVisible(
+      find.widgetWithText(ChoiceChip, 'Transport'),
+      find.byWidgetPredicate(
         (w) => w is ListView && w.scrollDirection == Axis.horizontal,
       ),
-      matching: find.byType(Scrollable),
+      const Offset(-150, 0),
     );
-    await tester.scrollUntilVisible(
-      find.widgetWithText(ChoiceChip, 'Transport'),
-      150,
-      scrollable: chips,
-    );
-    await tester.tap(find.widgetWithText(ChoiceChip, 'Transport'));
+    await scrollAndTap(tester, find.widgetWithText(ChoiceChip, 'Transport'));
     await tester.pumpAndSettle();
     expect(voice.feedCalls.last.category, IssueCategory.transport);
     expect(find.text('No water in Hall 2 since Sunday'), findsNothing);
+    // Tapping it again shows everything.
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Transport'));
+    await tester.pumpAndSettle();
+    expect(voice.feedCalls.last.category, isNull);
 
-    await tester.scrollUntilVisible(
-      find.widgetWithText(ChoiceChip, 'All'),
-      -150,
-      scrollable: chips,
-    );
-    await tester.tap(find.widgetWithText(ChoiceChip, 'All'));
-    await tester.tap(find.text('New'));
+    await tester.tap(find.text('Latest'));
     await tester.pumpAndSettle();
     expect(voice.feedCalls.last.sort, IssueSort.newest);
-    expect(cache.feeds['u1/new'], hasLength(2), reason: 'saved for offline');
+    expect(cache.feeds['u1/latest'], hasLength(2), reason: 'saved offline');
+
+    await tester.tap(find.text('Q&A'));
+    await tester.pumpAndSettle();
+    expect(voice.feedCalls.last.kinds, {PostKind.question});
+    expect(find.text('No questions yet'), findsOneWidget);
+
+    await tester.tap(find.text('Issues'));
+    await tester.pumpAndSettle();
+    expect(voice.feedCalls.last.kinds, {PostKind.issue});
+    expect(find.text('Safety reports'), findsNothing, reason: 'staff only');
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Solved'));
+    await tester.pumpAndSettle();
+    expect(voice.feedCalls.last.sort, IssueSort.solved);
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Open'));
+    await tester.tap(find.text('Latest'));
+    await tester.pumpAndSettle();
 
     voice.failure = const NetworkFailure();
     await tester.fling(
@@ -130,7 +142,78 @@ void main() {
     expect(find.text('No water in Hall 2 since Sunday'), findsOneWidget);
   });
 
-  testWidgets('raise an issue: category, details, photo, review, post', (
+  testWidgets('share a post with a photo, anonymously', (tester) async {
+    await start(tester);
+    await openCampus(tester);
+    await tester.tap(find.byTooltip('New post'));
+    await tester.pumpAndSettle();
+    expect(find.text('Create post'), findsOneWidget);
+    expect(find.text('Anonymous'), findsOneWidget, reason: 'the default');
+    final post = find.widgetWithText(FilledButton, 'Post');
+    expect(tester.widget<FilledButton>(post).onPressed, isNull);
+
+    await tester.enterText(
+      find.byType(TextField).first,
+      'Free coffee at the TSC fair today!',
+    );
+    await tester.pumpAndSettle();
+    await scrollAndTap(tester, find.widgetWithText(ChoiceChip, 'Events'));
+    await scrollAndTap(tester, find.bySemanticsLabel('Add photo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Choose from gallery'));
+    await tester.pumpAndSettle();
+    expect(voice.uploads, hasLength(1));
+    expect(cache.savedDraft?.kind, PostKind.post, reason: 'draft kept');
+
+    await tester.tap(post);
+    await tester.pumpAndSettle();
+    final d = voice.created.single;
+    expect(d.kind, PostKind.post);
+    expect(d.category, IssueCategory.event);
+    expect(d.anonymous, isTrue);
+    expect(d.imageIds, ['up1']);
+    expect(d.toJson().containsKey('title'), isFalse);
+    expect(cache.savedDraft, isNull, reason: 'draft cleared once posted');
+    // The new post opens.
+    expect(find.text('Free coffee at the TSC fair today!'), findsOneWidget);
+    expect(find.text('You'), findsOneWidget);
+  });
+
+  testWidgets('make a poll from the feed', (tester) async {
+    await start(tester);
+    await openCampus(tester);
+    await tester.tap(find.text('Poll'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Best place for tea?');
+    await tester.enterText(find.widgetWithText(TextField, 'Option 1'), 'TSC');
+    await tester.enterText(find.widgetWithText(TextField, 'Option 2'), 'tsc');
+    await tester.pumpAndSettle();
+    expect(find.text('Add at least two different options.'), findsOneWidget);
+    final post = find.widgetWithText(FilledButton, 'Post');
+    expect(tester.widget<FilledButton>(post).onPressed, isNull);
+
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Option 2'),
+      'Bot tola',
+    );
+    await scrollAndTap(tester, find.text('Add option'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Option 3'),
+      'Hall canteen',
+    );
+    await scrollAndTap(tester, find.text('7 days'));
+    await tester.pumpAndSettle();
+    await tester.tap(post);
+    await tester.pumpAndSettle();
+    final d = voice.created.single;
+    expect(d.kind, PostKind.poll);
+    expect(d.pollOptions, ['TSC', 'Bot tola', 'Hall canteen']);
+    expect(d.pollDays, 7);
+    expect(d.category, IssueCategory.general);
+  });
+
+  testWidgets('raise an issue: category, title, similar issues, photo', (
     tester,
   ) async {
     voice.similarResult = [
@@ -138,78 +221,55 @@ void main() {
     ];
     await start(tester);
     await openCampus(tester);
-    await tester.tap(find.text('Raise issue'));
-    await tester.pumpAndSettle();
-    expect(find.text('Step 1 of 3'), findsOneWidget);
-    expect(
-      tester
-          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Next'))
-          .onPressed,
-      isNull,
-      reason: 'nothing picked yet',
-    );
-    await tester.tap(find.text('Hostel'));
+    await tester.tap(find.text('Issue'));
     await tester.pumpAndSettle();
     expect(
-      find.text('Step 1 of 3'),
+      find.text(
+        "Issues go to your university's officials, who can reply and update "
+        'the status.',
+      ),
       findsOneWidget,
-      reason: 'picking is not moving on',
     );
-    expect(find.byIcon(CsIcons.checkCircle), findsOneWidget);
-    await tester.tap(find.widgetWithText(FilledButton, 'Next'));
-    await tester.pumpAndSettle();
-    expect(find.text('Step 2 of 3'), findsOneWidget);
-
-    // Too short: say how much to write.
+    final post = find.widgetWithText(FilledButton, 'Post');
     await tester.enterText(find.widgetWithText(TextField, 'Title'), 'Water');
     await tester.enterText(
       find.widgetWithText(TextField, 'Details'),
       'No water on the 3rd floor of Hall 2 since Sunday.',
     );
-    await scrollAndTap(tester, find.text('Next'));
     await tester.pumpAndSettle();
     expect(find.text('Write at least 8 characters.'), findsOneWidget);
     expect(
-      cache.savedDraft?.body,
-      startsWith('No water'),
-      reason: 'draft kept',
+      tester.widget<FilledButton>(post).onPressed,
+      isNull,
+      reason: 'no category, title too short',
     );
 
-    await tester.enterText(
-      find.widgetWithText(TextField, 'Title'),
-      'No water in Hall 2',
-    );
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Hostel'));
     await scrollAndTap(tester, find.bySemanticsLabel('Add photo'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Choose from gallery'));
     await tester.pumpAndSettle();
-    expect(voice.uploads, hasLength(1));
-    await scrollAndTap(tester, find.text('Next'));
-    await tester.pumpAndSettle();
-
-    // Review: similar issues, anonymous by default.
-    expect(find.text('Before you post'), findsOneWidget);
-    expect(find.text('Water problem in Hall 2'), findsOneWidget);
-    expect(find.text('Post anonymously'), findsOneWidget);
-    expect(
-      find.text('Your name, email and class are never shown.'),
-      findsOneWidget,
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Title'),
+      'No water in Hall 2',
     );
-    await scrollAndTap(tester, find.text('Post'));
+    await tester.pump(const Duration(milliseconds: 700));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Similar issues'));
+    expect(find.text('Similar issues'), findsOneWidget);
+    expect(find.text('Water problem in Hall 2'), findsOneWidget);
 
-    final posted = voice.created.single;
-    expect(posted.anonymous, isTrue);
-    expect(posted.category, IssueCategory.hostel);
-    expect(posted.imageIds, ['up1']);
-    expect(cache.savedDraft, isNull, reason: 'draft cleared once posted');
-    // The new issue opens.
+    await tester.tap(post);
+    await tester.pumpAndSettle();
+    final d = voice.created.single;
+    expect(d.kind, PostKind.issue);
+    expect(d.category, IssueCategory.hostel);
+    expect(d.title, 'No water in Hall 2');
+    expect(d.imageIds, ['up1']);
     expect(find.text('No water in Hall 2'), findsWidgets);
-    expect(find.text('You · 4 h ago'), findsOneWidget);
   });
 
   testWidgets('a held post explains itself to its author', (tester) async {
-    voice.holdNext = true;
     voice.issues.add(
       sampleIssue(
         id: 'mine',
@@ -221,7 +281,7 @@ void main() {
     );
     await start(tester);
     await openCampus(tester);
-    await tester.tap(find.byTooltip('My issues'));
+    await tester.tap(find.byTooltip('My posts'));
     await tester.pumpAndSettle();
     expect(find.text('Under review'), findsOneWidget);
     await tester.tap(find.text('Call 01712345678 about the canteen'));
@@ -261,7 +321,76 @@ void main() {
     expect(find.text('13'), findsOneWidget);
   });
 
-  testWidgets('comments show handles, the author and officials; report', (
+  testWidgets('react to a post: tap for a like, hold to pick', (tester) async {
+    voice.issues
+      ..clear()
+      ..add(
+        sampleIssue(
+          id: 'p1',
+          kind: PostKind.post,
+          category: IssueCategory.fun,
+          body: 'Who else is still awake for the 8 AM class?',
+          meToo: 2,
+          reactions: const {Reaction.haha: 2},
+        ),
+      );
+    await start(tester);
+    await openCampus(tester);
+    expect(find.text('😂'), findsOneWidget, reason: 'the summary');
+    await tester.tap(find.text('Like'));
+    await tester.pumpAndSettle();
+    expect(voice.issues.single.card.myReaction, Reaction.like);
+    expect(find.text('3'), findsOneWidget);
+
+    await tester.longPress(find.text('Like'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Wow'));
+    await tester.pumpAndSettle();
+    expect(voice.issues.single.card.myReaction, Reaction.wow);
+    expect(find.text('Wow'), findsOneWidget, reason: 'the button says so');
+    expect(find.text('3'), findsOneWidget, reason: 'still one each');
+
+    await tester.tap(find.text('Wow'));
+    await tester.pumpAndSettle();
+    expect(voice.issues.single.card.myReaction, isNull);
+    expect(find.text('2'), findsOneWidget);
+  });
+
+  testWidgets('vote in a poll, then see the results', (tester) async {
+    voice.issues
+      ..clear()
+      ..add(
+        sampleIssue(
+          id: 'p1',
+          kind: PostKind.poll,
+          category: IssueCategory.food,
+          body: 'Best place for tea?',
+          meToo: 0,
+          poll: Poll(
+            options: const [
+              PollOption(id: 'o1', label: 'TSC'),
+              PollOption(id: 'o2', label: 'Bot tola'),
+            ],
+            totalVotes: 2,
+            closesAt: DateTime(2026, 10, 30),
+          ),
+        ),
+      );
+    await start(tester);
+    await openCampus(tester);
+    expect(
+      find.text('2 votes · 3 days left · Vote to see the results'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Bot tola'));
+    await tester.pumpAndSettle();
+    expect(voice.issues.single.card.poll!.myVote, 'o2');
+    expect(find.text('100%'), findsOneWidget);
+    expect(find.text('0%'), findsOneWidget);
+    expect(find.text('3 votes · 3 days left'), findsOneWidget);
+  });
+
+  testWidgets('comments: handles, the author, replies and likes; report', (
     tester,
   ) async {
     voice.commentsByIssue['i1'] = [
@@ -282,28 +411,34 @@ void main() {
     await openCampus(tester);
     await tester.tap(find.text('No water in Hall 2 since Sunday'));
     await tester.pumpAndSettle();
-    expect(find.text('Student B2XZ'), findsOneWidget);
+    final list = find.byType(ListView).first;
+    await tester.dragUntilVisible(
+      find.text('Student B2XZ'),
+      list,
+      const Offset(0, -250),
+    );
     expect(find.text('Author'), findsOneWidget);
     expect(find.text('Commenting as Anonymous'), findsOneWidget);
 
+    // Like, then reply to the first comment.
+    await tester.tap(find.text('Like').first);
+    await tester.pumpAndSettle();
+    expect(voice.commentsByIssue['i1']!.first.liked, isTrue);
+    expect(find.text('Like · 1'), findsOneWidget);
+    await tester.tap(find.text('Reply').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Replying to Student B2XZ'), findsOneWidget);
     await tester.enterText(
-      find.widgetWithText(TextField, 'Add a comment'),
-      'Me too, room 304',
+      find.widgetWithText(TextField, 'Write a reply…'),
+      'Room 304 too',
     );
     await tester.tap(find.byTooltip('Send'));
     await tester.pumpAndSettle();
-    expect(voice.commentsByIssue['i1']!.last.body, 'Me too, room 304');
-    await tester.dragUntilVisible(
-      find.text('Student 7KQF'),
-      find.byType(ListView).first,
-      const Offset(0, -250),
-    );
-    expect(find.text('Student 7KQF'), findsOneWidget);
-    await tester.fling(
-      find.byType(ListView).first,
-      const Offset(0, 3000),
-      3000,
-    );
+    final reply = voice.commentsByIssue['i1']!.last;
+    expect(reply.body, 'Room 304 too');
+    expect(reply.parentId, 'c1');
+    expect(find.text('Commenting as Anonymous'), findsOneWidget);
+    await tester.fling(list, const Offset(0, 3000), 3000);
     await tester.pumpAndSettle();
 
     // Report the issue: anonymous, with a reason.
@@ -349,7 +484,9 @@ void main() {
       ),
     );
     await openCampus(tester);
-    expect(find.text('Safety reports'), findsOneWidget, reason: 'staff only');
+    await tester.tap(find.text('Issues'));
+    await tester.pumpAndSettle();
+    expect(find.text('Safety reports'), findsOneWidget, reason: 'staff');
     await tester.tap(find.text('No water in Hall 2 since Sunday'));
     await tester.pumpAndSettle();
     expect(find.text('University official'), findsOneWidget);
@@ -395,7 +532,6 @@ void main() {
   testWidgets('students see no official actions', (tester) async {
     await start(tester);
     await openCampus(tester);
-    expect(find.text('Safety reports'), findsNothing);
     await tester.tap(find.text('No water in Hall 2 since Sunday'));
     await tester.pumpAndSettle();
     expect(find.text('Change status'), findsNothing);
@@ -414,11 +550,16 @@ void main() {
     await start(tester, locale: const Locale('bn'));
     await tester.tap(find.text('ক্যাম্পাস'));
     await tester.pumpAndSettle();
-    expect(find.text('ক্যাম্পাস ভয়েস'), findsOneWidget);
+    expect(find.text('ক্যাম্পাসে কী হচ্ছে?'), findsOneWidget);
     expect(find.text('কাজ চলছে'), findsOneWidget);
     expect(find.text('১২'), findsOneWidget, reason: 'Bangla digits');
     await tester.tap(find.text('No water in Hall 2 since Sunday'));
     await tester.pumpAndSettle();
+    await tester.dragUntilVisible(
+      find.text('শিক্ষার্থী B2XZ'),
+      find.byType(ListView).first,
+      const Offset(0, -250),
+    );
     expect(find.text('শিক্ষার্থী B2XZ'), findsOneWidget);
   });
 
@@ -433,7 +574,12 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Bus 4 always late in the morning'), findsOneWidget);
-    expect(find.text('Comments · 0'.toUpperCase()), findsOneWidget);
+    await tester.dragUntilVisible(
+      find.text('0 COMMENTS'),
+      find.byType(ListView).first,
+      const Offset(0, -250),
+    );
+    expect(find.text('0 COMMENTS'), findsOneWidget);
   });
 
   testWidgets('how anonymity works', (tester) async {
@@ -449,7 +595,7 @@ void main() {
     );
   });
 
-  testWidgets('a saved draft reopens at step 1 with its category picked', (
+  testWidgets('a saved issue draft comes back in the issue composer', (
     tester,
   ) async {
     cache
@@ -460,31 +606,21 @@ void main() {
       );
     await start(tester);
     await openCampus(tester);
-    await tester.tap(find.text('Raise issue'));
+    // Another kind starts empty.
+    await tester.tap(find.byTooltip('New post'));
     await tester.pumpAndSettle();
-    expect(
-      find.text('Step 1 of 3'),
-      findsOneWidget,
-      reason: 'never jumps ahead',
-    );
-    expect(find.byIcon(CsIcons.checkCircle), findsOneWidget);
-    await tester.tap(find.widgetWithText(FilledButton, 'Next'));
+    expect(find.text('No water on the 3rd floor'), findsNothing);
+    await tester.tap(find.byTooltip('Close'));
     await tester.pumpAndSettle();
-    expect(find.text('Step 2 of 3'), findsOneWidget);
-    expect(find.text('No water on the 3rd floor'), findsOneWidget);
-  });
 
-  testWidgets('a category picked but nothing typed is not restored', (
-    tester,
-  ) async {
-    cache
-      ..draftUser = testUser.id
-      ..savedDraft = const VoiceDraft(category: IssueCategory.hostel);
-    await start(tester);
-    await openCampus(tester);
-    await tester.tap(find.text('Raise issue'));
+    await tester.tap(find.text('Issue'));
     await tester.pumpAndSettle();
-    expect(find.text('Step 1 of 3'), findsOneWidget);
-    expect(find.byIcon(CsIcons.checkCircle), findsNothing);
+    expect(find.text('No water on the 3rd floor'), findsOneWidget);
+    expect(
+      tester
+          .widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Hostel'))
+          .selected,
+      isTrue,
+    );
   });
 }

@@ -6,9 +6,25 @@ import '../../data/voice_cache.dart';
 
 enum FeedStatus { loading, ready, failure }
 
+/// The Campus feed's tabs.
+enum FeedTab {
+  /// Trending posts of every kind.
+  forYou,
+
+  /// Newest first, every kind.
+  latest,
+
+  /// Questions, newest first.
+  ask,
+
+  /// Issues: open ones by trend, or the solved ones.
+  issues,
+}
+
 final class FeedState extends Equatable {
   const FeedState({
-    this.sort = IssueSort.trending,
+    this.tab = FeedTab.forYou,
+    this.solved = false,
     this.category,
     this.query = '',
     this.safety = false,
@@ -20,11 +36,14 @@ final class FeedState extends Equatable {
     this.failure,
   });
 
-  final IssueSort sort;
+  final FeedTab tab;
+
+  /// Issues tab: the solved ones instead of the open ones.
+  final bool solved;
   final IssueCategory? category;
   final String query;
 
-  /// Officials and moderators: the private safety reports.
+  /// Officials and moderators (Issues tab): the private safety reports.
   final bool safety;
   final FeedStatus status;
   final List<IssueCard> items;
@@ -37,8 +56,26 @@ final class FeedState extends Equatable {
 
   bool get filtered => category != null || query.isNotEmpty || safety;
 
+  /// What the server is asked for.
+  IssueSort get sort => switch (tab) {
+    FeedTab.forYou => IssueSort.trending,
+    FeedTab.latest || FeedTab.ask => IssueSort.newest,
+    FeedTab.issues => solved ? IssueSort.solved : IssueSort.trending,
+  };
+
+  Set<PostKind>? get kinds => switch (tab) {
+    FeedTab.forYou || FeedTab.latest => null,
+    FeedTab.ask => const {PostKind.question},
+    FeedTab.issues => const {PostKind.issue},
+  };
+
+  /// Where the plain first page is saved on the phone.
+  String get cacheKey =>
+      tab == FeedTab.issues && solved ? 'issues-solved' : tab.name;
+
   FeedState copyWith({
-    IssueSort? sort,
+    FeedTab? tab,
+    bool? solved,
     IssueCategory? Function()? category,
     String? query,
     bool? safety,
@@ -49,7 +86,8 @@ final class FeedState extends Equatable {
     bool? offline,
     Failure? Function()? failure,
   }) => FeedState(
-    sort: sort ?? this.sort,
+    tab: tab ?? this.tab,
+    solved: solved ?? this.solved,
     category: category != null ? category() : this.category,
     query: query ?? this.query,
     safety: safety ?? this.safety,
@@ -63,7 +101,8 @@ final class FeedState extends Equatable {
 
   @override
   List<Object?> get props => [
-    sort,
+    tab,
+    solved,
     category,
     query,
     safety,
@@ -76,8 +115,9 @@ final class FeedState extends Equatable {
   ];
 }
 
-/// The university's issues: Trending / New / Solved, a category, a search.
-/// The plain first page of each order is saved for offline reading.
+/// The university's Campus feed: a tab, a topic, a search. The plain first
+/// page of each tab is saved for offline reading. Reactions and poll votes
+/// show at once and roll back if the server says no.
 class FeedCubit extends Cubit<FeedState> {
   FeedCubit(this._repo, this._cache, this._userId) : super(const FeedState());
 
@@ -86,17 +126,22 @@ class FeedCubit extends Cubit<FeedState> {
   final String _userId;
   int _request = 0;
 
+  Future<VoicePage<IssueCard>> _fetch(FeedState s, {String? cursor}) =>
+      _repo.feed(
+        sort: s.sort,
+        kinds: s.kinds,
+        category: s.category,
+        query: s.query,
+        cursor: cursor,
+        private: s.safety && s.tab == FeedTab.issues,
+      );
+
   Future<void> load() async {
     final request = ++_request;
     final s = state;
     emit(s.copyWith(status: FeedStatus.loading, failure: () => null));
     try {
-      final page = await _repo.feed(
-        sort: s.sort,
-        category: s.category,
-        query: s.query,
-        private: s.safety,
-      );
+      final page = await _fetch(s);
       if (isClosed || request != _request) return;
       emit(
         state.copyWith(
@@ -106,11 +151,11 @@ class FeedCubit extends Cubit<FeedState> {
           offline: false,
         ),
       );
-      if (!s.filtered) await _cache.saveFeed(_userId, s.sort, page.items);
+      if (!s.filtered) await _cache.saveFeed(_userId, s.cacheKey, page.items);
     } on Failure catch (f) {
       if (isClosed || request != _request) return;
       final saved = f is NetworkFailure && !s.filtered
-          ? await _cache.feed(_userId, s.sort)
+          ? await _cache.feed(_userId, s.cacheKey)
           : null;
       if (isClosed || request != _request) return;
       emit(
@@ -134,13 +179,7 @@ class FeedCubit extends Cubit<FeedState> {
     final request = _request;
     emit(s.copyWith(loadingMore: true));
     try {
-      final page = await _repo.feed(
-        sort: s.sort,
-        category: s.category,
-        query: s.query,
-        cursor: s.nextCursor,
-        private: s.safety,
-      );
+      final page = await _fetch(s, cursor: s.nextCursor);
       if (isClosed || request != _request) return;
       final seen = {for (final i in state.items) i.id};
       emit(
@@ -159,9 +198,16 @@ class FeedCubit extends Cubit<FeedState> {
     }
   }
 
-  void setSort(IssueSort sort) {
-    if (sort == state.sort) return;
-    emit(state.copyWith(sort: sort, items: const []));
+  void setTab(FeedTab tab) {
+    if (tab == state.tab) return;
+    emit(state.copyWith(tab: tab, items: const []));
+    load();
+  }
+
+  /// Issues tab: open or solved.
+  void setSolved(bool solved) {
+    if (solved == state.solved) return;
+    emit(state.copyWith(solved: solved, items: const []));
     load();
   }
 
@@ -184,7 +230,54 @@ class FeedCubit extends Cubit<FeedState> {
     load();
   }
 
-  /// An issue changed elsewhere (opened, voted, deleted).
+  IssueCard? _card(String id) {
+    for (final i in state.items) {
+      if (i.id == id) return i;
+    }
+    return null;
+  }
+
+  /// React (or take it back), shown at once.
+  Future<Failure?> react(String id, Reaction? reaction) async {
+    final before = _card(id);
+    if (before == null) return null;
+    updated(before.reacted(reaction));
+    try {
+      final r = await _repo.react(id, reaction);
+      final now = _card(id);
+      if (now != null && !isClosed) {
+        updated(
+          now.copyWith(
+            voted: r.voted,
+            meTooCount: r.meTooCount,
+            reactions: r.reactions,
+            myReaction: () => r.myReaction,
+          ),
+        );
+      }
+      return null;
+    } on Failure catch (f) {
+      if (!isClosed) updated(before);
+      return f;
+    }
+  }
+
+  /// Vote in a poll; the results show once the server answers.
+  Future<Failure?> votePoll(String id, String optionId) async {
+    final before = _card(id);
+    final poll = before?.poll;
+    if (before == null || poll == null) return null;
+    try {
+      final next = await _repo.votePoll(id, optionId);
+      final now = _card(id);
+      if (now != null && !isClosed) updated(now.copyWith(poll: next));
+      return null;
+    } on Failure catch (f) {
+      return f;
+    }
+  }
+
+  /// A post changed elsewhere (opened, reacted, deleted).
   void updated(IssueCard card) => emit(
     state.copyWith(
       items: [for (final i in state.items) i.id == card.id ? card : i],

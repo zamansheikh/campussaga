@@ -13,7 +13,12 @@ final onePixelPng = base64Decode(
 /// An issue for tests.
 Issue sampleIssue({
   String id = 'i1',
+  PostKind kind = PostKind.issue,
   String title = 'No water in Hall 2 since Sunday',
+  String body = 'The taps on the 3rd floor are dry since Sunday morning.',
+  Poll? poll,
+  Map<Reaction, int> reactions = const {},
+  Reaction? myReaction,
   IssueCategory category = IssueCategory.hostel,
   IssueStatus status = IssueStatus.open,
   ContentVisibility visibility = ContentVisibility.visible,
@@ -29,10 +34,16 @@ Issue sampleIssue({
 }) => Issue(
   card: IssueCard(
     id: id,
+    kind: kind,
     category: category,
     private: category == IssueCategory.safety,
-    title: title,
-    preview: 'The taps on the 3rd floor are dry.',
+    title: kind == PostKind.issue ? title : '',
+    preview: kind == PostKind.issue
+        ? 'The taps on the 3rd floor are dry.'
+        : body,
+    poll: poll,
+    reactions: reactions,
+    myReaction: myReaction,
     status: status,
     visibility: visibility,
     meTooCount: meToo,
@@ -45,7 +56,7 @@ Issue sampleIssue({
     locationLabel: 'Hall 2',
     createdAt: createdAt ?? DateTime(2026, 10, 27, 8),
   ),
-  body: 'The taps on the 3rd floor are dry since Sunday morning.',
+  body: body,
   images: images,
   timeline: timeline,
   holdReason: holdReason,
@@ -62,7 +73,13 @@ class FakeVoiceRepository implements VoiceRepository {
   final statusChanges = <(String, IssueStatus, String)>[];
   final feedCalls =
       <
-        ({IssueSort sort, IssueCategory? category, String? query, bool private})
+        ({
+          IssueSort sort,
+          Set<PostKind>? kinds,
+          IssueCategory? category,
+          String? query,
+          bool private,
+        })
       >[];
 
   /// Every call fails with this (e.g. NetworkFailure: offline).
@@ -97,6 +114,7 @@ class FakeVoiceRepository implements VoiceRepository {
   @override
   Future<VoicePage<IssueCard>> feed({
     IssueSort sort = IssueSort.trending,
+    Set<PostKind>? kinds,
     IssueCategory? category,
     String? query,
     String? cursor,
@@ -104,6 +122,7 @@ class FakeVoiceRepository implements VoiceRepository {
   }) async {
     feedCalls.add((
       sort: sort,
+      kinds: kinds,
       category: category,
       query: query,
       private: private,
@@ -113,9 +132,13 @@ class FakeVoiceRepository implements VoiceRepository {
     return VoicePage([
       for (final i in issues)
         if (i.card.visibility == ContentVisibility.visible &&
+            (kinds == null || kinds.contains(i.card.kind)) &&
             i.card.private == private &&
             (category == null || i.card.category == category) &&
-            (q.isEmpty || i.card.title.toLowerCase().contains(q)) &&
+            (q.isEmpty ||
+                '${i.card.title} ${i.card.preview}'.toLowerCase().contains(
+                  q,
+                )) &&
             (sort != IssueSort.solved || i.card.status == IssueStatus.solved))
           i.card,
     ]);
@@ -139,8 +162,24 @@ class FakeVoiceRepository implements VoiceRepository {
     created.add(draft);
     final issue = sampleIssue(
       id: 'new${++_ids}',
+      kind: draft.kind,
       title: draft.title,
+      body: draft.body,
       category: draft.category,
+      poll: draft.kind != PostKind.poll
+          ? null
+          : Poll(
+              options: [
+                for (final (n, o) in draft.pollOptions.indexed)
+                  PollOption(id: 'o$n', label: o),
+              ],
+              closesAt: DateTime(
+                2026,
+                10,
+                27,
+                8,
+              ).add(Duration(days: draft.pollDays)),
+            ),
       mine: true,
       meToo: 0,
       visibility: holdNext ? ContentVisibility.held : ContentVisibility.visible,
@@ -181,16 +220,48 @@ class FakeVoiceRepository implements VoiceRepository {
   }
 
   @override
-  Future<({int meTooCount, bool voted})> vote(
-    String id, {
-    required bool on,
-  }) async {
+  Future<ReactResult> react(String id, Reaction? reaction) async {
     _check();
     if (voteFailure != null) throw voteFailure!;
     final i = _find(id);
-    final count = i.card.meTooCount + (on == i.card.voted ? 0 : (on ? 1 : -1));
-    _put(i.withCard(i.card.copyWith(voted: on, meTooCount: count)));
-    return (meTooCount: count, voted: on);
+    if (i.card.isIssue && i.card.mine && reaction != null) {
+      throw const RejectedFailure(code: 'CANNOT_VOTE_OWN');
+    }
+    final r = i.card.isIssue && reaction != null ? Reaction.meToo : reaction;
+    final next = i.card.reacted(r);
+    _put(i.withCard(next));
+    return (
+      meTooCount: next.meTooCount,
+      voted: next.voted,
+      reactions: next.reactions,
+      myReaction: next.myReaction,
+    );
+  }
+
+  @override
+  Future<Poll> votePoll(String id, String optionId) async {
+    _check();
+    final i = _find(id);
+    final poll = i.card.poll;
+    if (poll == null) throw const RejectedFailure(code: 'POLL_CLOSED');
+    if (poll.myVote != null) {
+      throw const RejectedFailure(code: 'ALREADY_VOTED');
+    }
+    final next = Poll(
+      options: [
+        for (final o in poll.options)
+          PollOption(
+            id: o.id,
+            label: o.label,
+            votes: (o.votes ?? 0) + (o.id == optionId ? 1 : 0),
+          ),
+      ],
+      totalVotes: poll.totalVotes + 1,
+      myVote: optionId,
+      closesAt: poll.closesAt,
+    );
+    _put(i.withCard(i.card.copyWith(poll: next)));
+    return next;
   }
 
   @override
@@ -224,10 +295,12 @@ class FakeVoiceRepository implements VoiceRepository {
     String issueId,
     String body, {
     bool anonymous = true,
+    String? parentId,
   }) async {
     _check();
     final c = IssueComment(
       id: 'c${++_ids}',
+      parentId: parentId,
       body: body,
       handle: anonymous ? '7KQF' : '',
       mine: true,
@@ -236,6 +309,22 @@ class FakeVoiceRepository implements VoiceRepository {
     );
     (commentsByIssue[issueId] ??= []).add(c);
     return c;
+  }
+
+  @override
+  Future<({int likeCount, bool liked})> likeComment(
+    String issueId,
+    String commentId, {
+    required bool on,
+  }) async {
+    _check();
+    final list = commentsByIssue[issueId] ?? [];
+    final at = list.indexWhere((c) => c.id == commentId);
+    if (at < 0) throw const NotFoundFailure(code: 'COMMENT_NOT_FOUND');
+    final c = list[at];
+    final n = c.likeCount + (on == c.liked ? 0 : (on ? 1 : -1));
+    list[at] = c.copyWith(likeCount: n, liked: on);
+    return (likeCount: n, liked: on);
   }
 
   @override

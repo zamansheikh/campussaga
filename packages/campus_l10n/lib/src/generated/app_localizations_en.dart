@@ -2624,7 +2624,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voicePostAnonHint => 'Your name, email and class are never shown.';
 
   @override
-  String get voicePostNamedHint => 'Students will see your name on this issue.';
+  String get voicePostNamedHint => 'Students will see your name on this post.';
 
   @override
   String get voiceHowAnonymity => 'How anonymity works';
@@ -2639,7 +2639,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceBack => 'Back';
 
   @override
-  String get voicePosted => 'Issue posted';
+  String get voicePosted => 'Posted';
 
   @override
   String get voicePostedHeld =>
@@ -2761,4 +2761,344 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceHeldModerator => 'Moderators hid this while they look at it.';
+
+  @override
+  String get campusTitle => 'Campus';
+
+  @override
+  String get campusPrompt => 'What\'s happening on campus?';
+
+  @override
+  String get campusTabForYou => 'For you';
+
+  @override
+  String get campusTabLatest => 'Latest';
+
+  @override
+  String get campusTabAsk => 'Q&A';
+
+  @override
+  String get campusTabIssues => 'Issues';
+
+  @override
+  String get campusIssuesOpen => 'Open';
+
+  @override
+  String get campusKindPost => 'Post';
+
+  @override
+  String get campusKindQuestion => 'Ask';
+
+  @override
+  String get campusKindPoll => 'Poll';
+
+  @override
+  String get campusKindIssue => 'Issue';
+
+  @override
+  String get campusBadgeQuestion => 'Question';
+
+  @override
+  String get campusBadgePoll => 'Poll';
+
+  @override
+  String get campusQuickPhoto => 'Photo';
+
+  @override
+  String get voiceCatGeneral => 'General';
+
+  @override
+  String get voiceCatEvent => 'Events';
+
+  @override
+  String get voiceCatLostFound => 'Lost & found';
+
+  @override
+  String get voiceCatBuySell => 'Buy & sell';
+
+  @override
+  String get voiceCatFun => 'Fun';
+
+  @override
+  String get reactLike => 'Like';
+
+  @override
+  String get reactHaha => 'Haha';
+
+  @override
+  String get reactWow => 'Wow';
+
+  @override
+  String get reactSad => 'Sad';
+
+  @override
+  String get reactClap => 'Clap';
+
+  @override
+  String get campusComment => 'Comment';
+
+  @override
+  String get campusAnswer => 'Answer';
+
+  @override
+  String get campusShare => 'Share';
+
+  @override
+  String get campusSeeMore => 'See more';
+
+  @override
+  String campusCommentCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString comments',
+      one: '1 comment',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String campusAnswerCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString answers',
+      one: '1 answer',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String campusReactSemantics(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'React. $countString reactions';
+  }
+
+  @override
+  String campusLikeSemantics(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Like. $countString likes';
+  }
+
+  @override
+  String campusPollVotes(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString votes',
+      one: '1 vote',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String campusPollDaysLeft(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString days left',
+      one: '1 day left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String campusPollHoursLeft(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString hours left',
+      one: '1 hour left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get campusPollEndingSoon => 'Ends soon';
+
+  @override
+  String get campusPollFinal => 'Final results';
+
+  @override
+  String get campusPollVoteToSee => 'Vote to see the results';
+
+  @override
+  String get campusReply => 'Reply';
+
+  @override
+  String campusReplyingTo(String name) {
+    return 'Replying to $name';
+  }
+
+  @override
+  String campusViewReplies(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'View $countString replies',
+      one: 'View 1 reply',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get campusHideReplies => 'Hide replies';
+
+  @override
+  String get campusReplyHint => 'Write a reply…';
+
+  @override
+  String get campusAnswerHint => 'Write an answer…';
+
+  @override
+  String get campusNewPost => 'New post';
+
+  @override
+  String get campusCreateTitle => 'Create post';
+
+  @override
+  String get campusPostAction => 'Post';
+
+  @override
+  String get campusPostHint => 'What\'s on your mind?';
+
+  @override
+  String get campusQuestionHint => 'Ask the campus anything…';
+
+  @override
+  String get campusPollHint => 'Ask a question…';
+
+  @override
+  String campusPollOption(int n) {
+    final intl.NumberFormat nNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String nString = nNumberFormat.format(n);
+
+    return 'Option $nString';
+  }
+
+  @override
+  String get campusPollAddOption => 'Add option';
+
+  @override
+  String get campusPollLength => 'Poll length';
+
+  @override
+  String campusPollDays(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get campusPostingAs => 'Posting as';
+
+  @override
+  String get campusTopic => 'Topic';
+
+  @override
+  String get campusIssueNote =>
+      'Issues go to your university\'s officials, who can reply and update the status.';
+
+  @override
+  String campusShareText(String text, String link) {
+    return '$text\n\nSee it on VarsityKotha: $link';
+  }
+
+  @override
+  String get campusMyPosts => 'My posts';
+
+  @override
+  String get campusEmptyFeed => 'Nothing here yet';
+
+  @override
+  String get campusEmptyFeedHint =>
+      'Start the conversation: share something or ask a question.';
+
+  @override
+  String get campusEmptyAsk => 'No questions yet';
+
+  @override
+  String get campusEmptyAskHint =>
+      'Ask anything: seniors and classmates here can answer.';
+
+  @override
+  String get campusEmptyMine => 'You haven\'t posted yet';
+
+  @override
+  String get campusEmptyMineHint =>
+      'Your posts, questions, polls and issues show here.';
+
+  @override
+  String get campusEmptySearch => 'Nothing matches your search';
+
+  @override
+  String get campusSearchHint => 'Search Campus';
+
+  @override
+  String get campusDeletePostTitle => 'Delete this post?';
+
+  @override
+  String get campusEditPost => 'Edit post';
+
+  @override
+  String get campusTextLabel => 'Text';
+
+  @override
+  String get campusPhotoOrText => 'Write something or add a photo.';
+
+  @override
+  String get campusPollNeedsOptions => 'Add at least two different options.';
+
+  @override
+  String get campusQuestionTooShort =>
+      'Write the question in a few more words.';
+
+  @override
+  String get errorPollClosed => 'This poll has ended.';
+
+  @override
+  String get errorAlreadyVoted => 'You\'ve already voted in this poll.';
+
+  @override
+  String get errorNotAnIssue => 'This can only be done on issues.';
 }

@@ -7,14 +7,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// not kept (too large); the student adds them again.
 class VoiceDraft {
   const VoiceDraft({
+    this.kind = PostKind.issue,
     this.category,
     this.title = '',
     this.body = '',
     this.place = '',
     this.anonymous = true,
+    this.pollOptions = const [],
   });
 
   factory VoiceDraft.fromJson(Map<String, Object?> json) => VoiceDraft(
+    // Drafts saved before posts existed were issues.
+    kind: PostKind.parse(json['kind'] as String? ?? 'issue'),
     category: json['category'] == null
         ? null
         : IssueCategory.parse(json['category'] as String?),
@@ -22,31 +26,44 @@ class VoiceDraft {
     body: json['body'] as String? ?? '',
     place: json['place'] as String? ?? '',
     anonymous: json['anonymous'] as bool? ?? true,
+    pollOptions: [
+      for (final o in json['pollOptions'] as List<Object?>? ?? const [])
+        if (o is String) o,
+    ],
   );
 
+  final PostKind kind;
   final IssueCategory? category;
   final String title;
   final String body;
   final String place;
   final bool anonymous;
+  final List<String> pollOptions;
 
   /// Nothing typed yet (a picked category alone isn't worth restoring).
-  bool get isEmpty => title.isEmpty && body.isEmpty && place.isEmpty;
+  bool get isEmpty =>
+      title.isEmpty &&
+      body.isEmpty &&
+      place.isEmpty &&
+      pollOptions.every((o) => o.isEmpty);
 
   Map<String, Object?> toJson() => {
+    'kind': kind.wire,
     'category': category?.wire,
     'title': title,
     'body': body,
     'place': place,
     'anonymous': anonymous,
+    'pollOptions': pollOptions,
   };
 }
 
 /// Campus Voice saved on the phone, per account: the last feed page of each
 /// order, recently opened issues (to read offline) and the draft.
 abstract interface class VoiceCache {
-  Future<List<IssueCard>?> feed(String userId, IssueSort sort);
-  Future<void> saveFeed(String userId, IssueSort sort, List<IssueCard> items);
+  /// The last first page of a feed tab ([key]).
+  Future<List<IssueCard>?> feed(String userId, String key);
+  Future<void> saveFeed(String userId, String key, List<IssueCard> items);
   Future<Issue?> issue(String userId, String id);
   Future<void> saveIssue(String userId, Issue issue);
   Future<VoiceDraft?> draft(String userId);
@@ -82,8 +99,8 @@ class PrefsVoiceCache implements VoiceCache {
   }
 
   @override
-  Future<List<IssueCard>?> feed(String userId, IssueSort sort) async {
-    final json = await _read('$_feed${sort.wire}', userId);
+  Future<List<IssueCard>?> feed(String userId, String key) async {
+    final json = await _read('$_feed$key', userId);
     if (json == null) return null;
     try {
       return [
@@ -96,9 +113,9 @@ class PrefsVoiceCache implements VoiceCache {
   }
 
   @override
-  Future<void> saveFeed(String userId, IssueSort sort, List<IssueCard> items) =>
+  Future<void> saveFeed(String userId, String key, List<IssueCard> items) =>
       _prefs.setString(
-        '$_feed${sort.wire}',
+        '$_feed$key',
         jsonEncode({
           'userId': userId,
           'items': [for (final c in items) c.toJson()],
@@ -153,8 +170,8 @@ class PrefsVoiceCache implements VoiceCache {
 
   @override
   Future<void> clear() async {
-    for (final s in IssueSort.values) {
-      await _prefs.remove('$_feed${s.wire}');
+    for (final k in await _prefs.getKeys()) {
+      if (k.startsWith(_feed)) await _prefs.remove(k);
     }
     await _prefs.remove(_issues);
     await _prefs.remove(_draft);
@@ -169,15 +186,15 @@ class MemoryVoiceCache implements VoiceCache {
   String? draftUser;
 
   @override
-  Future<List<IssueCard>?> feed(String userId, IssueSort sort) async =>
-      feeds['$userId/${sort.wire}'];
+  Future<List<IssueCard>?> feed(String userId, String key) async =>
+      feeds['$userId/$key'];
 
   @override
   Future<void> saveFeed(
     String userId,
-    IssueSort sort,
+    String key,
     List<IssueCard> items,
-  ) async => feeds['$userId/${sort.wire}'] = items;
+  ) async => feeds['$userId/$key'] = items;
 
   @override
   Future<Issue?> issue(String userId, String id) async => issues['$userId/$id'];

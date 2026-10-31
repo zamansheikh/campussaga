@@ -2,12 +2,23 @@ import 'dart:typed_data';
 
 import 'voice_models.dart';
 
-/// Campus Voice API (docs/CAMPUS_VOICE.md §4). Every call throws a
-/// `Failure`; codes the app shows are mapped in the voice feature.
+/// The result of a reaction: the server's counts.
+typedef ReactResult = ({
+  int meTooCount,
+  bool voted,
+  Map<Reaction, int> reactions,
+  Reaction? myReaction,
+});
+
+/// Campus API (docs/CAMPUS_VOICE.md §4, docs/CAMPUS_SOCIAL.md §3). Every
+/// call throws a `Failure`; codes the app shows are mapped in the voice
+/// feature.
 abstract interface class VoiceRepository {
-  /// The university's feed. [private] lists safety issues (officials only).
+  /// The university's feed. [kinds] null = every kind. [private] lists
+  /// safety issues (officials only).
   Future<VoicePage<IssueCard>> feed({
     IssueSort sort = IssueSort.trending,
+    Set<PostKind>? kinds,
     IssueCategory? category,
     String? query,
     String? cursor,
@@ -31,8 +42,12 @@ abstract interface class VoiceRepository {
 
   Future<void> delete(String id);
 
-  /// Me too on/off: the new count.
-  Future<({int meTooCount, bool voted})> vote(String id, {required bool on});
+  /// React with [reaction] (issues: Me too, whatever is passed), or take
+  /// the caller's reaction back (null).
+  Future<ReactResult> react(String id, Reaction? reaction);
+
+  /// Vote in a poll (once): the poll with its results.
+  Future<Poll> votePoll(String id, String optionId);
 
   Future<bool> follow(String id, {required bool on});
 
@@ -41,10 +56,19 @@ abstract interface class VoiceRepository {
 
   Future<VoicePage<IssueComment>> comments(String issueId, {String? cursor});
 
+  /// A comment, or a reply when [parentId] is set.
   Future<IssueComment> addComment(
     String issueId,
     String body, {
     bool anonymous = true,
+    String? parentId,
+  });
+
+  /// Like on/off: the new count.
+  Future<({int likeCount, bool liked})> likeComment(
+    String issueId,
+    String commentId, {
+    required bool on,
   });
 
   Future<void> deleteComment(String issueId, String commentId);
@@ -62,7 +86,7 @@ abstract interface class VoiceRepository {
     String details = '',
   });
 
-  /// The caller's own issues, every state, newest first.
+  /// The caller's own posts of every kind and state, newest first.
   Future<VoicePage<IssueCard>> myIssues({String? cursor});
 
   /// One photo (already compressed on the phone).

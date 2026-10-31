@@ -4,7 +4,7 @@ import 'package:campus_core/campus_core.dart';
 
 import '../api_client.dart';
 
-/// Campus Voice over HTTP (docs/CAMPUS_VOICE.md §4.2–4.3).
+/// Campus over HTTP (docs/CAMPUS_VOICE.md §4.2–4.3, docs/CAMPUS_SOCIAL.md §3).
 class ApiVoiceRepository implements VoiceRepository {
   ApiVoiceRepository(this._api);
 
@@ -31,16 +31,26 @@ class ApiVoiceRepository implements VoiceRepository {
     ], json['nextCursor'] as String?);
   }
 
+  /// The `kinds` query value: every kind unless narrowed.
+  static String _kinds(Set<PostKind>? kinds) =>
+      kinds == null || kinds.length == PostKind.values.length
+      ? 'all'
+      : [
+          for (final k in PostKind.values)
+            if (kinds.contains(k)) k.wire,
+        ].join(',');
+
   @override
   Future<VoicePage<IssueCard>> feed({
     IssueSort sort = IssueSort.trending,
+    Set<PostKind>? kinds,
     IssueCategory? category,
     String? query,
     String? cursor,
     bool private = false,
   }) async => _page(
     await _api.get(
-      '/issues${_q({'sort': sort.wire, 'category': category?.wire, 'q': query?.trim(), 'cursor': cursor, 'private': private ? 'true' : null})}',
+      '/issues${_q({'sort': sort.wire, 'kinds': _kinds(kinds), 'category': category?.wire, 'q': query?.trim(), 'cursor': cursor, 'private': private ? 'true' : null})}',
     ),
     IssueCard.fromJson,
   );
@@ -84,20 +94,32 @@ class ApiVoiceRepository implements VoiceRepository {
   Future<void> delete(String id) => _api.delete('/issues/$id');
 
   @override
-  Future<({int meTooCount, bool voted})> vote(
-    String id, {
-    required bool on,
-  }) async {
+  Future<ReactResult> react(String id, Reaction? reaction) async {
     final data = _map(
-      on
-          ? await _api.put('/issues/$id/vote', null)
+      reaction != null
+          ? await _api.put('/issues/$id/vote', {'reaction': reaction.wire})
           : await _api.delete('/issues/$id/vote'),
     );
+    final counts = <Reaction, int>{};
+    if (data['reactions'] case final Map<String, Object?> m) {
+      for (final e in m.entries) {
+        final r = Reaction.parse(e.key);
+        final n = (e.value as num?)?.toInt() ?? 0;
+        if (r != null && n > 0) counts[r] = n;
+      }
+    }
     return (
       meTooCount: (data['meTooCount'] as num?)?.toInt() ?? 0,
-      voted: data['voted'] as bool? ?? on,
+      voted: data['voted'] as bool? ?? reaction != null,
+      reactions: counts,
+      myReaction: Reaction.parse(data['myReaction'] as String?),
     );
   }
+
+  @override
+  Future<Poll> votePoll(String id, String optionId) async => Poll.fromJson(
+    _map(await _api.post('/issues/$id/poll-vote', {'optionId': optionId})),
+  );
 
   @override
   Future<bool> follow(String id, {required bool on}) async {
@@ -126,14 +148,32 @@ class ApiVoiceRepository implements VoiceRepository {
     String issueId,
     String body, {
     bool anonymous = true,
+    String? parentId,
   }) async => IssueComment.fromJson(
     _map(
       await _api.post('/issues/$issueId/comments', {
         'body': body.trim(),
         'anonymous': anonymous,
+        'parentId': ?parentId,
       }),
     ),
   );
+
+  @override
+  Future<({int likeCount, bool liked})> likeComment(
+    String issueId,
+    String commentId, {
+    required bool on,
+  }) async {
+    final path = '/issues/$issueId/comments/$commentId/like';
+    final data = _map(
+      on ? await _api.put(path, null) : await _api.delete(path),
+    );
+    return (
+      likeCount: (data['likeCount'] as num?)?.toInt() ?? 0,
+      liked: data['liked'] as bool? ?? on,
+    );
+  }
 
   @override
   Future<void> deleteComment(String issueId, String commentId) =>
@@ -162,7 +202,7 @@ class ApiVoiceRepository implements VoiceRepository {
 
   @override
   Future<VoicePage<IssueCard>> myIssues({String? cursor}) async => _page(
-    await _api.get('/me/issues${_q({'cursor': cursor})}'),
+    await _api.get('/me/issues${_q({'kinds': 'all', 'cursor': cursor})}'),
     IssueCard.fromJson,
   );
 

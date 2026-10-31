@@ -2579,7 +2579,7 @@ class AppLocalizationsBn extends AppLocalizations {
       'তোমার নাম, ইমেইল বা ক্লাস কখনো দেখানো হয় না।';
 
   @override
-  String get voicePostNamedHint => 'এই ইস্যুতে শিক্ষার্থীরা তোমার নাম দেখবে।';
+  String get voicePostNamedHint => 'এই পোস্টে শিক্ষার্থীরা তোমার নাম দেখবে।';
 
   @override
   String get voiceHowAnonymity => 'বেনামি কীভাবে কাজ করে';
@@ -2594,7 +2594,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get voiceBack => 'আগের ধাপ';
 
   @override
-  String get voicePosted => 'ইস্যু পোস্ট হয়েছে';
+  String get voicePosted => 'পোস্ট হয়েছে';
 
   @override
   String get voicePostedHeld => 'পোস্ট হয়েছে। একটু যাচাইয়ের পর অন্যরা দেখবে।';
@@ -2715,4 +2715,301 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get voiceHeldModerator => 'মডারেটররা দেখার সময় এটা লুকিয়ে রেখেছেন।';
+
+  @override
+  String get campusTitle => 'ক্যাম্পাস';
+
+  @override
+  String get campusPrompt => 'ক্যাম্পাসে কী হচ্ছে?';
+
+  @override
+  String get campusTabForYou => 'তোমার জন্য';
+
+  @override
+  String get campusTabLatest => 'নতুন';
+
+  @override
+  String get campusTabAsk => 'প্রশ্নোত্তর';
+
+  @override
+  String get campusTabIssues => 'ইস্যু';
+
+  @override
+  String get campusIssuesOpen => 'চলমান';
+
+  @override
+  String get campusKindPost => 'পোস্ট';
+
+  @override
+  String get campusKindQuestion => 'প্রশ্ন';
+
+  @override
+  String get campusKindPoll => 'পোল';
+
+  @override
+  String get campusKindIssue => 'ইস্যু';
+
+  @override
+  String get campusBadgeQuestion => 'প্রশ্ন';
+
+  @override
+  String get campusBadgePoll => 'পোল';
+
+  @override
+  String get campusQuickPhoto => 'ছবি';
+
+  @override
+  String get voiceCatGeneral => 'সাধারণ';
+
+  @override
+  String get voiceCatEvent => 'ইভেন্ট';
+
+  @override
+  String get voiceCatLostFound => 'হারানো-পাওয়া';
+
+  @override
+  String get voiceCatBuySell => 'কেনাবেচা';
+
+  @override
+  String get voiceCatFun => 'মজা';
+
+  @override
+  String get reactLike => 'লাইক';
+
+  @override
+  String get reactHaha => 'হাহা';
+
+  @override
+  String get reactWow => 'ওয়াও';
+
+  @override
+  String get reactSad => 'দুঃখ';
+
+  @override
+  String get reactClap => 'সাবাস';
+
+  @override
+  String get campusComment => 'মন্তব্য';
+
+  @override
+  String get campusAnswer => 'উত্তর';
+
+  @override
+  String get campusShare => 'শেয়ার';
+
+  @override
+  String get campusSeeMore => 'আরও দেখো';
+
+  @override
+  String campusCommentCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countStringটি মন্তব্য';
+  }
+
+  @override
+  String campusAnswerCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countStringটি উত্তর';
+  }
+
+  @override
+  String campusReactSemantics(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'রিঅ্যাক্ট করো। $countStringটি রিঅ্যাকশন';
+  }
+
+  @override
+  String campusLikeSemantics(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'লাইক। $countStringটি লাইক';
+  }
+
+  @override
+  String campusPollVotes(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString ভোট';
+  }
+
+  @override
+  String campusPollDaysLeft(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'আর $countString দিন';
+  }
+
+  @override
+  String campusPollHoursLeft(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'আর $countString ঘণ্টা';
+  }
+
+  @override
+  String get campusPollEndingSoon => 'শিগগিরই শেষ';
+
+  @override
+  String get campusPollFinal => 'চূড়ান্ত ফলাফল';
+
+  @override
+  String get campusPollVoteToSee => 'ফলাফল দেখতে ভোট দাও';
+
+  @override
+  String get campusReply => 'উত্তর দাও';
+
+  @override
+  String campusReplyingTo(String name) {
+    return '$name-কে উত্তর দিচ্ছ';
+  }
+
+  @override
+  String campusViewReplies(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countStringটি উত্তর দেখো';
+  }
+
+  @override
+  String get campusHideReplies => 'উত্তর লুকাও';
+
+  @override
+  String get campusReplyHint => 'উত্তর লেখো…';
+
+  @override
+  String get campusAnswerHint => 'তোমার উত্তর লেখো…';
+
+  @override
+  String get campusNewPost => 'নতুন পোস্ট';
+
+  @override
+  String get campusCreateTitle => 'পোস্ট তৈরি করো';
+
+  @override
+  String get campusPostAction => 'পোস্ট করো';
+
+  @override
+  String get campusPostHint => 'কী ভাবছ?';
+
+  @override
+  String get campusQuestionHint => 'ক্যাম্পাসকে যেকোনো কিছু জিজ্ঞেস করো…';
+
+  @override
+  String get campusPollHint => 'প্রশ্নটি লেখো…';
+
+  @override
+  String campusPollOption(int n) {
+    final intl.NumberFormat nNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String nString = nNumberFormat.format(n);
+
+    return 'অপশন $nString';
+  }
+
+  @override
+  String get campusPollAddOption => 'অপশন যোগ করো';
+
+  @override
+  String get campusPollLength => 'পোল চলবে';
+
+  @override
+  String campusPollDays(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString দিন';
+  }
+
+  @override
+  String get campusPostingAs => 'পোস্ট করছ';
+
+  @override
+  String get campusTopic => 'বিষয়';
+
+  @override
+  String get campusIssueNote =>
+      'ইস্যু তোমার বিশ্ববিদ্যালয়ের কর্মকর্তাদের কাছে যায়; তাঁরা উত্তর দিতে আর অবস্থা জানাতে পারেন।';
+
+  @override
+  String campusShareText(String text, String link) {
+    return '$text\n\nভার্সিটিকথায় দেখো: $link';
+  }
+
+  @override
+  String get campusMyPosts => 'আমার পোস্ট';
+
+  @override
+  String get campusEmptyFeed => 'এখানে এখনো কিছু নেই';
+
+  @override
+  String get campusEmptyFeedHint =>
+      'আলাপ শুরু করো: কিছু শেয়ার করো বা প্রশ্ন করো।';
+
+  @override
+  String get campusEmptyAsk => 'এখনো কোনো প্রশ্ন নেই';
+
+  @override
+  String get campusEmptyAskHint =>
+      'যেকোনো কিছু জিজ্ঞেস করো: এখানকার সিনিয়র আর সহপাঠীরা উত্তর দিতে পারে।';
+
+  @override
+  String get campusEmptyMine => 'তুমি এখনো কিছু পোস্ট করোনি';
+
+  @override
+  String get campusEmptyMineHint =>
+      'তোমার পোস্ট, প্রশ্ন, পোল আর ইস্যু এখানে দেখাবে।';
+
+  @override
+  String get campusEmptySearch => 'এই খোঁজার সাথে কিছু মেলেনি';
+
+  @override
+  String get campusSearchHint => 'ক্যাম্পাসে খোঁজো';
+
+  @override
+  String get campusDeletePostTitle => 'পোস্টটি মুছে ফেলবে?';
+
+  @override
+  String get campusEditPost => 'পোস্ট এডিট করো';
+
+  @override
+  String get campusTextLabel => 'লেখা';
+
+  @override
+  String get campusPhotoOrText => 'কিছু লেখো বা একটি ছবি যোগ করো।';
+
+  @override
+  String get campusPollNeedsOptions => 'অন্তত দুটি আলাদা অপশন দাও।';
+
+  @override
+  String get campusQuestionTooShort => 'প্রশ্নটি আরেকটু বিস্তারিত লেখো।';
+
+  @override
+  String get errorPollClosed => 'এই পোলটি শেষ হয়ে গেছে।';
+
+  @override
+  String get errorAlreadyVoted => 'তুমি এই পোলে আগেই ভোট দিয়েছ।';
+
+  @override
+  String get errorNotAnIssue => 'এটা শুধু ইস্যুতে করা যায়।';
 }

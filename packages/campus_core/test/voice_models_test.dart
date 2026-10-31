@@ -79,4 +79,120 @@ void main() {
     expect(c.visibility, ContentVisibility.removed);
     expect(IssueComment.fromJson(c.toJson()).officialTitle, 'Hall Provost');
   });
+
+  group('campus social (CAMPUS_SOCIAL.md)', () {
+    test('cards without a kind are issues (older servers and saved feeds)', () {
+      final c = IssueCard.fromJson({
+        'id': 'i1',
+        'category': 'hostel',
+        'title': 'No water',
+        'status': 'open',
+        'createdAt': '2026-10-28T09:00:00Z',
+        'voted': true,
+        'thumbnail': 'img1',
+      });
+      expect(c.kind, PostKind.issue);
+      expect(c.shownReaction, Reaction.meToo);
+      expect(c.shownImages.single.id, 'img1');
+    });
+
+    test('a poll with reactions reads and saves the same', () {
+      final c = IssueCard.fromJson({
+        'id': 'p1',
+        'kind': 'poll',
+        'category': 'lost_found',
+        'title': '',
+        'preview': 'Best canteen?',
+        'status': 'open',
+        'meTooCount': 5,
+        'reactions': {'like': 3, 'haha': 2, 'angry': 9, 'wow': 0},
+        'myReaction': 'haha',
+        'voted': true,
+        'images': [
+          {'id': 'a', 'width': 100, 'height': 50},
+        ],
+        'poll': {
+          'options': [
+            {'id': 'o1', 'label': 'Bot tola', 'votes': null},
+            {'id': 'o2', 'label': 'TSC', 'votes': null},
+          ],
+          'totalVotes': 12,
+          'myVote': null,
+          'closesAt': '2026-11-03T10:00:00Z',
+          'closed': false,
+        },
+        'createdAt': '2026-10-28T09:00:00Z',
+      });
+      expect(c.kind, PostKind.poll);
+      expect(c.category, IssueCategory.lostFound);
+      expect(c.reactions, {Reaction.like: 3, Reaction.haha: 2});
+      expect(c.topReactions(), [Reaction.like, Reaction.haha]);
+      expect(c.poll!.resultsShown, isFalse);
+      expect(c.poll!.isClosed(DateTime.utc(2026, 11, 3, 10)), isTrue);
+      final back = IssueCard.fromJson(c.toJson());
+      expect(back.toJson(), c.toJson());
+      expect(back.poll!.totalVotes, 12);
+    });
+
+    test('changing a reaction moves one count; taking it back removes it', () {
+      final c = IssueCard(
+        id: 'p1',
+        kind: PostKind.post,
+        category: IssueCategory.general,
+        title: '',
+        status: IssueStatus.open,
+        createdAt: DateTime.utc(2026),
+        meTooCount: 3,
+        reactions: const {Reaction.like: 2, Reaction.haha: 1},
+        voted: true,
+        myReaction: Reaction.haha,
+      );
+      final wow = c.reacted(Reaction.wow);
+      expect(wow.meTooCount, 3);
+      expect(wow.reactions, {Reaction.like: 2, Reaction.wow: 1});
+      expect(wow.myReaction, Reaction.wow);
+      final none = wow.reacted(null);
+      expect(none.meTooCount, 2);
+      expect(none.voted, isFalse);
+      expect(none.reactions, {Reaction.like: 2});
+      expect(none.myReaction, isNull);
+    });
+
+    test('drafts send only what their kind takes', () {
+      const poll = IssueDraft(
+        kind: PostKind.poll,
+        category: IssueCategory.general,
+        title: 'ignored',
+        body: ' Which day? ',
+        pollOptions: [' Fri ', 'Sat'],
+        pollDays: 7,
+      );
+      expect(poll.toJson(), {
+        'kind': 'poll',
+        'category': 'general',
+        'body': 'Which day?',
+        'locationLabel': '',
+        'anonymous': true,
+        'imageIds': <String>[],
+        'pollOptions': ['Fri', 'Sat'],
+        'pollDays': 7,
+      });
+      expect(IssueDraft.bodyRange(PostKind.post), (0, 3000));
+      expect(IssueCategory.forPosts, isNot(contains(IssueCategory.safety)));
+    });
+
+    test('comments carry replies and likes', () {
+      final c = IssueComment.fromJson({
+        'id': 'c2',
+        'body': 'Me too',
+        'parentId': 'c1',
+        'likeCount': 4,
+        'liked': true,
+        'createdAt': '2026-10-28T09:00:00Z',
+      });
+      expect(c.parentId, 'c1');
+      expect(c.copyWith(likeCount: 5, liked: false).likeCount, 5);
+      expect(IssueComment.fromJson(c.toJson()).liked, isTrue);
+    });
+  });
 }
