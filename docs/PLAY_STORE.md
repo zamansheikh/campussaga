@@ -92,15 +92,18 @@ Google's reviewers have no university email. The API has a reviewer sign-in
 | Personal info → Email address | Yes | Required | App functionality, Account management | University or Google email |
 | Personal info → Name | Yes | Required | App functionality | Shown to classmates |
 | Personal info → User IDs | Yes | Required | App functionality, Account management | Internal account ID |
+| Personal info → Phone number | Yes | Optional | App functionality | Blood donation: a donor's number (sent only to a requester they offer to help) and a request's contact number |
+| Health and fitness → Health info | Yes | Optional | App functionality | Blood donation: blood group and last donation date |
 | Photos and videos → Photos | Yes | Optional | App functionality | Photos attached to Campus Voice posts, and an optional profile photo |
-| App activity → Other user-generated content | Yes | Optional | App functionality | Routines, announcements, Campus Voice posts and comments |
-| App activity → Other actions | Yes | Optional | App functionality | "Me too" votes, follows, reports |
+| App activity → Other user-generated content | Yes | Optional | App functionality | Routines, announcements, course links, Campus posts, comments and polls, blood requests |
+| App activity → Other actions | Yes | Optional | App functionality | Reactions, poll votes, follows, reports, blood donation offers |
 | App info and performance → Crash logs | Yes | Required | App functionality | Crashlytics; no user ID |
 | App info and performance → Diagnostics | Yes | Required | App functionality | Crashlytics device and app version |
 | Device or other IDs | Yes | Required | App functionality | Push token and Crashlytics installation ID |
 
-Not collected: location, contacts, phone number, financial info, health,
-messages, audio, files, web history, installed apps.
+Not collected: location, contacts, financial info, messages, audio, files,
+web history, installed apps. (Phone number and health info are collected
+only for blood donation, optionally, from build 6.)
 
 Bus route maps and location (build 4 and later): the app has the
 foreground location permission (`ACCESS_FINE_LOCATION`, asked only when

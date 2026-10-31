@@ -10,10 +10,12 @@ import 'package:intl/intl.dart';
 
 import '../../../app/clock.dart';
 import '../../../app/router.dart';
+import '../../../app/version/version_gate_cubit.dart';
 import '../../announcements/presentation/announcement_widgets.dart';
 import '../../announcements/presentation/seen_cubit.dart';
 import '../../assessments/presentation/assessment_widgets.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
+import '../../blood/presentation/widgets/blood_needed_card.dart';
 import '../../classes/presentation/bloc/my_classes_cubit.dart';
 import '../../classes/presentation/class_format.dart';
 import '../../classes/presentation/widgets/class_sheet.dart';
@@ -54,6 +56,9 @@ class _TodayPageState extends State<TodayPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final classes = context.watch<MyClassesCubit>().state;
+    final blood = context.select(
+      (VersionGateCubit g) => g.state.feature('bloodDonation'),
+    );
     final now = appNow();
     return Scaffold(
       body: SafeArea(
@@ -69,6 +74,8 @@ class _TodayPageState extends State<TodayPage> {
             children: [
               _Greeting(now: now),
               const SizedBox(height: CsSpace.lg),
+              // Blood needed for the donor's group (eligible donors only).
+              if (blood) const BloodNeededCard(),
               if (classes.failure is NetworkFailure && classes.hasGroups) ...[
                 const _OfflineNotice(),
                 const SizedBox(height: CsSpace.md),

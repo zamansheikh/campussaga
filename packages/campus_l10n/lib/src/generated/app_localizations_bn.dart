@@ -43,7 +43,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get exploreGroupsHint => 'সেকশনে যোগ দাও বা পরিচালনা করো';
 
   @override
-  String get exploreIssuesHint => 'তোমার তোলা সমস্যাগুলো';
+  String get exploreIssuesHint => 'তোমার পোস্ট, প্রশ্ন, পোল ও ইস্যু';
 
   @override
   String get busRoutesTitle => 'বাসের রুট';
@@ -3101,4 +3101,324 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get courseCopied => 'কপি হয়েছে';
+
+  @override
+  String get bloodTitle => 'রক্তদান';
+
+  @override
+  String get bloodHint => 'দ্রুত রক্তদাতা খুঁজো, বা কারও পাশে দাঁড়াও।';
+
+  @override
+  String get bloodBecomeDonor => 'রক্তদাতা হও';
+
+  @override
+  String get bloodBecomeDonorHint =>
+      'তোমার বিশ্ববিদ্যালয়ে কারও তোমার গ্রুপের রক্ত লাগলে তুমি নোটিফিকেশন পাবে।';
+
+  @override
+  String get bloodYourGroup => 'তোমার রক্তের গ্রুপ';
+
+  @override
+  String get bloodAvailable => 'রক্ত দিতে প্রস্তুত';
+
+  @override
+  String get bloodAvailableHint => 'তোমার গ্রুপের অনুরোধ এলে নোটিফিকেশন পাবে।';
+
+  @override
+  String get bloodCanDonateNow => 'তুমি এখন রক্ত দিতে পারবে';
+
+  @override
+  String bloodCanDonateFrom(String date) {
+    return 'আবার রক্ত দিতে পারবে $date থেকে';
+  }
+
+  @override
+  String bloodDonationsCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString বার রক্ত দিয়েছ',
+      zero: 'এখনো রক্ত দেওয়া হয়নি',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bloodIDonated => 'আজ রক্ত দিয়েছি';
+
+  @override
+  String get bloodDonatedThanks =>
+      'ধন্যবাদ! তুমি একটি জীবন বাঁচাতে সাহায্য করেছ।';
+
+  @override
+  String get bloodEditDonor => 'রক্তদাতা প্রোফাইল সম্পাদনা';
+
+  @override
+  String get bloodLeaveDonors => 'রক্তদাতা থেকে সরে যাও';
+
+  @override
+  String get bloodLeaveDonorsConfirm =>
+      'তুমি আর রক্তের অনুরোধ পাবে না। চাইলে যেকোনো সময় আবার যোগ দিতে পারবে।';
+
+  @override
+  String get bloodLastDonated => 'শেষ রক্তদান';
+
+  @override
+  String get bloodNeverDonated => 'কখনো না, বা মনে নেই';
+
+  @override
+  String get bloodPhone => 'ফোন নম্বর';
+
+  @override
+  String get bloodPhoneHint =>
+      'তুমি যাকে রক্ত দিতে চাইবে, শুধু তাকেই দেখানো হবে।';
+
+  @override
+  String get bloodPhoneInvalid => '০১৭১২৩৪৫৬৭৮-এর মতো মোবাইল নম্বর দাও।';
+
+  @override
+  String get bloodPrivacyNote =>
+      'তোমার রক্তের গ্রুপ গোপন থাকবে: কেউ রক্তদাতার তালিকা দেখতে পারবে না।';
+
+  @override
+  String get bloodSaveDonor => 'সংরক্ষণ করো';
+
+  @override
+  String get bloodRequests => 'অনুরোধ';
+
+  @override
+  String get bloodMyRequests => 'আমার অনুরোধ';
+
+  @override
+  String get bloodMyGroupOnly => 'আমার গ্রুপ';
+
+  @override
+  String get bloodNoRequests => 'এই মুহূর্তে কারও রক্ত লাগবে না';
+
+  @override
+  String get bloodNoRequestsHint =>
+      'তোমার বিশ্ববিদ্যালয়ে কারও লাগলে এখানে দেখাবে।';
+
+  @override
+  String get bloodNoMyRequests => 'তুমি এখনো রক্ত চাওনি';
+
+  @override
+  String get bloodRequestAction => 'রক্ত চাও';
+
+  @override
+  String get bloodUrgent => 'জরুরি';
+
+  @override
+  String bloodUnits(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString ব্যাগ';
+  }
+
+  @override
+  String bloodNeededTitle(String group) {
+    return '$group রক্ত প্রয়োজন';
+  }
+
+  @override
+  String bloodToday(String time) {
+    return 'আজ, $time';
+  }
+
+  @override
+  String bloodTomorrow(String time) {
+    return 'আগামীকাল, $time';
+  }
+
+  @override
+  String get bloodStatusFulfilled => 'রক্ত পাওয়া গেছে';
+
+  @override
+  String get bloodStatusClosed => 'বাতিল';
+
+  @override
+  String get bloodStatusExpired => 'মেয়াদ শেষ';
+
+  @override
+  String bloodResponses(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString জন রক্ত দিতে পারবেন',
+      zero: 'এখনো কেউ সাড়া দেননি',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bloodNotified(int count, String group) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString জন $group রক্তদাতাকে জানানো হয়েছে';
+  }
+
+  @override
+  String bloodMatching(int count, String group) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'তোমার বিশ্ববিদ্যালয়ে $countString জন $group রক্তদাতা';
+  }
+
+  @override
+  String bloodCompatible(String groups) {
+    return 'যাদের রক্তও নেওয়া যাবে: $groups';
+  }
+
+  @override
+  String get bloodContact => 'যোগাযোগ';
+
+  @override
+  String get bloodCall => 'কল করো';
+
+  @override
+  String get bloodPhoneCopied => 'নম্বর কপি হয়েছে';
+
+  @override
+  String get bloodICanDonate => 'আমি রক্ত দিতে পারব';
+
+  @override
+  String get bloodWithdraw => 'আর পারছি না';
+
+  @override
+  String get bloodYouOffered => 'তুমি রক্ত দিতে চেয়েছ';
+
+  @override
+  String get bloodRespondTitle => 'রক্ত দিতে চাও?';
+
+  @override
+  String bloodRespondBody(String name) {
+    return 'তোমার নাম, রক্তের গ্রুপ ও ফোন নম্বর $name-এর কাছে যাবে; তিনি তোমাকে কল করবেন।';
+  }
+
+  @override
+  String get bloodRespondSend => 'আমার নম্বর পাঠাও';
+
+  @override
+  String bloodResponded(String name) {
+    return 'ধন্যবাদ! $name এখন তোমাকে কল করতে পারবেন।';
+  }
+
+  @override
+  String bloodNotYourGroup(String group, String mine) {
+    return 'এই অনুরোধে $group লাগবে; তোমার গ্রুপ $mine।';
+  }
+
+  @override
+  String get bloodGotBlood => 'রক্ত পেয়েছি';
+
+  @override
+  String get bloodCancelRequest => 'অনুরোধ বাতিল করো';
+
+  @override
+  String get bloodCancelConfirm =>
+      'অনুরোধটি বাতিল করবে? রক্তদাতারা আর এটি দেখবেন না।';
+
+  @override
+  String get bloodClosedThanks => 'সাহায্য পেয়েছ জেনে ভালো লাগল। ভালো থেকো!';
+
+  @override
+  String get bloodGroupNeeded => 'কোন গ্রুপের রক্ত লাগবে';
+
+  @override
+  String get bloodUnitsLabel => 'ব্যাগ';
+
+  @override
+  String get bloodHospital => 'হাসপাতাল';
+
+  @override
+  String get bloodHospitalHint => 'যেমন এনাম মেডিকেল কলেজ হাসপাতাল';
+
+  @override
+  String get bloodArea => 'এলাকা';
+
+  @override
+  String get bloodAreaHint => 'যেমন সাভার';
+
+  @override
+  String get bloodWhen => 'কখন';
+
+  @override
+  String get bloodWhenToday => 'আজ';
+
+  @override
+  String get bloodWhenTomorrow => 'আগামীকাল';
+
+  @override
+  String get bloodWhenPick => 'তারিখ বাছো';
+
+  @override
+  String get bloodUrgentHint => 'কয়েক ঘণ্টার মধ্যে লাগবে';
+
+  @override
+  String get bloodContactName => 'যোগাযোগের ব্যক্তি';
+
+  @override
+  String get bloodContactPhone => 'যোগাযোগের ফোন';
+
+  @override
+  String get bloodNote => 'নোট (ঐচ্ছিক)';
+
+  @override
+  String get bloodNoteHint => 'যেমন থ্যালাসেমিয়া রোগী, সকাল ১০টায় অপারেশন';
+
+  @override
+  String get bloodPost => 'অনুরোধ পাঠাও';
+
+  @override
+  String bloodPostedNone(String group) {
+    return 'পোস্ট হয়েছে। শেয়ারও করো: এখানে এখনো কোনো $group রক্তদাতা যোগ দেননি।';
+  }
+
+  @override
+  String get bloodVerifyFirst =>
+      'রক্ত চাইতে তোমার বিশ্ববিদ্যালয়ের ইমেইল যাচাই করো। এতে অনুরোধগুলো সত্যি থাকে।';
+
+  @override
+  String bloodShareIntro(String group) {
+    return '🩸 $group রক্ত প্রয়োজন';
+  }
+
+  @override
+  String bloodShareVia(String link) {
+    return 'ভার্সিটিকথায় দেখো: $link';
+  }
+
+  @override
+  String get errorVerifyRequired =>
+      'আগে তোমার বিশ্ববিদ্যালয়ের ইমেইল যাচাই করো।';
+
+  @override
+  String get errorTooManyOpenRequests =>
+      'তোমার ৩টি অনুরোধ খোলা আছে। আগে একটি বন্ধ করো।';
+
+  @override
+  String get errorBloodRequestNotFound => 'এই অনুরোধটি আর নেই।';
+
+  @override
+  String get errorRequestClosed => 'এই অনুরোধটি বন্ধ হয়ে গেছে।';
+
+  @override
+  String get errorCannotRespondOwn => 'এটি তোমার নিজের অনুরোধ।';
+
+  @override
+  String get errorDonorRequired => 'আগে তোমার রক্তদাতা প্রোফাইল তৈরি করো।';
 }

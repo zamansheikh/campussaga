@@ -155,4 +155,6 @@ abstract final class CsIcons {
   static const IconData reply = PhosphorIconsRegular.arrowBendUpLeft;
   static const IconData share = PhosphorIconsRegular.shareFat;
   static const IconData folder = PhosphorIconsRegular.folderOpen;
+  static const IconData blood = PhosphorIconsRegular.drop;
+  static const IconData bloodFill = PhosphorIconsFill.drop;
 }

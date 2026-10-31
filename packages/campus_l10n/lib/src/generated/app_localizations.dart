@@ -167,7 +167,7 @@ abstract class AppLocalizations {
   /// No description provided for @exploreIssuesHint.
   ///
   /// In en, this message translates to:
-  /// **'Issues you raised'**
+  /// **'Your posts, questions, polls and issues'**
   String get exploreIssuesHint;
 
   /// No description provided for @busRoutesTitle.
@@ -5359,6 +5359,498 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copied'**
   String get courseCopied;
+
+  /// No description provided for @bloodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood donation'**
+  String get bloodTitle;
+
+  /// No description provided for @bloodHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Find donors fast, or help someone in need.'**
+  String get bloodHint;
+
+  /// No description provided for @bloodBecomeDonor.
+  ///
+  /// In en, this message translates to:
+  /// **'Become a donor'**
+  String get bloodBecomeDonor;
+
+  /// No description provided for @bloodBecomeDonorHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When someone at your university needs your blood group, you\'ll get a notification.'**
+  String get bloodBecomeDonorHint;
+
+  /// No description provided for @bloodYourGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Your blood group'**
+  String get bloodYourGroup;
+
+  /// No description provided for @bloodAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available to donate'**
+  String get bloodAvailable;
+
+  /// No description provided for @bloodAvailableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified about requests for your group.'**
+  String get bloodAvailableHint;
+
+  /// No description provided for @bloodCanDonateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'You can donate now'**
+  String get bloodCanDonateNow;
+
+  /// No description provided for @bloodCanDonateFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'You can donate again from {date}'**
+  String bloodCanDonateFrom(String date);
+
+  /// No description provided for @bloodDonationsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No donations yet} =1{Donated once} other{Donated {count} times}}'**
+  String bloodDonationsCount(int count);
+
+  /// No description provided for @bloodIDonated.
+  ///
+  /// In en, this message translates to:
+  /// **'I donated today'**
+  String get bloodIDonated;
+
+  /// No description provided for @bloodDonatedThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you! You\'ve helped save a life.'**
+  String get bloodDonatedThanks;
+
+  /// No description provided for @bloodEditDonor.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit donor profile'**
+  String get bloodEditDonor;
+
+  /// No description provided for @bloodLeaveDonors.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop being a donor'**
+  String get bloodLeaveDonors;
+
+  /// No description provided for @bloodLeaveDonorsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'You won\'t get blood requests any more. You can join again anytime.'**
+  String get bloodLeaveDonorsConfirm;
+
+  /// No description provided for @bloodLastDonated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last donated'**
+  String get bloodLastDonated;
+
+  /// No description provided for @bloodNeverDonated.
+  ///
+  /// In en, this message translates to:
+  /// **'Never, or don\'t remember'**
+  String get bloodNeverDonated;
+
+  /// No description provided for @bloodPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get bloodPhone;
+
+  /// No description provided for @bloodPhoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared only with someone you offer to donate to.'**
+  String get bloodPhoneHint;
+
+  /// No description provided for @bloodPhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a mobile number like 01712345678.'**
+  String get bloodPhoneInvalid;
+
+  /// No description provided for @bloodPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your blood group stays private: no one can browse donors.'**
+  String get bloodPrivacyNote;
+
+  /// No description provided for @bloodSaveDonor.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get bloodSaveDonor;
+
+  /// No description provided for @bloodRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests'**
+  String get bloodRequests;
+
+  /// No description provided for @bloodMyRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'My requests'**
+  String get bloodMyRequests;
+
+  /// No description provided for @bloodMyGroupOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'My group'**
+  String get bloodMyGroupOnly;
+
+  /// No description provided for @bloodNoRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No one needs blood right now'**
+  String get bloodNoRequests;
+
+  /// No description provided for @bloodNoRequestsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When someone at your university does, it shows here.'**
+  String get bloodNoRequestsHint;
+
+  /// No description provided for @bloodNoMyRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t asked for blood'**
+  String get bloodNoMyRequests;
+
+  /// No description provided for @bloodRequestAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Request blood'**
+  String get bloodRequestAction;
+
+  /// No description provided for @bloodUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent'**
+  String get bloodUrgent;
+
+  /// No description provided for @bloodUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 bag} other{{count} bags}}'**
+  String bloodUnits(int count);
+
+  /// No description provided for @bloodNeededTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{group} blood needed'**
+  String bloodNeededTitle(String group);
+
+  /// No description provided for @bloodToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today, {time}'**
+  String bloodToday(String time);
+
+  /// No description provided for @bloodTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow, {time}'**
+  String bloodTomorrow(String time);
+
+  /// No description provided for @bloodStatusFulfilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Got blood'**
+  String get bloodStatusFulfilled;
+
+  /// No description provided for @bloodStatusClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get bloodStatusClosed;
+
+  /// No description provided for @bloodStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get bloodStatusExpired;
+
+  /// No description provided for @bloodResponses.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No donors yet} =1{1 donor can help} other{{count} donors can help}}'**
+  String bloodResponses(int count);
+
+  /// No description provided for @bloodNotified.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {group} donors were notified'**
+  String bloodNotified(int count, String group);
+
+  /// No description provided for @bloodMatching.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {group} donors at your university'**
+  String bloodMatching(int count, String group);
+
+  /// No description provided for @bloodCompatible.
+  ///
+  /// In en, this message translates to:
+  /// **'Can also receive from: {groups}'**
+  String bloodCompatible(String groups);
+
+  /// No description provided for @bloodContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get bloodContact;
+
+  /// No description provided for @bloodCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get bloodCall;
+
+  /// No description provided for @bloodPhoneCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Number copied'**
+  String get bloodPhoneCopied;
+
+  /// No description provided for @bloodICanDonate.
+  ///
+  /// In en, this message translates to:
+  /// **'I can donate'**
+  String get bloodICanDonate;
+
+  /// No description provided for @bloodWithdraw.
+  ///
+  /// In en, this message translates to:
+  /// **'I can\'t any more'**
+  String get bloodWithdraw;
+
+  /// No description provided for @bloodYouOffered.
+  ///
+  /// In en, this message translates to:
+  /// **'You offered to donate'**
+  String get bloodYouOffered;
+
+  /// No description provided for @bloodRespondTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Offer to donate?'**
+  String get bloodRespondTitle;
+
+  /// No description provided for @bloodRespondBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name, blood group and phone number go to {name}, who will call you.'**
+  String bloodRespondBody(String name);
+
+  /// No description provided for @bloodRespondSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send my number'**
+  String get bloodRespondSend;
+
+  /// No description provided for @bloodResponded.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you! {name} can now call you.'**
+  String bloodResponded(String name);
+
+  /// No description provided for @bloodNotYourGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'This request needs {group}; you are {mine}.'**
+  String bloodNotYourGroup(String group, String mine);
+
+  /// No description provided for @bloodGotBlood.
+  ///
+  /// In en, this message translates to:
+  /// **'Got blood'**
+  String get bloodGotBlood;
+
+  /// No description provided for @bloodCancelRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel request'**
+  String get bloodCancelRequest;
+
+  /// No description provided for @bloodCancelConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this request? Donors won\'t see it any more.'**
+  String get bloodCancelConfirm;
+
+  /// No description provided for @bloodClosedThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Glad you got help. Take care!'**
+  String get bloodClosedThanks;
+
+  /// No description provided for @bloodGroupNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood group needed'**
+  String get bloodGroupNeeded;
+
+  /// No description provided for @bloodUnitsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bags'**
+  String get bloodUnitsLabel;
+
+  /// No description provided for @bloodHospital.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospital'**
+  String get bloodHospital;
+
+  /// No description provided for @bloodHospitalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Enam Medical College Hospital'**
+  String get bloodHospitalHint;
+
+  /// No description provided for @bloodArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Area'**
+  String get bloodArea;
+
+  /// No description provided for @bloodAreaHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Savar'**
+  String get bloodAreaHint;
+
+  /// No description provided for @bloodWhen.
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get bloodWhen;
+
+  /// No description provided for @bloodWhenToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get bloodWhenToday;
+
+  /// No description provided for @bloodWhenTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get bloodWhenTomorrow;
+
+  /// No description provided for @bloodWhenPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date'**
+  String get bloodWhenPick;
+
+  /// No description provided for @bloodUrgentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed within a few hours'**
+  String get bloodUrgentHint;
+
+  /// No description provided for @bloodContactName.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact person'**
+  String get bloodContactName;
+
+  /// No description provided for @bloodContactPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact phone'**
+  String get bloodContactPhone;
+
+  /// No description provided for @bloodNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get bloodNote;
+
+  /// No description provided for @bloodNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Thalassemia patient, surgery at 10 AM'**
+  String get bloodNoteHint;
+
+  /// No description provided for @bloodPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Send request'**
+  String get bloodPost;
+
+  /// No description provided for @bloodPostedNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Posted. Share it too: no {group} donors have joined here yet.'**
+  String bloodPostedNone(String group);
+
+  /// No description provided for @bloodVerifyFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your university email to ask for blood. This keeps requests real.'**
+  String get bloodVerifyFirst;
+
+  /// No description provided for @bloodShareIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'🩸 {group} blood needed'**
+  String bloodShareIntro(String group);
+
+  /// No description provided for @bloodShareVia.
+  ///
+  /// In en, this message translates to:
+  /// **'Via VarsityKotha: {link}'**
+  String bloodShareVia(String link);
+
+  /// No description provided for @errorVerifyRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your university email first.'**
+  String get errorVerifyRequired;
+
+  /// No description provided for @errorTooManyOpenRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have 3 open requests. Close one first.'**
+  String get errorTooManyOpenRequests;
+
+  /// No description provided for @errorBloodRequestNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This request isn\'t available any more.'**
+  String get errorBloodRequestNotFound;
+
+  /// No description provided for @errorRequestClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'This request is closed.'**
+  String get errorRequestClosed;
+
+  /// No description provided for @errorCannotRespondOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'This is your own request.'**
+  String get errorCannotRespondOwn;
+
+  /// No description provided for @errorDonorRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up your donor profile first.'**
+  String get errorDonorRequired;
 }
 
 class _AppLocalizationsDelegate

@@ -126,7 +126,8 @@ class _CampusAppState extends State<CampusApp> {
 
   /// A push while the app is open: show it, and fetch what changed.
   void _onPush(PushNote note) {
-    if (!'${note.data['type']}'.startsWith('issue_')) {
+    final type = '${note.data['type']}';
+    if (!type.startsWith('issue_') && !type.startsWith('blood_')) {
       unawaited(_classes.refresh());
     }
     final title = note.title;
@@ -143,6 +144,17 @@ class _CampusAppState extends State<CampusApp> {
   /// A push was tapped: open its issue (Campus Voice) or, after fetching
   /// what changed, its group.
   void _onPushOpened(PushNote note) {
+    final blood = note.data['requestId'];
+    if ('${note.data['type']}'.startsWith('blood_') && blood is String) {
+      WidgetsBinding.instance
+        ..addPostFrameCallback((_) {
+          if (_auth.state.status == AuthStatus.signedIn) {
+            unawaited(_router.push(Routes.bloodRequest(blood)));
+          }
+        })
+        ..ensureVisualUpdate();
+      return;
+    }
     final issue = note.data['issueId'];
     if ('${note.data['type']}'.startsWith('issue_') && issue is String) {
       WidgetsBinding.instance

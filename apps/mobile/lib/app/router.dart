@@ -12,6 +12,9 @@ import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/email_sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
+import '../features/blood/presentation/pages/blood_page.dart';
+import '../features/blood/presentation/pages/blood_request_form_page.dart';
+import '../features/blood/presentation/pages/blood_request_page.dart';
 import '../features/cgpa/data/cgpa_store.dart';
 import '../features/cgpa/presentation/cgpa_cubit.dart';
 import '../features/cgpa/presentation/cgpa_page.dart';
@@ -136,6 +139,11 @@ abstract final class Routes {
   ).toString();
   // Bus routes (transport).
   static const bus = '/bus';
+
+  /// Blood donation: requests and the donor profile.
+  static const blood = '/blood';
+  static const bloodNew = '/blood/new';
+  static String bloodRequest(String id) => '/blood/requests/$id';
   static const busNew = '/bus/new';
   static String busRoute(String id) => '/bus/$id';
   static String busEdit(String id) => '/bus/$id/edit';
@@ -219,6 +227,7 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
       ),
       // Full-screen pages over the tabs.
       _busRoutes,
+      _bloodRoutes,
       GoRoute(
         path: '/personal/:slotId',
         builder: (context, state) {
@@ -446,6 +455,29 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
     ],
   );
 }
+
+/// Blood donation: the page, a new request, one request; a shared link
+/// (https://varsitykotha.com/blood/{id}) opens the request.
+final _bloodRoutes = GoRoute(
+  path: Routes.blood,
+  builder: (context, state) => const BloodPage(),
+  routes: [
+    GoRoute(
+      path: 'new',
+      builder: (context, state) => const BloodRequestFormPage(),
+    ),
+    GoRoute(
+      path: 'requests/:id',
+      builder: (context, state) =>
+          BloodRequestPage(requestId: state.pathParameters['id']!),
+    ),
+    GoRoute(
+      path: ':id',
+      redirect: (context, state) =>
+          Routes.bloodRequest(state.pathParameters['id']!),
+    ),
+  ],
+);
 
 /// Bus routes: the list, one route, and the transport reps' editors.
 final _busRoutes = GoRoute(

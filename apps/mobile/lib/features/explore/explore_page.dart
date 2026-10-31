@@ -18,7 +18,17 @@ class ExplorePage extends StatelessWidget {
     final voice = context.select(
       (VersionGateCubit g) => g.state.feature('campusVoice'),
     );
+    final blood = context.select(
+      (VersionGateCubit g) => g.state.feature('bloodDonation'),
+    );
     final tools = [
+      if (blood)
+        _Feature(
+          icon: CsIcons.bloodFill,
+          title: l10n.bloodTitle,
+          hint: l10n.bloodHint,
+          onTap: () => context.push(Routes.blood),
+        ),
       _Feature(
         icon: CsIcons.groups,
         title: l10n.classGroups,
@@ -40,7 +50,7 @@ class ExplorePage extends StatelessWidget {
       if (voice)
         _Feature(
           icon: CsIcons.myIssues,
-          title: l10n.voiceMyIssues,
+          title: l10n.campusMyPosts,
           hint: l10n.exploreIssuesHint,
           onTap: () => context.push(Routes.campusMine),
         ),

@@ -272,6 +272,33 @@ BEGIN
     INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_a);
     INSERT INTO issue_votes (issue_id, user_id, reaction) VALUES (v_issue, v_c, 'like');
 
+    -- ---- blood donation (docs/BLOOD_DONATION.md) --------------------------------
+    -- Classmates are donors; two open requests. Your own account is left as
+    -- it is, so you can become a donor yourself.
+    DELETE FROM blood_requests WHERE requester_id IN (v_cr2, v_a, v_b, v_c);
+    INSERT INTO blood_donors (user_id, blood_group, available, phone, last_donated, donations) VALUES
+        (v_cr2, 'A+', true, '01711000001', NULL, 2),
+        (v_a,   'A+', true, '01711000002', (now() - interval '200 days')::date, 4),
+        (v_b,   'O+', true, '01711000003', (now() - interval '30 days')::date, 1),
+        (v_c,   'B+', true, '01711000004', NULL, 0)
+    ON CONFLICT (user_id) DO UPDATE SET blood_group = EXCLUDED.blood_group, available = EXCLUDED.available,
+        phone = EXCLUDED.phone, last_donated = EXCLUDED.last_donated, donations = EXCLUDED.donations;
+
+    INSERT INTO blood_requests (university_id, requester_id, blood_group, units, hospital, area, needed_by, urgent,
+                                contact_name, contact_phone, note, notified, created_at)
+    VALUES (v_uni, v_cr2, 'A+', 2, 'Enam Medical College Hospital', 'Savar',
+            date_trunc('hour', now()) + interval '5 hours', true, 'Tanvir Ahmed', '01711000001',
+            'My cousin has a surgery tonight. Please call if you can come.', 3, now() - interval '40 minutes')
+    RETURNING id INTO v_issue;
+    INSERT INTO blood_responses (request_id, donor_id, phone, created_at)
+    VALUES (v_issue, v_a, '01711000002', now() - interval '20 minutes');
+
+    INSERT INTO blood_requests (university_id, requester_id, blood_group, units, hospital, area, needed_by, urgent,
+                                contact_name, contact_phone, note, notified, created_at)
+    VALUES (v_uni, v_c, 'O-', 1, 'Dhaka Medical College Hospital', 'Shahbagh',
+            date_trunc('day', now()) + interval '1 day 10 hours', false, 'Sadia Rahman', '01711000004',
+            'Thalassemia patient, needs blood every month.', 0, now() - interval '3 hours');
+
     -- ---- bus routes (stops in to-campus order; minutes from the start) ------
     DELETE FROM bus_routes WHERE university_id = v_uni AND name LIKE 'Demo %';
 

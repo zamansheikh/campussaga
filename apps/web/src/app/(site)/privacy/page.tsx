@@ -144,6 +144,19 @@ export default function PrivacyPage() {
               "Up to 4 photos per post, chosen with your phone's photo picker: the app cannot see your other photos. Our server re-encodes and shrinks each photo, which removes hidden details such as location, phone model and the time it was taken, and checks it with a nudity filter that runs on our own server (photos are not sent to any outside service for this). Photos you add but don't post are deleted after 24 hours.",
             ],
             [
+              <strong key="k">Blood donation (optional)</strong>,
+              <>
+                If you become a donor: your blood group, whether you are available, the date you last gave blood and
+                your mobile number. Your blood group is <strong>health information</strong>: no one can browse or
+                search donors. Students of your university only see how many donors of a group there are. When someone
+                at your university asks for blood of your group, we send you a notification. Your name, blood group
+                and number go to the person who asked only if you tap &quot;I can donate&quot;. If you ask for blood,
+                the request (blood group, hospital, time, note, and the contact name and number you enter) is visible
+                to students of your university and can be shared. You can stop being a donor any time; deleting your
+                account deletes your donor profile.
+              </>,
+            ],
+            [
               <strong key="k">Push notification token</strong>,
               "A token from Firebase Cloud Messaging, your phone type and the app language, so we can tell you when your CR changes a class or posts an announcement. It is tied to your sign-in on that phone: signing out stops notifications there.",
             ],
@@ -181,8 +194,8 @@ export default function PrivacyPage() {
           with the route.
         </p>
         <p>
-          We do not collect your phone number, contacts or location history, and we never see photos or files you
-          don&apos;t choose to attach. The app does not use advertising identifiers.
+          We do not collect your contacts or location history, we have your phone number only if you add it for
+          blood donation, and we never see photos or files you don&apos;t choose to attach. The app does not use advertising identifiers.
         </p>
 
         <h2>Who else handles your information</h2>
@@ -405,6 +418,15 @@ export default function PrivacyPage() {
             পরীক্ষা করে (এজন্য ছবি বাইরের কোনো সেবায় পাঠানো হয় না)। যোগ করে পোস্ট না করা ছবি ২৪ ঘণ্টা পর মুছে যায়।
           </li>
           <li>
+            <strong>রক্তদান (ঐচ্ছিক):</strong> রক্তদাতা হলে তোমার রক্তের গ্রুপ, তুমি এখন দিতে পারবে কি না, শেষ রক্তদানের
+            তারিখ আর মোবাইল নম্বর। রক্তের গ্রুপ <strong>স্বাস্থ্য তথ্য</strong>: কেউ রক্তদাতার তালিকা দেখতে বা খুঁজতে
+            পারে না; তোমার বিশ্ববিদ্যালয়ের শিক্ষার্থীরা শুধু কোন গ্রুপের কতজন রক্তদাতা আছে সেই সংখ্যা দেখে। তোমার
+            বিশ্ববিদ্যালয়ে কেউ তোমার গ্রুপের রক্ত চাইলে তোমাকে নোটিফিকেশন পাঠানো হয়। তুমি &quot;আমি রক্ত দিতে
+            পারব&quot; চাপলে তবেই তোমার নাম, রক্তের গ্রুপ ও নম্বর অনুরোধকারীর কাছে যায়। তুমি রক্ত চাইলে অনুরোধটি (গ্রুপ,
+            হাসপাতাল, সময়, নোট এবং তোমার দেওয়া যোগাযোগের নাম ও নম্বর) তোমার বিশ্ববিদ্যালয়ের শিক্ষার্থীরা দেখে এবং শেয়ার
+            করতে পারে। যেকোনো সময় রক্তদাতা থেকে সরে যেতে পারো; অ্যাকাউন্ট মুছলে রক্তদাতা প্রোফাইলও মুছে যায়।
+          </li>
+          <li>
             <strong>পুশ নোটিফিকেশন টোকেন:</strong> Firebase Cloud Messaging-এর একটি টোকেন, ফোনের ধরন ও অ্যাপের ভাষা,
             যাতে সিআর ক্লাস বদলালে বা ঘোষণা দিলে তোমাকে জানাতে পারি। এটি ওই ফোনের সাইন-ইনের সাথে যুক্ত: সাইন আউট করলে
             ওই ফোনে নোটিফিকেশন বন্ধ হয়।
@@ -435,8 +457,8 @@ export default function PrivacyPage() {
           অবস্থান (ম্যাপের একটি বিন্দু, কে বা কখন ছিল তা নয়) রুটের সাথে সংরক্ষিত হয়।
         </p>
         <p>
-          আমরা তোমার ফোন নম্বর, কন্টাক্ট বা লোকেশনের ইতিহাস নিই না, আর তুমি নিজে যুক্ত না করলে কোনো ছবি বা ফাইল দেখি
-          না। অ্যাপে বিজ্ঞাপনের আইডি ব্যবহার হয় না।
+          আমরা তোমার কন্টাক্ট বা লোকেশনের ইতিহাস নিই না; রক্তদানের জন্য নিজে না দিলে তোমার ফোন নম্বরও নিই না; আর
+          তুমি নিজে যুক্ত না করলে কোনো ছবি বা ফাইল দেখি না। অ্যাপে বিজ্ঞাপনের আইডি ব্যবহার হয় না।
         </p>
 
         <h2>আর কারা তথ্য ব্যবহার করে</h2>

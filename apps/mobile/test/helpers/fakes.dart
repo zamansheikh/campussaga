@@ -21,6 +21,7 @@ import 'package:varsitykotha/features/reminders/data/reminder_store.dart';
 import 'package:varsitykotha/features/voice/data/photo_picker.dart';
 import 'package:varsitykotha/features/voice/data/voice_cache.dart';
 
+import '../blood_fakes.dart';
 import '../voice_fakes.dart';
 
 const testUser = UserProfile(
@@ -361,6 +362,7 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   FakeVoiceRepository? voice,
   VoiceCache? voiceCache,
   PhotoPicker? photos,
+  BloodRepository? blood,
   int build = 1,
 }) async {
   await getIt.reset();
@@ -395,7 +397,8 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
     ..registerSingleton<PhoneInfo>(phone ?? MemoryPhoneInfo())
     ..registerSingleton<VoiceRepository>(voice ?? FakeVoiceRepository())
     ..registerSingleton<VoiceCache>(voiceCache ?? MemoryVoiceCache())
-    ..registerSingleton<PhotoPicker>(photos ?? FakePhotoPicker());
+    ..registerSingleton<PhotoPicker>(photos ?? FakePhotoPicker())
+    ..registerSingleton<BloodRepository>(blood ?? FakeBloodRepository());
   return (repo, google);
 }
 

@@ -75,6 +75,9 @@ Future<void> configureDependencies({
       () => ApiVoiceRepository(getIt<ApiClient>()),
     )
     ..registerLazySingleton<VoiceCache>(PrefsVoiceCache.new)
+    ..registerLazySingleton<BloodRepository>(
+      () => ApiBloodRepository(getIt<ApiClient>()),
+    )
     ..registerLazySingleton<PhotoPicker>(ImagePickerPhotoPicker.new);
   registerTransport();
 }

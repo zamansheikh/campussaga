@@ -44,7 +44,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exploreGroupsHint => 'Join or manage your sections';
 
   @override
-  String get exploreIssuesHint => 'Issues you raised';
+  String get exploreIssuesHint => 'Your posts, questions, polls and issues';
 
   @override
   String get busRoutesTitle => 'Bus routes';
@@ -3189,4 +3189,332 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get courseCopied => 'Copied';
+
+  @override
+  String get bloodTitle => 'Blood donation';
+
+  @override
+  String get bloodHint => 'Find donors fast, or help someone in need.';
+
+  @override
+  String get bloodBecomeDonor => 'Become a donor';
+
+  @override
+  String get bloodBecomeDonorHint =>
+      'When someone at your university needs your blood group, you\'ll get a notification.';
+
+  @override
+  String get bloodYourGroup => 'Your blood group';
+
+  @override
+  String get bloodAvailable => 'Available to donate';
+
+  @override
+  String get bloodAvailableHint =>
+      'Get notified about requests for your group.';
+
+  @override
+  String get bloodCanDonateNow => 'You can donate now';
+
+  @override
+  String bloodCanDonateFrom(String date) {
+    return 'You can donate again from $date';
+  }
+
+  @override
+  String bloodDonationsCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Donated $countString times',
+      one: 'Donated once',
+      zero: 'No donations yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bloodIDonated => 'I donated today';
+
+  @override
+  String get bloodDonatedThanks => 'Thank you! You\'ve helped save a life.';
+
+  @override
+  String get bloodEditDonor => 'Edit donor profile';
+
+  @override
+  String get bloodLeaveDonors => 'Stop being a donor';
+
+  @override
+  String get bloodLeaveDonorsConfirm =>
+      'You won\'t get blood requests any more. You can join again anytime.';
+
+  @override
+  String get bloodLastDonated => 'Last donated';
+
+  @override
+  String get bloodNeverDonated => 'Never, or don\'t remember';
+
+  @override
+  String get bloodPhone => 'Phone number';
+
+  @override
+  String get bloodPhoneHint =>
+      'Shared only with someone you offer to donate to.';
+
+  @override
+  String get bloodPhoneInvalid => 'Enter a mobile number like 01712345678.';
+
+  @override
+  String get bloodPrivacyNote =>
+      'Your blood group stays private: no one can browse donors.';
+
+  @override
+  String get bloodSaveDonor => 'Save';
+
+  @override
+  String get bloodRequests => 'Requests';
+
+  @override
+  String get bloodMyRequests => 'My requests';
+
+  @override
+  String get bloodMyGroupOnly => 'My group';
+
+  @override
+  String get bloodNoRequests => 'No one needs blood right now';
+
+  @override
+  String get bloodNoRequestsHint =>
+      'When someone at your university does, it shows here.';
+
+  @override
+  String get bloodNoMyRequests => 'You haven\'t asked for blood';
+
+  @override
+  String get bloodRequestAction => 'Request blood';
+
+  @override
+  String get bloodUrgent => 'Urgent';
+
+  @override
+  String bloodUnits(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString bags',
+      one: '1 bag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bloodNeededTitle(String group) {
+    return '$group blood needed';
+  }
+
+  @override
+  String bloodToday(String time) {
+    return 'Today, $time';
+  }
+
+  @override
+  String bloodTomorrow(String time) {
+    return 'Tomorrow, $time';
+  }
+
+  @override
+  String get bloodStatusFulfilled => 'Got blood';
+
+  @override
+  String get bloodStatusClosed => 'Cancelled';
+
+  @override
+  String get bloodStatusExpired => 'Expired';
+
+  @override
+  String bloodResponses(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString donors can help',
+      one: '1 donor can help',
+      zero: 'No donors yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bloodNotified(int count, String group) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString $group donors were notified';
+  }
+
+  @override
+  String bloodMatching(int count, String group) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString $group donors at your university';
+  }
+
+  @override
+  String bloodCompatible(String groups) {
+    return 'Can also receive from: $groups';
+  }
+
+  @override
+  String get bloodContact => 'Contact';
+
+  @override
+  String get bloodCall => 'Call';
+
+  @override
+  String get bloodPhoneCopied => 'Number copied';
+
+  @override
+  String get bloodICanDonate => 'I can donate';
+
+  @override
+  String get bloodWithdraw => 'I can\'t any more';
+
+  @override
+  String get bloodYouOffered => 'You offered to donate';
+
+  @override
+  String get bloodRespondTitle => 'Offer to donate?';
+
+  @override
+  String bloodRespondBody(String name) {
+    return 'Your name, blood group and phone number go to $name, who will call you.';
+  }
+
+  @override
+  String get bloodRespondSend => 'Send my number';
+
+  @override
+  String bloodResponded(String name) {
+    return 'Thank you! $name can now call you.';
+  }
+
+  @override
+  String bloodNotYourGroup(String group, String mine) {
+    return 'This request needs $group; you are $mine.';
+  }
+
+  @override
+  String get bloodGotBlood => 'Got blood';
+
+  @override
+  String get bloodCancelRequest => 'Cancel request';
+
+  @override
+  String get bloodCancelConfirm =>
+      'Cancel this request? Donors won\'t see it any more.';
+
+  @override
+  String get bloodClosedThanks => 'Glad you got help. Take care!';
+
+  @override
+  String get bloodGroupNeeded => 'Blood group needed';
+
+  @override
+  String get bloodUnitsLabel => 'Bags';
+
+  @override
+  String get bloodHospital => 'Hospital';
+
+  @override
+  String get bloodHospitalHint => 'e.g. Enam Medical College Hospital';
+
+  @override
+  String get bloodArea => 'Area';
+
+  @override
+  String get bloodAreaHint => 'e.g. Savar';
+
+  @override
+  String get bloodWhen => 'When';
+
+  @override
+  String get bloodWhenToday => 'Today';
+
+  @override
+  String get bloodWhenTomorrow => 'Tomorrow';
+
+  @override
+  String get bloodWhenPick => 'Pick a date';
+
+  @override
+  String get bloodUrgentHint => 'Needed within a few hours';
+
+  @override
+  String get bloodContactName => 'Contact person';
+
+  @override
+  String get bloodContactPhone => 'Contact phone';
+
+  @override
+  String get bloodNote => 'Note (optional)';
+
+  @override
+  String get bloodNoteHint => 'e.g. Thalassemia patient, surgery at 10 AM';
+
+  @override
+  String get bloodPost => 'Send request';
+
+  @override
+  String bloodPostedNone(String group) {
+    return 'Posted. Share it too: no $group donors have joined here yet.';
+  }
+
+  @override
+  String get bloodVerifyFirst =>
+      'Verify your university email to ask for blood. This keeps requests real.';
+
+  @override
+  String bloodShareIntro(String group) {
+    return '🩸 $group blood needed';
+  }
+
+  @override
+  String bloodShareVia(String link) {
+    return 'Via VarsityKotha: $link';
+  }
+
+  @override
+  String get errorVerifyRequired => 'Verify your university email first.';
+
+  @override
+  String get errorTooManyOpenRequests =>
+      'You already have 3 open requests. Close one first.';
+
+  @override
+  String get errorBloodRequestNotFound =>
+      'This request isn\'t available any more.';
+
+  @override
+  String get errorRequestClosed => 'This request is closed.';
+
+  @override
+  String get errorCannotRespondOwn => 'This is your own request.';
+
+  @override
+  String get errorDonorRequired => 'Set up your donor profile first.';
 }
