@@ -416,6 +416,84 @@ other universities**, so the app fills each campus and spreads between them.
 - **Web:** the rules page states both minimums (EN/BN); the admin form has
   both fields; standings mark who isn't eligible with both counts.
 
+## 9. Low-cost rewards (migration `00770_growth_rewards.sql`)
+
+Status (badges, boards) for many students, and only small, capped money for
+a few. No lucky draws.
+
+### 9.1 Section challenge
+- **Champion section**: a class group with **≥ 25 verified members** and
+  **≥ 5 routine slots**. Every member (CR included) earns the badge
+  `champion_section` (no tiers, stays once earned). Constants in the API:
+  25 and 5, returned as `sectionChallenge: {members: 25, slots: 5}` on the
+  campaign detail so the app shows the goal.
+- **Top sections board**: `GET /campaigns/{id}/sections` → `{rows: [{rank,
+  groupId, name, university, members, slots, champion}], mine: row|null}`.
+  Top 20 class groups of the campaign's universities by verified members
+  (ties: the group that reached that count earlier, then id); `mine` is my
+  best group (where I'm a member) with its rank, also when outside the top 20.
+  Names as the app shows a group.
+- **Optional section prize**: `campaigns.section_prize_en/_bn` (text ≤ 120,
+  default empty). Empty: no prize, only badges. Returned as `sectionPrize`
+  (student language) on list and detail and on the public endpoint (both
+  languages). The team chooses the winning section by hand from the board.
+
+### 9.2 Race finisher reward
+- **Finishers**: the first time a student is in the prize race (§8.5
+  eligible) while the campaign is **live**, they get the next finisher
+  position. Table `campaign_finishers (campaign_id, user_id, position,
+  finished_at, phone text null ≤ 20, claimed_at null, sent_at null,
+  sent_by null; pk (campaign_id, user_id); unique (campaign_id, position))`.
+  Checked when an invite qualifies and in the hourly sweep. Positions never
+  change; disqualifying the participant deletes their row.
+- **Badge** `race_finisher` for anyone with a finisher row (no tiers, stays).
+- **Reward for the first N**: `campaigns.finisher_reward_en/_bn` (text ≤ 120,
+  e.g. "20 TK mobile recharge") and `finisher_reward_count` (0–10000, default
+  0 = no reward). Editable while draft; once live the count may only go up.
+- **Student API** (campaign detail):
+  - `finisherReward: {title, count, left}` or null when count is 0;
+  - `finisher: {position, inReward, claimed, sent}` or null.
+  - `POST /campaigns/{id}/finisher-claim {phone}` → 204. Errors
+    `NOT_A_FINISHER` (403), `NO_REWARD` (422, position > count),
+    `ALREADY_CLAIMED` (409), `INVALID_PHONE` (400; BD mobile, 11 digits
+    01XXXXXXXXX, `+880` accepted and stored as 01…).
+- **Push** `race_finished` to the student, data `{campaignId}`:
+  - in the reward: EN "You're in the prize race! You're finisher #{n}: {reward}. Add your number to get it." / BN "তুমি পুরস্কারের দৌড়ে! তুমি #{n} নম্বর: {reward}। পেতে তোমার নম্বর দাও।"
+  - otherwise: EN "You're in the prize race!" / BN "তুমি পুরস্কারের দৌড়ে আছ!"
+- **Admin**: `GET /admin/campaigns/{id}/finishers` → `[{position, user: {id,
+  name, email, university}, finishedAt, inReward, phone, claimedAt, sentAt}]`;
+  `POST /admin/campaigns/{id}/finishers/{userId}/sent`. Audited
+  (`campaign.finisher_sent`). Phones are deleted 90 days after sent.
+
+### 9.3 Campus ambassador
+- Badge `ambassador` (no tiers, moves like a role): at each university, the
+  verified non-team student with the **most qualified invites of friends at
+  the same university**, at least **5**; ties: who reached it first. Hourly
+  sweep (and on my badges).
+- **Admin**: university detail adds `ambassador: {id, name, email, invites}`
+  or null; the admin panel shows it with a "Make campus admin" button that
+  uses the existing campus-admin assign action.
+
+### 9.4 Share cards and invite QR (app only)
+- **Invite QR**: on the invite card, a QR button opens a sheet with a large
+  QR code of my invite link, my name and university, and Share.
+- **Share card**: "Share" on the campaign page makes a story-size image
+  (1080×1920) of the campaign poster style: my name, my featured badge,
+  "Rank 3 · 42 points" or "In the prize race" or my progress, the campaign
+  title, and a QR of my invite link with "varsitykotha.com/r/{code}". It's
+  shared as an image with my link in the text.
+
+### 9.5 Strings and texts
+- Badge names and how-to (EN/BN) for `champion_section` ("Champion section",
+  "Be in a section with 25+ verified members and 5+ classes"),
+  `race_finisher` ("Race finisher", "Enter a campaign's prize race"),
+  `ambassador` ("Campus ambassador", "Bring the most friends from your own
+  university (at least 5)").
+- Rules page (EN/BN): the section challenge (badge for every champion
+  section; the prize, if set, chosen by the team from the board), and the
+  finisher reward ("the first N students who enter the prize race get …"),
+  hidden when not set.
+
 ## As implemented (API, migration `00740_growth.sql`)
 
 Paths, fields and error codes are as in §5. Where the spec left a choice:
