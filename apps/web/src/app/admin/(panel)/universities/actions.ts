@@ -123,15 +123,16 @@ export async function setDomains(id: string, domains: string[]): Promise<ActionR
 }
 
 /**
- * The university's Campus ambassador (§9.3) from `GET /admin/universities/{id}`;
- * null when there is none or the server doesn't have that endpoint.
+ * The university's Campus ambassador (§9.3) from
+ * `GET /admin/universities/{id}/growth`; null when there is none or the
+ * server doesn't have that endpoint.
  */
 export async function getAmbassador(universityId: string): Promise<ActionResult<Ambassador | null>> {
   const parsedId = z.uuid().safeParse(universityId);
   if (!parsedId.success) return { ok: false, error: "That university isn't valid." };
   try {
-    const uni = await api<AdminUniversity>(`/admin/universities/${parsedId.data}`);
-    return { ok: true, data: uni?.ambassador ?? null };
+    const growth = await api<{ ambassador?: Ambassador | null }>(`/admin/universities/${parsedId.data}/growth`);
+    return { ok: true, data: growth?.ambassador ?? null };
   } catch (e) {
     if (e instanceof ApiError && (e.status === 404 || e.status === 405)) return { ok: true, data: null };
     return failure(e);
