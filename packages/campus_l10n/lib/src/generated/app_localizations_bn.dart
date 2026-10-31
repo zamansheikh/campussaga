@@ -3027,4 +3027,7 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get openLinkFailed => 'লিংকটি খোলা গেল না।';
+
+  @override
+  String get showLess => 'কম দেখাও';
 }

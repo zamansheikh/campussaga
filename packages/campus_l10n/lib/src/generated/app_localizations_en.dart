@@ -3116,4 +3116,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openLinkFailed => 'Couldn\'t open this link.';
+
+  @override
+  String get showLess => 'Show less';
 }

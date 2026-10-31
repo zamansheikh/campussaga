@@ -34,4 +34,14 @@ class SeenCubit extends Cubit<Map<String, DateTime>> {
     emit(next);
     unawaited(_store.write(next));
   }
+
+  /// One announcement was read where it is (expanded on Today): it and
+  /// older ones of the group are seen.
+  void markRead(ClassGroup g, Announcement a) {
+    final seen = state[g.id];
+    if (seen != null && !a.createdAt.isAfter(seen)) return;
+    final next = {...state, g.id: a.createdAt};
+    emit(next);
+    unawaited(_store.write(next));
+  }
 }

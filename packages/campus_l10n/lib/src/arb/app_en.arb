@@ -1279,5 +1279,6 @@
   "editedLabel": "Edited",
   "announcementSaved": "Saved. Classmates see the new text.",
   "saveAction": "Save",
-  "openLinkFailed": "Couldn't open this link."
+  "openLinkFailed": "Couldn't open this link.",
+  "showLess": "Show less"
 }

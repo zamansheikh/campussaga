@@ -853,5 +853,6 @@
   "editedLabel": "সম্পাদিত",
   "announcementSaved": "সংরক্ষণ হয়েছে। সহপাঠীরা নতুন লেখাটি দেখবে।",
   "saveAction": "সংরক্ষণ করো",
-  "openLinkFailed": "লিংকটি খোলা গেল না।"
+  "openLinkFailed": "লিংকটি খোলা গেল না।",
+  "showLess": "কম দেখাও"
 }

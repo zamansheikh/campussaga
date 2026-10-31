@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:varsitykotha/app/app.dart';
 import 'package:varsitykotha/app/clock.dart';
 import 'package:varsitykotha/features/announcements/data/seen_store.dart';
+import 'package:varsitykotha/features/announcements/presentation/announcement_widgets.dart';
 
 import 'helpers/fakes.dart';
 
@@ -160,8 +161,22 @@ void main() {
     expect(find.text('New'), findsNWidgets(2));
     expect(find.textContaining('yesterday'), findsOneWidget);
 
-    // Members have no menu on the group page; opening it marks all seen.
+    // A tap opens the message where it is: read now, still on Today.
     await scrollAndTap(tester, find.text('Quiz on Sunday, chapters 3-4'));
+    await tester.pumpAndSettle();
+    expect(find.text('ANNOUNCEMENTS'), findsOneWidget, reason: 'on Today');
+    expect(find.text('New'), findsNothing);
+    expect(seen.saved['g-cse'], DateTime(2026, 10, 26, 20));
+
+    // The group's name leads to the group; members have no menu there.
+    await tester.tapOnText(
+      find.textRange
+          .ofSubstring(
+            'CSE 61 · A',
+            descendentOf: find.byType(AnnouncementCard),
+          )
+          .first,
+    );
     await tester.pumpAndSettle();
     expect(find.text('Old news'), findsOneWidget);
     expect(find.byIcon(CsIcons.more), findsOneWidget, reason: 'app bar only');
@@ -170,5 +185,33 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('New'), findsNothing);
     expect(seen.saved['g-cse'], DateTime(2026, 10, 26, 20));
+  });
+
+  testWidgets('a long announcement opens in place on Today', (tester) async {
+    final long = List.filled(
+      12,
+      'Bring the lab manual and your ID card.',
+    ).join(' ');
+    await signedIn(
+      tester,
+      sampleGroup().copyWith(
+        announcements: [
+          note('a1', long, tuesdayMorning.subtract(const Duration(hours: 2))),
+        ],
+      ),
+    );
+    await tester.ensureVisible(find.text('See more'));
+    await tester.pumpAndSettle();
+    final before = tester.getSize(find.byType(AnnouncementCard)).height;
+    await tester.tap(find.text('See more'));
+    await tester.pumpAndSettle();
+    expect(find.text('Show less'), findsOneWidget);
+    expect(
+      tester.getSize(find.byType(AnnouncementCard)).height,
+      greaterThan(before),
+    );
+    await scrollAndTap(tester, find.text('Show less'));
+    await tester.pumpAndSettle();
+    expect(find.text('See more'), findsOneWidget);
   });
 }

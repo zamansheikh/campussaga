@@ -5221,6 +5221,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t open this link.'**
   String get openLinkFailed;
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get showLess;
 }
 
 class _AppLocalizationsDelegate

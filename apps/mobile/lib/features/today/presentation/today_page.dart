@@ -227,12 +227,13 @@ class _RecentAnnouncements extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: CsSpace.sm),
               child: AnnouncementCard(
+                key: ValueKey(a.id),
                 group: g,
                 announcement: a,
                 showGroup: true,
                 isNew: seen.isNew(g, a),
                 maxLines: 3,
-                onTap: () => context.push(Routes.group(g.id)),
+                onOpenGroup: () => context.push(Routes.group(g.id)),
               ),
             ),
         ],

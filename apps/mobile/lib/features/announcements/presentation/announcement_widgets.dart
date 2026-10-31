@@ -1,6 +1,7 @@
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -72,15 +73,17 @@ class AnnouncementsSection extends StatelessWidget {
   }
 }
 
-/// One message: text (selectable), when, pinned; CR menu.
-class AnnouncementCard extends StatelessWidget {
+/// One message: text, when, pinned; CR menu. With [maxLines] (Today) the
+/// text is cut, and a tap opens it in place ("See more" / "Show less");
+/// the group's name then leads to the group ([onOpenGroup]).
+class AnnouncementCard extends StatefulWidget {
   const AnnouncementCard({
     super.key,
     required this.group,
     required this.announcement,
     this.showGroup = false,
     this.isNew = false,
-    this.onTap,
+    this.onOpenGroup,
     this.maxLines,
   });
 
@@ -88,8 +91,31 @@ class AnnouncementCard extends StatelessWidget {
   final Announcement announcement;
   final bool showGroup;
   final bool isNew;
-  final VoidCallback? onTap;
+  final VoidCallback? onOpenGroup;
   final int? maxLines;
+
+  @override
+  State<AnnouncementCard> createState() => _AnnouncementCardState();
+}
+
+class _AnnouncementCardState extends State<AnnouncementCard> {
+  bool _expanded = false;
+  late final _groupTap = TapGestureRecognizer()
+    ..onTap = () => widget.onOpenGroup?.call();
+
+  @override
+  void dispose() {
+    _groupTap.dispose();
+    super.dispose();
+  }
+
+  ClassGroup get group => widget.group;
+  Announcement get announcement => widget.announcement;
+
+  void _toggle() {
+    setState(() => _expanded = !_expanded);
+    if (_expanded) context.read<SeenCubit>().markRead(group, announcement);
+  }
 
   Future<void> _act(BuildContext context, _Action action) async {
     final l10n = AppLocalizations.of(context);
@@ -144,15 +170,16 @@ class AnnouncementCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final cs = context.cs;
     final a = announcement;
+    final cut = widget.maxLines;
     final meta = [
-      if (showGroup) group.title,
       agoText(context, a.createdAt, appNow()),
       if (a.edited) l10n.editedLabel,
     ].join(' · ');
+    final style = context.text.bodyLarge;
     return Card(
       color: a.pinned ? cs.primaryContainer.withValues(alpha: 0.45) : null,
       child: InkWell(
-        onTap: onTap,
+        onTap: cut == null ? null : _toggle,
         borderRadius: BorderRadius.circular(CsRadius.lg),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(CsSpace.md, 12, CsSpace.xs, 12),
@@ -182,9 +209,29 @@ class AnnouncementCard extends StatelessWidget {
                       runSpacing: 4,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Text(meta, style: context.text.labelMedium),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              if (widget.showGroup) ...[
+                                TextSpan(
+                                  text: group.title,
+                                  style: widget.onOpenGroup == null
+                                      ? null
+                                      : TextStyle(
+                                          color: cs.primary,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  recognizer: _groupTap,
+                                ),
+                                const TextSpan(text: ' · '),
+                              ],
+                              TextSpan(text: meta),
+                            ],
+                          ),
+                          style: context.text.labelMedium,
+                        ),
                         if (a.pinned) CsBadge(label: l10n.pinnedLabel),
-                        if (isNew)
+                        if (widget.isNew)
                           CsBadge(
                             label: l10n.newBadge,
                             tone: CsBadgeTone.accent,
@@ -192,13 +239,52 @@ class AnnouncementCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    CsLinkText(
-                      a.body,
-                      style: context.text.bodyLarge,
-                      maxLines: maxLines,
-                      overflow: maxLines == null ? null : TextOverflow.ellipsis,
-                      selectable: maxLines == null,
-                    ),
+                    if (cut == null)
+                      CsLinkText(a.body, style: style, selectable: true)
+                    else
+                      LayoutBuilder(
+                        builder: (context, box) {
+                          final painter = TextPainter(
+                            text: TextSpan(text: a.body, style: style),
+                            maxLines: cut,
+                            textDirection: Directionality.of(context),
+                            textScaler: MediaQuery.textScalerOf(context),
+                          )..layout(maxWidth: box.maxWidth);
+                          final long = painter.didExceedMaxLines;
+                          painter.dispose();
+                          return AnimatedSize(
+                            duration: CsMotion.normal,
+                            curve: CsMotion.curve,
+                            alignment: Alignment.topCenter,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CsLinkText(
+                                  a.body,
+                                  style: style,
+                                  maxLines: _expanded ? null : cut,
+                                  overflow: _expanded
+                                      ? null
+                                      : TextOverflow.ellipsis,
+                                ),
+                                if (long)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 2),
+                                    child: Text(
+                                      _expanded
+                                          ? l10n.showLess
+                                          : l10n.campusSeeMore,
+                                      style: context.text.labelLarge?.copyWith(
+                                        color: cs.textSecondary,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                   ],
                 ),
               ),
