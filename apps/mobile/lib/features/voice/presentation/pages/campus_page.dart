@@ -112,6 +112,7 @@ class _CampusViewState extends State<_CampusView> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: null, // tabs keep several alive at once
         onPressed: () async {
           final posted = await context.push<IssueCard>(Routes.campusNew);
           if (posted != null && context.mounted) unawaited(cubit.load());

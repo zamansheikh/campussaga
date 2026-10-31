@@ -50,6 +50,7 @@ class _RoutinePageState extends State<RoutinePage> {
       floatingActionButton: _selected.isBefore(today)
           ? null
           : FloatingActionButton.extended(
+              heroTag: null, // tabs keep several alive at once
               onPressed: () => _add(context, crGroups),
               icon: const Icon(CsIcons.add),
               label: Text(l10n.addAction),
