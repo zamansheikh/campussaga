@@ -579,8 +579,8 @@ void main() {
       expect(find.text('42 points'), findsOneWidget);
       expect(find.text('+10 for each friend who joins'), findsOneWidget);
       expect(find.text('3 friends · +35'), findsOneWidget);
-      expect(find.text('Extra for each friend:'), findsOneWidget);
-      expect(find.text('Another university +5 pts'), findsOneWidget);
+      expect(find.text('Extra for each friend'), findsOneWidget);
+      expect(find.text('At another university'), findsOneWidget);
       expect(find.text('A friend from another university'), findsNothing);
       expect(find.text('Done · +2'), findsOneWidget);
       expect(find.text('+3, once'), findsOneWidget);
@@ -627,8 +627,10 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.text('Your university 1/3'), findsOneWidget);
-      expect(find.text('Other universities 1/2'), findsOneWidget);
+      expect(find.text('Your university'), findsOneWidget);
+      expect(find.text('1/3'), findsOneWidget);
+      expect(find.text('Other universities'), findsOneWidget);
+      expect(find.text('1/2'), findsOneWidget);
       await scrollAndTap(tester, find.text('Enter the prize race'));
       await tester.pumpAndSettle();
       expect(shared.single, contains('/r/abcd1234'));

@@ -1887,7 +1887,7 @@
   "@missionBonusPioneer": {"placeholders": {"points": {"type": "int", "format": "decimalPattern"}}},
   "missionBonusSection": "Joins a section +{points} pts",
   "@missionBonusSection": {"placeholders": {"points": {"type": "int", "format": "decimalPattern"}}},
-  "missionInviteBonuses": "Extra for each friend:",
+  "missionInviteBonuses": "Extra for each friend",
   "raceTitle": "Enter the prize race",
   "raceRule": "To win, bring {min, plural, =1{1 friend} other{{min} friends}} from other universities",
   "@raceRule": {"placeholders": {"min": {"type": "int", "format": "decimalPattern"}}},
@@ -1907,5 +1907,13 @@
   "raceOtherProgress": "Other universities {count}/{min}",
   "@raceOtherProgress": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}, "min": {"type": "int", "format": "decimalPattern"}}},
   "campaignNextRaceOwn": "Next: {count, plural, =1{1 more friend} other{{count} more friends}} from your university",
-  "@campaignNextRaceOwn": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}}
+  "@campaignNextRaceOwn": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}},
+  "missionBonusOtherCampusDesc": "At another university",
+  "missionBonusPioneerDesc": "Among the first {first} at their university",
+  "@missionBonusPioneerDesc": {"placeholders": {"first": {"type": "int", "format": "decimalPattern"}}},
+  "missionBonusSectionDesc": "Joins their section",
+  "raceOwnLabel": "Your university",
+  "raceOtherLabel": "Other universities",
+  "raceCount": "{count}/{min}",
+  "@raceCount": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}, "min": {"type": "int", "format": "decimalPattern"}}}
 }

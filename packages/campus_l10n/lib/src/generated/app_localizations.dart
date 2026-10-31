@@ -8189,7 +8189,7 @@ abstract class AppLocalizations {
   /// No description provided for @missionInviteBonuses.
   ///
   /// In en, this message translates to:
-  /// **'Extra for each friend:'**
+  /// **'Extra for each friend'**
   String get missionInviteBonuses;
 
   /// No description provided for @raceTitle.
@@ -8257,6 +8257,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next: {count, plural, =1{1 more friend} other{{count} more friends}} from your university'**
   String campaignNextRaceOwn(int count);
+
+  /// No description provided for @missionBonusOtherCampusDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'At another university'**
+  String get missionBonusOtherCampusDesc;
+
+  /// No description provided for @missionBonusPioneerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Among the first {first} at their university'**
+  String missionBonusPioneerDesc(int first);
+
+  /// No description provided for @missionBonusSectionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Joins their section'**
+  String get missionBonusSectionDesc;
+
+  /// No description provided for @raceOwnLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your university'**
+  String get raceOwnLabel;
+
+  /// No description provided for @raceOtherLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Other universities'**
+  String get raceOtherLabel;
+
+  /// No description provided for @raceCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}/{min}'**
+  String raceCount(int count, int min);
 }
 
 class _AppLocalizationsDelegate

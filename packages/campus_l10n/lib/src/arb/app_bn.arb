@@ -1348,7 +1348,7 @@
   "missionBonusOtherCampus": "অন্য বিশ্ববিদ্যালয় +{points} পয়েন্ট",
   "missionBonusPioneer": "নতুন ক্যাম্পাস +{points} পয়েন্ট",
   "missionBonusSection": "সেকশনে যোগ দিলে +{points} পয়েন্ট",
-  "missionInviteBonuses": "প্রতি বন্ধুতে বাড়তি:",
+  "missionInviteBonuses": "প্রতি বন্ধুতে বাড়তি",
   "raceTitle": "পুরস্কারের দৌড়ে নামো",
   "raceRule": "জিততে অন্য বিশ্ববিদ্যালয়ের {min} জন বন্ধু আনো",
   "raceProgress": "অন্য বিশ্ববিদ্যালয়ের বন্ধু {count}/{min}",
@@ -1359,5 +1359,11 @@
   "raceRuleOwn": "জিততে নিজের বিশ্ববিদ্যালয়ের {min} জন বন্ধু আনো",
   "raceOwnProgress": "নিজের বিশ্ববিদ্যালয় {count}/{min}",
   "raceOtherProgress": "অন্য বিশ্ববিদ্যালয় {count}/{min}",
-  "campaignNextRaceOwn": "পরের ধাপ: নিজের বিশ্ববিদ্যালয়ের আরও {count} জন বন্ধু"
+  "campaignNextRaceOwn": "পরের ধাপ: নিজের বিশ্ববিদ্যালয়ের আরও {count} জন বন্ধু",
+  "missionBonusOtherCampusDesc": "অন্য বিশ্ববিদ্যালয়ে পড়ে",
+  "missionBonusPioneerDesc": "তার বিশ্ববিদ্যালয়ের প্রথম {first} জনের একজন",
+  "missionBonusSectionDesc": "নিজের সেকশনে যোগ দেয়",
+  "raceOwnLabel": "নিজের বিশ্ববিদ্যালয়",
+  "raceOtherLabel": "অন্য বিশ্ববিদ্যালয়",
+  "raceCount": "{count}/{min}"
 }

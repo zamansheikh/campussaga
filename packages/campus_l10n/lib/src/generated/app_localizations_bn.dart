@@ -5185,7 +5185,7 @@ class AppLocalizationsBn extends AppLocalizations {
   }
 
   @override
-  String get missionInviteBonuses => 'প্রতি বন্ধুতে বাড়তি:';
+  String get missionInviteBonuses => 'প্রতি বন্ধুতে বাড়তি';
 
   @override
   String get raceTitle => 'পুরস্কারের দৌড়ে নামো';
@@ -5286,5 +5286,39 @@ class AppLocalizationsBn extends AppLocalizations {
     final String countString = countNumberFormat.format(count);
 
     return 'পরের ধাপ: নিজের বিশ্ববিদ্যালয়ের আরও $countString জন বন্ধু';
+  }
+
+  @override
+  String get missionBonusOtherCampusDesc => 'অন্য বিশ্ববিদ্যালয়ে পড়ে';
+
+  @override
+  String missionBonusPioneerDesc(int first) {
+    final intl.NumberFormat firstNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String firstString = firstNumberFormat.format(first);
+
+    return 'তার বিশ্ববিদ্যালয়ের প্রথম $firstString জনের একজন';
+  }
+
+  @override
+  String get missionBonusSectionDesc => 'নিজের সেকশনে যোগ দেয়';
+
+  @override
+  String get raceOwnLabel => 'নিজের বিশ্ববিদ্যালয়';
+
+  @override
+  String get raceOtherLabel => 'অন্য বিশ্ববিদ্যালয়';
+
+  @override
+  String raceCount(int count, int min) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return '$countString/$minString';
   }
 }

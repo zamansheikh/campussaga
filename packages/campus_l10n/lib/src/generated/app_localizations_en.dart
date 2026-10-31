@@ -5344,7 +5344,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get missionInviteBonuses => 'Extra for each friend:';
+  String get missionInviteBonuses => 'Extra for each friend';
 
   @override
   String get raceTitle => 'Enter the prize race';
@@ -5469,5 +5469,39 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '1 more friend',
     );
     return 'Next: $_temp0 from your university';
+  }
+
+  @override
+  String get missionBonusOtherCampusDesc => 'At another university';
+
+  @override
+  String missionBonusPioneerDesc(int first) {
+    final intl.NumberFormat firstNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String firstString = firstNumberFormat.format(first);
+
+    return 'Among the first $firstString at their university';
+  }
+
+  @override
+  String get missionBonusSectionDesc => 'Joins their section';
+
+  @override
+  String get raceOwnLabel => 'Your university';
+
+  @override
+  String get raceOtherLabel => 'Other universities';
+
+  @override
+  String raceCount(int count, int min) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return '$countString/$minString';
   }
 }
