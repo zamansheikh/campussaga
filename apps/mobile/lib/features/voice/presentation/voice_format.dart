@@ -194,6 +194,8 @@ String voiceErrorText(BuildContext context, Failure f) {
     'POLL_CLOSED' => l10n.errorPollClosed,
     'ALREADY_VOTED' => l10n.errorAlreadyVoted,
     'NOT_AN_ISSUE' => l10n.errorNotAnIssue,
+    'VISITOR_READ_ONLY' => l10n.errorVisitorReadOnly,
+    'UNIVERSITY_NOT_FOUND' => l10n.errorUniversityGone,
     _ when f is RateLimitedFailure => l10n.errorTooManyRequests,
     _ => authErrorText(l10n, f),
   };

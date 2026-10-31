@@ -114,6 +114,7 @@ class FakeVoiceRepository implements VoiceRepository {
   @override
   Future<VoicePage<IssueCard>> feed({
     IssueSort sort = IssueSort.trending,
+    String? universityId,
     Set<PostKind>? kinds,
     IssueCategory? category,
     String? query,
@@ -128,6 +129,13 @@ class FakeVoiceRepository implements VoiceRepository {
       private: private,
     ));
     _check();
+    if (universityId != null) {
+      lastVisited = universityId;
+      return VoicePage([
+        for (final c in visitPosts[universityId] ?? const <IssueCard>[])
+          if (kinds == null || kinds.contains(c.kind)) c,
+      ]);
+    }
     final q = query?.toLowerCase() ?? '';
     return VoicePage([
       for (final i in issues)
@@ -377,6 +385,32 @@ class FakeVoiceRepository implements VoiceRepository {
   @override
   Future<Uint8List> image(String imageId, {bool thumb = false}) async =>
       onePixelPng;
+
+  /// Other universities, and the posts each one shows a visitor.
+  final campusList = <CampusSummary>[];
+  final campusProfiles = <String, CampusProfile>{};
+  final visitPosts = <String, List<IssueCard>>{};
+  String? lastVisited;
+
+  @override
+  Future<VoicePage<CampusSummary>> campuses({
+    String? query,
+    String? cursor,
+  }) async {
+    _check();
+    final q = query?.trim().toLowerCase() ?? '';
+    return VoicePage([
+      for (final c in campusList)
+        if (q.isEmpty || c.name.toLowerCase().contains(q)) c,
+    ]);
+  }
+
+  @override
+  Future<CampusProfile> campus(String slug) async {
+    _check();
+    return campusProfiles[slug] ??
+        (throw const NotFoundFailure(code: 'UNIVERSITY_NOT_FOUND'));
+  }
 
   @override
   Future<Issue> changeStatus(

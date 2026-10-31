@@ -14,10 +14,12 @@ typedef ReactResult = ({
 /// call throws a `Failure`; codes the app shows are mapped in the voice
 /// feature.
 abstract interface class VoiceRepository {
-  /// The university's feed. [kinds] null = every kind. [private] lists
-  /// safety issues (officials only).
+  /// The university's feed, or another university's ([universityId]: a
+  /// visit, read-only). [kinds] null = every kind. [private] lists safety
+  /// issues (officials only).
   Future<VoicePage<IssueCard>> feed({
     IssueSort sort = IssueSort.trending,
+    String? universityId,
     Set<PostKind>? kinds,
     IssueCategory? category,
     String? query,
@@ -98,6 +100,12 @@ abstract interface class VoiceRepository {
 
   /// An issue photo (or the caller's own unattached upload).
   Future<Uint8List> image(String imageId, {bool thumb = false});
+
+  /// Other universities to visit, most active first.
+  Future<VoicePage<CampusSummary>> campuses({String? query, String? cursor});
+
+  /// A university's profile (by slug).
+  Future<CampusProfile> campus(String slug);
 
   /// Officials: move the issue to [to].
   Future<Issue> changeStatus(String id, IssueStatus to, {String note = ''});

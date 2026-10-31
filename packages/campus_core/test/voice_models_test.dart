@@ -174,6 +174,7 @@ void main() {
         'locationLabel': '',
         'anonymous': true,
         'imageIds': <String>[],
+        'campusOnly': false,
         'pollOptions': ['Fri', 'Sat'],
         'pollDays': 7,
       });

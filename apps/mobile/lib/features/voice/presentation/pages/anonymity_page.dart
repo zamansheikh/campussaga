@@ -19,6 +19,7 @@ class AnonymityPage extends StatelessWidget {
       (CsIcons.rules, l10n.voiceAnon6),
       (CsIcons.warning, l10n.voiceAnon7),
       (CsIcons.safety, l10n.voiceAnon8),
+      (CsIcons.visitCampus, l10n.voiceAnon9),
     ];
     return Scaffold(
       appBar: AppBar(title: Text(l10n.voiceAnonTitle)),

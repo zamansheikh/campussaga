@@ -167,15 +167,16 @@ class _IssueViewState extends State<_IssueView> {
               ),
         actions: [
           if (issue != null && !s.offline) ...[
-            IconButton(
-              tooltip: issue.card.following
-                  ? l10n.voiceFollowing
-                  : l10n.voiceFollow,
-              isSelected: issue.card.following,
-              icon: const Icon(CsIcons.bell),
-              selectedIcon: const Icon(CsIcons.bellActive),
-              onPressed: () async => _done(await cubit.toggleFollow()),
-            ),
+            if (!issue.card.visitor)
+              IconButton(
+                tooltip: issue.card.following
+                    ? l10n.voiceFollowing
+                    : l10n.voiceFollow,
+                isSelected: issue.card.following,
+                icon: const Icon(CsIcons.bell),
+                selectedIcon: const Icon(CsIcons.bellActive),
+                onPressed: () async => _done(await cubit.toggleFollow()),
+              ),
             PopupMenuButton<String>(
               icon: const Icon(CsIcons.more),
               onSelected: (a) => _menu(a, issue),
@@ -218,11 +219,16 @@ class _IssueViewState extends State<_IssueView> {
                   scroll: _scroll,
                   onResult: _done,
                   onReply: _reply,
-                  onComment: _focus.requestFocus,
+                  onComment: issue.card.visitor
+                      ? () => _snack(
+                          AppLocalizations.of(context).visitReadOnlyNote,
+                        )
+                      : _focus.requestFocus,
                 ),
               ),
             ),
             if (!s.offline &&
+                !issue.card.visitor &&
                 issue.card.visibility != ContentVisibility.removed)
               _Composer(
                 focus: _focus,
@@ -269,7 +275,7 @@ class _Body extends StatelessWidget {
       controller: scroll,
       padding: const EdgeInsets.only(bottom: CsSpace.xl),
       children: [
-        if (state.offline || _notices(l10n, issue).isNotEmpty)
+        if (state.offline || c.visitor || _notices(l10n, issue).isNotEmpty)
           Padding(
             padding: const EdgeInsets.fromLTRB(
               CsSpace.md,
@@ -281,6 +287,11 @@ class _Body extends StatelessWidget {
               children: [
                 if (state.offline)
                   _Note(icon: CsIcons.offline, text: l10n.errorNetwork),
+                if (c.visitor)
+                  _Note(
+                    icon: CsIcons.visitCampus,
+                    text: l10n.visitReadOnlyNote,
+                  ),
                 ..._notices(l10n, issue),
               ],
             ),
@@ -333,7 +344,7 @@ class _Body extends StatelessWidget {
                 comments: state.comments,
                 onResult: onResult,
                 onReply: onReply,
-                offline: state.offline,
+                offline: state.offline || c.visitor,
               ),
               if (state.commentsCursor != null)
                 Center(

@@ -21,6 +21,9 @@ class ExplorePage extends StatelessWidget {
     final blood = context.select(
       (VersionGateCubit g) => g.state.feature('bloodDonation'),
     );
+    final visit =
+        voice &&
+        context.select((VersionGateCubit g) => g.state.feature('visitCampus'));
     final tools = [
       if (blood)
         _Feature(
@@ -47,6 +50,13 @@ class ExplorePage extends StatelessWidget {
         hint: l10n.cgpaHint,
         onTap: () => context.push(Routes.cgpa),
       ),
+      if (visit)
+        _Feature(
+          icon: CsIcons.visitCampus,
+          title: l10n.visitCampusTitle,
+          hint: l10n.visitCampusBody,
+          onTap: () => context.push(Routes.campusVisit),
+        ),
       if (voice)
         _Feature(
           icon: CsIcons.myIssues,
@@ -74,12 +84,13 @@ class ExplorePage extends StatelessWidget {
         hint: l10n.rankingsBody,
         soon: true,
       ),
-      _Feature(
-        icon: CsIcons.visitCampus,
-        title: l10n.visitCampusTitle,
-        hint: l10n.visitCampusBody,
-        soon: true,
-      ),
+      if (!visit)
+        _Feature(
+          icon: CsIcons.visitCampus,
+          title: l10n.visitCampusTitle,
+          hint: l10n.visitCampusBody,
+          soon: true,
+        ),
     ];
 
     return Scaffold(
@@ -234,8 +245,10 @@ Future<void> _showSoon(BuildContext context, _Feature f) {
   return showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
+    // Long text (and Bangla) can be taller than the default sheet.
+    isScrollControlled: true,
     builder: (sheet) => SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(
           CsSpace.lg,
           0,

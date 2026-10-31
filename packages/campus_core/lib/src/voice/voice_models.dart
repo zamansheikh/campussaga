@@ -278,6 +278,8 @@ class IssueCard {
     this.author,
     this.locationLabel = '',
     this.poll,
+    this.campusOnly = false,
+    this.visitor = false,
     DateTime? statusChangedAt,
   }) : statusChangedAt = statusChangedAt ?? createdAt;
 
@@ -323,6 +325,8 @@ class IssueCard {
       poll: json['poll'] is Map<String, Object?>
           ? Poll.fromJson(json['poll']! as Map<String, Object?>)
           : null,
+      campusOnly: json['campusOnly'] as bool? ?? false,
+      visitor: json['visitor'] as bool? ?? false,
       createdAt: _time(json['createdAt']),
       statusChangedAt: json['statusChangedAt'] == null
           ? null
@@ -376,6 +380,13 @@ class IssueCard {
 
   /// Polls only.
   final Poll? poll;
+
+  /// The author kept it inside their university.
+  final bool campusOnly;
+
+  /// The caller is visiting: another university's post (read and react
+  /// only).
+  final bool visitor;
 
   /// Rounded to 5 minutes for anonymous posts (by the server).
   final DateTime createdAt;
@@ -432,6 +443,8 @@ class IssueCard {
     author: author,
     locationLabel: locationLabel,
     poll: poll ?? this.poll,
+    campusOnly: campusOnly,
+    visitor: visitor,
     createdAt: createdAt,
     statusChangedAt: statusChangedAt,
   );
@@ -483,6 +496,8 @@ class IssueCard {
     'author': author?.toJson(),
     'locationLabel': locationLabel,
     'poll': poll?.toJson(),
+    'campusOnly': campusOnly,
+    'visitor': visitor,
     'createdAt': createdAt.toUtc().toIso8601String(),
     'statusChangedAt': statusChangedAt.toUtc().toIso8601String(),
   };
@@ -796,6 +811,7 @@ class IssueDraft {
     this.imageIds = const [],
     this.pollOptions = const [],
     this.pollDays = 3,
+    this.campusOnly = false,
   });
 
   final PostKind kind;
@@ -811,6 +827,9 @@ class IssueDraft {
   /// Polls: 2–4 answers, and how many days it stays open (1, 3 or 7).
   final List<String> pollOptions;
   final int pollDays;
+
+  /// Only students of the author's university see it (issues always).
+  final bool campusOnly;
 
   static const minTitle = 8;
   static const maxTitle = 120;
@@ -842,9 +861,77 @@ class IssueDraft {
     'locationLabel': locationLabel.trim(),
     'anonymous': anonymous,
     'imageIds': imageIds,
+    if (kind != PostKind.issue) 'campusOnly': campusOnly,
     if (kind == PostKind.poll) ...{
       'pollOptions': [for (final o in pollOptions) o.trim()],
       'pollDays': pollDays,
     },
   };
+}
+
+/// Another university, in the list of campuses to visit.
+class CampusSummary {
+  const CampusSummary({
+    required this.id,
+    required this.slug,
+    required this.name,
+    this.nameBn = '',
+    this.city = '',
+    this.kind = '',
+    this.students = 0,
+    this.posts7d = 0,
+  });
+
+  factory CampusSummary.fromJson(Map<String, Object?> json) => CampusSummary(
+    id: json['id']! as String,
+    slug: json['slug'] as String? ?? '',
+    name: json['name'] as String? ?? '',
+    nameBn: json['nameBn'] as String? ?? '',
+    city: json['city'] as String? ?? '',
+    kind: json['kind'] as String? ?? '',
+    students: (json['students'] as num?)?.toInt() ?? 0,
+    posts7d: (json['posts7d'] as num?)?.toInt() ?? 0,
+  );
+
+  final String id;
+  final String slug;
+  final String name;
+  final String nameBn;
+  final String city;
+
+  /// "public" or "private" ("" when unknown).
+  final String kind;
+
+  /// Students on VarsityKotha.
+  final int students;
+
+  /// Posts, questions and polls in the last 7 days.
+  final int posts7d;
+}
+
+/// A university's profile, seen by a visitor (or its own student).
+class CampusProfile {
+  const CampusProfile({
+    required this.summary,
+    this.website = '',
+    this.classGroups = 0,
+    this.busRoutes = 0,
+    this.mine = false,
+  });
+
+  factory CampusProfile.fromJson(Map<String, Object?> json) => CampusProfile(
+    summary: CampusSummary.fromJson(json),
+    website: json['website'] as String? ?? '',
+    classGroups: (json['classGroups'] as num?)?.toInt() ?? 0,
+    busRoutes: (json['busRoutes'] as num?)?.toInt() ?? 0,
+    mine: json['mine'] as bool? ?? false,
+  );
+
+  final CampusSummary summary;
+  final String website;
+  final int classGroups;
+  final int busRoutes;
+
+  /// The caller's own university.
+  final bool mine;
 }

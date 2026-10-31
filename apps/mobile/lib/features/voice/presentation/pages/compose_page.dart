@@ -323,6 +323,19 @@ class _ComposeViewState extends State<_ComposeView> {
                     selected: s.category,
                     onSelected: cubit.setCategory,
                   ),
+                  const SizedBox(height: CsSpace.sm),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    secondary: Icon(
+                      s.campusOnly ? CsIcons.lock : CsIcons.visitCampus,
+                    ),
+                    title: Text(l10n.campusOnlyLabel),
+                    subtitle: Text(
+                      s.campusOnly ? l10n.campusOnlyOn : l10n.campusOnlyOff,
+                    ),
+                    value: s.campusOnly,
+                    onChanged: cubit.setCampusOnly,
+                  ),
                 ],
                 const SizedBox(height: CsSpace.md),
                 if (_showPlace || s.kind == PostKind.issue)

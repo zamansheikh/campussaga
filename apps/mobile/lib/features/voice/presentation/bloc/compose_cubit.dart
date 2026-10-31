@@ -41,6 +41,7 @@ final class ComposeState extends Equatable {
     this.photos = const [],
     this.pollOptions = const ['', ''],
     this.pollDays = 3,
+    this.campusOnly = false,
     this.similar = const [],
     this.posting = false,
     this.posted,
@@ -63,6 +64,9 @@ final class ComposeState extends Equatable {
   /// Polls: 2–4 answers and how many days it stays open.
   final List<String> pollOptions;
   final int pollDays;
+
+  /// Only students of the author's university see it (issues always).
+  final bool campusOnly;
 
   /// Issues: ones like this title already raised.
   final List<IssueCard> similar;
@@ -125,6 +129,7 @@ final class ComposeState extends Equatable {
     List<DraftPhoto>? photos,
     List<String>? pollOptions,
     int? pollDays,
+    bool? campusOnly,
     List<IssueCard>? similar,
     bool? posting,
     Issue? posted,
@@ -140,6 +145,7 @@ final class ComposeState extends Equatable {
     photos: photos ?? this.photos,
     pollOptions: pollOptions ?? this.pollOptions,
     pollDays: pollDays ?? this.pollDays,
+    campusOnly: campusOnly ?? this.campusOnly,
     similar: similar ?? this.similar,
     posting: posting ?? this.posting,
     posted: posted ?? this.posted,
@@ -158,6 +164,7 @@ final class ComposeState extends Equatable {
     photos,
     pollOptions,
     pollDays,
+    campusOnly,
     similar,
     posting,
     posted,
@@ -291,6 +298,8 @@ class ComposeCubit extends Cubit<ComposeState> {
 
   void setPollDays(int days) => emit(state.copyWith(pollDays: days));
 
+  void setCampusOnly(bool on) => emit(state.copyWith(campusOnly: on));
+
   /// Issues: look for the same issue raised before, as the title is typed.
   void _findSimilar() {
     _similarTimer?.cancel();
@@ -388,6 +397,7 @@ class ComposeCubit extends Cubit<ComposeState> {
           ],
           pollOptions: s.kind == PostKind.poll ? s.typedOptions : const [],
           pollDays: s.pollDays,
+          campusOnly: s.campusOnly,
         ),
       );
       await _cache.clearDraft();

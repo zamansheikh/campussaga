@@ -3517,4 +3517,107 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorDonorRequired => 'Set up your donor profile first.';
+
+  @override
+  String get visitSearchHint => 'Search universities';
+
+  @override
+  String get visitMostActive => 'Most active this week';
+
+  @override
+  String visitStudents(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString students',
+      one: '1 student',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String visitPostsWeek(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString posts this week',
+      one: '1 post this week',
+      zero: 'No posts this week',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get visitClassGroups => 'Class groups';
+
+  @override
+  String get visitBusRoutes => 'Bus routes';
+
+  @override
+  String get visitStudentsLabel => 'Students';
+
+  @override
+  String get visitPostsLabel => 'Posts this week';
+
+  @override
+  String get visitPublic => 'Public';
+
+  @override
+  String get visitPrivate => 'Private';
+
+  @override
+  String get visitWebsite => 'Website';
+
+  @override
+  String visitYouAreVisiting(String name) {
+    return 'You\'re visiting $name. Only its students can comment.';
+  }
+
+  @override
+  String get visitEmpty => 'No posts here yet';
+
+  @override
+  String get visitEmptyHint => 'Its students haven\'t posted anything yet.';
+
+  @override
+  String get visitNoCampuses => 'No university matches';
+
+  @override
+  String get visitYourCampus => 'Your campus';
+
+  @override
+  String get campusOnlyLabel => 'Only my university';
+
+  @override
+  String get campusOnlyOn => 'Only students of your university can see this.';
+
+  @override
+  String get campusOnlyOff =>
+      'Students of all universities can see this (they can\'t comment).';
+
+  @override
+  String get campusOnlyBadge => 'My university only';
+
+  @override
+  String get voiceAnon9 =>
+      'Posts, questions and polls can be read by students of other universities, unless you choose \"Only my university\". Issues and safety reports stay inside your university.';
+
+  @override
+  String get errorVisitorReadOnly =>
+      'Only students of this university can do that.';
+
+  @override
+  String get errorUniversityGone => 'This university isn\'t on VarsityKotha.';
+
+  @override
+  String get visitReadOnlyNote =>
+      'You\'re visiting another university: read and react; only its students can comment.';
 }

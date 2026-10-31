@@ -27,6 +27,8 @@ DECLARE
     v_issue  uuid;
     v_cmt    uuid;
     v_opt    uuid;
+    v_other  uuid;
+    v_vis    uuid;
     v_route  uuid;
     v_domain text;
 BEGIN
@@ -298,6 +300,61 @@ BEGIN
     VALUES (v_uni, v_c, 'O-', 1, 'Dhaka Medical College Hospital', 'Shahbagh',
             date_trunc('day', now()) + interval '1 day 10 hours', false, 'Sadia Rahman', '01711000004',
             'Thalassemia patient, needs blood every month.', 0, now() - interval '3 hours');
+
+    -- ---- another campus to visit (docs/CAMPUS_VISITS.md) -----------------------
+    -- A few posts at the University of Dhaka (or BUET, when you are at DU):
+    -- what a visitor sees, plus an issue and a campus-only post they don't.
+    SELECT id INTO v_other FROM universities
+    WHERE slug IN ('du', 'buet') AND id <> v_uni ORDER BY slug DESC LIMIT 1;
+    IF v_other IS NOT NULL THEN
+        INSERT INTO users (email, university_id, display_name, department, batch, role, verified_at)
+        VALUES ('demo-visit@other.demo.local', v_other, 'Arif Hossain', 'EEE', '27', 'student', now())
+        ON CONFLICT (email) DO UPDATE SET university_id = EXCLUDED.university_id RETURNING id INTO v_vis;
+        DELETE FROM issues WHERE id IN (SELECT issue_id FROM issue_authors WHERE user_id = v_vis);
+
+        INSERT INTO issues (university_id, kind, category, private, title, body, location_label, status, me_too_count,
+                            comment_count, created_at, status_changed_at)
+        VALUES (v_other, 'post', 'event', false, '',
+                E'📚 The book fair at TSC starts tomorrow! 60+ stalls, and student discounts until Friday.',
+                'TSC', 'open', 18, 0, now() - interval '2 hours', now() - interval '2 hours')
+        RETURNING id INTO v_issue;
+        INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_vis);
+        INSERT INTO issue_votes (issue_id, user_id, reaction) VALUES (v_issue, v_vis, 'like');
+
+        INSERT INTO issues (university_id, kind, category, private, title, body, status, me_too_count, comment_count,
+                            poll_closes_at, created_at, status_changed_at)
+        VALUES (v_other, 'poll', 'fun', false, '', 'Best late-night snack near campus?', 'open', 9, 0,
+                now() + interval '3 days', now() - interval '6 hours', now() - interval '6 hours')
+        RETURNING id INTO v_issue;
+        INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_vis);
+        INSERT INTO poll_options (issue_id, position, label, vote_count) VALUES
+            (v_issue, 0, 'Chotpoti at Nilkhet', 21), (v_issue, 1, 'Tea and puri at Chankharpul', 14), (v_issue, 2, 'Kacchi', 30);
+
+        INSERT INTO issues (university_id, kind, category, private, title, body, status, me_too_count, comment_count,
+                            created_at, status_changed_at)
+        VALUES (v_other, 'question', 'academic', false, '',
+                'Any tips for the EEE 201 lab viva? The teacher asks a lot about op-amps.', 'open', 4, 1,
+                now() - interval '1 day', now() - interval '1 day')
+        RETURNING id INTO v_issue;
+        INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_vis);
+        INSERT INTO comments (issue_id, kind, handle, body, created_at) VALUES
+            (v_issue, 'student', 'R4TP', 'Revise inverting vs non-inverting gain, and draw the circuits neatly.', now() - interval '20 hours');
+
+        -- Not for visitors: an issue, and a post kept inside the university.
+        INSERT INTO issues (university_id, kind, category, private, title, body, status, me_too_count, comment_count,
+                            created_at, status_changed_at)
+        VALUES (v_other, 'issue', 'hostel', false, 'Lift broken in the new hall building',
+                'The lift in the new building has been broken for a week; students on the 10th floor are struggling.',
+                'open', 12, 0, now() - interval '3 hours', now() - interval '3 hours')
+        RETURNING id INTO v_issue;
+        INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_vis);
+        INSERT INTO issues (university_id, kind, category, private, title, body, status, me_too_count, comment_count,
+                            campus_only, created_at, status_changed_at)
+        VALUES (v_other, 'post', 'general', false, '', 'Hall meeting tonight at 9 in the common room.', 'open', 2, 0,
+                true, now() - interval '1 hour', now() - interval '1 hour')
+        RETURNING id INTO v_issue;
+        INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_vis);
+    END IF;
 
     -- ---- bus routes (stops in to-campus order; minutes from the start) ------
     DELETE FROM bus_routes WHERE university_id = v_uni AND name LIKE 'Demo %';

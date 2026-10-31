@@ -5851,6 +5851,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set up your donor profile first.'**
   String get errorDonorRequired;
+
+  /// No description provided for @visitSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search universities'**
+  String get visitSearchHint;
+
+  /// No description provided for @visitMostActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Most active this week'**
+  String get visitMostActive;
+
+  /// No description provided for @visitStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 student} other{{count} students}}'**
+  String visitStudents(int count);
+
+  /// No description provided for @visitPostsWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No posts this week} =1{1 post this week} other{{count} posts this week}}'**
+  String visitPostsWeek(int count);
+
+  /// No description provided for @visitClassGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Class groups'**
+  String get visitClassGroups;
+
+  /// No description provided for @visitBusRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus routes'**
+  String get visitBusRoutes;
+
+  /// No description provided for @visitStudentsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Students'**
+  String get visitStudentsLabel;
+
+  /// No description provided for @visitPostsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts this week'**
+  String get visitPostsLabel;
+
+  /// No description provided for @visitPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get visitPublic;
+
+  /// No description provided for @visitPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get visitPrivate;
+
+  /// No description provided for @visitWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get visitWebsite;
+
+  /// No description provided for @visitYouAreVisiting.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re visiting {name}. Only its students can comment.'**
+  String visitYouAreVisiting(String name);
+
+  /// No description provided for @visitEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No posts here yet'**
+  String get visitEmpty;
+
+  /// No description provided for @visitEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Its students haven\'t posted anything yet.'**
+  String get visitEmptyHint;
+
+  /// No description provided for @visitNoCampuses.
+  ///
+  /// In en, this message translates to:
+  /// **'No university matches'**
+  String get visitNoCampuses;
+
+  /// No description provided for @visitYourCampus.
+  ///
+  /// In en, this message translates to:
+  /// **'Your campus'**
+  String get visitYourCampus;
+
+  /// No description provided for @campusOnlyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Only my university'**
+  String get campusOnlyLabel;
+
+  /// No description provided for @campusOnlyOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Only students of your university can see this.'**
+  String get campusOnlyOn;
+
+  /// No description provided for @campusOnlyOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Students of all universities can see this (they can\'t comment).'**
+  String get campusOnlyOff;
+
+  /// No description provided for @campusOnlyBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'My university only'**
+  String get campusOnlyBadge;
+
+  /// No description provided for @voiceAnon9.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts, questions and polls can be read by students of other universities, unless you choose \"Only my university\". Issues and safety reports stay inside your university.'**
+  String get voiceAnon9;
+
+  /// No description provided for @errorVisitorReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only students of this university can do that.'**
+  String get errorVisitorReadOnly;
+
+  /// No description provided for @errorUniversityGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This university isn\'t on VarsityKotha.'**
+  String get errorUniversityGone;
+
+  /// No description provided for @visitReadOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re visiting another university: read and react; only its students can comment.'**
+  String get visitReadOnlyNote;
 }
 
 class _AppLocalizationsDelegate

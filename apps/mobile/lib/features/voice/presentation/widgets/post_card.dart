@@ -85,6 +85,12 @@ class PostCard extends StatelessWidget {
               photos.isEmpty &&
               text.characters.length <= 90),
       tags: [
+        if (c.campusOnly && !c.visitor)
+          CsBadge(
+            label: l10n.campusOnlyBadge,
+            icon: CsIcons.lock,
+            tone: CsBadgeTone.neutral,
+          ),
         if (c.private)
           CsBadge(
             label: l10n.voicePrivate,
@@ -153,6 +159,7 @@ class PostCard extends StatelessWidget {
     final total = poll.options.fold<int>(0, (a, o) => a + (o.votes ?? 0));
     final canVote =
         onVote != null &&
+        !card.visitor &&
         !offline &&
         poll.myVote == null &&
         !poll.isClosed(now) &&

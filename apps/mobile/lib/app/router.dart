@@ -49,6 +49,7 @@ import '../features/transport/presentation/pages/bus_stops_edit_page.dart';
 import '../features/transport/presentation/pages/bus_trips_edit_page.dart';
 import '../features/voice/presentation/pages/anonymity_page.dart';
 import '../features/voice/presentation/pages/campus_page.dart';
+import '../features/voice/presentation/pages/campus_visit_pages.dart';
 import '../features/voice/presentation/pages/compose_page.dart';
 import '../features/voice/presentation/pages/issue_page.dart';
 import '../features/voice/presentation/pages/my_issues_page.dart';
@@ -119,6 +120,10 @@ abstract final class Routes {
   static const campusNew = '/campus/new';
   static const campusMine = '/campus/mine';
   static const campusAnonymity = '/campus/anonymity';
+
+  /// Visit other campuses: the list, and one university (by slug).
+  static const campusVisit = '/campus/visit';
+  static String campusOf(String slug) => '/campus/u/$slug';
 
   /// A post; [comment] opens it with the comment box ready.
   static String campusIssue(String id, {bool comment = false}) =>
@@ -287,6 +292,15 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
       GoRoute(
         path: Routes.campusAnonymity,
         builder: (context, state) => const AnonymityPage(),
+      ),
+      GoRoute(
+        path: Routes.campusVisit,
+        builder: (context, state) => const VisitCampusesPage(),
+      ),
+      GoRoute(
+        path: '/campus/u/:slug',
+        builder: (context, state) =>
+            CampusVisitPage(slug: state.pathParameters['slug']!),
       ),
       GoRoute(
         path: '/campus/issues/:id',

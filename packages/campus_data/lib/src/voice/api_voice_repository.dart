@@ -43,6 +43,7 @@ class ApiVoiceRepository implements VoiceRepository {
   @override
   Future<VoicePage<IssueCard>> feed({
     IssueSort sort = IssueSort.trending,
+    String? universityId,
     Set<PostKind>? kinds,
     IssueCategory? category,
     String? query,
@@ -50,7 +51,7 @@ class ApiVoiceRepository implements VoiceRepository {
     bool private = false,
   }) async => _page(
     await _api.get(
-      '/issues${_q({'sort': sort.wire, 'kinds': _kinds(kinds), 'category': category?.wire, 'q': query?.trim(), 'cursor': cursor, 'private': private ? 'true' : null})}',
+      '/issues${_q({'sort': sort.wire, 'universityId': universityId, 'kinds': _kinds(kinds), 'category': category?.wire, 'q': query?.trim(), 'cursor': cursor, 'private': private ? 'true' : null})}',
     ),
     IssueCard.fromJson,
   );
@@ -226,6 +227,20 @@ class ApiVoiceRepository implements VoiceRepository {
   @override
   Future<Uint8List> image(String imageId, {bool thumb = false}) =>
       _api.getBytes('/issues/images/$imageId?size=${thumb ? 'thumb' : 'full'}');
+
+  @override
+  Future<VoicePage<CampusSummary>> campuses({
+    String? query,
+    String? cursor,
+  }) async => _page(
+    await _api.get('/campuses${_q({'q': query?.trim(), 'cursor': cursor})}'),
+    CampusSummary.fromJson,
+  );
+
+  @override
+  Future<CampusProfile> campus(String slug) async => CampusProfile.fromJson(
+    _map(await _api.get('/campuses/${Uri.encodeComponent(slug)}')),
+  );
 
   @override
   Future<Issue> changeStatus(

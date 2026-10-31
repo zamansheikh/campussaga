@@ -119,16 +119,23 @@ final class FeedState extends Equatable {
 /// page of each tab is saved for offline reading. Reactions and poll votes
 /// show at once and roll back if the server says no.
 class FeedCubit extends Cubit<FeedState> {
-  FeedCubit(this._repo, this._cache, this._userId) : super(const FeedState());
+  FeedCubit(this._repo, this._cache, this._userId, {this.universityId})
+    : super(const FeedState());
 
   final VoiceRepository _repo;
   final VoiceCache _cache;
   final String _userId;
+
+  /// Another university's feed (a visit): read-only, not saved offline.
+  final String? universityId;
+
+  bool get _saves => universityId == null;
   int _request = 0;
 
   Future<VoicePage<IssueCard>> _fetch(FeedState s, {String? cursor}) =>
       _repo.feed(
         sort: s.sort,
+        universityId: universityId,
         kinds: s.kinds,
         category: s.category,
         query: s.query,
@@ -151,10 +158,12 @@ class FeedCubit extends Cubit<FeedState> {
           offline: false,
         ),
       );
-      if (!s.filtered) await _cache.saveFeed(_userId, s.cacheKey, page.items);
+      if (!s.filtered && _saves) {
+        await _cache.saveFeed(_userId, s.cacheKey, page.items);
+      }
     } on Failure catch (f) {
       if (isClosed || request != _request) return;
-      final saved = f is NetworkFailure && !s.filtered
+      final saved = f is NetworkFailure && !s.filtered && _saves
           ? await _cache.feed(_userId, s.cacheKey)
           : null;
       if (isClosed || request != _request) return;

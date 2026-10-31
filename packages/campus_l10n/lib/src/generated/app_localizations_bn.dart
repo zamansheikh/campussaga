@@ -3421,4 +3421,101 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get errorDonorRequired => 'আগে তোমার রক্তদাতা প্রোফাইল তৈরি করো।';
+
+  @override
+  String get visitSearchHint => 'বিশ্ববিদ্যালয় খুঁজো';
+
+  @override
+  String get visitMostActive => 'এই সপ্তাহে সবচেয়ে সক্রিয়';
+
+  @override
+  String visitStudents(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString জন শিক্ষার্থী';
+  }
+
+  @override
+  String visitPostsWeek(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'এই সপ্তাহে $countStringটি পোস্ট',
+      zero: 'এই সপ্তাহে পোস্ট নেই',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get visitClassGroups => 'ক্লাস গ্রুপ';
+
+  @override
+  String get visitBusRoutes => 'বাস রুট';
+
+  @override
+  String get visitStudentsLabel => 'শিক্ষার্থী';
+
+  @override
+  String get visitPostsLabel => 'এই সপ্তাহের পোস্ট';
+
+  @override
+  String get visitPublic => 'সরকারি';
+
+  @override
+  String get visitPrivate => 'বেসরকারি';
+
+  @override
+  String get visitWebsite => 'ওয়েবসাইট';
+
+  @override
+  String visitYouAreVisiting(String name) {
+    return 'তুমি $name ঘুরে দেখছ। শুধু এর শিক্ষার্থীরা মন্তব্য করতে পারে।';
+  }
+
+  @override
+  String get visitEmpty => 'এখানে এখনো কোনো পোস্ট নেই';
+
+  @override
+  String get visitEmptyHint => 'এর শিক্ষার্থীরা এখনো কিছু পোস্ট করেনি।';
+
+  @override
+  String get visitNoCampuses => 'কোনো বিশ্ববিদ্যালয় মেলেনি';
+
+  @override
+  String get visitYourCampus => 'তোমার ক্যাম্পাস';
+
+  @override
+  String get campusOnlyLabel => 'শুধু আমার বিশ্ববিদ্যালয়';
+
+  @override
+  String get campusOnlyOn =>
+      'শুধু তোমার বিশ্ববিদ্যালয়ের শিক্ষার্থীরা দেখতে পারবে।';
+
+  @override
+  String get campusOnlyOff =>
+      'সব বিশ্ববিদ্যালয়ের শিক্ষার্থীরা দেখতে পারবে (মন্তব্য করতে পারবে না)।';
+
+  @override
+  String get campusOnlyBadge => 'শুধু আমার বিশ্ববিদ্যালয়';
+
+  @override
+  String get voiceAnon9 =>
+      '\"শুধু আমার বিশ্ববিদ্যালয়\" না বাছলে পোস্ট, প্রশ্ন ও পোল অন্য বিশ্ববিদ্যালয়ের শিক্ষার্থীরাও পড়তে পারে। ইস্যু ও নিরাপত্তা রিপোর্ট তোমার বিশ্ববিদ্যালয়ের ভেতরেই থাকে।';
+
+  @override
+  String get errorVisitorReadOnly =>
+      'এটা শুধু এই বিশ্ববিদ্যালয়ের শিক্ষার্থীরা করতে পারে।';
+
+  @override
+  String get errorUniversityGone => 'এই বিশ্ববিদ্যালয়টি ভার্সিটিকথায় নেই।';
+
+  @override
+  String get visitReadOnlyNote =>
+      'তুমি অন্য বিশ্ববিদ্যালয় ঘুরে দেখছ: পড়তে ও রিঅ্যাক্ট করতে পারো; মন্তব্য শুধু এর শিক্ষার্থীরা করতে পারে।';
 }
