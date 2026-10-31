@@ -135,3 +135,84 @@ Every admin change writes one row (`user.update`, `user.delete`,
 `university.create`, `university.update`, `university.domains`,
 `group.member.role`, `group.member.remove`, `group.delete`, `config.update`,
 `push.send`, `admin.sign_in`).
+
+## Build 6 features in the admin panel
+
+What the admin panel needs for Campus social, blood donation, campus visits
+and live buses. All routes are admin-only like the rest of `/admin/*`, and
+every change writes an audit row.
+
+### Dashboard (`GET /admin/stats`, new keys)
+
+```json
+{
+  "campus": {"postsLast7Days": {"issue": 0, "post": 0, "question": 0, "poll": 0},
+             "commentsLast7Days": 0, "reactionsLast7Days": 0},
+  "blood": {"donors": 0, "available": 0, "openRequests": 0,
+            "requestsLast7Days": 0, "responsesLast7Days": 0},
+  "bus": {"liveNow": 0, "sharesLast7Days": 0, "tripsShared": 0, "ratingsLast30Days": 0}
+}
+```
+
+- `campus.postsLast7Days`: items created in the last 7 days, by kind.
+- `blood.donors`: donor profiles; `available` of them can donate now.
+- `bus.liveNow`: open sharing sessions with a point in the last 2 minutes.
+  `sharesLast7Days` counts sessions started. `tripsShared` is the sum of
+  `bus_share_stats.trips`, which survives the 24-hour purge.
+
+Existing keys are unchanged; the dashboard shows the new ones as three new
+sections.
+
+### Blood requests
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/admin/blood/requests` | Paged. `?status=open\|fulfilled\|closed\|all` (default `open`), `?universityId=`, `?q=` (hospital, area, contact name or phone, requester email). Newest first. |
+| POST | `/admin/blood/requests/{id}/close` | `{reason?: string ≤ 300}` closes an open request (status `closed`, `closed_at` now) → the item. `409 BLOOD_REQUEST_NOT_OPEN` if it isn't open. Audit `blood.close` with `{reason}`. |
+
+Item:
+```json
+{"id": "uuid", "university": {"id": "uuid", "name": "…"},
+ "bloodGroup": "A+", "units": 2, "hospital": "…", "area": "…",
+ "neededBy": "RFC3339", "urgent": true,
+ "contactName": "…", "contactPhone": "…", "note": "…",
+ "status": "open|fulfilled|closed", "notified": 12, "responses": 1,
+ "requester": {"id": "uuid", "name": "…", "email": "…"} | null,
+ "createdAt": "RFC3339", "closedAt": "RFC3339" | null}
+```
+
+### Live buses on a route
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/admin/transport/routes/{id}/activity` | `{live: {runs: [Run]}, insights: {trips: [TripInsight]}, sharesLast7Days, ratingsLast30Days}`. `Run` and `TripInsight` have the same shape as `/transport/routes/{id}/live` and `/insights` (docs/BUS_LIVE.md); there is no `mine`, and no user ids. |
+| POST | `/admin/transport/routes/{id}/live/end` | Ends every open sharing session on the route (a fake or stuck bus) → `{ended: n}`. The sharers' next ping answers `{ended: true, reason: "admin"}`, which the app treats as stopped. Audit `transport.live.end` with `{ended}`. Needs migration `00700_bus_live_admin_end.sql` to add `admin` to the `end_reason` check. |
+
+### Moderation
+The moderation issue view adds `campusOnly` (boolean). The page shows
+"Campus only" next to the kind when it's true.
+
+### Admin panel pages
+- **Dashboard:** three new sections, Campus, Blood donation and Live buses,
+  with the numbers above.
+- **Blood donation** (`/admin/blood`, new item in the side nav):
+  - Status tabs (Open, Fulfilled, Closed, All), a university filter and a search box.
+  - A table with: group (red badge), units, hospital and area, needed by,
+    urgent, university, requester (links to the user), contact, notified,
+    responses, created.
+  - Close request asks for a confirmation and an optional reason.
+- **Bus route** (`/admin/transport/[id]`):
+  - **Live now:** each run's direction and departure, riders, next stop,
+    how late, and when it was last updated, with an "End all sharing"
+    button that asks first.
+  - **What riders say:** per trip, votes, on time, late, didn't come,
+    crowded, measured delay and measured runs.
+- **Settings:** names and hints for the new switches:
+  - `bloodDonation`: Blood donation. "Donor sign-up, blood requests and
+    'blood needed' notifications. Off hides it in the app."
+  - `visitCampus`: Visit other campuses. "Students read and react to
+    other universities' Campus posts. Off hides it in the app."
+  - `busLive`: Live buses. "Students share the bus they're on; live map,
+    arrival times, 'bus near' alerts and trip ratings. Off hides it in
+    the app."
+- **Audit log:** readable labels for `blood.close` and `transport.live.end`.
