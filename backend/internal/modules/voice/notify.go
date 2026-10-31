@@ -87,9 +87,18 @@ func (s *Service) officialNotice(ctx context.Context, q *store.Queries, is store
 	}}, nil
 }
 
-// commentNotice tells the issue's author about a new comment, at most once
-// per issue every 15 minutes.
-func (s *Service) commentNotice(ctx context.Context, q *store.Queries, is store.Issue, commenter uuid.UUID) (*pending, error) {
+// quote is what a push says about a post: the title of an issue, the
+// first 80 characters of the text of any other kind.
+func quote(is store.Issue) string {
+	if is.Kind == "issue" {
+		return short(is.Title, 120)
+	}
+	return short(is.Body, 80)
+}
+
+// commentNotice tells the post's author about a new comment, at most once
+// per post every 15 minutes. except: someone who already got a push for this comment.
+func (s *Service) commentNotice(ctx context.Context, q *store.Queries, is store.Issue, commenter, except uuid.UUID) (*pending, error) {
 	author, err := q.IssueAuthorID(ctx, is.ID)
 	if db.IsNoRows(err) {
 		return nil, nil // the author deleted their account
@@ -97,7 +106,7 @@ func (s *Service) commentNotice(ctx context.Context, q *store.Queries, is store.
 	if err != nil {
 		return nil, err
 	}
-	if author == commenter {
+	if author == commenter || author == except {
 		return nil, nil
 	}
 	s.mu.Lock()
@@ -107,12 +116,52 @@ func (s *Service) commentNotice(ctx context.Context, q *store.Queries, is store.
 		return nil, nil
 	}
 	s.lastComment[is.ID] = now
+	en, bn := "New comment on your issue", "তোমার ইস্যুতে নতুন মন্তব্য"
+	switch is.Kind {
+	case "question":
+		en, bn = "New answer to your question", "তোমার প্রশ্নের নতুন উত্তর"
+	case "post", "poll":
+		en, bn = "New comment on your post", "তোমার পোস্টে নতুন মন্তব্য"
+	}
 	return &pending{to: []uuid.UUID{author}, n: Notice{
 		Texts: map[string]NoticeText{
-			"en": {Title: "New comment on your issue", Body: short(is.Title, 120)},
-			"bn": {Title: "তোমার ইস্যুতে নতুন মন্তব্য", Body: short(is.Title, 120)},
+			"en": {Title: en, Body: quote(is)},
+			"bn": {Title: bn, Body: quote(is)},
 		},
 		Data: data("issue_comment", is.ID),
+	}}, nil
+}
+
+// replyNotice tells the author of a comment about a reply to it: not to the
+// replier, not for an official's comment, at most once per comment every 15 minutes.
+func (s *Service) replyNotice(ctx context.Context, q *store.Queries, is store.Issue, to store.GetCommentRow, body string, replier uuid.UUID) (*pending, error) {
+	if to.Kind == "official" {
+		return nil, nil
+	}
+	author, err := q.CommentAuthorID(ctx, to.ID)
+	if db.IsNoRows(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if author == replier {
+		return nil, nil
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	now := s.now()
+	if last, ok := s.lastReply[to.ID]; ok && now.Sub(last) < 15*time.Minute {
+		return nil, nil
+	}
+	s.lastReply[to.ID] = now
+	text := short(body, 80)
+	return &pending{to: []uuid.UUID{author}, n: Notice{
+		Texts: map[string]NoticeText{
+			"en": {Title: "New reply to your comment", Body: text},
+			"bn": {Title: "তোমার মন্তব্যে নতুন উত্তর", Body: text},
+		},
+		Data: data("issue_reply", is.ID),
 	}}, nil
 }
 
@@ -125,11 +174,15 @@ func (s *Service) moderatedNotice(ctx context.Context, q *store.Queries, is stor
 	if err != nil {
 		return nil, err
 	}
-	en, bn := NoticeText{Title: "Your issue is now public", Body: short(is.Title, 120)},
-		NoticeText{Title: "তোমার ইস্যু এখন সবাই দেখছে", Body: short(is.Title, 120)}
+	what, whatBN := "issue", "ইস্যু"
+	if is.Kind != "issue" {
+		what, whatBN = "post", "পোস্ট"
+	}
+	en, bn := NoticeText{Title: "Your " + what + " is now public", Body: quote(is)},
+		NoticeText{Title: "তোমার " + whatBN + " এখন সবাই দেখছে", Body: quote(is)}
 	if !approved {
-		en = NoticeText{Title: "Your issue was removed", Body: short(reason, 160)}
-		bn = NoticeText{Title: "তোমার ইস্যু সরানো হয়েছে", Body: short(reason, 160)}
+		en = NoticeText{Title: "Your " + what + " was removed", Body: short(reason, 160)}
+		bn = NoticeText{Title: "তোমার " + whatBN + " সরানো হয়েছে", Body: short(reason, 160)}
 	}
 	return &pending{to: []uuid.UUID{author}, n: Notice{
 		Texts: map[string]NoticeText{"en": en, "bn": bn},

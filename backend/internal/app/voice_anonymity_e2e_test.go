@@ -60,17 +60,46 @@ func TestVoiceAnonymitySweep(t *testing.T) {
 	require.Equal(t, http.StatusOK, h.do("POST", "/moderation/comments/"+mateComment.ID, c.mod,
 		map[string]string{"action": "restore"}).Status)
 
+	// Campus social: posts, reactions, poll votes, replies and comment likes
+	// are anonymous too, for the author and for the voter.
+	mateID := h.me(c.mate).ID
 	forbidden := func(t *testing.T, body string) {
 		t.Helper()
-		for _, s := range []string{c.authorID, c.authorEmail, c.authorName, "alpha.author"} {
+		for _, s := range []string{c.authorID, c.authorEmail, c.authorName, "alpha.author", mateID, "mate@test.ac.bd", "Mate Student"} {
 			assert.NotContains(t, body, s)
 		}
 	}
+	post := h.postIssue(c.author, postBody("post", "Fresh samosas at the canteen today"))
+	question := h.postIssue(c.author, postBody("question", "Where is the physics lab?"))
+	poll := h.postIssue(c.author, pollBody("Best canteen day?", "Friday", "Saturday"))
+	mateQuestion := h.postIssue(c.mate, postBody("question", "Is the library open on Friday?"))
+	answer := h.comment(c.mate, question.ID, map[string]any{"body": "Block C, third floor."})
+	reply := h.comment(c.author, question.ID, map[string]any{"body": "Thank you!", "parentId": answer.ID})
+	for _, w := range []*response{
+		h.do("PUT", "/issues/"+post.ID+"/vote", c.mate, map[string]string{"reaction": "haha"}),
+		h.do("PUT", "/issues/"+post.ID+"/vote", c.author, map[string]string{"reaction": "wow"}),
+		h.do("PUT", "/issues/"+mateQuestion.ID+"/vote", c.author, map[string]string{"reaction": "clap"}),
+		h.do("POST", "/issues/"+poll.ID+"/poll-vote", c.mate, map[string]string{"optionId": poll.Poll.Options[0].ID}),
+		h.do("PUT", "/issues/"+question.ID+"/comments/"+answer.ID+"/like", c.author, nil),
+		h.do("PUT", "/issues/"+question.ID+"/comments/"+reply.ID+"/like", c.mate, nil),
+		h.do("DELETE", "/issues/"+post.ID+"/vote", c.author, nil),
+	} {
+		require.Equal(t, http.StatusOK, w.Status, w.Raw)
+		forbidden(t, w.Raw)
+	}
+	_, replyBody := h.raw(c.mate, "/issues/"+question.ID+"/comments")
+	forbidden(t, string(replyBody))
+	require.Equal(t, http.StatusOK, h.do("PUT", "/issues/"+post.ID+"/vote", c.author, nil).Status)
+	_ = reply
 	voiceReads := func(id string) []string {
 		return []string{
 			"/issues", "/issues?sort=new", "/issues?sort=solved", "/issues?private=true",
 			"/issues/similar?q=" + "Broken+water+pump", "/issues/" + id, "/issues/" + id + "/comments",
 			"/issues/" + safety.ID, "/issues/" + safety.ID + "/comments", "/me/issues",
+			"/issues?kinds=all", "/issues?kinds=all&sort=new", "/issues?kinds=post,question,poll&sort=trending",
+			"/issues?kinds=all&sort=solved", "/me/issues?kinds=all",
+			"/issues/" + post.ID, "/issues/" + question.ID, "/issues/" + question.ID + "/comments",
+			"/issues/" + poll.ID, "/issues/" + mateQuestion.ID,
 		}
 	}
 	modReads := func(id string) []string {
@@ -121,6 +150,7 @@ func TestVoiceAnonymitySweep(t *testing.T) {
 	require.Equal(t, http.StatusNoContent, h.do("DELETE", "/me", c.author, nil).Status)
 	sweep(t, "after deleting the account")
 	assert.Equal(t, "Broken water pump in Hall 3", h.getIssue(c.mate, pub.ID).Title)
+	assert.Equal(t, "Fresh samosas at the canteen today", h.getIssue(c.mate, post.ID).Preview)
 	for _, cm := range h.comments(c.mate, pub.ID) {
 		assert.False(t, cm.IsIssueAuthor, "no author link left")
 	}

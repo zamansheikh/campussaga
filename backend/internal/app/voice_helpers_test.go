@@ -59,6 +59,12 @@ type issueJSON struct {
 	HoldReason    string           `json:"holdReason"`
 	RemovedReason string           `json:"removedReason"`
 	ReportCount   int              `json:"reportCount"`
+	Kind          string           `json:"kind"`
+	Preview       string           `json:"preview"`
+	PreviewCut    bool             `json:"previewCut"`
+	Reactions     map[string]int   `json:"reactions"`
+	MyReaction    *string          `json:"myReaction"`
+	Poll          *pollJSON        `json:"poll"`
 	Images        []struct {
 		ID string `json:"id"`
 	} `json:"images"`
@@ -78,6 +84,21 @@ type voiceCommentJSON struct {
 	OfficialTitle string           `json:"officialTitle"`
 	Visibility    string           `json:"visibility"`
 	CreatedAt     time.Time        `json:"createdAt"`
+	ParentID      *string          `json:"parentId"`
+	LikeCount     int              `json:"likeCount"`
+	Liked         bool             `json:"liked"`
+}
+
+type pollJSON struct {
+	Options []struct {
+		ID    string `json:"id"`
+		Label string `json:"label"`
+		Votes *int   `json:"votes"`
+	} `json:"options"`
+	TotalVotes int       `json:"totalVotes"`
+	MyVote     *string   `json:"myVote"`
+	ClosesAt   time.Time `json:"closesAt"`
+	Closed     bool      `json:"closed"`
 }
 
 type voicePage[T any] struct {

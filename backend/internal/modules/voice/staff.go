@@ -58,6 +58,9 @@ func (s *Service) handleStatus(ctx context.Context, in *statusInput) (*Issue, er
 		if !v.authorityOf(r.UniversityID) {
 			return ErrIssueNotFound
 		}
+		if r.Kind != "issue" {
+			return ErrNotAnIssue
+		}
 		is, err := q.LockIssue(ctx, id)
 		if err != nil {
 			return err
@@ -123,6 +126,9 @@ func (s *Service) handleOfficialReply(ctx context.Context, in *officialInput) (*
 		}
 		if !v.authorityOf(r.UniversityID) || r.Visibility != "visible" {
 			return ErrIssueNotFound
+		}
+		if r.Kind != "issue" {
+			return ErrNotAnIssue
 		}
 		cid, err := q.CreateComment(ctx, store.CreateCommentParams{IssueID: id, Kind: "official",
 			OfficialTitle: v.staffTitle, Named: true, NamedAuthorID: &v.id, Body: body, Visibility: "visible", Now: s.now()})
@@ -214,7 +220,7 @@ func (s *Service) handleQueue(ctx context.Context, in *queueReq) (*Page[QueueIte
 		if err != nil {
 			return nil, err
 		}
-		item := QueueItem{TargetType: row.TargetType, Issue: cardView(v, r), HoldReason: row.HoldReason,
+		item := QueueItem{TargetType: row.TargetType, Issue: cardView(v, r, s.now()), HoldReason: row.HoldReason,
 			CreatedAt: roughTime(row.CreatedAt), Reasons: map[string]int{}}
 		target := row.IssueID
 		if row.TargetType == "comment" && row.CommentID != nil {

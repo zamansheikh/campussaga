@@ -56,10 +56,11 @@ type Service struct {
 
 	mu          sync.Mutex
 	lastComment map[uuid.UUID]time.Time // issue → last "new comment" push
+	lastReply   map[uuid.UUID]time.Time // comment → last "new reply" push
 }
 
 func NewService(d *db.DB, store media.Store, handleSecret []byte, now func() time.Time, log *slog.Logger) *Service {
-	return &Service{d: d, media: store, secret: handleSecret, now: now, log: log, lastComment: map[uuid.UUID]time.Time{}}
+	return &Service{d: d, media: store, secret: handleSecret, now: now, log: log, lastComment: map[uuid.UUID]time.Time{}, lastReply: map[uuid.UUID]time.Time{}}
 }
 
 // SetNotifier turns pushes on.

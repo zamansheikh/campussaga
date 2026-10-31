@@ -58,6 +58,7 @@ type commentInput struct {
 	ID        string `json:"-" path:"id" validate:"required,uuid"`
 	Body      string `json:"body" validate:"required"`
 	Anonymous *bool  `json:"anonymous"`
+	ParentID  string `json:"parentId" validate:"omitempty,uuid"`
 }
 
 func (s *Service) handleComment(ctx context.Context, in *commentInput) (*Comment, error) {
@@ -69,6 +70,7 @@ func (s *Service) handleComment(ctx context.Context, in *commentInput) (*Comment
 	var (
 		out    *Comment
 		notice *pending
+		reply  *pending
 	)
 	err := s.d.InTx(ctx, func(ctx context.Context) error {
 		q := store.New(s.d.Q(ctx))
@@ -87,6 +89,25 @@ func (s *Service) handleComment(ctx context.Context, in *commentInput) (*Comment
 		if err := s.requireNoBan(ctx, q, v); err != nil {
 			return err
 		}
+		// A reply: the comment replied to must be a visible one of this
+		// issue; replying to a reply attaches to that reply's parent (one level).
+		var parentID *uuid.UUID
+		var replyTo *store.GetCommentRow
+		if in.ParentID != "" {
+			pc, err := q.GetComment(ctx, store.GetCommentParams{ID: uuid.MustParse(in.ParentID), Viewer: v.id})
+			if db.IsNoRows(err) || (err == nil && (pc.IssueID != issueID || pc.Visibility != "visible")) {
+				return ErrCommentNotFound
+			}
+			if err != nil {
+				return err
+			}
+			replyTo = &pc
+			top := pc.ID
+			if pc.ParentID != nil {
+				top = *pc.ParentID
+			}
+			parentID = &top
+		}
 		visibility, hold := "visible", checkText(body)
 		if hold == "" && !v.verified && !v.isStaff() {
 			hold = HoldUnverified
@@ -94,7 +115,7 @@ func (s *Service) handleComment(ctx context.Context, in *commentInput) (*Comment
 		if hold != "" {
 			visibility = "held"
 		}
-		params := store.CreateCommentParams{IssueID: issueID, Kind: "student", Body: body,
+		params := store.CreateCommentParams{IssueID: issueID, Kind: "student", Body: body, ParentID: parentID,
 			Visibility: visibility, HoldReason: hold, Named: !anonymous, Now: s.now()}
 		if anonymous {
 			params.Handle = handle(s.secret, issueID, v.id)
@@ -119,7 +140,16 @@ func (s *Service) handleComment(ctx context.Context, in *commentInput) (*Comment
 			if err != nil {
 				return err
 			}
-			if notice, err = s.commentNotice(ctx, q, is, v.id); err != nil {
+			except := uuid.Nil
+			if replyTo != nil {
+				if reply, err = s.replyNotice(ctx, q, is, *replyTo, body, v.id); err != nil {
+					return err
+				}
+				if reply != nil {
+					except = reply.to[0] // one push is enough for them
+				}
+			}
+			if notice, err = s.commentNotice(ctx, q, is, v.id, except); err != nil {
 				return err
 			}
 		}
@@ -132,6 +162,7 @@ func (s *Service) handleComment(ctx context.Context, in *commentInput) (*Comment
 		return nil
 	})
 	if err == nil {
+		s.send(reply)
 		s.send(notice)
 	}
 	return out, err
@@ -203,4 +234,69 @@ func (s *Service) commentOf(ctx context.Context, q *store.Queries, v viewer, iss
 		return c, ErrCommentNotFound
 	}
 	return c, nil
+}
+
+// ---- comment likes ----------------------------------------------------------------------------------
+
+type likeRes struct {
+	LikeCount int  `json:"likeCount"`
+	Liked     bool `json:"liked"`
+}
+
+func (s *Service) handleLikeComment(ctx context.Context, in *commentReq) (*likeRes, error) {
+	return s.likeComment(ctx, in, true)
+}
+
+func (s *Service) handleUnlikeComment(ctx context.Context, in *commentReq) (*likeRes, error) {
+	return s.likeComment(ctx, in, false)
+}
+
+// likeComment: visible comments only; liking your own is fine. Who liked is never returned.
+func (s *Service) likeComment(ctx context.Context, in *commentReq, on bool) (*likeRes, error) {
+	var out *likeRes
+	err := s.d.InTx(ctx, func(ctx context.Context) error {
+		q := store.New(s.d.Q(ctx))
+		v, err := s.begin(ctx, q)
+		if err != nil {
+			return err
+		}
+		r, err := s.getIssue(ctx, q, v, uuid.MustParse(in.ID))
+		if err != nil {
+			return err
+		}
+		if err := s.requireNoBan(ctx, q, v); err != nil {
+			return err
+		}
+		c, err := s.commentOf(ctx, q, v, r.ID, uuid.MustParse(in.Comment))
+		if err != nil {
+			return err
+		}
+		if c.Visibility != "visible" {
+			return ErrCommentNotFound
+		}
+		if r.Visibility == "removed" {
+			return ErrIssueClosed
+		}
+		var delta int32
+		if on {
+			n, err := q.LikeComment(ctx, store.LikeCommentParams{CommentID: c.ID, UserID: v.id})
+			if err != nil {
+				return err
+			}
+			delta = int32(n)
+		} else {
+			n, err := q.UnlikeComment(ctx, store.UnlikeCommentParams{CommentID: c.ID, UserID: v.id})
+			if err != nil {
+				return err
+			}
+			delta = -int32(n)
+		}
+		n, err := q.AdjustCommentLikes(ctx, store.AdjustCommentLikesParams{ID: c.ID, Delta: delta})
+		if err != nil {
+			return err
+		}
+		out = &likeRes{LikeCount: int(n), Liked: on}
+		return nil
+	})
+	return out, err
 }

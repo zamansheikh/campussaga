@@ -5,17 +5,48 @@ import (
 	"slices"
 	"strings"
 	"time"
-	"unicode/utf8"
 
 	"github.com/google/uuid"
 
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/voice/store"
 	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
-	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
 	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
 )
 
-var categories = []string{"academic", "hostel", "transport", "facilities", "safety", "administration", "food", "it", "other"}
+// Issue categories; posts, questions and polls use every one but "safety"
+// plus the social ones.
+var issueCategories = []string{"academic", "hostel", "transport", "facilities", "safety", "administration", "food", "it", "other"}
+
+var socialCategories = []string{"academic", "hostel", "transport", "facilities", "administration", "food", "it", "other",
+	"general", "event", "lost_found", "buy_sell", "fun"}
+
+var allKinds = []string{"issue", "post", "question", "poll"}
+
+// issuesPerDay: issues (kind = issue) one person may post in 24 hours,
+// inside the route limit for all kinds together.
+const issuesPerDay = 5
+
+// parseKinds: absent = issues only (apps before campus social), "all" = every kind.
+func parseKinds(raw string) ([]string, error) {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return []string{"issue"}, nil
+	}
+	if raw == "all" {
+		return allKinds, nil
+	}
+	var out []string
+	for _, k := range strings.Split(raw, ",") {
+		k = strings.TrimSpace(k)
+		if !slices.Contains(allKinds, k) {
+			return nil, apperr.Validation(map[string]string{"kinds": "must be issue, post, question, poll or all"})
+		}
+		if !slices.Contains(out, k) {
+			out = append(out, k)
+		}
+	}
+	return out, nil
+}
 
 const (
 	feedPageSize    = 20
@@ -30,7 +61,8 @@ const (
 
 type feedReq struct {
 	Sort         string `json:"-" query:"sort" validate:"omitempty,oneof=trending new solved"`
-	Category     string `json:"-" query:"category" validate:"omitempty,oneof=academic hostel transport facilities safety administration food it other"`
+	Category     string `json:"-" query:"category" validate:"omitempty,oneof=academic hostel transport facilities safety administration food it other general event lost_found buy_sell fun"`
+	Kinds        string `json:"-" query:"kinds" validate:"max=60"`
 	Q            string `json:"-" query:"q" validate:"max=100"`
 	Cursor       string `json:"-" query:"cursor" validate:"max=200"`
 	Private      string `json:"-" query:"private" validate:"omitempty,oneof=true false"`
@@ -55,6 +87,10 @@ func (s *Service) handleFeed(ctx context.Context, in *feedReq) (*Page[IssueCard]
 	}
 	// Private (safety) issues: the university's authorities and moderators.
 	private := in.Private == "true" && (v.authorityOf(uni) || v.isMod())
+	kinds, err := parseKinds(in.Kinds)
+	if err != nil {
+		return nil, err
+	}
 	search := strings.TrimSpace(in.Q)
 	out := &Page[IssueCard]{Items: []IssueCard{}}
 	now := s.now()
@@ -66,7 +102,7 @@ func (s *Service) handleFeed(ctx context.Context, in *feedReq) (*Page[IssueCard]
 			return nil, err
 		}
 		rs, err := q.FeedNew(ctx, store.FeedNewParams{Viewer: v.id, UniversityID: uni, Private: private,
-			Category: in.Category, Q: search, QLike: like(search), BeforeAt: at, BeforeID: id, Lim: feedPageSize})
+			Kinds: kinds, Category: in.Category, Q: search, QLike: like(search), BeforeAt: at, BeforeID: id, Lim: feedPageSize})
 		if err != nil {
 			return nil, err
 		}
@@ -106,7 +142,7 @@ func (s *Service) handleFeed(ctx context.Context, in *feedReq) (*Page[IssueCard]
 		}
 		rs, err := q.FeedTrending(ctx, store.FeedTrendingParams{Viewer: v.id,
 			NowEpoch: float64(now.UnixNano()) / 1e9, UniversityID: uni, Private: private,
-			Since: now.Add(-trendingDays * 24 * time.Hour), Category: in.Category, Q: search, QLike: like(search),
+			Since: now.Add(-trendingDays * 24 * time.Hour), Kinds: kinds, Category: in.Category, Q: search, QLike: like(search),
 			Off: int32(off), Lim: feedPageSize})
 		if err != nil {
 			return nil, err
@@ -120,7 +156,7 @@ func (s *Service) handleFeed(ctx context.Context, in *feedReq) (*Page[IssueCard]
 		}
 	}
 	for _, r := range rows {
-		out.Items = append(out.Items, cardView(v, r))
+		out.Items = append(out.Items, cardView(v, r, now))
 	}
 	return out, nil
 }
@@ -149,13 +185,14 @@ func (s *Service) handleSimilar(ctx context.Context, in *similarReq) (*cardsRes,
 	}
 	out := &cardsRes{Items: []IssueCard{}}
 	for _, r := range rs {
-		out.Items = append(out.Items, cardView(v, store.GetIssueRow(r)))
+		out.Items = append(out.Items, cardView(v, store.GetIssueRow(r), s.now()))
 	}
 	return out, nil
 }
 
 type myIssuesReq struct {
 	Cursor string `json:"-" query:"cursor" validate:"max=200"`
+	Kinds  string `json:"-" query:"kinds" validate:"max=60"`
 }
 
 func (s *Service) handleMyIssues(ctx context.Context, in *myIssuesReq) (*Page[IssueCard], error) {
@@ -164,17 +201,21 @@ func (s *Service) handleMyIssues(ctx context.Context, in *myIssuesReq) (*Page[Is
 	if err != nil {
 		return nil, err
 	}
+	kinds, err := parseKinds(in.Kinds)
+	if err != nil {
+		return nil, err
+	}
 	at, id, err := parseKeyCursor(in.Cursor)
 	if err != nil {
 		return nil, err
 	}
-	rs, err := q.MyIssues(ctx, store.MyIssuesParams{Viewer: v.id, BeforeAt: at, BeforeID: id, Lim: feedPageSize})
+	rs, err := q.MyIssues(ctx, store.MyIssuesParams{Viewer: v.id, Kinds: kinds, BeforeAt: at, BeforeID: id, Lim: feedPageSize})
 	if err != nil {
 		return nil, err
 	}
 	out := &Page[IssueCard]{Items: []IssueCard{}}
 	for _, r := range rs {
-		out.Items = append(out.Items, cardView(v, store.GetIssueRow(r)))
+		out.Items = append(out.Items, cardView(v, store.GetIssueRow(r), s.now()))
 	}
 	if len(rs) == feedPageSize {
 		last := rs[len(rs)-1]
@@ -203,16 +244,8 @@ func (s *Service) handleGet(ctx context.Context, in *issueReq) (*Issue, error) {
 	return s.detail(ctx, q, v, r)
 }
 
-// detail loads images and the timeline for an issue the viewer may see.
+// detail loads the timeline for an issue the viewer may see.
 func (s *Service) detail(ctx context.Context, q *store.Queries, v viewer, r store.GetIssueRow) (*Issue, error) {
-	imgs, err := q.IssueImages(ctx, r.ID)
-	if err != nil {
-		return nil, err
-	}
-	images := make([]Image, 0, len(imgs))
-	for _, im := range imgs {
-		images = append(images, Image{ID: im.ID, Width: int(im.Width), Height: int(im.Height)})
-	}
 	tl, err := q.Timeline(ctx, r.ID)
 	if err != nil {
 		return nil, err
@@ -222,7 +255,7 @@ func (s *Service) detail(ctx context.Context, q *store.Queries, v viewer, r stor
 		timeline = append(timeline, TimelineEntry{From: t.FromStatus, To: t.ToStatus, ActorKind: t.ActorKind,
 			ActorTitle: t.ActorTitle, Note: t.Note, CreatedAt: t.CreatedAt.UTC()})
 	}
-	out := s.issueView(v, r, images, timeline)
+	out := s.issueView(v, r, timeline)
 	return &out, nil
 }
 
@@ -236,179 +269,6 @@ func (s *Service) reload(ctx context.Context, q *store.Queries, v viewer, id uui
 }
 
 // ---- post / edit / delete ------------------------------------------------------------------
-
-type IssueInput struct {
-	Category      string   `json:"category" validate:"required,oneof=academic hostel transport facilities safety administration food it other"`
-	Title         string   `json:"title" validate:"required"`
-	Body          string   `json:"body" validate:"required"`
-	LocationLabel string   `json:"locationLabel"`
-	Anonymous     *bool    `json:"anonymous"`
-	ImageIDs      []string `json:"imageIds" validate:"max=4,dive,uuid"`
-}
-
-func cleanText(s string) string { return strings.TrimSpace(s) }
-
-func checkLengths(title, body, place string) error {
-	bad := map[string]string{}
-	if n := utf8.RuneCountInString(title); n < 8 || n > 120 {
-		bad["title"] = "must be 8 to 120 characters"
-	}
-	if n := utf8.RuneCountInString(body); n < 20 || n > 3000 {
-		bad["body"] = "must be 20 to 3000 characters"
-	}
-	if utf8.RuneCountInString(place) > 80 {
-		bad["locationLabel"] = "must be at most 80 characters"
-	}
-	if len(bad) > 0 {
-		return apperr.Validation(bad)
-	}
-	return nil
-}
-
-func (s *Service) handleCreate(ctx context.Context, in *IssueInput) (*Issue, error) {
-	in.Title, in.Body, in.LocationLabel = cleanText(in.Title), cleanText(in.Body), cleanText(in.LocationLabel)
-	if err := checkLengths(in.Title, in.Body, in.LocationLabel); err != nil {
-		return nil, err
-	}
-	ids := make([]uuid.UUID, 0, len(in.ImageIDs))
-	for _, raw := range in.ImageIDs {
-		id := uuid.MustParse(raw)
-		if slices.Contains(ids, id) {
-			return nil, apperr.Validation(map[string]string{"imageIds": "has the same photo twice"})
-		}
-		ids = append(ids, id)
-	}
-	anonymous := in.Anonymous == nil || *in.Anonymous
-	var out *Issue
-	err := s.d.InTx(ctx, func(ctx context.Context) error {
-		q := store.New(s.d.Q(ctx))
-		v, err := s.begin(ctx, q)
-		if err != nil {
-			return err
-		}
-		if v.uni == uuid.Nil {
-			return ErrUniversityRequired
-		}
-		if err := s.requireNoBan(ctx, q, v); err != nil {
-			return err
-		}
-		visibility, hold := "visible", checkText(in.Title, in.Body, in.LocationLabel)
-		if hold == "" && !v.verified && !v.isStaff() {
-			hold = HoldUnverified
-		}
-		// A flagged photo (or one the checker couldn't see) holds the issue
-		// for a moderator; the photo reason wins over "unverified".
-		for _, upID := range ids {
-			up, err := q.GetUpload(ctx, store.GetUploadParams{ID: upID, UserID: v.id})
-			if db.IsNoRows(err) {
-				return ErrUploadNotFound.WithDetails(map[string]string{"imageId": upID.String()})
-			}
-			if err != nil {
-				return err
-			}
-			if up.Flagged && (hold == "" || hold == HoldUnverified || hold == HoldPhotoCheckUnavailable) {
-				hold = HoldPhotoCheck
-				if up.NsfwScore == nil {
-					hold = HoldPhotoCheckUnavailable
-				}
-			}
-		}
-		if hold != "" {
-			visibility = "held"
-		}
-		params := store.CreateIssueParams{
-			UniversityID: v.uni, Category: in.Category, Private: in.Category == "safety", Title: in.Title,
-			Body: in.Body, LocationLabel: in.LocationLabel, Visibility: visibility, HoldReason: hold, Named: !anonymous,
-			Now: s.now(),
-		}
-		if !anonymous {
-			params.NamedAuthorID = &v.id
-		}
-		id, err := q.CreateIssue(ctx, params)
-		if err != nil {
-			return err
-		}
-		if err := q.InsertIssueAuthor(ctx, store.InsertIssueAuthorParams{IssueID: id, UserID: v.id}); err != nil {
-			return err
-		}
-		if err := q.Follow(ctx, store.FollowParams{IssueID: id, UserID: v.id}); err != nil {
-			return err
-		}
-		for pos, upID := range ids {
-			up, err := q.TakeUpload(ctx, store.TakeUploadParams{ID: upID, UserID: v.id})
-			if db.IsNoRows(err) {
-				return ErrUploadNotFound.WithDetails(map[string]string{"imageId": upID.String()})
-			}
-			if err != nil {
-				return err
-			}
-			if err := q.InsertIssueImage(ctx, store.InsertIssueImageParams{ID: up.ID, IssueID: id, Position: int16(pos),
-				FullKey: up.FullKey, ThumbKey: up.ThumbKey, Width: up.Width, Height: up.Height,
-				NsfwScore: up.NsfwScore, Flagged: up.Flagged}); err != nil {
-				return err
-			}
-			if err := q.DeleteUpload(ctx, up.ID); err != nil {
-				return err
-			}
-		}
-		out, err = s.reload(ctx, q, v, id)
-		return err
-	})
-	return out, err
-}
-
-type patchReq struct {
-	ID            string  `json:"-" path:"id" validate:"required,uuid"`
-	Title         *string `json:"title"`
-	Body          *string `json:"body"`
-	LocationLabel *string `json:"locationLabel"`
-}
-
-func (s *Service) handlePatch(ctx context.Context, in *patchReq) (*Issue, error) {
-	var out *Issue
-	err := s.d.InTx(ctx, func(ctx context.Context) error {
-		q := store.New(s.d.Q(ctx))
-		v, err := s.begin(ctx, q)
-		if err != nil {
-			return err
-		}
-		id := uuid.MustParse(in.ID)
-		cur, err := s.ownIssue(ctx, q, v, id)
-		if err != nil {
-			return err
-		}
-		if cur.Visibility == "removed" || s.now().Sub(cur.CreatedAt) >= EditWindow {
-			return ErrEditWindowClosed
-		}
-		if err := s.requireNoBan(ctx, q, v); err != nil {
-			return err
-		}
-		title, body, place := cur.Title, cur.Body, cur.LocationLabel
-		if in.Title != nil {
-			title = cleanText(*in.Title)
-		}
-		if in.Body != nil {
-			body = cleanText(*in.Body)
-		}
-		if in.LocationLabel != nil {
-			place = cleanText(*in.LocationLabel)
-		}
-		if err := checkLengths(title, body, place); err != nil {
-			return err
-		}
-		visibility, hold := cur.Visibility, cur.HoldReason
-		if h := checkText(title, body, place); h != "" && cur.Visibility == "visible" {
-			visibility, hold = "held", h
-		}
-		if err := q.UpdateIssueText(ctx, store.UpdateIssueTextParams{ID: id, Title: title, Body: body,
-			LocationLabel: place, Now: s.now(), Visibility: visibility, HoldReason: hold}); err != nil {
-			return err
-		}
-		out, err = s.reload(ctx, q, v, id)
-		return err
-	})
-	return out, err
-}
 
 // ownIssue locks an issue the caller wrote (ISSUE_NOT_FOUND otherwise).
 func (s *Service) ownIssue(ctx context.Context, q *store.Queries, v viewer, id uuid.UUID) (store.Issue, error) {
@@ -442,67 +302,6 @@ func (s *Service) handleDelete(ctx context.Context, in *issueReq) (*httpx.Empty,
 }
 
 // ---- me too / follow ----------------------------------------------------------------------
-
-type voteRes struct {
-	MeTooCount int  `json:"meTooCount"`
-	Voted      bool `json:"voted"`
-}
-
-func (s *Service) handleVote(ctx context.Context, in *issueReq) (*voteRes, error) {
-	return s.vote(ctx, in, true)
-}
-
-func (s *Service) handleUnvote(ctx context.Context, in *issueReq) (*voteRes, error) {
-	return s.vote(ctx, in, false)
-}
-
-func (s *Service) vote(ctx context.Context, in *issueReq, on bool) (*voteRes, error) {
-	var out *voteRes
-	err := s.d.InTx(ctx, func(ctx context.Context) error {
-		q := store.New(s.d.Q(ctx))
-		v, err := s.begin(ctx, q)
-		if err != nil {
-			return err
-		}
-		id := uuid.MustParse(in.ID)
-		r, err := s.getIssue(ctx, q, v, id)
-		if err != nil {
-			return err
-		}
-		if err := s.requireNoBan(ctx, q, v); err != nil {
-			return err
-		}
-		if r.Mine {
-			return ErrCannotVoteOwn
-		}
-		if r.Visibility != "visible" {
-			return ErrIssueClosed
-		}
-		var n int64
-		delta := int32(0)
-		if on {
-			if n, err = q.Vote(ctx, store.VoteParams{IssueID: id, UserID: v.id}); err != nil {
-				return err
-			}
-			delta = int32(n)
-			if err := q.Follow(ctx, store.FollowParams{IssueID: id, UserID: v.id}); err != nil {
-				return err
-			}
-		} else {
-			if n, err = q.Unvote(ctx, store.UnvoteParams{IssueID: id, UserID: v.id}); err != nil {
-				return err
-			}
-			delta = -int32(n)
-		}
-		counts, err := q.AdjustIssueCounts(ctx, store.AdjustIssueCountsParams{ID: id, MeToo: delta})
-		if err != nil {
-			return err
-		}
-		out = &voteRes{MeTooCount: int(counts.MeTooCount), Voted: on}
-		return nil
-	})
-	return out, err
-}
 
 type followRes struct {
 	Following bool `json:"following"`
@@ -562,6 +361,9 @@ func (s *Service) handleReopen(ctx context.Context, in *noteReq) (*Issue, error)
 		cur, err := s.ownIssue(ctx, q, v, uuid.MustParse(in.ID))
 		if err != nil {
 			return err
+		}
+		if cur.Kind != "issue" {
+			return ErrNotAnIssue
 		}
 		now := s.now()
 		if cur.Status != "solved" || cur.SolvedAt == nil || now.Sub(*cur.SolvedAt) >= ReopenWindow || cur.Visibility == "removed" {

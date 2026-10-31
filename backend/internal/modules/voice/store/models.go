@@ -25,6 +25,8 @@ type Comment struct {
 	DeletedByAuthor bool
 	ReportCount     int32
 	CreatedAt       time.Time
+	ParentID        *uuid.UUID
+	LikeCount       int32
 }
 
 type Issue struct {
@@ -50,6 +52,8 @@ type Issue struct {
 	EditedAt        *time.Time
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
+	Kind            string
+	PollClosesAt    *time.Time
 }
 
 type Upload struct {

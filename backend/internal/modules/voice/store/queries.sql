@@ -19,6 +19,8 @@ ON CONFLICT (user_id) DO UPDATE SET until = EXCLUDED.until, reason = EXCLUDED.re
 
 -- ---- issue cards ------------------------------------------------------------------
 -- Every card query selects exactly these columns (the rows convert to one type).
+-- reactions / poll_options carry counts only; my_reaction and poll_my_vote are
+-- the viewer's own.
 
 -- name: GetIssue :one
 SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, i.visibility,
@@ -28,6 +30,15 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
+       i.kind, i.poll_closes_at,
+       coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
+           SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
+       coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', im.id, 'width', im.width, 'height', im.height) ORDER BY im.position)
+                 FROM issue_images im WHERE im.issue_id = i.id), '[]'::jsonb)::jsonb AS images,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', po.id, 'label', po.label, 'votes', po.vote_count) ORDER BY po.position)
+                 FROM poll_options po WHERE po.issue_id = i.id), '[]'::jsonb)::jsonb AS poll_options,
+       coalesce((SELECT pv.option_id::text FROM poll_votes pv WHERE pv.issue_id = i.id AND pv.user_id = @viewer), '')::text AS poll_my_vote,
        EXISTS (SELECT 1 FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer)::bool AS voted,
        EXISTS (SELECT 1 FROM issue_follows f WHERE f.issue_id = i.id AND f.user_id = @viewer)::bool AS following,
        EXISTS (SELECT 1 FROM issue_authors a WHERE a.issue_id = i.id AND a.user_id = @viewer)::bool AS mine
@@ -43,12 +54,22 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
+       i.kind, i.poll_closes_at,
+       coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
+           SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
+       coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', im.id, 'width', im.width, 'height', im.height) ORDER BY im.position)
+                 FROM issue_images im WHERE im.issue_id = i.id), '[]'::jsonb)::jsonb AS images,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', po.id, 'label', po.label, 'votes', po.vote_count) ORDER BY po.position)
+                 FROM poll_options po WHERE po.issue_id = i.id), '[]'::jsonb)::jsonb AS poll_options,
+       coalesce((SELECT pv.option_id::text FROM poll_votes pv WHERE pv.issue_id = i.id AND pv.user_id = @viewer), '')::text AS poll_my_vote,
        EXISTS (SELECT 1 FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer)::bool AS voted,
        EXISTS (SELECT 1 FROM issue_follows f WHERE f.issue_id = i.id AND f.user_id = @viewer)::bool AS following,
        EXISTS (SELECT 1 FROM issue_authors a WHERE a.issue_id = i.id AND a.user_id = @viewer)::bool AS mine
 FROM issues i
 LEFT JOIN users u ON u.id = i.named_author_id
 WHERE i.university_id = @university_id AND i.visibility = 'visible' AND i.private = @private
+  AND i.kind = ANY(@kinds::text[])
   AND (@category::text = '' OR i.category = @category)
   AND (@q::text = '' OR i.title ILIKE @q_like OR i.body ILIKE @q_like)
   AND (sqlc.narg(before_at)::timestamptz IS NULL OR (i.created_at, i.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
@@ -63,12 +84,22 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
+       i.kind, i.poll_closes_at,
+       coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
+           SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
+       coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', im.id, 'width', im.width, 'height', im.height) ORDER BY im.position)
+                 FROM issue_images im WHERE im.issue_id = i.id), '[]'::jsonb)::jsonb AS images,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', po.id, 'label', po.label, 'votes', po.vote_count) ORDER BY po.position)
+                 FROM poll_options po WHERE po.issue_id = i.id), '[]'::jsonb)::jsonb AS poll_options,
+       coalesce((SELECT pv.option_id::text FROM poll_votes pv WHERE pv.issue_id = i.id AND pv.user_id = @viewer), '')::text AS poll_my_vote,
        EXISTS (SELECT 1 FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer)::bool AS voted,
        EXISTS (SELECT 1 FROM issue_follows f WHERE f.issue_id = i.id AND f.user_id = @viewer)::bool AS following,
        EXISTS (SELECT 1 FROM issue_authors a WHERE a.issue_id = i.id AND a.user_id = @viewer)::bool AS mine
 FROM issues i
 LEFT JOIN users u ON u.id = i.named_author_id
 WHERE i.university_id = @university_id AND i.visibility = 'visible' AND i.private = @private
+  AND i.kind = 'issue'
   AND i.status = 'solved' AND i.solved_at IS NOT NULL
   AND (@category::text = '' OR i.category = @category)
   AND (@q::text = '' OR i.title ILIKE @q_like OR i.body ILIKE @q_like)
@@ -86,6 +117,15 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
+       i.kind, i.poll_closes_at,
+       coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
+           SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
+       coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', im.id, 'width', im.width, 'height', im.height) ORDER BY im.position)
+                 FROM issue_images im WHERE im.issue_id = i.id), '[]'::jsonb)::jsonb AS images,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', po.id, 'label', po.label, 'votes', po.vote_count) ORDER BY po.position)
+                 FROM poll_options po WHERE po.issue_id = i.id), '[]'::jsonb)::jsonb AS poll_options,
+       coalesce((SELECT pv.option_id::text FROM poll_votes pv WHERE pv.issue_id = i.id AND pv.user_id = @viewer), '')::text AS poll_my_vote,
        EXISTS (SELECT 1 FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer)::bool AS voted,
        EXISTS (SELECT 1 FROM issue_follows f WHERE f.issue_id = i.id AND f.user_id = @viewer)::bool AS following,
        EXISTS (SELECT 1 FROM issue_authors a WHERE a.issue_id = i.id AND a.user_id = @viewer)::bool AS mine
@@ -97,6 +137,7 @@ CROSS JOIN LATERAL (
            / power(greatest(sqlc.arg(now_epoch)::float8 - date_part('epoch', i.created_at), 0) / 3600.0 + 2, 1.5) AS score
 ) t
 WHERE i.university_id = @university_id AND i.visibility = 'visible' AND i.private = @private
+  AND i.kind = ANY(@kinds::text[])
   AND i.status NOT IN ('solved', 'rejected') AND i.created_at > @since
   AND (@category::text = '' OR i.category = @category)
   AND (@q::text = '' OR i.title ILIKE @q_like OR i.body ILIKE @q_like)
@@ -111,13 +152,23 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
+       i.kind, i.poll_closes_at,
+       coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
+           SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
+       coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', im.id, 'width', im.width, 'height', im.height) ORDER BY im.position)
+                 FROM issue_images im WHERE im.issue_id = i.id), '[]'::jsonb)::jsonb AS images,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', po.id, 'label', po.label, 'votes', po.vote_count) ORDER BY po.position)
+                 FROM poll_options po WHERE po.issue_id = i.id), '[]'::jsonb)::jsonb AS poll_options,
+       coalesce((SELECT pv.option_id::text FROM poll_votes pv WHERE pv.issue_id = i.id AND pv.user_id = @viewer), '')::text AS poll_my_vote,
        EXISTS (SELECT 1 FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer)::bool AS voted,
        EXISTS (SELECT 1 FROM issue_follows f WHERE f.issue_id = i.id AND f.user_id = @viewer)::bool AS following,
        true::bool AS mine
 FROM issues i
 JOIN issue_authors a ON a.issue_id = i.id AND a.user_id = @viewer
 LEFT JOIN users u ON u.id = i.named_author_id
-WHERE (sqlc.narg(before_at)::timestamptz IS NULL OR (i.created_at, i.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
+WHERE i.kind = ANY(@kinds::text[])
+  AND (sqlc.narg(before_at)::timestamptz IS NULL OR (i.created_at, i.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
 ORDER BY i.created_at DESC, i.id DESC
 LIMIT @lim;
 
@@ -129,12 +180,21 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
+       i.kind, i.poll_closes_at,
+       coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
+           SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
+       coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', im.id, 'width', im.width, 'height', im.height) ORDER BY im.position)
+                 FROM issue_images im WHERE im.issue_id = i.id), '[]'::jsonb)::jsonb AS images,
+       coalesce((SELECT jsonb_agg(jsonb_build_object('id', po.id, 'label', po.label, 'votes', po.vote_count) ORDER BY po.position)
+                 FROM poll_options po WHERE po.issue_id = i.id), '[]'::jsonb)::jsonb AS poll_options,
+       coalesce((SELECT pv.option_id::text FROM poll_votes pv WHERE pv.issue_id = i.id AND pv.user_id = @viewer), '')::text AS poll_my_vote,
        EXISTS (SELECT 1 FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer)::bool AS voted,
        EXISTS (SELECT 1 FROM issue_follows f WHERE f.issue_id = i.id AND f.user_id = @viewer)::bool AS following,
        EXISTS (SELECT 1 FROM issue_authors a WHERE a.issue_id = i.id AND a.user_id = @viewer)::bool AS mine
 FROM issues i
 LEFT JOIN users u ON u.id = i.named_author_id
-WHERE i.university_id = @university_id AND i.visibility = 'visible' AND NOT i.private
+WHERE i.university_id = @university_id AND i.visibility = 'visible' AND NOT i.private AND i.kind = 'issue'
   AND i.created_at > @since AND similarity(i.title, @q::text) > 0.3
 ORDER BY similarity(i.title, @q::text) DESC, i.created_at DESC
 LIMIT 5;
@@ -168,10 +228,10 @@ SELECT user_id FROM issue_authors WHERE issue_id = @issue_id;
 -- ---- issue writes ---------------------------------------------------------------------
 
 -- name: CreateIssue :one
-INSERT INTO issues (university_id, category, private, title, body, location_label, visibility,
-                    hold_reason, named, named_author_id, created_at, status_changed_at)
-VALUES (@university_id, @category, @private, @title, @body, @location_label, @visibility,
-        @hold_reason, @named, sqlc.narg(named_author_id), @now, @now)
+INSERT INTO issues (university_id, kind, category, private, title, body, location_label, visibility,
+                    hold_reason, named, named_author_id, poll_closes_at, created_at, status_changed_at)
+VALUES (@university_id, @kind, @category, @private, @title, @body, @location_label, @visibility,
+        @hold_reason, @named, sqlc.narg(named_author_id), sqlc.narg(poll_closes_at), @now, @now)
 RETURNING id;
 
 -- name: InsertIssueAuthor :exec
@@ -205,7 +265,44 @@ RETURNING me_too_count, comment_count, report_count;
 UPDATE issues SET report_count = 0 WHERE id = @id;
 
 -- name: Vote :execrows
-INSERT INTO issue_votes (issue_id, user_id) VALUES (@issue_id, @user_id) ON CONFLICT DO NOTHING;
+INSERT INTO issue_votes (issue_id, user_id, reaction) VALUES (@issue_id, @user_id, @reaction) ON CONFLICT DO NOTHING;
+
+-- name: SetReaction :exec
+UPDATE issue_votes SET reaction = @reaction WHERE issue_id = @issue_id AND user_id = @user_id;
+
+-- Counts per reaction, never who.
+-- name: ReactionCounts :many
+SELECT reaction, count(*)::int AS n FROM issue_votes WHERE issue_id = @issue_id GROUP BY reaction;
+
+-- The caller's own reaction.
+-- name: MyReaction :one
+SELECT reaction FROM issue_votes WHERE issue_id = @issue_id AND user_id = @viewer;
+
+-- ---- polls -------------------------------------------------------------------------------
+
+-- name: InsertPollOption :exec
+INSERT INTO poll_options (issue_id, position, label) VALUES (@issue_id, @position, @label);
+
+-- name: PollLabels :many
+SELECT label FROM poll_options WHERE issue_id = @issue_id ORDER BY position;
+
+-- name: PollOptionOf :one
+SELECT id FROM poll_options WHERE id = @id AND issue_id = @issue_id;
+
+-- The caller's own vote.
+-- name: MyPollVote :one
+SELECT option_id FROM poll_votes WHERE issue_id = @issue_id AND user_id = @viewer;
+
+-- name: InsertPollVote :exec
+INSERT INTO poll_votes (issue_id, user_id, option_id) VALUES (@issue_id, @user_id, @option_id);
+
+-- name: BumpPollOption :exec
+UPDATE poll_options SET vote_count = vote_count + 1 WHERE id = @id;
+
+-- Issues (kind = issue) the caller wrote since a time: the daily limit.
+-- name: CountMyIssuesSince :one
+SELECT count(*)::int FROM issue_authors a JOIN issues i ON i.id = a.issue_id
+WHERE a.user_id = @viewer AND i.kind = 'issue' AND i.created_at > @since;
 
 -- name: Unvote :execrows
 DELETE FROM issue_votes WHERE issue_id = @issue_id AND user_id = @user_id;
@@ -250,6 +347,8 @@ SELECT c.id, c.issue_id, c.kind, c.handle, c.official_title, c.named,
        coalesce(u.display_name, '')::text AS author_name, (u.verified_at IS NOT NULL)::bool AS author_verified,
        (u.id IS NOT NULL)::bool AS author_exists,
        c.body, c.visibility, c.hold_reason, c.removed_reason, c.deleted_by_author, c.report_count, c.created_at,
+       c.parent_id, c.like_count,
+       EXISTS (SELECT 1 FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.user_id = @viewer)::bool AS liked,
        EXISTS (SELECT 1 FROM comment_authors ca WHERE ca.comment_id = c.id AND ca.user_id = @viewer)::bool AS mine,
        (c.kind = 'student' AND EXISTS (
            SELECT 1 FROM comment_authors ca JOIN issue_authors ia ON ia.user_id = ca.user_id
@@ -268,6 +367,8 @@ SELECT c.id, c.issue_id, c.kind, c.handle, c.official_title, c.named,
        coalesce(u.display_name, '')::text AS author_name, (u.verified_at IS NOT NULL)::bool AS author_verified,
        (u.id IS NOT NULL)::bool AS author_exists,
        c.body, c.visibility, c.hold_reason, c.removed_reason, c.deleted_by_author, c.report_count, c.created_at,
+       c.parent_id, c.like_count,
+       EXISTS (SELECT 1 FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.user_id = @viewer)::bool AS liked,
        EXISTS (SELECT 1 FROM comment_authors ca WHERE ca.comment_id = c.id AND ca.user_id = @viewer)::bool AS mine,
        (c.kind = 'student' AND EXISTS (
            SELECT 1 FROM comment_authors ca JOIN issue_authors ia ON ia.user_id = ca.user_id
@@ -277,8 +378,8 @@ LEFT JOIN users u ON u.id = c.named_author_id
 WHERE c.id = @id;
 
 -- name: CreateComment :one
-INSERT INTO comments (issue_id, kind, handle, official_title, named, named_author_id, body, visibility, hold_reason, created_at)
-VALUES (@issue_id, @kind, @handle, @official_title, @named, sqlc.narg(named_author_id), @body, @visibility, @hold_reason, @now)
+INSERT INTO comments (issue_id, parent_id, kind, handle, official_title, named, named_author_id, body, visibility, hold_reason, created_at)
+VALUES (@issue_id, sqlc.narg(parent_id), @kind, @handle, @official_title, @named, sqlc.narg(named_author_id), @body, @visibility, @hold_reason, @now)
 RETURNING id;
 
 -- name: InsertCommentAuthor :exec
@@ -298,6 +399,15 @@ SELECT user_id FROM comment_authors WHERE comment_id = @comment_id;
 UPDATE comments SET visibility = @visibility, hold_reason = @hold_reason, removed_reason = @removed_reason,
     deleted_by_author = deleted_by_author OR @deleted_by_author::bool
 WHERE id = @id;
+
+-- name: LikeComment :execrows
+INSERT INTO comment_likes (comment_id, user_id) VALUES (@comment_id, @user_id) ON CONFLICT DO NOTHING;
+
+-- name: UnlikeComment :execrows
+DELETE FROM comment_likes WHERE comment_id = @comment_id AND user_id = @user_id;
+
+-- name: AdjustCommentLikes :one
+UPDATE comments SET like_count = greatest(like_count + @delta, 0) WHERE id = @id RETURNING like_count;
 
 -- name: AdjustCommentReports :one
 UPDATE comments SET report_count = greatest(report_count + @delta, 0) WHERE id = @id RETURNING report_count;

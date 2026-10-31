@@ -13,7 +13,8 @@ func (s *Service) Routes(r *httpx.Router) {
 	st := r.Student().With(httpx.Unlogged)
 	st.Get("/issues", httpx.Handle(s.handleFeed))
 	st.Get("/issues/similar", httpx.Handle(s.handleSimilar))
-	st.With(r.LimitUser("voice-issue", 5, 24*time.Hour)).
+	// 25 posts a day of any kind; the service allows 5 issues of them.
+	st.With(r.LimitUser("voice-issue", 25, 24*time.Hour)).
 		Post("/issues", httpx.Handle(s.handleCreate, httpx.Status(http.StatusCreated)))
 	st.Get("/issues/{id}", httpx.Handle(s.handleGet))
 	st.Patch("/issues/{id}", httpx.Handle(s.handlePatch))
@@ -21,6 +22,9 @@ func (s *Service) Routes(r *httpx.Router) {
 	votes := st.With(r.LimitUser("voice-vote", 300, time.Hour))
 	votes.Put("/issues/{id}/vote", httpx.Handle(s.handleVote))
 	votes.Delete("/issues/{id}/vote", httpx.Handle(s.handleUnvote))
+	votes.Post("/issues/{id}/poll-vote", httpx.Handle(s.handlePollVote))
+	votes.Put("/issues/{id}/comments/{c}/like", httpx.Handle(s.handleLikeComment))
+	votes.Delete("/issues/{id}/comments/{c}/like", httpx.Handle(s.handleUnlikeComment))
 	st.Put("/issues/{id}/follow", httpx.Handle(s.handleFollow))
 	st.Delete("/issues/{id}/follow", httpx.Handle(s.handleUnfollow))
 	st.Post("/issues/{id}/reopen", httpx.Handle(s.handleReopen))

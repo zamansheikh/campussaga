@@ -1450,13 +1450,13 @@ func (q *Queries) VerifyUserByHand(ctx context.Context, arg VerifyUserByHandPara
 }
 
 const voiceCounts = `-- name: VoiceCounts :one
-SELECT (SELECT count(*) FROM issues WHERE status IN ('open', 'acknowledged', 'in_progress') AND visibility <> 'removed')::int AS open,
-       (SELECT count(*) FROM issues WHERE status = 'solved' AND visibility <> 'removed')::int AS solved,
+SELECT (SELECT count(*) FROM issues WHERE status IN ('open', 'acknowledged', 'in_progress') AND kind = 'issue' AND visibility <> 'removed')::int AS open,
+       (SELECT count(*) FROM issues WHERE status = 'solved' AND kind = 'issue' AND visibility <> 'removed')::int AS solved,
        ((SELECT count(*) FROM issues WHERE visibility = 'held')
         + (SELECT count(*) FROM comments WHERE visibility = 'held'))::int AS held,
        ((SELECT count(*) FROM issues WHERE report_count > 0 AND visibility <> 'removed')
         + (SELECT count(*) FROM comments WHERE report_count > 0 AND visibility <> 'removed'))::int AS reported,
-       (SELECT count(*) FROM issues x WHERE x.created_at > $1::timestamptz)::int AS issues_last_7_days
+       (SELECT count(*) FROM issues x WHERE x.kind = 'issue' AND x.created_at > $1::timestamptz)::int AS issues_last_7_days
 `
 
 type VoiceCountsRow struct {
