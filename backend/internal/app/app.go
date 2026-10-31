@@ -23,6 +23,7 @@ import (
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/growth"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/photos"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/push"
+	"github.com/zamansheikh/varsitykotha/backend/internal/modules/sponsors"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/transport"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/universities"
 	"github.com/zamansheikh/varsitykotha/backend/internal/modules/voice"
@@ -53,6 +54,7 @@ type App struct {
 	CampusAdmin  *campusadmin.Service
 	Feedback     *feedback.Service
 	Growth       *growth.Service
+	Sponsors     *sponsors.Service
 
 	handler http.Handler
 }
@@ -246,8 +248,12 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		pushSvc.Notify(userIDs, push.Message{Texts: texts, Data: n.Data})
 	})
 
+	sponsorSvc := sponsors.NewService(d, now, log)
+	sponsorSvc.SetMedia(store)
+
 	growthSvc := growth.NewService(d, now, growth.Ports{
-		Posts: func(ctx context.Context, author uuid.UUID) (any, error) { return voiceSvc.ProfilePosts(ctx, author) },
+		Posts:           func(ctx context.Context, author uuid.UUID) (any, error) { return voiceSvc.ProfilePosts(ctx, author) },
+		CampaignSponsor: sponsorSvc.CampaignSponsor,
 	}, log)
 	growthSvc.SetMedia(store)
 	growthSvc.SetNotifier(func(userIDs []uuid.UUID, n growth.Notice) {
@@ -261,7 +267,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 	campusSvc.OnVerified(growthSvc.OnVerified)
 	adminSvc.OnVerified(growthSvc.OnVerified)
 
-	a := &App{Growth: growthSvc, CampusAdmin: campusSvc, Feedback: feedbackSvc, Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc, Blood: bloodSvc, Transport: transportSvc}
+	a := &App{Growth: growthSvc, Sponsors: sponsorSvc, CampusAdmin: campusSvc, Feedback: feedbackSvc, Cfg: cfg, Log: log, DB: d, Tokens: tokens, Universities: uniSvc, Accounts: accSvc, Config: cfgSvc, ClassGroups: groupSvc, Push: pushSvc, Voice: voiceSvc, Blood: bloodSvc, Transport: transportSvc}
 
 	root := chi.NewRouter()
 	root.NotFound(httpx.NotFoundHandler)
@@ -284,6 +290,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		campusSvc.Routes(r)
 		feedbackSvc.Routes(r)
 		growthSvc.Routes(r)
+		sponsorSvc.Routes(r)
 	})
 
 	var h http.Handler = root
@@ -291,6 +298,8 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 		cfg.APIPrefix + "/uploads":                  voice.UploadLimit,
 		cfg.APIPrefix + "/me/photo":                 photos.UploadLimit,
 		cfg.APIPrefix + "/admin/campaigns/*/banner": growth.BannerUploadLimit,
+		cfg.APIPrefix + "/admin/promos/*/image":     sponsors.UploadLimit,
+		cfg.APIPrefix + "/admin/sponsors/*/logo":    sponsors.LogoUploadLimit,
 	})(h)
 	h = httpx.SecurityHeaders(h)
 	h = httpx.AccessLog(h)
@@ -338,6 +347,7 @@ func (a *App) Serve(ctx context.Context) error {
 	go a.Voice.CleanupLoop(bg, time.Hour)
 	go a.Transport.SweepLoop(bg, 5*time.Minute)
 	go a.Growth.SweepLoop(bg, time.Hour)
+	go a.Sponsors.SweepLoop(bg, time.Hour)
 
 	errc := make(chan error, 1)
 	go func() {

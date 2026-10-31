@@ -80,6 +80,12 @@ type Stats struct {
 		QualifiedLast7Days int `json:"qualifiedLast7Days"`
 		LiveCampaigns      int `json:"liveCampaigns"`
 	} `json:"growth"`
+	// Sponsors: ads serving now, and today's views and taps (docs/SPONSORS.md).
+	Sponsors struct {
+		LivePromos int `json:"livePromos"`
+		ViewsToday int `json:"viewsToday"`
+		TapsToday  int `json:"tapsToday"`
+	} `json:"sponsors"`
 	SignupsByDay    []DayCount      `json:"signupsByDay"`
 	TopUniversities []UniversityUse `json:"topUniversities"`
 }
@@ -164,6 +170,14 @@ func (s *Service) handleStats(ctx context.Context, _ *httpx.Empty) (*Stats, erro
 		       (SELECT count(*) FROM referrals WHERE qualified_at >= $1)::int,
 		       (SELECT count(*) FROM campaigns WHERE status IN ('live', 'ended') AND starts_at <= $2 AND ends_at >= $2)::int`,
 		week, now).Scan(&out.Growth.InvitesLast7Days, &out.Growth.QualifiedLast7Days, &out.Growth.LiveCampaigns); err != nil {
+		return nil, err
+	}
+
+	if err := s.d.Q(ctx).QueryRow(ctx, `
+		SELECT (SELECT count(*) FROM promos WHERE status = 'live' AND starts_at <= $1 AND ends_at > $1)::int,
+		       coalesce((SELECT sum(views) FROM promo_days WHERE day = $2::date), 0)::int,
+		       coalesce((SELECT sum(taps) FROM promo_days WHERE day = $2::date), 0)::int`,
+		now, bdToday(now).Format(time.DateOnly)).Scan(&out.Sponsors.LivePromos, &out.Sponsors.ViewsToday, &out.Sponsors.TapsToday); err != nil {
 		return nil, err
 	}
 

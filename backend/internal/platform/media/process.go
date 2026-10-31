@@ -100,6 +100,72 @@ func ProcessBanner(data []byte) ([]byte, error) {
 	return encode(scale(img, BannerWidth), 80)
 }
 
+// Ad images (docs/SPONSORS.md) fit within PromoWidth × PromoHeight (2:1);
+// sponsor logos within LogoSide × LogoSide.
+const (
+	PromoWidth   = 1600
+	PromoHeight  = 800
+	LogoSide     = 512
+	LogoMaxBytes = 4 << 20
+	promoQuality = 80
+	logoQuality  = 88
+)
+
+// ProcessPromo checks an ad image and re-encodes it as a JPEG that fits
+// within PromoWidth × PromoHeight, keeping its shape (never enlarged).
+func ProcessPromo(data []byte) ([]byte, error) {
+	img, err := decodeChecked(data, MaxBytes)
+	if err != nil {
+		return nil, err
+	}
+	return encode(fit(img, PromoWidth, PromoHeight), promoQuality)
+}
+
+// ProcessLogo checks a sponsor logo (at most LogoMaxBytes) and re-encodes it
+// as a JPEG within LogoSide × LogoSide on white (transparency becomes white).
+func ProcessLogo(data []byte) ([]byte, error) {
+	img, err := decodeChecked(data, LogoMaxBytes)
+	if err != nil {
+		return nil, err
+	}
+	return encode(fit(img, LogoSide, LogoSide), logoQuality)
+}
+
+// decodeChecked: a JPEG, PNG or WebP of at most limit bytes and 8000 px a
+// side, turned the way it was taken.
+func decodeChecked(data []byte, limit int) (image.Image, error) {
+	if len(data) > limit {
+		return nil, ErrTooLarge
+	}
+	cfg, format, err := image.DecodeConfig(bytes.NewReader(data))
+	if err != nil || (format != "jpeg" && format != "png" && format != "webp") {
+		return nil, ErrInvalid
+	}
+	if cfg.Width < 1 || cfg.Height < 1 || cfg.Width > maxPixelSide || cfg.Height > maxPixelSide {
+		return nil, ErrTooLarge
+	}
+	img, _, err := image.Decode(bytes.NewReader(data))
+	if err != nil {
+		return nil, ErrInvalid
+	}
+	if format == "jpeg" {
+		img = orient(img, jpegOrientation(data))
+	}
+	return img, nil
+}
+
+// fit scales img to fit within w × h (never enlarges), on white.
+func fit(img image.Image, w, h int) image.Image {
+	b := img.Bounds()
+	f := math.Min(1, math.Min(float64(w)/float64(b.Dx()), float64(h)/float64(b.Dy())))
+	dw := max(1, int(math.Round(float64(b.Dx())*f)))
+	dh := max(1, int(math.Round(float64(b.Dy())*f)))
+	dst := image.NewRGBA(image.Rect(0, 0, dw, dh))
+	draw.Draw(dst, dst.Bounds(), image.White, image.Point{}, draw.Src)
+	draw.CatmullRom.Scale(dst, dst.Bounds(), img, b, draw.Over, nil)
+	return dst
+}
+
 func encode(img image.Image, quality int) ([]byte, error) {
 	var buf bytes.Buffer
 	if err := jpeg.Encode(&buf, img, &jpeg.Options{Quality: quality}); err != nil {

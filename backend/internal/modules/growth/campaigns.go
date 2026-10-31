@@ -369,6 +369,8 @@ type CampaignView struct {
 	// SectionPrize: the prize for the section the team picks from the board
 	// (§9.1), in my language; null without one.
 	SectionPrize *string `json:"sectionPrize"`
+	// Sponsor: "Powered by" (docs/SPONSORS.md §5): {name, logoUrl, link}, or null.
+	Sponsor any `json:"sponsor"`
 }
 
 // CampaignDetail adds whether the student won, the ways to earn points with
@@ -394,6 +396,11 @@ func (s *Service) view(ctx context.Context, c campaign, uid uuid.UUID) (Campaign
 	if sp := pick(l, c.SectionPrizeEn, c.SectionPrizeBn); sp != "" {
 		v.SectionPrize = &sp
 	}
+	sponsor, err := s.campaignSponsor(ctx, c.ID)
+	if err != nil {
+		return v, standing{}, err
+	}
+	v.Sponsor = sponsor
 	for _, p := range c.Prizes {
 		v.Prizes = append(v.Prizes, PrizeView{RankFrom: p.RankFrom, RankTo: p.RankTo, Title: pick(l, p.TitleEn, p.TitleBn)})
 	}
@@ -649,6 +656,16 @@ type PublicCampaign struct {
 	FinisherRewardEn    string `json:"finisherRewardEn"`
 	FinisherRewardBn    string `json:"finisherRewardBn"`
 	FinisherRewardCount int    `json:"finisherRewardCount"`
+	// Sponsor: "Powered by" (docs/SPONSORS.md §5), or null.
+	Sponsor any `json:"sponsor"`
+}
+
+// campaignSponsor: the campaign's live sponsor, or nil.
+func (s *Service) campaignSponsor(ctx context.Context, id uuid.UUID) (any, error) {
+	if s.ports.CampaignSponsor == nil {
+		return nil, nil
+	}
+	return s.ports.CampaignSponsor(ctx, id)
 }
 
 func (s *Service) handlePublicCampaign(ctx context.Context, in *campaignReq) (*PublicCampaign, error) {
@@ -660,7 +677,11 @@ func (s *Service) handlePublicCampaign(ctx context.Context, in *campaignReq) (*P
 	if c.Status == "draft" {
 		return nil, ErrCampaignNotFound
 	}
-	return &PublicCampaign{
+	sponsor, err := s.campaignSponsor(ctx, c.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &PublicCampaign{Sponsor: sponsor,
 		ID: c.ID, TitleEn: c.TitleEn, TitleBn: c.TitleBn, BodyEn: c.BodyEn, BodyBn: c.BodyBn, RulesEn: c.RulesEn, RulesBn: c.RulesBn,
 		StartsAt: c.StartsAt.UTC(), EndsAt: c.EndsAt.UTC(), SettlesAt: c.SettlesAt.UTC(), Status: c.state(s.now()), Prizes: c.Prizes,
 		BannerURL: c.bannerURL(), Scoring: c.Scoring,

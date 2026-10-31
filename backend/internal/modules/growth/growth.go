@@ -77,6 +77,9 @@ type Notifier func(userIDs []uuid.UUID, n Notice)
 type Ports struct {
 	// Posts: a student's named Campus posts as the caller may see them.
 	Posts func(ctx context.Context, author uuid.UUID) (any, error)
+	// CampaignSponsor: the campaign's live sponsor ("Powered by",
+	// docs/SPONSORS.md §5), or nil. A nil func: no sponsors.
+	CampaignSponsor func(ctx context.Context, campaignID uuid.UUID) (any, error)
 }
 
 type Service struct {

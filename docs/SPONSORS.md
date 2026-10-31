@@ -188,3 +188,53 @@ viewsToday, tapsToday}`.
 ## 8. Play Console
 "Contains ads: Yes" in the store listing (App content → Ads). Data safety does
 not change: no data goes to ad networks or sponsors.
+
+## As implemented (API, migration `00780_sponsors.sql`)
+
+Module `backend/internal/modules/sponsors`. Paths and fields are as in §2–§5;
+where the spec left a choice:
+
+- **Student Promo JSON** also has `targeted` (bool): true when the ad has
+  `university_ids` or `cities`, so the app can group deals into "Near you"
+  and "For every student".
+- **Images**: ad images fit within 1600×800 keeping their shape (not cropped);
+  logos fit within 512×512 (not cropped) and are JPEGs on white (media keys
+  are `.jpg` only), so transparent logos get a white background.
+- **Errors**: field tags (lengths, ranges, enums, unknown fields) answer
+  `VALIDATION_FAILED`; the spec's rules answer `INVALID_PROMO` with
+  `details: {field: reason}` (sponsor name/website/email too). New:
+  `PROMO_LOCKED` (409) for an edit the status doesn't allow (live: only
+  `endsAt`, `totalViews`, `dailyCap`, `priority`, `status`; ended: nothing),
+  a status move that isn't allowed, deleting a non-draft, and changing a live
+  ad's image; `IMAGE_NOT_FOUND` (404) on the public image routes;
+  `MEDIA_UNAVAILABLE` (503) without a media store.
+- **Status**: draft → live; live ⇄ paused; live/paused → ended. Ended is
+  final: duplicate to run it again. PATCH also takes `status` (same rules).
+  Drafts may lack dates; going live needs them (and checks the whole ad).
+  The hourly sweep ends live and paused ads past `ends_at`.
+- **One live sponsor per campaign**: a partial unique index; a second one going
+  live answers `INVALID_PROMO {campaignId}`.
+- **Campaign sponsor link**: the ad's link, else the sponsor's website (as a
+  web link), else null. Only a live campaign ad inside its dates counts.
+- **Archiving** a sponsor (DELETE, or PATCH `{archived: true}`) pauses its live
+  ads; PATCH `{archived: false}` restores the sponsor (its ads stay paused).
+  `GET /admin/sponsors?archived=true` lists archived ones; the default lists
+  the others. A health sponsor can't become general while it has a live or
+  paused Blood ad (`HEALTH_SPONSOR_ONLY`).
+- **Serving**: `expires_at` hides any ad once past (not only deals).
+  Targeting compares cities case-insensitively with the student's
+  university city. Staff = any role but student (admin, moderator,
+  authority): they get ads, their events are ignored.
+- **Events**: `at` is accepted but the server's clock decides the day. Views,
+  taps and copies each count up to 20 per ad, student and day
+  (`promo_user_days.copies` was added for that); there is no per-session
+  dedupe on the server. A hide counts once while it lasts; hiding again
+  extends it. Events for ads the student couldn't be shown (not live, outside
+  their dates, archived sponsor, not targeted to them) are dropped.
+- **Stats**: the default range is the last 30 days to today (Asia/Dhaka); at
+  most 366 days; `days` lists every day, zeros included. `totals.viewers`
+  counts distinct students over the range from `promo_user_days`, which is
+  kept 90 days, so older ranges count fewer.
+- **Admin objects** also carry `promos: {live, total}` (sponsor), and
+  `delivered`, `stats: {viewsToday, tapsToday, views, taps}` and the sponsor
+  summary (ad). `GET /admin/sponsors/{id}` exists too.
