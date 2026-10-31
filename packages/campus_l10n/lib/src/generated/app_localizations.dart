@@ -8017,6 +8017,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'More'**
   String get badgesMore;
+
+  /// No description provided for @badgesEarnedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Earned · {count}'**
+  String badgesEarnedTitle(int count);
 }
 
 class _AppLocalizationsDelegate

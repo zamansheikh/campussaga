@@ -194,7 +194,7 @@ class _ProfileView extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.all(CsSpace.sm),
-              child: Wrap(
+              child: CsBadgeGrid(
                 children: [
                   for (final b in p.badges)
                     CsBadgeTile(

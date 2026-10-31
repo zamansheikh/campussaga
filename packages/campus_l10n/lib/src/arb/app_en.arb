@@ -1840,5 +1840,7 @@
   "badgesPageTitle": "Badges",
   "badgesPlus": "+{count}",
   "@badgesPlus": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}},
-  "badgesMore": "More"
+  "badgesMore": "More",
+  "badgesEarnedTitle": "Earned · {count}",
+  "@badgesEarnedTitle": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}}
 }

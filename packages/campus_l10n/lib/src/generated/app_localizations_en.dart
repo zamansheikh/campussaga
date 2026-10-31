@@ -5104,4 +5104,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get badgesMore => 'More';
+
+  @override
+  String badgesEarnedTitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Earned · $countString';
+  }
 }

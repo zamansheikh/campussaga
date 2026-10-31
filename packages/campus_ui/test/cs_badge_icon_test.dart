@@ -31,30 +31,38 @@ void main() {
     }
   });
 
-  testWidgets('a badge icon rings in its tier colour; locked is grey', (
+  testWidgets('a medal: gold rim and three stars at tier 3; locked is grey', (
     tester,
   ) async {
-    Future<BoxDecoration> ring(Widget w) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: CsTheme.light,
-          home: Scaffold(body: w),
+    late BuildContext ctx;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: CsTheme.light,
+        home: Builder(
+          builder: (c) {
+            ctx = c;
+            return const Scaffold(
+              body: Row(
+                children: [
+                  CsBadgeIcon(badgeKey: 'connector', tier: 3, size: 52),
+                  CsBadgeIcon(badgeKey: 'cr', size: 18),
+                  CsBadgeIcon(badgeKey: 'cr', locked: true),
+                ],
+              ),
+            );
+          },
         ),
-      );
-      final box = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(CsBadgeIcon),
-          matching: find.byType(Container),
-        ),
-      );
-      return box.decoration! as BoxDecoration;
-    }
-
-    final gold = await ring(const CsBadgeIcon(badgeKey: 'connector', tier: 3));
-    expect((gold.border! as Border).top.color, CsTierColors.gold);
-    final locked = await ring(
-      const CsBadgeIcon(badgeKey: 'connector', tier: 3, locked: true),
+      ),
     );
-    expect((locked.border! as Border).top.color, isNot(CsTierColors.gold));
+    expect(tester.takeException(), isNull);
+    final gold = CsBadgeIcon.look(ctx, 'connector', tier: 3);
+    expect(gold.rim, CsTierColors.metal(3));
+    expect(gold.stars, 3);
+    expect(gold.hexagon, isFalse);
+    expect(CsBadgeIcon.look(ctx, 'cr').hexagon, isTrue);
+    expect(CsBadgeIcon.look(ctx, 'cr').stars, 0);
+    final locked = CsBadgeIcon.look(ctx, 'connector', tier: 3, locked: true);
+    expect(locked.rim, isNot(contains(CsTierColors.gold)));
+    expect(locked.stars, 0);
   });
 }

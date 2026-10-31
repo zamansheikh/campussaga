@@ -1319,5 +1319,6 @@
   "badgesToEarn": "আরও {count}টি",
   "badgesPageTitle": "ব্যাজ",
   "badgesPlus": "+{count}",
-  "badgesMore": "আরও"
+  "badgesMore": "আরও",
+  "badgesEarnedTitle": "অর্জিত · {count}"
 }

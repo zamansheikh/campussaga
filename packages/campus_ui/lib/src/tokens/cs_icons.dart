@@ -189,4 +189,23 @@ abstract final class CsIcons {
     'campus_voice' => PhosphorIconsRegular.megaphone,
     _ => PhosphorIconsRegular.medal,
   };
+
+  /// The filled emblem on a badge medal.
+  static IconData badgeFill(String key) => switch (key) {
+    'verified' => PhosphorIconsFill.sealCheck,
+    'founding' => PhosphorIconsFill.rocketLaunch,
+    'cr' => PhosphorIconsFill.crown,
+    'campus_admin' => PhosphorIconsFill.shieldCheck,
+    'bus_rep' => PhosphorIconsFill.bus,
+    'official' => PhosphorIconsFill.buildings,
+    'blood_donor' => PhosphorIconsFill.drop,
+    'life_saver' => PhosphorIconsFill.heartbeat,
+    'bus_buddy' => PhosphorIconsFill.mapPin,
+    'section_builder' => PhosphorIconsFill.usersThree,
+    'connector' => PhosphorIconsFill.shareNetwork,
+    'bug_hunter' => PhosphorIconsFill.bug,
+    'helper' => PhosphorIconsFill.handHeart,
+    'campus_voice' => PhosphorIconsFill.megaphone,
+    _ => PhosphorIconsFill.medal,
+  };
 }

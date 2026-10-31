@@ -156,7 +156,7 @@ class _BadgesSectionState extends State<BadgesSection> {
                           icon: CsBadgeIcon(
                             badgeKey: b.key,
                             tier: b.tier,
-                            size: 46,
+                            size: 52,
                             semanticLabel: badgeName(l10n, b.key),
                           ),
                           label: badgeName(l10n, b.key),
@@ -166,7 +166,8 @@ class _BadgesSectionState extends State<BadgesSection> {
                       if (more > 0)
                         _MiniBadge(
                           width: width,
-                          icon: _Circle(
+                          icon: CsBadgeSlot(
+                            size: 52,
                             child: Text(
                               l10n.badgesPlus(more),
                               style: context.text.titleSmall?.copyWith(
@@ -181,7 +182,8 @@ class _BadgesSectionState extends State<BadgesSection> {
                       else if (locked > 0)
                         _MiniBadge(
                           width: width,
-                          icon: _Circle(
+                          icon: CsBadgeSlot(
+                            size: 52,
                             child: Icon(
                               CsIcons.lock,
                               size: 20,
@@ -216,7 +218,8 @@ class _BadgesSectionState extends State<BadgesSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CsSectionTitle(title: l10n.badgesTitle),
+          // On the Badges page: the app bar already says "Badges".
+          CsSectionTitle(title: l10n.badgesEarnedTitle(badges.badges.length)),
           Material(
             color: cs.surface,
             shape: RoundedRectangleBorder(
@@ -235,8 +238,7 @@ class _BadgesSectionState extends State<BadgesSection> {
                         ),
                       ),
                     )
-                  : Wrap(
-                      alignment: WrapAlignment.start,
+                  : CsBadgeGrid(
                       children: [
                         for (final b in badges.badges)
                           CsBadgeTile(
@@ -322,26 +324,6 @@ class _MiniBadge extends StatelessWidget {
       ),
     );
   }
-}
-
-/// The round frame of the "+N" and "to earn" slots, the size of a badge.
-class _Circle extends StatelessWidget {
-  const _Circle({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: 46,
-    height: 46,
-    alignment: Alignment.center,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: context.cs.surfaceVariant,
-      border: Border.all(color: context.cs.border, width: 2),
-    ),
-    child: child,
-  );
 }
 
 /// A badge still to earn: greyed, with how to earn it.

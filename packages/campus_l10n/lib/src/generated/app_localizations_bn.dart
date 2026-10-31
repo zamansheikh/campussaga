@@ -4957,4 +4957,13 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get badgesMore => 'আরও';
+
+  @override
+  String badgesEarnedTitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'অর্জিত · $countString';
+  }
 }
