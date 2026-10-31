@@ -29,7 +29,7 @@ Feature flag: `features.busLive` (app_config). Migration 00690 sets it on.
 
 - Location is sent only while a student shares, which they start by hand
   from a screen that says what is sent and who sees it. A notification
-  stays up while it runs, with a Stop button.
+  stays up while it runs (tapping it opens the app, where Stop is).
 - Other students never see who shares. The live view has counts and the
   run's combined position only: no user ids, names or single tracks.
 - Raw points (`bus_live_pings`) and sessions are deleted 24 hours after
@@ -251,18 +251,24 @@ feedback older than 180 days.
     "4 min late", ETA at my stop ("At Mirpur 10 in ~6 min"), and Open map.
   - Nothing live during a trip window (10 min before departure until 30 min
     after its last stop): "On the 7:30 bus? Share where it is so others
-    can see it" with "I'm on this bus".
+    can see it" with "I'm on this bus". A live bus has "I'm on it" (more
+    riders, a truer position), and the app bar has a share button for a
+    bus not on the timetable.
   - Sharing: "You're sharing the 7:30 bus · 2 others too" with Stop.
-  - Alert toggle on the my-stop card: "Tell me when it's 10 min away".
+  - "Alert me" on the my-stop card: 5, 10 or 15 min, or off.
 - **Share sheet**: the trip (preselected: the one running now), what is
   shared and who sees it (Play's prominent disclosure), Start.
 - **While sharing**: an Android foreground service (geolocator's
-  foreground notification: "Sharing the bus's location", ongoing), points
+  foreground notification: "Sharing {route} live", ongoing), points
   every ~10 s or 20 m, sent in batches every 15 s, held and retried while
-  offline (at most 30 per request). Stops on Stop, `ended` from the
-  server, the app being closed, or 3 hours.
+  offline (at most 30 per request, 240 held). Stops on Stop, `ended` from
+  the server, sign-out, or 3 hours; if the app is swiped away, the server
+  ends it after 10 silent minutes. iOS: background location updates with
+  the blue indicator (`UIBackgroundModes: location`).
 - **After sharing**: "Thanks! 12 students saw your bus" and the one-tap
-  feedback sheet.
+  feedback (On time · Late, "It was crowded"; no "Didn't come" for a bus
+  you rode). Answering or closing it counts as this route's ask for the
+  day.
 - **Live map**: the bus marker (route colour, riders count) gliding
   between updates, "Live · 3 sharing · 10 s ago", ETAs on the stop strip;
   polled every 10 s while open.
@@ -270,8 +276,9 @@ feedback older than 180 days.
   late", "Often crowded", "Sometimes doesn't come") once there are ≥ 3
   votes or ≥ 3 measured runs.
 - **Feedback card**: on the route page for the latest trip past my stop in
-  the last 3 hours (once per trip; dismissable): On time · Late · Didn't
-  come, plus "It was crowded".
+  the last 3 hours, not while a live bus of that trip is still on its way
+  there; at most once per route per day (answered or closed, kept on the
+  phone): On time · Late · Didn't come, plus "It was crowded".
 - **Routes list**: a "Live" pill on routes with a live run.
 - **Push** `bus_near` opens the route page.
 

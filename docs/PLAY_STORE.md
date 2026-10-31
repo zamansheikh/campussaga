@@ -72,7 +72,7 @@ Google's reviewers have no university email. The API has a reviewer sign-in
 | Privacy policy | `https://varsitykotha.com/privacy` |
 | App access | **All or some functionality is restricted** → add instructions: email `play-review@review.varsitykotha.com`, code = the `REVIEW_CODE`, steps: open the app, tap "Use university email instead", enter the email, tap "Send code", type the code (no email arrives) |
 | Ads | **No, my app does not contain ads** |
-| Content rating | Category **Social or Communication** (users post and comment). Answer honestly: no violence, sexual content, drugs, gambling or bad language from the app itself; **users can interact and share content** (Campus Voice posts, comments, photos), with reporting and moderation; no sharing of precise location; no purchases. Expect a "Users interact" descriptor |
+| Content rating | Category **Social or Communication** (users post and comment). Answer honestly: no violence, sexual content, drugs, gambling or bad language from the app itself; **users can interact and share content** (Campus Voice posts, comments, photos), with reporting and moderation; **shares location with other users: Yes** from build 6 (a student who opts in to share their bus live shows other students where that bus is, anonymously); no purchases. Expect a "Users interact" descriptor |
 | Target audience | **18 and over** (university students). The app is not for children |
 | News app | No |
 | COVID-19 / Health / Financial features | None |
@@ -100,10 +100,11 @@ Google's reviewers have no university email. The API has a reviewer sign-in
 | App info and performance → Crash logs | Yes | Required | App functionality | Crashlytics; no user ID |
 | App info and performance → Diagnostics | Yes | Required | App functionality | Crashlytics device and app version |
 | Device or other IDs | Yes | Required | App functionality | Push token and Crashlytics installation ID |
+| Location → Precise location | Yes | Optional | App functionality | Live buses (build 6): only while a student shares the bus they're on; points deleted 24 h after sharing ends. Also a rep's "Use my location" for a stop |
 
-Not collected: location, contacts, financial info, messages, audio, files,
-web history, installed apps. (Phone number and health info are collected
-only for blood donation, optionally, from build 6.)
+Not collected: approximate location, contacts, financial info, messages,
+audio, files, web history, installed apps. (Phone number and health info
+are collected only for blood donation, optionally, from build 6.)
 
 Bus route maps and location (build 4 and later): the app has the
 foreground location permission (`ACCESS_FINE_LOCATION`, asked only when
@@ -115,10 +116,23 @@ shared** to be safe. Map images and place search come from OpenStreetMap,
 which sees the phone's IP address and the map area like any website (listed
 in the privacy policy).
 
+Live buses (build 6, docs/BUS_LIVE.md): sharing a bus runs a
+**location foreground service** (`FOREGROUND_SERVICE_LOCATION`) with an
+ongoing notification, started by the student in the app. Play Console →
+App content → **Foreground service permissions**: declare *Location*, task
+"Live bus sharing: a student on a university bus shares its position so
+students waiting at stops see where it is; started by the user, stops on
+Stop, at the end of the route or after 3 hours", with a short screen
+recording of starting and stopping it. The share sheet is the prominent
+disclosure (what is sent, also with the screen off, and who sees it). No
+`ACCESS_BACKGROUND_LOCATION`, so no background location declaration.
+
 ### Permissions to explain if asked
 - `SCHEDULE_EXACT_ALARM`: class reminders at the exact time (the student
   turns it on; not `USE_EXACT_ALARM`, so no declaration form).
-- `POST_NOTIFICATIONS`: class changes and announcements.
+- `POST_NOTIFICATIONS`: class changes, announcements, blood requests and
+  "bus near" alerts.
+- `FOREGROUND_SERVICE_LOCATION`: only while sharing a bus live (above).
 - Photos: the system photo picker, so no photo permission.
 
 ## 4. Releasing
