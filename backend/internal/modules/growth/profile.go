@@ -108,8 +108,9 @@ func (s *Service) handleProfile(ctx context.Context, in *profileReq) (*Profile, 
 		}
 	}
 	// A student looking at their own profile gets fresh badges, private
-	// ones included; everyone else gets the public ones.
-	if id == c.UserID {
+	// ones included; everyone else gets the public ones, refreshed now and
+	// then so a profile isn't empty until the hourly sweep.
+	if id == c.UserID || s.dueProfileRecompute(id) {
 		if err := s.Recompute(ctx, id); err != nil {
 			return nil, err
 		}
@@ -139,4 +140,20 @@ func (s *Service) handleProfile(ctx context.Context, in *profileReq) (*Profile, 
 		}
 	}
 	return p, nil
+}
+
+// dueProfileRecompute reports whether another student's badges should be
+// recomputed for their profile, and marks them done.
+func (s *Service) dueProfileRecompute(id uuid.UUID) bool {
+	now := s.now()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if last, ok := s.recomputed[id]; ok && now.Sub(last) < profileRecomputeEvery {
+		return false
+	}
+	if len(s.recomputed) > 50000 { // keep it small
+		s.recomputed = map[uuid.UUID]time.Time{}
+	}
+	s.recomputed[id] = now
+	return true
 }

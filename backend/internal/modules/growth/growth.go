@@ -86,13 +86,19 @@ type Service struct {
 	mu      sync.Mutex
 	seenDay string
 	seen    map[uuid.UUID]struct{}
+
+	// Badges recomputed when someone else opens a profile, at most once
+	// per profileRecomputeEvery per student.
+	recomputed map[uuid.UUID]time.Time
 }
+
+const profileRecomputeEvery = 10 * time.Minute
 
 func NewService(d *db.DB, now func() time.Time, ports Ports, log *slog.Logger) *Service {
 	if log == nil {
 		log = slog.Default()
 	}
-	return &Service{d: d, now: now, log: log, ports: ports, seen: map[uuid.UUID]struct{}{}}
+	return &Service{d: d, now: now, log: log, ports: ports, seen: map[uuid.UUID]struct{}{}, recomputed: map[uuid.UUID]time.Time{}}
 }
 
 // SetNotifier turns pushes on.
