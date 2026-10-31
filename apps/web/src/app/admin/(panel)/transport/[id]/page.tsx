@@ -6,13 +6,14 @@ import { ErrorPanel } from "@/components/admin/notice";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { load } from "@/lib/admin/load";
-import { api, requireAdmin } from "@/lib/admin/session";
-import type { BusRoute } from "@/lib/admin/transport";
+import { api, requestNow, requireAdmin } from "@/lib/admin/session";
+import type { BusRoute, RouteActivity } from "@/lib/admin/transport";
 import { allUniversities } from "@/lib/admin/universities";
 import { formatDateTime } from "@/lib/format";
 
 import { DeleteRouteButton } from "../rep-buttons";
 import { RouteDialog } from "../route-dialog";
+import { RouteActivitySections } from "./live-sections";
 import { StopsEditor } from "./stops-editor";
 import { TripsEditor } from "./trips-editor";
 
@@ -21,10 +22,12 @@ export const metadata: Metadata = { title: "Bus route" };
 export default async function BusRoutePage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
   const { id } = await params;
-  const [res, unis] = await Promise.all([
+  const [res, unis, activity] = await Promise.all([
     load(() => api<BusRoute>(`/transport/routes/${encodeURIComponent(id)}`)),
     load(() => allUniversities()),
+    load(() => api<RouteActivity>(`/admin/transport/routes/${encodeURIComponent(id)}/activity`)),
   ]);
+  const now = requestNow();
   const r = res.data;
   const university = unis.data?.find((u) => u.id === r?.universityId);
   return (
@@ -65,6 +68,7 @@ export default async function BusRoutePage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
+          <RouteActivitySections route={r} activity={activity.data} error={activity.error} now={now} />
           <StopsEditor routeId={r.id} stops={r.stops} />
           <TripsEditor routeId={r.id} trips={r.trips} />
         </div>

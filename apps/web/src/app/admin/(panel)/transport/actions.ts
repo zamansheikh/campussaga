@@ -144,6 +144,24 @@ export async function saveTrips(routeId: string, trips: TripInput[]): Promise<Ac
   }
 }
 
+/** Ends every open live-sharing session on a route and says how many ended. */
+export async function endLiveSharing(routeId: string): Promise<ActionResult<{ ended: number }>> {
+  const rid = id.safeParse(routeId);
+  if (!rid.success) return { ok: false, error: "That route isn't valid." };
+  try {
+    const res = await api<{ ended: number }>(`/admin/transport/routes/${rid.data}/live/end`, { method: "POST", body: {} });
+    refresh(rid.data);
+    const n = res.ended ?? 0;
+    return {
+      ok: true,
+      data: { ended: n },
+      message: n === 0 ? "Nobody was sharing" : `Ended ${n} sharing ${n === 1 ? "session" : "sessions"}`,
+    };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
 /** Lets a student edit their university's bus routes in the app. */
 export async function addRep(userId: string, universityId: string): Promise<ActionResult<TransportRep[]>> {
   const parsed = z.object({ userId: z.uuid("Choose a user."), universityId: z.uuid("Choose a university.") }).safeParse({

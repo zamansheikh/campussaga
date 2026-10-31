@@ -56,6 +56,7 @@ const messages: Record<string, string> = {
   NOTE_REQUIRED: "Add a note explaining why.",
   CANNOT_BAN_OFFICIAL: "Official replies come from university staff; their authors can't be banned here.",
   ROLE_CONFLICT: "Admins can't also be staff. Make them a student first.",
+  BLOOD_REQUEST_NOT_OPEN: "This request is already fulfilled or closed, so it can't be closed again. Refresh the list.",
   NOT_FOUND: "Not found.",
   FORBIDDEN: "You don't have access to this.",
   NETWORK: "Can't reach the VarsityKotha server. Is it running?",

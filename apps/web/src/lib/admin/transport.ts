@@ -186,3 +186,34 @@ export const formatLatLng = (p: LatLng | null) => (p ? `${p.lat.toFixed(6)}, ${p
 
 export const osmLink = (p: LatLng) => `https://www.openstreetmap.org/?mlat=${p.lat}&mlon=${p.lng}#map=17/${p.lat}/${p.lng}`;
 
+
+/** A bus being shared live (docs/BUS_LIVE.md 3.4; the admin view has no `mine` and no user ids). */
+export type BusRun = {
+  direction: BusDirection;
+  /** "HH:MM", or null when the run isn't on the timetable. */
+  departs: string | null;
+  riders: number;
+  delayMin: number | null;
+  nextStopId: string | null;
+  updatedAt: string;
+};
+
+export type TripInsight = {
+  direction: BusDirection;
+  departs: string;
+  votes: number;
+  onTime: number;
+  late: number;
+  noShow: number;
+  crowded: number;
+  /** Median delay at stops over measured runs (null: fewer than 3 runs). */
+  delayMin: number | null;
+  runs: number;
+};
+
+export type RouteActivity = {
+  live: { runs: BusRun[] };
+  insights: { trips: TripInsight[] };
+  sharesLast7Days: number;
+  ratingsLast30Days: number;
+};

@@ -41,6 +41,48 @@ export type Stats = {
   topUniversities: { id: string; name: string; users: number }[];
   /** Campus Voice numbers (once the API has them). */
   voice?: VoiceStats;
+  /** Build 6 numbers (an older API doesn't send them). */
+  campus?: CampusStats;
+  blood?: BloodStats;
+  bus?: BusStats;
+};
+
+export type CampusStats = {
+  postsLast7Days?: Partial<Record<"issue" | "post" | "question" | "poll", number>>;
+  commentsLast7Days?: number;
+  reactionsLast7Days?: number;
+};
+
+export type BloodStats = {
+  donors?: number;
+  available?: number;
+  openRequests?: number;
+  requestsLast7Days?: number;
+  responsesLast7Days?: number;
+};
+
+export type BusStats = { liveNow?: number; sharesLast7Days?: number; tripsShared?: number; ratingsLast30Days?: number };
+
+export type BloodRequestStatus = "open" | "fulfilled" | "closed";
+
+export type BloodRequest = {
+  id: string;
+  university: { id: string; name: string };
+  bloodGroup: string;
+  units: number;
+  hospital: string;
+  area: string;
+  neededBy: string;
+  urgent: boolean;
+  contactName: string;
+  contactPhone: string;
+  note: string;
+  status: BloodRequestStatus | string;
+  notified: number;
+  responses: number;
+  requester: { id: string; name: string | null; email: string } | null;
+  createdAt: string;
+  closedAt: string | null;
 };
 
 export type Role = "student" | "admin";
@@ -174,6 +216,8 @@ export type Poll = {
 export type IssueCard = {
   id: string;
   kind?: PostKind | string;
+  /** Hidden from students visiting other campuses (older servers: absent). */
+  campusOnly?: boolean;
   category: IssueCategory | string;
   private: boolean;
   title: string;

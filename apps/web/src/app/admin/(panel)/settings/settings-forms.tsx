@@ -16,6 +16,12 @@ import { updateConfig } from "./actions";
 const featureNames: Record<string, { label: string; hint: string }> = {
   myClass: { label: "My Class", hint: "Class groups, routine, reminders and announcements. The app doesn't read this switch yet, so it stays on." },
   campusVoice: { label: "Campus Voice", hint: "Anonymous campus issues, \"Me too\" votes and official replies. Off hides it in the app." },
+  bloodDonation: { label: "Blood donation", hint: "Donor sign-up, blood requests and 'blood needed' notifications. Off hides it in the app." },
+  visitCampus: { label: "Visit other campuses", hint: "Students read and react to other universities' Campus posts. Off hides it in the app." },
+  busLive: {
+    label: "Live buses",
+    hint: "Students share the bus they're on; live map, arrival times, 'bus near' alerts and trip ratings. Off hides it in the app.",
+  },
 };
 
 /** One switch per feature flag; each change asks first (it reaches every phone). */

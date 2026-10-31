@@ -41,6 +41,8 @@ const actions: Record<string, string> = {
   "moderation.restore": "Restored a post",
   "moderation.ban": "Banned a post's author",
   "moderation.dismiss": "Dismissed reports",
+  "blood.close": "Closed a blood request",
+  "transport.live.end": "Ended live bus sharing",
   "staff.add": "Added staff",
   "staff.remove": "Removed staff",
 };

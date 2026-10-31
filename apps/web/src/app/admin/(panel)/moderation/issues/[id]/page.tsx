@@ -86,6 +86,7 @@ function IssueView({ issue, now }: { issue: ModerationIssue; now: number }) {
           <section aria-labelledby="issue-title">
             <div className="flex flex-wrap items-center gap-1.5">
               <Badge variant="outline">{label(kindLabel, issue.kind ?? "issue")}</Badge>
+              {issue.campusOnly ? <Badge variant="info">Campus only</Badge> : null}
               <Badge variant="soft">{label(categoryLabel, issue.category)}</Badge>
               {issue.private ? (
                 <Badge variant="warning">

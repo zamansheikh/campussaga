@@ -1,4 +1,4 @@
-import { Building2, Megaphone, Smartphone, UserCheck, UserRoundPlus, Users, UsersRound } from "lucide-react";
+import { Building2, Bus, Droplet, Megaphone, School, Smartphone, UserCheck, UserRoundPlus, Users, UsersRound } from "lucide-react";
 import Link from "next/link";
 
 import { SignupsChart } from "@/components/admin/dashboard/signups-chart";
@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/admin/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { load } from "@/lib/admin/load";
 import { api, requireAdmin } from "@/lib/admin/session";
-import type { Stats, VoiceStats } from "@/lib/admin/types";
+import type { BloodStats, BusStats, CampusStats, Stats, VoiceStats } from "@/lib/admin/types";
 import { formatNumber } from "@/lib/format";
 
 export const metadata = { title: "Dashboard" };
@@ -113,6 +113,9 @@ export default async function DashboardPage() {
           </div>
 
           {s.voice ? <VoiceCard v={s.voice} /> : null}
+          {s.campus ? <CampusCard c={s.campus} /> : null}
+          {s.blood ? <BloodCard b={s.blood} /> : null}
+          {s.bus ? <BusCard b={s.bus} /> : null}
 
           <div className="grid gap-4 sm:grid-cols-3">
             <MiniStat label="Admins" value={s.users.admins} href="/admin/users?status=admin" />
@@ -144,6 +147,70 @@ function VoiceCard({ v }: { v: VoiceStats }) {
         <MiniStat label="Solved" value={v.solved} />
         <MiniStat label="Held for review" value={v.held} href="/admin/moderation" />
         <MiniStat label="Reported" value={v.reported} href="/admin/moderation?kind=reported" />
+      </CardContent>
+    </Card>
+  );
+}
+
+/** Campus posts of the last 7 days, by kind. */
+function CampusCard({ c }: { c: CampusStats }) {
+  const posts = c.postsLast7Days ?? {};
+  const total = (posts.issue ?? 0) + (posts.post ?? 0) + (posts.question ?? 0) + (posts.poll ?? 0);
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <School className="size-4 text-muted-foreground" /> Campus
+        </CardTitle>
+        <CardDescription>{formatNumber(total)} new items in the last 7 days</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-3 sm:grid-cols-3 xl:grid-cols-6">
+        <MiniStat label="Issues" value={posts.issue ?? 0} />
+        <MiniStat label="Posts" value={posts.post ?? 0} />
+        <MiniStat label="Questions" value={posts.question ?? 0} />
+        <MiniStat label="Polls" value={posts.poll ?? 0} />
+        <MiniStat label="Comments" value={c.commentsLast7Days ?? 0} />
+        <MiniStat label="Reactions" value={c.reactionsLast7Days ?? 0} />
+      </CardContent>
+    </Card>
+  );
+}
+
+function BloodCard({ b }: { b: BloodStats }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Droplet className="size-4 text-muted-foreground" /> Blood donation
+        </CardTitle>
+        <CardDescription>
+          {formatNumber(b.requestsLast7Days ?? 0)} requests and {formatNumber(b.responsesLast7Days ?? 0)} responses in
+          the last 7 days
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-3 sm:grid-cols-3">
+        <MiniStat label="Donors" value={b.donors ?? 0} />
+        <MiniStat label="Can donate now" value={b.available ?? 0} />
+        <MiniStat label="Open requests" value={b.openRequests ?? 0} href="/admin/blood" />
+      </CardContent>
+    </Card>
+  );
+}
+
+function BusCard({ b }: { b: BusStats }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Bus className="size-4 text-muted-foreground" /> Live buses
+        </CardTitle>
+        <CardDescription>{formatNumber(b.liveNow ?? 0)} being shared right now</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-3 sm:grid-cols-4">
+        <MiniStat label="Live now" value={b.liveNow ?? 0} href="/admin/transport" />
+        <MiniStat label="Shares, 7 days" value={b.sharesLast7Days ?? 0} />
+        <MiniStat label="Trips shared, all time" value={b.tripsShared ?? 0} />
+        <MiniStat label="Ratings, 30 days" value={b.ratingsLast30Days ?? 0} />
       </CardContent>
     </Card>
   );
