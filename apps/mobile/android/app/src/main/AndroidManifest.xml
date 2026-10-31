@@ -50,6 +50,7 @@
                 <data android:scheme="https" android:host="varsitykotha.com" android:pathPrefix="/join/"/>
                 <data android:scheme="https" android:host="varsitykotha.com" android:pathPrefix="/c/"/>
                 <data android:scheme="https" android:host="varsitykotha.com" android:pathPrefix="/blood/"/>
+                <data android:scheme="https" android:host="varsitykotha.com" android:pathPrefix="/v/"/>
             </intent-filter>
         </activity>
         <!-- Cropping a profile photo (image_cropper / uCrop). -->

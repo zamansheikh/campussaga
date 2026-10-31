@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/di.dart';
 import '../../../profile/presentation/widgets/user_avatar.dart';
+import '../../../verification/presentation/verification_text.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
 
@@ -87,6 +89,61 @@ class _MembersPageState extends State<MembersPage> {
     }
   }
 
+  /// A CR vouches that [m] is a classmate: they become verified.
+  Future<void> _confirm(GroupMember m) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final name = m.name.isEmpty ? l10n.unnamedStudent : m.name;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: Text(l10n.confirmTitle(name)),
+        content: Text(l10n.confirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialog).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialog).pop(true),
+            child: Text(l10n.confirmAction),
+          ),
+        ],
+      ),
+    );
+    if (!(ok ?? false)) return;
+    try {
+      final done = await getIt<VerificationRepository>().confirmMember(
+        widget.groupId,
+        m.userId,
+      );
+      if (!mounted) return;
+      setState(() {
+        _members = [
+          for (final x in _members ?? <GroupMember>[])
+            x.userId == m.userId
+                ? GroupMember(
+                    userId: x.userId,
+                    name: x.name,
+                    role: x.role,
+                    isMe: x.isMe,
+                    verified: done.verified,
+                    photoVersion: x.photoVersion,
+                    googlePhotoUrl: x.googlePhotoUrl,
+                  )
+                : x,
+        ];
+      });
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.confirmedSnack(name))),
+      );
+    } on Failure catch (f) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(verificationErrorText(l10n, f, name: name))),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -124,6 +181,9 @@ class _MembersPageState extends State<MembersPage> {
                           _Action.remove,
                       ],
                       onAction: (a) => _act(m, a),
+                      onConfirm: !m.verified && !m.isMe
+                          ? () => _confirm(m)
+                          : null,
                     ),
                 ],
               ),
@@ -139,8 +199,11 @@ class _MemberRow extends StatelessWidget {
     required this.member,
     required this.actions,
     required this.onAction,
+    this.onConfirm,
   });
 
+  /// Shown for a not-verified member: the CR confirms them.
+  final VoidCallback? onConfirm;
   final GroupMember member;
   final List<_Action> actions;
   final ValueChanged<_Action> onAction;
@@ -177,6 +240,15 @@ class _MemberRow extends StatelessWidget {
               ],
             ),
           ),
+          if (onConfirm != null)
+            FilledButton.tonal(
+              onPressed: onConfirm,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, 36),
+                padding: const EdgeInsets.symmetric(horizontal: CsSpace.md),
+              ),
+              child: Text(l10n.confirmAction),
+            ),
           if (actions.isEmpty)
             const SizedBox(width: 48)
           else

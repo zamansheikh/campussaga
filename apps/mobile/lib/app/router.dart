@@ -10,11 +10,15 @@ import 'package:go_router/go_router.dart';
 import '../features/assessments/presentation/assessment_editor_page.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/email_sign_in_page.dart';
+import '../features/auth/presentation/pages/request_university_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
 import '../features/blood/presentation/pages/blood_page.dart';
 import '../features/blood/presentation/pages/blood_request_form_page.dart';
 import '../features/blood/presentation/pages/blood_request_page.dart';
+import '../features/campus_admin/presentation/pages/campus_admin_page.dart';
+import '../features/campus_admin/presentation/pages/sections_tab.dart';
+import '../features/campus_admin/presentation/pages/students_tab.dart';
 import '../features/cgpa/data/cgpa_store.dart';
 import '../features/cgpa/presentation/cgpa_cubit.dart';
 import '../features/cgpa/presentation/cgpa_page.dart';
@@ -33,6 +37,10 @@ import '../features/classes/presentation/pages/members_page.dart';
 import '../features/classes/presentation/pages/my_courses_page.dart';
 import '../features/classes/presentation/pages/slot_editor_page.dart';
 import '../features/explore/explore_page.dart';
+import '../features/feedback/presentation/pages/feedback_form_page.dart';
+import '../features/feedback/presentation/pages/feedback_thread_page.dart';
+import '../features/feedback/presentation/pages/help_feedback_page.dart';
+import '../features/feedback/presentation/pages/my_feedback_page.dart';
 import '../features/onboarding/presentation/onboarding_page.dart';
 import '../features/profile/presentation/pages/edit_profile_page.dart';
 import '../features/profile/presentation/pages/profile_setup_page.dart';
@@ -47,6 +55,8 @@ import '../features/transport/presentation/pages/bus_route_page.dart';
 import '../features/transport/presentation/pages/bus_routes_page.dart';
 import '../features/transport/presentation/pages/bus_stops_edit_page.dart';
 import '../features/transport/presentation/pages/bus_trips_edit_page.dart';
+import '../features/verification/presentation/pages/get_verified_page.dart';
+import '../features/verification/presentation/pages/vouch_page.dart';
 import '../features/voice/presentation/pages/anonymity_page.dart';
 import '../features/voice/presentation/pages/campus_page.dart';
 import '../features/voice/presentation/pages/campus_visit_pages.dart';
@@ -57,11 +67,23 @@ import 'di.dart';
 import 'settings/bloc/settings_cubit.dart';
 import 'version/version_gate_cubit.dart';
 
+/// A vouch code waiting for the student to sign in.
+abstract final class PendingVouch {
+  static String? code;
+}
+
 abstract final class Routes {
   static const splash = '/splash';
   static const welcome = '/welcome';
   static const signIn = '/sign-in';
   static const signInEmail = '/sign-in/email';
+
+  /// "Request your university" (the email's domain isn't recognized).
+  static const requestUniversity = '/sign-in/university';
+  static String requestUniversityFor(String email) => Uri(
+    path: requestUniversity,
+    queryParameters: {'email': email},
+  ).toString();
   static const setupProfile = '/setup-profile';
   static const today = '/today';
   static const routine = '/routine';
@@ -75,6 +97,25 @@ abstract final class Routes {
   static const editProfile = '/profile/edit';
   static const reminders = '/profile/reminders';
   static const verifyEmail = '/profile/verify';
+
+  /// Get verified: email, CR or classmates.
+  static const verify = '/verify';
+
+  /// A classmate's vouch link (https://varsitykotha.com/v/{code}).
+  static String vouch(String code) => '/v/$code';
+
+  /// Campus admin tools; [tab] is inbox, students, sections, bus,
+  /// reports or blood.
+  static const campusAdmin = '/campus-admin';
+  static String campusAdminTab(String tab) => '/campus-admin/$tab';
+  static String campusStudent(String id) => '/campus-admin/students/$id';
+  static String campusSection(String id) => '/campus-admin/sections/$id';
+
+  /// Help & feedback.
+  static const help = '/profile/help';
+  static const feedbackSend = '/profile/help/send';
+  static const feedbackMine = '/profile/help/mine';
+  static String feedbackThread(String id) => '/profile/help/mine/$id';
   static const groups = '/groups';
   static const joinGroup = '/groups/join';
   static String joinWith(String code) => '$joinGroup?code=$code';
@@ -181,6 +222,16 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
         // Otherwise on as usual (welcome, sign-in, profile setup); the code
         // waits and is used right after.
       }
+      // A vouch link (https://varsitykotha.com/v/xxxxxxxx): keep the code
+      // until the student is signed in and set up.
+      if (at.startsWith('/v/')) {
+        final code = state.pathParameters['code'];
+        if (code != null) PendingVouch.code = code;
+        if (status == AuthStatus.signedIn && !auth.state.needsProfileSetup) {
+          PendingVouch.code = null;
+          return null;
+        }
+      }
       if (status == AuthStatus.unknown) {
         return at == Routes.splash ? null : Routes.splash;
       }
@@ -197,6 +248,11 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
         return at == Routes.setupProfile ? null : Routes.setupProfile;
       }
       if (atSignIn || at == Routes.splash || at == Routes.setupProfile) {
+        final v = PendingVouch.code;
+        if (v != null) {
+          PendingVouch.code = null;
+          return Routes.vouch(v);
+        }
         final c = PendingInvite.take();
         return c == null ? Routes.today : Routes.joinWith(c);
       }
@@ -207,6 +263,38 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
       GoRoute(
         path: '/join/:code',
         builder: (context, state) => const SizedBox.shrink(),
+      ),
+      GoRoute(
+        path: '/v/:code',
+        builder: (context, state) =>
+            VouchPage(code: state.pathParameters['code']!),
+      ),
+      GoRoute(
+        path: Routes.verify,
+        builder: (context, state) => const GetVerifiedPage(),
+      ),
+      GoRoute(
+        path: Routes.campusAdmin,
+        redirect: (context, state) => state.uri.path == Routes.campusAdmin
+            ? Routes.campusAdminTab('inbox')
+            : null,
+        routes: [
+          GoRoute(
+            path: 'students/:id',
+            builder: (context, state) =>
+                CampusStudentPage(studentId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: 'sections/:id',
+            builder: (context, state) =>
+                SectionPage(sectionId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: ':tab',
+            builder: (context, state) =>
+                CampusAdminPage(tab: state.pathParameters['tab']!),
+          ),
+        ],
       ),
       GoRoute(
         path: Routes.splash,
@@ -223,6 +311,12 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
           GoRoute(
             path: 'email',
             builder: (context, state) => const EmailSignInPage(),
+          ),
+          GoRoute(
+            path: 'university',
+            builder: (context, state) => RequestUniversityPage(
+              email: state.uri.queryParameters['email'] ?? '',
+            ),
           ),
         ],
       ),
@@ -459,6 +553,28 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
                   GoRoute(
                     path: 'verify',
                     builder: (context, state) => const VerifyEmailPage(),
+                  ),
+                  GoRoute(
+                    path: 'help',
+                    builder: (context, state) => const HelpFeedbackPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'send',
+                        builder: (context, state) => const FeedbackFormPage(),
+                      ),
+                      GoRoute(
+                        path: 'mine',
+                        builder: (context, state) => const MyFeedbackPage(),
+                        routes: [
+                          GoRoute(
+                            path: ':id',
+                            builder: (context, state) => FeedbackThreadPage(
+                              feedbackId: state.pathParameters['id']!,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),

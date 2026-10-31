@@ -133,6 +133,8 @@ class _CampusAppState extends State<CampusApp> {
   void _onPush(PushNote note) {
     final type = '${note.data['type']}';
     if (!type.startsWith('issue_') &&
+        !type.startsWith('feedback_') &&
+        type != 'campus_verified' &&
         !type.startsWith('blood_') &&
         !type.startsWith('bus_')) {
       unawaited(_classes.refresh());
@@ -157,6 +159,29 @@ class _CampusAppState extends State<CampusApp> {
         ..addPostFrameCallback((_) {
           if (_auth.state.status == AuthStatus.signedIn) {
             unawaited(_router.push(Routes.busRoute(route)));
+          }
+        })
+        ..ensureVisualUpdate();
+      return;
+    }
+    final type = '${note.data['type']}';
+    if (type == 'campus_verified') {
+      WidgetsBinding.instance
+        ..addPostFrameCallback((_) {
+          if (_auth.state.status == AuthStatus.signedIn) {
+            _auth.add(const AuthRefreshRequested());
+            _router.go(Routes.profile);
+          }
+        })
+        ..ensureVisualUpdate();
+      return;
+    }
+    final feedback = note.data['feedbackId'];
+    if (type == 'feedback_reply' && feedback is String) {
+      WidgetsBinding.instance
+        ..addPostFrameCallback((_) {
+          if (_auth.state.status == AuthStatus.signedIn) {
+            unawaited(_router.push(Routes.feedbackThread(feedback)));
           }
         })
         ..ensureVisualUpdate();

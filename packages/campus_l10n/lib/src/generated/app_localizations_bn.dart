@@ -3862,4 +3862,644 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get busShareJoin => 'আমিও আছি';
+
+  @override
+  String get verifyGetTitle => 'ভেরিফায়েড হও';
+
+  @override
+  String get verifyBannerTitle => 'তোমার বিশ্ববিদ্যালয়ে ভেরিফায়েড হও';
+
+  @override
+  String get verifyBannerBody =>
+      'সিআর বা দুজন সহপাঠীকে বলো, অথবা বিশ্ববিদ্যালয়ের ইমেইল ব্যবহার করো।';
+
+  @override
+  String get verifyIntro => 'তোমার জন্য সহজ উপায়টা বেছে নাও।';
+
+  @override
+  String get verifyViaEmail => 'বিশ্ববিদ্যালয়ের ইমেইল ব্যবহার করো';
+
+  @override
+  String get verifyViaEmailHint => 'সেখানে একটি ৬ অঙ্কের কোড পাঠাব।';
+
+  @override
+  String get verifyAskCr => 'তোমার সিআরকে বলো';
+
+  @override
+  String get verifyAskCrHint =>
+      'গ্রুপের সদস্য তালিকা থেকে তোমার সিআর তোমাকে কনফার্ম করতে পারবে।';
+
+  @override
+  String verifyCrLine(String name, String group) {
+    return '$group-এর সিআর $name';
+  }
+
+  @override
+  String get verifyNoCr =>
+      'তুমি এখনো কোনো ক্লাস গ্রুপে নেই। আগে তোমার সেকশনের গ্রুপে যোগ দাও, তারপর সিআরকে বলো।';
+
+  @override
+  String get verifyAskClassmates => '২ জন সহপাঠীকে বলো';
+
+  @override
+  String get verifyAskClassmatesHint =>
+      'তোমার বিশ্ববিদ্যালয়ের ভেরিফায়েড সহপাঠীরা একটি লিংক দিয়ে তোমার হয়ে নিশ্চিত করতে পারবে।';
+
+  @override
+  String verifyProgress(int count, int needed) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat neededNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String neededString = neededNumberFormat.format(needed);
+
+    return '$neededString জনের মধ্যে $countString জন';
+  }
+
+  @override
+  String verifyVouchedBy(String names) {
+    return '$names নিশ্চিত করেছে';
+  }
+
+  @override
+  String get verifyShareLink => 'লিংক শেয়ার করো';
+
+  @override
+  String verifyShareText(String university, String link) {
+    return 'হাই! ভার্সিটিকথায় নিশ্চিত করো যে আমি $university-এ পড়ি: $link';
+  }
+
+  @override
+  String get verifyDoneTitle => 'তুমি এখন ভেরিফায়েড';
+
+  @override
+  String get verifiedViaEmail => 'বিশ্ববিদ্যালয়ের ইমেইল দিয়ে ভেরিফায়েড।';
+
+  @override
+  String get verifiedViaCr => 'তোমার সিআর কনফার্ম করেছে।';
+
+  @override
+  String get verifiedViaVouch => 'সহপাঠীরা নিশ্চিত করেছে।';
+
+  @override
+  String get verifiedViaCampusAdmin => 'ক্যাম্পাস অ্যাডমিন ভেরিফাই করেছে।';
+
+  @override
+  String get verifiedViaAdmin => 'ভার্সিটিকথা টিম ভেরিফাই করেছে।';
+
+  @override
+  String get vouchTitle => 'সহপাঠীর হয়ে নিশ্চিত করো';
+
+  @override
+  String vouchButton(String university) {
+    return 'আমি ওকে চিনি, ও $university-এ পড়ে';
+  }
+
+  @override
+  String get vouchCareHint => 'ওকে সত্যিই চিনলে তবেই নিশ্চিত করো।';
+
+  @override
+  String vouchProgress(int count, int needed) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat neededNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String neededString = neededNumberFormat.format(needed);
+
+    return '$neededString জনের মধ্যে $countString জন সহপাঠী নিশ্চিত করেছে';
+  }
+
+  @override
+  String get vouchAlready => 'তুমি আগেই নিশ্চিত করেছ। ধন্যবাদ!';
+
+  @override
+  String vouchThanksMore(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'ধন্যবাদ! আরও $countString জন সহপাঠী দরকার';
+  }
+
+  @override
+  String vouchNowVerified(String name) {
+    return '$name এখন ভেরিফায়েড';
+  }
+
+  @override
+  String get vouchReasonSelf =>
+      'এটা তোমার নিজের লিংক। সহপাঠীদের পাঠাও, ওরা তোমার হয়ে নিশ্চিত করবে।';
+
+  @override
+  String get vouchReasonNotVerified =>
+      'নিশ্চিত করার আগে তোমাকে নিজে ভেরিফায়েড হতে হবে। বিশ্ববিদ্যালয়ের ইমেইল ব্যবহার করো, অথবা সিআরকে বলো।';
+
+  @override
+  String get vouchReasonOther =>
+      'শুধু নিজের বিশ্ববিদ্যালয়ের শিক্ষার্থীর হয়ে নিশ্চিত করা যায়।';
+
+  @override
+  String get vouchReasonBlocked =>
+      'এখন তুমি অন্যের হয়ে নিশ্চিত করতে পারবে না। ক্যাম্পাস অ্যাডমিনকে জিজ্ঞেস করো।';
+
+  @override
+  String get vouchReasonLimit =>
+      'সম্প্রতি অনেকবার নিশ্চিত করেছ (৩০ দিনে ৫ বার)। পরে আবার চেষ্টা করো।';
+
+  @override
+  String vouchReasonAlreadyVerified(String name) {
+    return '$name আগেই ভেরিফায়েড।';
+  }
+
+  @override
+  String get vouchNotFound => 'এই লিংকটি আর কাজ করছে না।';
+
+  @override
+  String get confirmAction => 'কনফার্ম';
+
+  @override
+  String confirmTitle(String name) {
+    return '$name-কে কনফার্ম করবে?';
+  }
+
+  @override
+  String get confirmBody =>
+      'শুধু তাদেরই কনফার্ম করো, যাদের তুমি চেনো এবং যারা তোমার সেকশনের।';
+
+  @override
+  String confirmedSnack(String name) {
+    return '$name এখন ভেরিফায়েড';
+  }
+
+  @override
+  String get confirmLimit =>
+      'সম্প্রতি অনেক শিক্ষার্থীকে কনফার্ম করেছ (৩০ দিনে ৮০ জন)। পরে আবার চেষ্টা করো।';
+
+  @override
+  String get confirmNotCr => 'শুধু এই গ্রুপের সিআর কনফার্ম করতে পারে।';
+
+  @override
+  String get requestUniversityAction =>
+      'তোমার বিশ্ববিদ্যালয় যোগ করার অনুরোধ করো';
+
+  @override
+  String get requestUniversityTitle => 'বিশ্ববিদ্যালয় যোগ করার অনুরোধ';
+
+  @override
+  String get requestUniversityHint =>
+      'তোমার বিশ্ববিদ্যালয়ের নাম জানাও, আমরা এর ইমেইল যোগ করব।';
+
+  @override
+  String get requestUniversityName => 'বিশ্ববিদ্যালয়ের নাম';
+
+  @override
+  String get requestUniversityPick => 'তালিকা থেকে বেছে নাও';
+
+  @override
+  String get requestUniversitySend => 'অনুরোধ পাঠাও';
+
+  @override
+  String get requestUniversityDone => 'আমরা শিগগিরই যোগ করব';
+
+  @override
+  String get requestUniversityDoneBody =>
+      'ধন্যবাদ! ততদিন Google দিয়ে চালিয়ে যেতে পারো।';
+
+  @override
+  String get requestUniversityNeeded =>
+      'বিশ্ববিদ্যালয়ের নাম লেখো, অথবা তালিকা থেকে বেছে নাও।';
+
+  @override
+  String requestUniversityEmail(String email) {
+    return 'তোমার ইমেইল: $email';
+  }
+
+  @override
+  String campusAdminEntry(String university) {
+    return 'ক্যাম্পাস অ্যাডমিন · $university';
+  }
+
+  @override
+  String get campusAdminTitle => 'ক্যাম্পাস অ্যাডমিন';
+
+  @override
+  String get caTabInbox => 'ইনবক্স';
+
+  @override
+  String get caTabStudents => 'শিক্ষার্থী';
+
+  @override
+  String get caTabSections => 'সেকশন';
+
+  @override
+  String get caTabBusReps => 'বাস প্রতিনিধি';
+
+  @override
+  String get caTabReports => 'রিপোর্ট';
+
+  @override
+  String get caTabBlood => 'রক্ত';
+
+  @override
+  String get caNotAdmin => 'তুমি ক্যাম্পাস অ্যাডমিন নও।';
+
+  @override
+  String get caWaiting => 'ভেরিফিকেশনের অপেক্ষায়';
+
+  @override
+  String get caWaitingEmpty => 'কেউ অপেক্ষায় নেই।';
+
+  @override
+  String caWaitingMore(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString জন শিক্ষার্থী অপেক্ষায়';
+  }
+
+  @override
+  String get caNeedsAttention => 'নজর দরকার';
+
+  @override
+  String caReportsWaiting(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countStringটি রিপোর্ট অপেক্ষায়',
+      zero: 'কোনো রিপোর্ট নেই',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String caSectionsNoCr(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countStringটি সেকশনে সিআর নেই',
+      zero: 'সব সেকশনে সিআর আছে',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String caOpenBlood(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countStringটি রক্তের অনুরোধ খোলা',
+      zero: 'কোনো খোলা রক্তের অনুরোধ নেই',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get caRecent => 'সাম্প্রতিক ভেরিফিকেশন';
+
+  @override
+  String get caRecentEmpty => 'এখনো কিছু নেই।';
+
+  @override
+  String get caSearchStudents => 'শিক্ষার্থী খোঁজো';
+
+  @override
+  String get caFilterVerified => 'ভেরিফায়েড';
+
+  @override
+  String get caFilterAll => 'সবাই';
+
+  @override
+  String get caNoStudents => 'কোনো শিক্ষার্থী পাওয়া যায়নি।';
+
+  @override
+  String get caStudentTitle => 'শিক্ষার্থী';
+
+  @override
+  String get caGroups => 'গ্রুপ';
+
+  @override
+  String get caNoGroups => 'কোনো গ্রুপে নেই।';
+
+  @override
+  String get caHistory => 'ভেরিফিকেশনের ইতিহাস';
+
+  @override
+  String get caHistoryEmpty => 'এখনো কোনো ইতিহাস নেই।';
+
+  @override
+  String caVouchedBy(String name, String time) {
+    return '$name নিশ্চিত করেছে · $time';
+  }
+
+  @override
+  String caConfirmedByCr(String name, String time) {
+    return 'সিআর $name কনফার্ম করেছে · $time';
+  }
+
+  @override
+  String caVerifiedByAdmin(String name, String time) {
+    return 'ক্যাম্পাস অ্যাডমিন $name ভেরিফাই করেছে · $time';
+  }
+
+  @override
+  String caVerifiedByEmail(String time) {
+    return 'বিশ্ববিদ্যালয়ের ইমেইলে ভেরিফায়েড · $time';
+  }
+
+  @override
+  String caVerifiedByTeam(String time) {
+    return 'ভার্সিটিকথা টিম ভেরিফাই করেছে · $time';
+  }
+
+  @override
+  String caHistoryRemoved(String reason) {
+    return 'তুলে নেওয়া হয়েছে: $reason';
+  }
+
+  @override
+  String get caVouchedByList => 'যারা নিশ্চিত করেছে';
+
+  @override
+  String get caVerify => 'ভেরিফাই করো';
+
+  @override
+  String get caUnverify => 'ভেরিফিকেশন তুলে নাও';
+
+  @override
+  String get caReasonLabel => 'কারণ';
+
+  @override
+  String get caReasonRequired => 'একটি কারণ লেখো।';
+
+  @override
+  String get caUnverifyBody => 'কারণ লেখো। কারণটি ইতিহাসে থেকে যাবে।';
+
+  @override
+  String get caEmailVerifiedNote =>
+      'বিশ্ববিদ্যালয়ের ইমেইলে ভেরিফায়েড: শুধু ভার্সিটিকথা টিম এটা বদলাতে পারে।';
+
+  @override
+  String get caBlockVouching => 'নিশ্চিত করা বন্ধ করো';
+
+  @override
+  String get caUnblockVouching => 'আবার নিশ্চিত করতে দাও';
+
+  @override
+  String get caBlockBody =>
+      'ও আর অন্যের হয়ে নিশ্চিত বা কনফার্ম করতে পারবে না। কারণ লেখো।';
+
+  @override
+  String get caBlockedPill => 'নিশ্চিত করতে পারে না';
+
+  @override
+  String caVerifiedSnack(String name) {
+    return '$name এখন ভেরিফায়েড';
+  }
+
+  @override
+  String get caUnverifiedSnack => 'ভেরিফিকেশন তুলে নেওয়া হয়েছে';
+
+  @override
+  String get caBlockedSnack => 'নিশ্চিত করা বন্ধ করা হয়েছে';
+
+  @override
+  String get caUnblockedSnack => 'আবার নিশ্চিত করতে পারবে';
+
+  @override
+  String caVouchesCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countStringটি নিশ্চিতকরণ';
+  }
+
+  @override
+  String caHelpedCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString জনের জন্য নিশ্চিত বা কনফার্ম করেছে';
+  }
+
+  @override
+  String get caAskTeam => 'ভার্সিটিকথা টিমকে জানাও';
+
+  @override
+  String get caAskTeamNote => 'টিমকে কী জানাতে চাও?';
+
+  @override
+  String get caAskTeamSend => 'পাঠাও';
+
+  @override
+  String get caAskTeamSent => 'ভার্সিটিকথা টিমকে পাঠানো হয়েছে';
+
+  @override
+  String get caSectionNoCr => 'সিআর নেই';
+
+  @override
+  String get caRemoveCr => 'সিআর সরাও';
+
+  @override
+  String get caSectionCrs => 'সিআর';
+
+  @override
+  String get caSectionStudents => 'শিক্ষার্থী';
+
+  @override
+  String get caSectionHint =>
+      'সিআর বানাতে এই সেকশনের একজন ভেরিফায়েড শিক্ষার্থীকে খোঁজো।';
+
+  @override
+  String caCrMadeSnack(String name) {
+    return '$name এখন সিআর';
+  }
+
+  @override
+  String caCrRemovedSnack(String name) {
+    return '$name আবার সাধারণ সদস্য';
+  }
+
+  @override
+  String get caNoSections => 'এখনো কোনো সেকশন নেই।';
+
+  @override
+  String get caBusRepsEmpty => 'এখনো কোনো বাস প্রতিনিধি নেই।';
+
+  @override
+  String get caAddBusRep => 'বাস প্রতিনিধি যোগ করো';
+
+  @override
+  String get caRemove => 'সরাও';
+
+  @override
+  String get caReportHide => 'লুকাও';
+
+  @override
+  String get caReportRestore => 'ফিরিয়ে আনো';
+
+  @override
+  String get caReportDismiss => 'বাদ দাও';
+
+  @override
+  String get caReportsEmpty => 'কোনো রিপোর্ট করা পোস্ট নেই।';
+
+  @override
+  String get caReportPost => 'পোস্ট';
+
+  @override
+  String get caReportComment => 'মন্তব্য';
+
+  @override
+  String get caReportHidden => 'লুকানো';
+
+  @override
+  String caReportCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countStringটি রিপোর্ট';
+  }
+
+  @override
+  String get caBloodEmpty => 'কোনো খোলা রক্তের অনুরোধ নেই।';
+
+  @override
+  String get caBloodClose => 'বন্ধ করো';
+
+  @override
+  String get caBloodCloseTitle => 'অনুরোধটি বন্ধ করবে?';
+
+  @override
+  String get caBloodCloseReason => 'কারণ (ঐচ্ছিক)';
+
+  @override
+  String get caBloodClosedSnack => 'অনুরোধ বন্ধ করা হয়েছে';
+
+  @override
+  String get helpFeedback => 'সাহায্য ও মতামত';
+
+  @override
+  String get helpFeedbackHint => 'সমস্যা জানাও বা নতুন আইডিয়া দাও।';
+
+  @override
+  String get feedbackSend => 'মতামত পাঠাও';
+
+  @override
+  String get feedbackMine => 'আমার মতামত';
+
+  @override
+  String get feedbackKindBug => 'সমস্যা';
+
+  @override
+  String get feedbackKindIdea => 'আইডিয়া';
+
+  @override
+  String get feedbackKindOther => 'অন্যান্য';
+
+  @override
+  String get feedbackMessageLabel => 'তোমার বার্তা';
+
+  @override
+  String get feedbackMessageHint => 'কী হয়েছে, বা কী দেখতে চাও?';
+
+  @override
+  String feedbackTooShort(int min) {
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return 'অন্তত $minStringটি অক্ষর লেখো।';
+  }
+
+  @override
+  String feedbackScreenshots(int max) {
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return 'স্ক্রিনশট (সর্বোচ্চ $maxStringটি)';
+  }
+
+  @override
+  String get feedbackAddScreenshot => 'স্ক্রিনশট যোগ করো';
+
+  @override
+  String feedbackAttached(String info) {
+    return 'সাথে যাবে: $info';
+  }
+
+  @override
+  String get feedbackSendButton => 'পাঠাও';
+
+  @override
+  String get feedbackSentSnack => 'ধন্যবাদ! তোমার মতামত পেয়েছি।';
+
+  @override
+  String get feedbackLimit => 'আজ ১০টি পাঠিয়ে ফেলেছ। কাল আবার চেষ্টা করো।';
+
+  @override
+  String get feedbackStatusNew => 'নতুন';
+
+  @override
+  String get feedbackStatusSeen => 'দেখা হয়েছে';
+
+  @override
+  String get feedbackStatusPlanned => 'পরিকল্পনায়';
+
+  @override
+  String get feedbackStatusInProgress => 'চলছে';
+
+  @override
+  String get feedbackStatusDone => 'শেষ';
+
+  @override
+  String get feedbackStatusWontDo => 'করা হবে না';
+
+  @override
+  String get feedbackEmpty => 'তুমি এখনো কোনো মতামত পাঠাওনি';
+
+  @override
+  String get feedbackEmptyBody =>
+      'সমস্যা পেয়েছ বা আইডিয়া আছে? আমরা সবকিছু পড়ি।';
+
+  @override
+  String get feedbackTitle => 'মতামত';
+
+  @override
+  String get feedbackTeam => 'ভার্সিটিকথা টিম';
+
+  @override
+  String get feedbackYou => 'তুমি';
+
+  @override
+  String get feedbackReplyHint => 'উত্তর লেখো';
+
+  @override
+  String get feedbackReplySend => 'উত্তর পাঠাও';
+
+  @override
+  String get feedbackClosedNote => 'এটি বন্ধ, তবুও টিম তোমার উত্তর পড়বে।';
+
+  @override
+  String get feedbackNotFound => 'এই মতামতটি পাওয়া যাচ্ছে না।';
 }

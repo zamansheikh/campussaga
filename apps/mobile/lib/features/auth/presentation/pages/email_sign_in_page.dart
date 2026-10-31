@@ -3,8 +3,10 @@ import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/di.dart';
+import '../../../../app/router.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/email_sign_in_bloc.dart';
 import '../email_error_text.dart';
@@ -124,6 +126,22 @@ class _EmailStepState extends State<_EmailStep> {
               errorMaxLines: 3,
             ),
           ),
+          if (state.failure case RejectedFailure(
+            code: 'UNIVERSITY_EMAIL_REQUIRED',
+          )) ...[
+            const SizedBox(height: CsSpace.sm),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: CsPill(
+                icon: CsIcons.university,
+                label: l10n.requestUniversityAction,
+                onTap: () => context.push(
+                  Routes.requestUniversityFor(_controller.text.trim()),
+                ),
+                trailing: CsIcons.chevronRight,
+              ),
+            ),
+          ],
           const SizedBox(height: CsSpace.lg),
           FilledButton(
             onPressed: state.busy ? null : _submit,

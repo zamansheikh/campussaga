@@ -3968,4 +3968,673 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get busShareJoin => 'I\'m on it';
+
+  @override
+  String get verifyGetTitle => 'Get verified';
+
+  @override
+  String get verifyBannerTitle => 'Get verified at your university';
+
+  @override
+  String get verifyBannerBody =>
+      'Ask your CR or two classmates, or use your university email.';
+
+  @override
+  String get verifyIntro => 'Pick the way that works for you.';
+
+  @override
+  String get verifyViaEmail => 'Use your university email';
+
+  @override
+  String get verifyViaEmailHint => 'We send a 6-digit code to it.';
+
+  @override
+  String get verifyAskCr => 'Ask your CR';
+
+  @override
+  String get verifyAskCrHint =>
+      'Your CR can confirm you from the group\'s member list.';
+
+  @override
+  String verifyCrLine(String name, String group) {
+    return '$name, CR of $group';
+  }
+
+  @override
+  String get verifyNoCr =>
+      'You are not in a class group yet. Join your section first, then ask your CR.';
+
+  @override
+  String get verifyAskClassmates => 'Ask 2 classmates';
+
+  @override
+  String get verifyAskClassmatesHint =>
+      'Verified classmates from your university can vouch for you with a link.';
+
+  @override
+  String verifyProgress(int count, int needed) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat neededNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String neededString = neededNumberFormat.format(needed);
+
+    return '$countString of $neededString';
+  }
+
+  @override
+  String verifyVouchedBy(String names) {
+    return 'Vouched by $names';
+  }
+
+  @override
+  String get verifyShareLink => 'Share link';
+
+  @override
+  String verifyShareText(String university, String link) {
+    return 'Hi! Please vouch that I study at $university on VarsityKotha: $link';
+  }
+
+  @override
+  String get verifyDoneTitle => 'You\'re verified';
+
+  @override
+  String get verifiedViaEmail => 'Verified with your university email.';
+
+  @override
+  String get verifiedViaCr => 'Confirmed by your CR.';
+
+  @override
+  String get verifiedViaVouch => 'Vouched for by your classmates.';
+
+  @override
+  String get verifiedViaCampusAdmin => 'Verified by your campus admin.';
+
+  @override
+  String get verifiedViaAdmin => 'Verified by the VarsityKotha team.';
+
+  @override
+  String get vouchTitle => 'Vouch for a classmate';
+
+  @override
+  String vouchButton(String university) {
+    return 'I know them, they study at $university';
+  }
+
+  @override
+  String get vouchCareHint => 'Only vouch if you really know them.';
+
+  @override
+  String vouchProgress(int count, int needed) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat neededNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String neededString = neededNumberFormat.format(needed);
+
+    return '$countString of $neededString classmates have vouched';
+  }
+
+  @override
+  String get vouchAlready => 'You already vouched for them. Thanks!';
+
+  @override
+  String vouchThanksMore(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString more classmates needed',
+      one: '1 more classmate needed',
+    );
+    return 'Thanks! $_temp0';
+  }
+
+  @override
+  String vouchNowVerified(String name) {
+    return '$name is verified';
+  }
+
+  @override
+  String get vouchReasonSelf =>
+      'This is your own link. Share it with classmates so they can vouch for you.';
+
+  @override
+  String get vouchReasonNotVerified =>
+      'You need to be verified yourself before you can vouch. Verify with your university email, or ask your CR.';
+
+  @override
+  String get vouchReasonOther =>
+      'You can only vouch for students of your own university.';
+
+  @override
+  String get vouchReasonBlocked =>
+      'You can\'t vouch for others right now. Ask your campus admin.';
+
+  @override
+  String get vouchReasonLimit =>
+      'You\'ve vouched a lot lately (5 in 30 days). Please try again later.';
+
+  @override
+  String vouchReasonAlreadyVerified(String name) {
+    return '$name is already verified.';
+  }
+
+  @override
+  String get vouchNotFound => 'This link isn\'t valid anymore.';
+
+  @override
+  String get confirmAction => 'Confirm';
+
+  @override
+  String confirmTitle(String name) {
+    return 'Confirm $name?';
+  }
+
+  @override
+  String get confirmBody =>
+      'Only confirm classmates you know are in your section.';
+
+  @override
+  String confirmedSnack(String name) {
+    return '$name is verified now';
+  }
+
+  @override
+  String get confirmLimit =>
+      'You\'ve confirmed a lot of students lately (80 in 30 days). Please try again later.';
+
+  @override
+  String get confirmNotCr => 'Only a CR of this group can confirm students.';
+
+  @override
+  String get requestUniversityAction => 'Request your university';
+
+  @override
+  String get requestUniversityTitle => 'Request your university';
+
+  @override
+  String get requestUniversityHint =>
+      'Tell us your university and we\'ll add its email.';
+
+  @override
+  String get requestUniversityName => 'University name';
+
+  @override
+  String get requestUniversityPick => 'Pick from the list';
+
+  @override
+  String get requestUniversitySend => 'Send request';
+
+  @override
+  String get requestUniversityDone => 'We\'ll add it soon';
+
+  @override
+  String get requestUniversityDoneBody =>
+      'Thanks! Until then you can continue with Google.';
+
+  @override
+  String get requestUniversityNeeded =>
+      'Type your university\'s name, or pick it from the list.';
+
+  @override
+  String requestUniversityEmail(String email) {
+    return 'Your email: $email';
+  }
+
+  @override
+  String campusAdminEntry(String university) {
+    return 'Campus admin · $university';
+  }
+
+  @override
+  String get campusAdminTitle => 'Campus admin';
+
+  @override
+  String get caTabInbox => 'Inbox';
+
+  @override
+  String get caTabStudents => 'Students';
+
+  @override
+  String get caTabSections => 'Sections';
+
+  @override
+  String get caTabBusReps => 'Bus reps';
+
+  @override
+  String get caTabReports => 'Reports';
+
+  @override
+  String get caTabBlood => 'Blood';
+
+  @override
+  String get caNotAdmin => 'You\'re not a campus admin.';
+
+  @override
+  String get caWaiting => 'Waiting for verification';
+
+  @override
+  String get caWaitingEmpty => 'No one is waiting.';
+
+  @override
+  String caWaitingMore(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString students waiting',
+      one: '1 student waiting',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get caNeedsAttention => 'Needs attention';
+
+  @override
+  String caReportsWaiting(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString reports waiting',
+      one: '1 report waiting',
+      zero: 'No reports',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String caSectionsNoCr(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString sections without a CR',
+      one: '1 section without a CR',
+      zero: 'Every section has a CR',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String caOpenBlood(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString open blood requests',
+      one: '1 open blood request',
+      zero: 'No open blood requests',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get caRecent => 'Recent verifications';
+
+  @override
+  String get caRecentEmpty => 'Nothing yet.';
+
+  @override
+  String get caSearchStudents => 'Search students';
+
+  @override
+  String get caFilterVerified => 'Verified';
+
+  @override
+  String get caFilterAll => 'All';
+
+  @override
+  String get caNoStudents => 'No students found.';
+
+  @override
+  String get caStudentTitle => 'Student';
+
+  @override
+  String get caGroups => 'Groups';
+
+  @override
+  String get caNoGroups => 'Not in any group.';
+
+  @override
+  String get caHistory => 'Verification history';
+
+  @override
+  String get caHistoryEmpty => 'No history yet.';
+
+  @override
+  String caVouchedBy(String name, String time) {
+    return 'Vouched by $name · $time';
+  }
+
+  @override
+  String caConfirmedByCr(String name, String time) {
+    return 'Confirmed by CR $name · $time';
+  }
+
+  @override
+  String caVerifiedByAdmin(String name, String time) {
+    return 'Verified by campus admin $name · $time';
+  }
+
+  @override
+  String caVerifiedByEmail(String time) {
+    return 'Verified by university email · $time';
+  }
+
+  @override
+  String caVerifiedByTeam(String time) {
+    return 'Verified by the VarsityKotha team · $time';
+  }
+
+  @override
+  String caHistoryRemoved(String reason) {
+    return 'Removed: $reason';
+  }
+
+  @override
+  String get caVouchedByList => 'Vouched by';
+
+  @override
+  String get caVerify => 'Verify';
+
+  @override
+  String get caUnverify => 'Remove verification';
+
+  @override
+  String get caReasonLabel => 'Reason';
+
+  @override
+  String get caReasonRequired => 'Write a reason.';
+
+  @override
+  String get caUnverifyBody => 'Say why. The reason stays in the history.';
+
+  @override
+  String get caEmailVerifiedNote =>
+      'Verified by university email: only the VarsityKotha team can change this.';
+
+  @override
+  String get caBlockVouching => 'Block vouching';
+
+  @override
+  String get caUnblockVouching => 'Allow vouching again';
+
+  @override
+  String get caBlockBody =>
+      'They won\'t be able to vouch for or confirm others. Say why.';
+
+  @override
+  String get caBlockedPill => 'Can\'t vouch';
+
+  @override
+  String caVerifiedSnack(String name) {
+    return '$name is verified';
+  }
+
+  @override
+  String get caUnverifiedSnack => 'Verification removed';
+
+  @override
+  String get caBlockedSnack => 'Vouching blocked';
+
+  @override
+  String get caUnblockedSnack => 'Vouching allowed again';
+
+  @override
+  String caVouchesCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString vouches',
+      one: '1 vouch',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String caHelpedCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Vouched or confirmed for $countString';
+  }
+
+  @override
+  String get caAskTeam => 'Ask the VarsityKotha team';
+
+  @override
+  String get caAskTeamNote => 'What should the team know?';
+
+  @override
+  String get caAskTeamSend => 'Send';
+
+  @override
+  String get caAskTeamSent => 'Sent to the VarsityKotha team';
+
+  @override
+  String get caSectionNoCr => 'No CR';
+
+  @override
+  String get caRemoveCr => 'Remove CR';
+
+  @override
+  String get caSectionCrs => 'CRs';
+
+  @override
+  String get caSectionStudents => 'Students';
+
+  @override
+  String get caSectionHint =>
+      'Search for a verified student of this section to make them CR.';
+
+  @override
+  String caCrMadeSnack(String name) {
+    return '$name is CR now';
+  }
+
+  @override
+  String caCrRemovedSnack(String name) {
+    return '$name is a member again';
+  }
+
+  @override
+  String get caNoSections => 'No sections yet.';
+
+  @override
+  String get caBusRepsEmpty => 'No bus reps yet.';
+
+  @override
+  String get caAddBusRep => 'Add bus rep';
+
+  @override
+  String get caRemove => 'Remove';
+
+  @override
+  String get caReportHide => 'Hide';
+
+  @override
+  String get caReportRestore => 'Restore';
+
+  @override
+  String get caReportDismiss => 'Dismiss';
+
+  @override
+  String get caReportsEmpty => 'No reported posts.';
+
+  @override
+  String get caReportPost => 'Post';
+
+  @override
+  String get caReportComment => 'Comment';
+
+  @override
+  String get caReportHidden => 'Hidden';
+
+  @override
+  String caReportCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString reports',
+      one: '1 report',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get caBloodEmpty => 'No open blood requests.';
+
+  @override
+  String get caBloodClose => 'Close';
+
+  @override
+  String get caBloodCloseTitle => 'Close this request?';
+
+  @override
+  String get caBloodCloseReason => 'Reason (optional)';
+
+  @override
+  String get caBloodClosedSnack => 'Request closed';
+
+  @override
+  String get helpFeedback => 'Help & feedback';
+
+  @override
+  String get helpFeedbackHint => 'Report a bug or share an idea.';
+
+  @override
+  String get feedbackSend => 'Send feedback';
+
+  @override
+  String get feedbackMine => 'My feedback';
+
+  @override
+  String get feedbackKindBug => 'Bug';
+
+  @override
+  String get feedbackKindIdea => 'Idea';
+
+  @override
+  String get feedbackKindOther => 'Other';
+
+  @override
+  String get feedbackMessageLabel => 'Your message';
+
+  @override
+  String get feedbackMessageHint =>
+      'What happened, or what would you like to see?';
+
+  @override
+  String feedbackTooShort(int min) {
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return 'Write at least $minString characters.';
+  }
+
+  @override
+  String feedbackScreenshots(int max) {
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return 'Screenshots (up to $maxString)';
+  }
+
+  @override
+  String get feedbackAddScreenshot => 'Add screenshot';
+
+  @override
+  String feedbackAttached(String info) {
+    return 'Sent with it: $info';
+  }
+
+  @override
+  String get feedbackSendButton => 'Send';
+
+  @override
+  String get feedbackSentSnack => 'Thanks! We got your feedback.';
+
+  @override
+  String get feedbackLimit =>
+      'You\'ve sent 10 today. Please try again tomorrow.';
+
+  @override
+  String get feedbackStatusNew => 'New';
+
+  @override
+  String get feedbackStatusSeen => 'Seen';
+
+  @override
+  String get feedbackStatusPlanned => 'Planned';
+
+  @override
+  String get feedbackStatusInProgress => 'In progress';
+
+  @override
+  String get feedbackStatusDone => 'Done';
+
+  @override
+  String get feedbackStatusWontDo => 'Won\'t do';
+
+  @override
+  String get feedbackEmpty => 'You haven\'t sent any feedback yet';
+
+  @override
+  String get feedbackEmptyBody =>
+      'Found a bug or have an idea? We read everything.';
+
+  @override
+  String get feedbackTitle => 'Feedback';
+
+  @override
+  String get feedbackTeam => 'VarsityKotha team';
+
+  @override
+  String get feedbackYou => 'You';
+
+  @override
+  String get feedbackReplyHint => 'Write a reply';
+
+  @override
+  String get feedbackReplySend => 'Send reply';
+
+  @override
+  String get feedbackClosedNote =>
+      'This one is closed, but the team still reads your reply.';
+
+  @override
+  String get feedbackNotFound => 'This feedback isn\'t available.';
 }

@@ -156,6 +156,7 @@ class UserProfile {
     this.universityEmail,
     this.photoVersion,
     this.googlePhotoUrl,
+    this.campusAdmin = false,
   });
 
   factory UserProfile.fromJson(Map<String, Object?> json) => UserProfile(
@@ -173,6 +174,7 @@ class UserProfile {
     universityEmail: json['universityEmail'] as String?,
     photoVersion: json['photoVersion'] as String?,
     googlePhotoUrl: json['googlePhotoUrl'] as String?,
+    campusAdmin: json['campusAdmin'] as bool? ?? false,
   );
 
   final String id;
@@ -200,6 +202,9 @@ class UserProfile {
   /// no uploaded photo.
   final String? googlePhotoUrl;
 
+  /// Appointed to run their own university in the app (campus admin).
+  final bool campusAdmin;
+
   /// As [UserProfile.fromJson] reads it (kept on the phone for offline use).
   Map<String, Object?> toJson() => {
     'id': id,
@@ -213,6 +218,7 @@ class UserProfile {
     'universityEmail': universityEmail,
     'photoVersion': photoVersion,
     'googlePhotoUrl': googlePhotoUrl,
+    'campusAdmin': campusAdmin,
   };
 
   /// Name, department and batch are all filled in.

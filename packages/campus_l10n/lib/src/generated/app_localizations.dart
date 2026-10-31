@@ -6415,6 +6415,972 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I\'m on it'**
   String get busShareJoin;
+
+  /// No description provided for @verifyGetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get verified'**
+  String get verifyGetTitle;
+
+  /// No description provided for @verifyBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get verified at your university'**
+  String get verifyBannerTitle;
+
+  /// No description provided for @verifyBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask your CR or two classmates, or use your university email.'**
+  String get verifyBannerBody;
+
+  /// No description provided for @verifyIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the way that works for you.'**
+  String get verifyIntro;
+
+  /// No description provided for @verifyViaEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your university email'**
+  String get verifyViaEmail;
+
+  /// No description provided for @verifyViaEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'We send a 6-digit code to it.'**
+  String get verifyViaEmailHint;
+
+  /// No description provided for @verifyAskCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask your CR'**
+  String get verifyAskCr;
+
+  /// No description provided for @verifyAskCrHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your CR can confirm you from the group\'s member list.'**
+  String get verifyAskCrHint;
+
+  /// No description provided for @verifyCrLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, CR of {group}'**
+  String verifyCrLine(String name, String group);
+
+  /// No description provided for @verifyNoCr.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not in a class group yet. Join your section first, then ask your CR.'**
+  String get verifyNoCr;
+
+  /// No description provided for @verifyAskClassmates.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask 2 classmates'**
+  String get verifyAskClassmates;
+
+  /// No description provided for @verifyAskClassmatesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified classmates from your university can vouch for you with a link.'**
+  String get verifyAskClassmatesHint;
+
+  /// No description provided for @verifyProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {needed}'**
+  String verifyProgress(int count, int needed);
+
+  /// No description provided for @verifyVouchedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Vouched by {names}'**
+  String verifyVouchedBy(String names);
+
+  /// No description provided for @verifyShareLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Share link'**
+  String get verifyShareLink;
+
+  /// No description provided for @verifyShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi! Please vouch that I study at {university} on VarsityKotha: {link}'**
+  String verifyShareText(String university, String link);
+
+  /// No description provided for @verifyDoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re verified'**
+  String get verifyDoneTitle;
+
+  /// No description provided for @verifiedViaEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified with your university email.'**
+  String get verifiedViaEmail;
+
+  /// No description provided for @verifiedViaCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed by your CR.'**
+  String get verifiedViaCr;
+
+  /// No description provided for @verifiedViaVouch.
+  ///
+  /// In en, this message translates to:
+  /// **'Vouched for by your classmates.'**
+  String get verifiedViaVouch;
+
+  /// No description provided for @verifiedViaCampusAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified by your campus admin.'**
+  String get verifiedViaCampusAdmin;
+
+  /// No description provided for @verifiedViaAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified by the VarsityKotha team.'**
+  String get verifiedViaAdmin;
+
+  /// No description provided for @vouchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vouch for a classmate'**
+  String get vouchTitle;
+
+  /// No description provided for @vouchButton.
+  ///
+  /// In en, this message translates to:
+  /// **'I know them, they study at {university}'**
+  String vouchButton(String university);
+
+  /// No description provided for @vouchCareHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Only vouch if you really know them.'**
+  String get vouchCareHint;
+
+  /// No description provided for @vouchProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {needed} classmates have vouched'**
+  String vouchProgress(int count, int needed);
+
+  /// No description provided for @vouchAlready.
+  ///
+  /// In en, this message translates to:
+  /// **'You already vouched for them. Thanks!'**
+  String get vouchAlready;
+
+  /// No description provided for @vouchThanksMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks! {count, plural, =1{1 more classmate needed} other{{count} more classmates needed}}'**
+  String vouchThanksMore(int count);
+
+  /// No description provided for @vouchNowVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is verified'**
+  String vouchNowVerified(String name);
+
+  /// No description provided for @vouchReasonSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'This is your own link. Share it with classmates so they can vouch for you.'**
+  String get vouchReasonSelf;
+
+  /// No description provided for @vouchReasonNotVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to be verified yourself before you can vouch. Verify with your university email, or ask your CR.'**
+  String get vouchReasonNotVerified;
+
+  /// No description provided for @vouchReasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'You can only vouch for students of your own university.'**
+  String get vouchReasonOther;
+
+  /// No description provided for @vouchReasonBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'You can\'t vouch for others right now. Ask your campus admin.'**
+  String get vouchReasonBlocked;
+
+  /// No description provided for @vouchReasonLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve vouched a lot lately (5 in 30 days). Please try again later.'**
+  String get vouchReasonLimit;
+
+  /// No description provided for @vouchReasonAlreadyVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is already verified.'**
+  String vouchReasonAlreadyVerified(String name);
+
+  /// No description provided for @vouchNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This link isn\'t valid anymore.'**
+  String get vouchNotFound;
+
+  /// No description provided for @confirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmAction;
+
+  /// No description provided for @confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm {name}?'**
+  String confirmTitle(String name);
+
+  /// No description provided for @confirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Only confirm classmates you know are in your section.'**
+  String get confirmBody;
+
+  /// No description provided for @confirmedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is verified now'**
+  String confirmedSnack(String name);
+
+  /// No description provided for @confirmLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve confirmed a lot of students lately (80 in 30 days). Please try again later.'**
+  String get confirmLimit;
+
+  /// No description provided for @confirmNotCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Only a CR of this group can confirm students.'**
+  String get confirmNotCr;
+
+  /// No description provided for @requestUniversityAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Request your university'**
+  String get requestUniversityAction;
+
+  /// No description provided for @requestUniversityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request your university'**
+  String get requestUniversityTitle;
+
+  /// No description provided for @requestUniversityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us your university and we\'ll add its email.'**
+  String get requestUniversityHint;
+
+  /// No description provided for @requestUniversityName.
+  ///
+  /// In en, this message translates to:
+  /// **'University name'**
+  String get requestUniversityName;
+
+  /// No description provided for @requestUniversityPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from the list'**
+  String get requestUniversityPick;
+
+  /// No description provided for @requestUniversitySend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send request'**
+  String get requestUniversitySend;
+
+  /// No description provided for @requestUniversityDone.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll add it soon'**
+  String get requestUniversityDone;
+
+  /// No description provided for @requestUniversityDoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks! Until then you can continue with Google.'**
+  String get requestUniversityDoneBody;
+
+  /// No description provided for @requestUniversityNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Type your university\'s name, or pick it from the list.'**
+  String get requestUniversityNeeded;
+
+  /// No description provided for @requestUniversityEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Your email: {email}'**
+  String requestUniversityEmail(String email);
+
+  /// No description provided for @campusAdminEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus admin · {university}'**
+  String campusAdminEntry(String university);
+
+  /// No description provided for @campusAdminTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus admin'**
+  String get campusAdminTitle;
+
+  /// No description provided for @caTabInbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox'**
+  String get caTabInbox;
+
+  /// No description provided for @caTabStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'Students'**
+  String get caTabStudents;
+
+  /// No description provided for @caTabSections.
+  ///
+  /// In en, this message translates to:
+  /// **'Sections'**
+  String get caTabSections;
+
+  /// No description provided for @caTabBusReps.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus reps'**
+  String get caTabBusReps;
+
+  /// No description provided for @caTabReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get caTabReports;
+
+  /// No description provided for @caTabBlood.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood'**
+  String get caTabBlood;
+
+  /// No description provided for @caNotAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re not a campus admin.'**
+  String get caNotAdmin;
+
+  /// No description provided for @caWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for verification'**
+  String get caWaiting;
+
+  /// No description provided for @caWaitingEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No one is waiting.'**
+  String get caWaitingEmpty;
+
+  /// No description provided for @caWaitingMore.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 student waiting} other{{count} students waiting}}'**
+  String caWaitingMore(int count);
+
+  /// No description provided for @caNeedsAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get caNeedsAttention;
+
+  /// No description provided for @caReportsWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No reports} =1{1 report waiting} other{{count} reports waiting}}'**
+  String caReportsWaiting(int count);
+
+  /// No description provided for @caSectionsNoCr.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Every section has a CR} =1{1 section without a CR} other{{count} sections without a CR}}'**
+  String caSectionsNoCr(int count);
+
+  /// No description provided for @caOpenBlood.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No open blood requests} =1{1 open blood request} other{{count} open blood requests}}'**
+  String caOpenBlood(int count);
+
+  /// No description provided for @caRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent verifications'**
+  String get caRecent;
+
+  /// No description provided for @caRecentEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing yet.'**
+  String get caRecentEmpty;
+
+  /// No description provided for @caSearchStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'Search students'**
+  String get caSearchStudents;
+
+  /// No description provided for @caFilterVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get caFilterVerified;
+
+  /// No description provided for @caFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get caFilterAll;
+
+  /// No description provided for @caNoStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'No students found.'**
+  String get caNoStudents;
+
+  /// No description provided for @caStudentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Student'**
+  String get caStudentTitle;
+
+  /// No description provided for @caGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get caGroups;
+
+  /// No description provided for @caNoGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in any group.'**
+  String get caNoGroups;
+
+  /// No description provided for @caHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification history'**
+  String get caHistory;
+
+  /// No description provided for @caHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No history yet.'**
+  String get caHistoryEmpty;
+
+  /// No description provided for @caVouchedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Vouched by {name} · {time}'**
+  String caVouchedBy(String name, String time);
+
+  /// No description provided for @caConfirmedByCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed by CR {name} · {time}'**
+  String caConfirmedByCr(String name, String time);
+
+  /// No description provided for @caVerifiedByAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified by campus admin {name} · {time}'**
+  String caVerifiedByAdmin(String name, String time);
+
+  /// No description provided for @caVerifiedByEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified by university email · {time}'**
+  String caVerifiedByEmail(String time);
+
+  /// No description provided for @caVerifiedByTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified by the VarsityKotha team · {time}'**
+  String caVerifiedByTeam(String time);
+
+  /// No description provided for @caHistoryRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed: {reason}'**
+  String caHistoryRemoved(String reason);
+
+  /// No description provided for @caVouchedByList.
+  ///
+  /// In en, this message translates to:
+  /// **'Vouched by'**
+  String get caVouchedByList;
+
+  /// No description provided for @caVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get caVerify;
+
+  /// No description provided for @caUnverify.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove verification'**
+  String get caUnverify;
+
+  /// No description provided for @caReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get caReasonLabel;
+
+  /// No description provided for @caReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a reason.'**
+  String get caReasonRequired;
+
+  /// No description provided for @caUnverifyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Say why. The reason stays in the history.'**
+  String get caUnverifyBody;
+
+  /// No description provided for @caEmailVerifiedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified by university email: only the VarsityKotha team can change this.'**
+  String get caEmailVerifiedNote;
+
+  /// No description provided for @caBlockVouching.
+  ///
+  /// In en, this message translates to:
+  /// **'Block vouching'**
+  String get caBlockVouching;
+
+  /// No description provided for @caUnblockVouching.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow vouching again'**
+  String get caUnblockVouching;
+
+  /// No description provided for @caBlockBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They won\'t be able to vouch for or confirm others. Say why.'**
+  String get caBlockBody;
+
+  /// No description provided for @caBlockedPill.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t vouch'**
+  String get caBlockedPill;
+
+  /// No description provided for @caVerifiedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is verified'**
+  String caVerifiedSnack(String name);
+
+  /// No description provided for @caUnverifiedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification removed'**
+  String get caUnverifiedSnack;
+
+  /// No description provided for @caBlockedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Vouching blocked'**
+  String get caBlockedSnack;
+
+  /// No description provided for @caUnblockedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Vouching allowed again'**
+  String get caUnblockedSnack;
+
+  /// No description provided for @caVouchesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 vouch} other{{count} vouches}}'**
+  String caVouchesCount(int count);
+
+  /// No description provided for @caHelpedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Vouched or confirmed for {count}'**
+  String caHelpedCount(int count);
+
+  /// No description provided for @caAskTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the VarsityKotha team'**
+  String get caAskTeam;
+
+  /// No description provided for @caAskTeamNote.
+  ///
+  /// In en, this message translates to:
+  /// **'What should the team know?'**
+  String get caAskTeamNote;
+
+  /// No description provided for @caAskTeamSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get caAskTeamSend;
+
+  /// No description provided for @caAskTeamSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to the VarsityKotha team'**
+  String get caAskTeamSent;
+
+  /// No description provided for @caSectionNoCr.
+  ///
+  /// In en, this message translates to:
+  /// **'No CR'**
+  String get caSectionNoCr;
+
+  /// No description provided for @caRemoveCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove CR'**
+  String get caRemoveCr;
+
+  /// No description provided for @caSectionCrs.
+  ///
+  /// In en, this message translates to:
+  /// **'CRs'**
+  String get caSectionCrs;
+
+  /// No description provided for @caSectionStudents.
+  ///
+  /// In en, this message translates to:
+  /// **'Students'**
+  String get caSectionStudents;
+
+  /// No description provided for @caSectionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a verified student of this section to make them CR.'**
+  String get caSectionHint;
+
+  /// No description provided for @caCrMadeSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is CR now'**
+  String caCrMadeSnack(String name);
+
+  /// No description provided for @caCrRemovedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is a member again'**
+  String caCrRemovedSnack(String name);
+
+  /// No description provided for @caNoSections.
+  ///
+  /// In en, this message translates to:
+  /// **'No sections yet.'**
+  String get caNoSections;
+
+  /// No description provided for @caBusRepsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No bus reps yet.'**
+  String get caBusRepsEmpty;
+
+  /// No description provided for @caAddBusRep.
+  ///
+  /// In en, this message translates to:
+  /// **'Add bus rep'**
+  String get caAddBusRep;
+
+  /// No description provided for @caRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get caRemove;
+
+  /// No description provided for @caReportHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get caReportHide;
+
+  /// No description provided for @caReportRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get caReportRestore;
+
+  /// No description provided for @caReportDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get caReportDismiss;
+
+  /// No description provided for @caReportsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No reported posts.'**
+  String get caReportsEmpty;
+
+  /// No description provided for @caReportPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get caReportPost;
+
+  /// No description provided for @caReportComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get caReportComment;
+
+  /// No description provided for @caReportHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden'**
+  String get caReportHidden;
+
+  /// No description provided for @caReportCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 report} other{{count} reports}}'**
+  String caReportCount(int count);
+
+  /// No description provided for @caBloodEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No open blood requests.'**
+  String get caBloodEmpty;
+
+  /// No description provided for @caBloodClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get caBloodClose;
+
+  /// No description provided for @caBloodCloseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Close this request?'**
+  String get caBloodCloseTitle;
+
+  /// No description provided for @caBloodCloseReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason (optional)'**
+  String get caBloodCloseReason;
+
+  /// No description provided for @caBloodClosedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Request closed'**
+  String get caBloodClosedSnack;
+
+  /// No description provided for @helpFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & feedback'**
+  String get helpFeedback;
+
+  /// No description provided for @helpFeedbackHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a bug or share an idea.'**
+  String get helpFeedbackHint;
+
+  /// No description provided for @feedbackSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send feedback'**
+  String get feedbackSend;
+
+  /// No description provided for @feedbackMine.
+  ///
+  /// In en, this message translates to:
+  /// **'My feedback'**
+  String get feedbackMine;
+
+  /// No description provided for @feedbackKindBug.
+  ///
+  /// In en, this message translates to:
+  /// **'Bug'**
+  String get feedbackKindBug;
+
+  /// No description provided for @feedbackKindIdea.
+  ///
+  /// In en, this message translates to:
+  /// **'Idea'**
+  String get feedbackKindIdea;
+
+  /// No description provided for @feedbackKindOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get feedbackKindOther;
+
+  /// No description provided for @feedbackMessageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your message'**
+  String get feedbackMessageLabel;
+
+  /// No description provided for @feedbackMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened, or what would you like to see?'**
+  String get feedbackMessageHint;
+
+  /// No description provided for @feedbackTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Write at least {min} characters.'**
+  String feedbackTooShort(int min);
+
+  /// No description provided for @feedbackScreenshots.
+  ///
+  /// In en, this message translates to:
+  /// **'Screenshots (up to {max})'**
+  String feedbackScreenshots(int max);
+
+  /// No description provided for @feedbackAddScreenshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Add screenshot'**
+  String get feedbackAddScreenshot;
+
+  /// No description provided for @feedbackAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent with it: {info}'**
+  String feedbackAttached(String info);
+
+  /// No description provided for @feedbackSendButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get feedbackSendButton;
+
+  /// No description provided for @feedbackSentSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks! We got your feedback.'**
+  String get feedbackSentSnack;
+
+  /// No description provided for @feedbackLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve sent 10 today. Please try again tomorrow.'**
+  String get feedbackLimit;
+
+  /// No description provided for @feedbackStatusNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get feedbackStatusNew;
+
+  /// No description provided for @feedbackStatusSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen'**
+  String get feedbackStatusSeen;
+
+  /// No description provided for @feedbackStatusPlanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get feedbackStatusPlanned;
+
+  /// No description provided for @feedbackStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get feedbackStatusInProgress;
+
+  /// No description provided for @feedbackStatusDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get feedbackStatusDone;
+
+  /// No description provided for @feedbackStatusWontDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Won\'t do'**
+  String get feedbackStatusWontDo;
+
+  /// No description provided for @feedbackEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t sent any feedback yet'**
+  String get feedbackEmpty;
+
+  /// No description provided for @feedbackEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Found a bug or have an idea? We read everything.'**
+  String get feedbackEmptyBody;
+
+  /// No description provided for @feedbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback'**
+  String get feedbackTitle;
+
+  /// No description provided for @feedbackTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'VarsityKotha team'**
+  String get feedbackTeam;
+
+  /// No description provided for @feedbackYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get feedbackYou;
+
+  /// No description provided for @feedbackReplyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a reply'**
+  String get feedbackReplyHint;
+
+  /// No description provided for @feedbackReplySend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reply'**
+  String get feedbackReplySend;
+
+  /// No description provided for @feedbackClosedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This one is closed, but the team still reads your reply.'**
+  String get feedbackClosedNote;
+
+  /// No description provided for @feedbackNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This feedback isn\'t available.'**
+  String get feedbackNotFound;
 }
 
 class _AppLocalizationsDelegate

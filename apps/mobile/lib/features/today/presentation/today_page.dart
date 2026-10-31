@@ -23,6 +23,7 @@ import '../../classes/presentation/widgets/class_tile.dart';
 import '../../profile/presentation/widgets/user_avatar.dart';
 import '../../reminders/presentation/bloc/reminders_cubit.dart';
 import '../../reminders/presentation/reminder_prompt.dart';
+import '../../verification/presentation/widgets/verify_banner.dart';
 
 /// Home screen: the next class with a countdown, then the rest of today.
 /// Before the student joins a class group it explains how that works.
@@ -75,6 +76,7 @@ class _TodayPageState extends State<TodayPage> {
               _Greeting(now: now),
               const SizedBox(height: CsSpace.lg),
               // Blood needed for the donor's group (eligible donors only).
+              const VerifyBanner(),
               if (blood) const BloodNeededCard(),
               if (classes.failure is NetworkFailure && classes.hasGroups) ...[
                 const _OfflineNotice(),

@@ -7,6 +7,7 @@ import '../features/announcements/data/seen_store.dart';
 import '../features/auth/data/google_auth.dart';
 import '../features/auth/data/profile_cache.dart';
 import '../features/classes/data/routine_cache.dart';
+import '../features/feedback/data/device_details.dart';
 import '../features/push/push_messaging.dart';
 import '../features/reminders/data/phone_info.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
@@ -79,6 +80,16 @@ Future<void> configureDependencies({
     ..registerLazySingleton<BloodRepository>(
       () => ApiBloodRepository(getIt<ApiClient>()),
     )
+    ..registerLazySingleton<VerificationRepository>(
+      () => ApiVerificationRepository(getIt<ApiClient>()),
+    )
+    ..registerLazySingleton<CampusAdminRepository>(
+      () => ApiCampusAdminRepository(getIt<ApiClient>()),
+    )
+    ..registerLazySingleton<FeedbackRepository>(
+      () => ApiFeedbackRepository(getIt<ApiClient>()),
+    )
+    ..registerLazySingleton<DeviceDetailsSource>(PlatformDeviceDetails.new)
     ..registerLazySingleton<PhotoPicker>(ImagePickerPhotoPicker.new);
   registerTransport();
 }

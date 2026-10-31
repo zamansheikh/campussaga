@@ -15,6 +15,7 @@ import '../../../app/version/version_gate_cubit.dart';
 import '../../auth/presentation/auth_error_text.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../reminders/presentation/bloc/reminders_cubit.dart';
+import '../../verification/presentation/widgets/verify_banner.dart';
 import 'widgets/university_picker.dart';
 import 'widgets/user_avatar.dart';
 
@@ -55,6 +56,30 @@ class ProfilePage extends StatelessWidget {
           children: [
             const _ProfileHeader(),
             const SizedBox(height: CsSpace.lg),
+            const VerifyBanner(),
+            if (context.select((AuthBloc b) => b.state.user?.campusAdmin) ??
+                false) ...[
+              CsSection(
+                children: [
+                  CsRow(
+                    icon: CsIcons.safety,
+                    title: l10n.campusAdminEntry(
+                      context
+                              .read<AuthBloc>()
+                              .state
+                              .user
+                              ?.university
+                              ?.localName(
+                                Localizations.localeOf(context).languageCode,
+                              ) ??
+                          '',
+                    ),
+                    onTap: () => context.push(Routes.campusAdmin),
+                  ),
+                ],
+              ),
+              const SizedBox(height: CsSpace.lg),
+            ],
             if (context.select(
               (VersionGateCubit g) => g.state.feature('campusVoice'),
             )) ...[
@@ -125,10 +150,10 @@ class ProfilePage extends StatelessWidget {
               title: l10n.about,
               children: [
                 CsRow(
-                  icon: CsIcons.comment,
-                  title: l10n.sendFeedback,
-                  subtitle: l10n.sendFeedbackHint,
-                  onTap: () => _sendFeedback(context),
+                  icon: CsIcons.info,
+                  title: l10n.helpFeedback,
+                  subtitle: l10n.helpFeedbackHint,
+                  onTap: () => context.push(Routes.help),
                 ),
                 CsRow(
                   icon: CsIcons.privacy,
@@ -153,30 +178,6 @@ class ProfilePage extends StatelessWidget {
             const _Footer(),
           ],
         ),
-      ),
-    );
-  }
-
-  /// Opens an email to us with what helps answer: version and phone.
-  Future<void> _sendFeedback(BuildContext context) async {
-    final l10n = AppLocalizations.of(context);
-    final version = getIt.isRegistered<AppVersion>()
-        ? getIt<AppVersion>()
-        : null;
-    final body = [
-      '',
-      '',
-      '---',
-      '${l10n.appName} ${version?.version ?? ''} (${version?.build ?? ''})',
-      '${Theme.of(context).platform.name} · ${Localizations.localeOf(context).languageCode}',
-    ].join('\n');
-    await launchUrl(
-      Uri(
-        scheme: 'mailto',
-        path: Env.supportEmail,
-        query:
-            'subject=${Uri.encodeComponent('${l10n.appName}: ${l10n.sendFeedback}')}'
-            '&body=${Uri.encodeComponent(body)}',
       ),
     );
   }

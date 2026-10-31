@@ -14,6 +14,7 @@ import 'package:varsitykotha/features/announcements/data/seen_store.dart';
 import 'package:varsitykotha/features/auth/data/google_auth.dart';
 import 'package:varsitykotha/features/auth/data/profile_cache.dart';
 import 'package:varsitykotha/features/classes/data/routine_cache.dart';
+import 'package:varsitykotha/features/feedback/data/device_details.dart';
 import 'package:varsitykotha/features/push/push_messaging.dart';
 import 'package:varsitykotha/features/reminders/data/phone_info.dart';
 import 'package:varsitykotha/features/reminders/data/reminder_scheduler.dart';
@@ -22,6 +23,7 @@ import 'package:varsitykotha/features/voice/data/photo_picker.dart';
 import 'package:varsitykotha/features/voice/data/voice_cache.dart';
 
 import '../blood_fakes.dart';
+import '../campus_fakes.dart';
 import '../voice_fakes.dart';
 
 const testUser = UserProfile(
@@ -363,6 +365,9 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   VoiceCache? voiceCache,
   PhotoPicker? photos,
   BloodRepository? blood,
+  FakeVerificationRepository? verification,
+  FakeCampusAdminRepository? campusAdmin,
+  FakeFeedbackRepository? feedback,
   int build = 1,
 }) async {
   await getIt.reset();
@@ -398,7 +403,17 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
     ..registerSingleton<VoiceRepository>(voice ?? FakeVoiceRepository())
     ..registerSingleton<VoiceCache>(voiceCache ?? MemoryVoiceCache())
     ..registerSingleton<PhotoPicker>(photos ?? FakePhotoPicker())
-    ..registerSingleton<BloodRepository>(blood ?? FakeBloodRepository());
+    ..registerSingleton<BloodRepository>(blood ?? FakeBloodRepository())
+    ..registerSingleton<VerificationRepository>(
+      verification ?? FakeVerificationRepository(),
+    )
+    ..registerSingleton<CampusAdminRepository>(
+      campusAdmin ?? FakeCampusAdminRepository(),
+    )
+    ..registerSingleton<FeedbackRepository>(
+      feedback ?? FakeFeedbackRepository(),
+    )
+    ..registerSingleton<DeviceDetailsSource>(MemoryDeviceDetails());
   return (repo, google);
 }
 
