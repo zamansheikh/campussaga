@@ -316,6 +316,133 @@ enum CampaignStatus {
   );
 }
 
+/// A campaign's point values (`scoring`). A 0 turns that way off.
+class CampaignScoring {
+  const CampaignScoring({
+    this.invite = 10,
+    this.otherCampus = 5,
+    this.pioneer = 5,
+    this.friendSection = 3,
+    this.joinSection = 2,
+    this.bloodDonor = 3,
+    this.busShare = 2,
+    this.busShareDays = 10,
+    this.sectionSetup = 15,
+    this.sectionSetupMax = 2,
+    this.pioneerFirst = 20,
+  });
+
+  /// Missing keys (or an older server) take the defaults.
+  factory CampaignScoring.fromJson(Map<String, Object?>? json) {
+    const d = CampaignScoring();
+    int v(String k, int def) => (json?[k] as num?)?.toInt() ?? def;
+    return CampaignScoring(
+      invite: v('invite', d.invite),
+      otherCampus: v('otherCampus', d.otherCampus),
+      pioneer: v('pioneer', d.pioneer),
+      friendSection: v('friendSection', d.friendSection),
+      joinSection: v('joinSection', d.joinSection),
+      bloodDonor: v('bloodDonor', d.bloodDonor),
+      busShare: v('busShare', d.busShare),
+      busShareDays: v('busShareDays', d.busShareDays),
+      sectionSetup: v('sectionSetup', d.sectionSetup),
+      sectionSetupMax: v('sectionSetupMax', d.sectionSetupMax),
+      pioneerFirst: v('pioneerFirst', d.pioneerFirst),
+    );
+  }
+
+  final int invite;
+  final int otherCampus;
+  final int pioneer;
+  final int friendSection;
+  final int joinSection;
+  final int bloodDonor;
+  final int busShare;
+  final int busShareDays;
+  final int sectionSetup;
+  final int sectionSetupMax;
+  final int pioneerFirst;
+}
+
+/// How a mission's points come: per friend, once, per day, per section.
+enum MissionPer {
+  friend,
+  once,
+  day,
+  section;
+
+  static MissionPer parse(Object? v) => MissionPer.values.firstWhere(
+    (p) => p.name == v,
+    orElse: () => MissionPer.once,
+  );
+}
+
+/// One way to earn points, with my progress (`missions` on a campaign).
+class CampaignMission {
+  const CampaignMission({
+    required this.key,
+    required this.points,
+    required this.per,
+    this.count = 0,
+    this.max,
+    this.earned = 0,
+  });
+
+  factory CampaignMission.fromJson(Map<String, Object?> json) =>
+      CampaignMission(
+        key: json['key'] as String? ?? '',
+        points: _int(json['points']),
+        per: MissionPer.parse(json['per']),
+        count: _int(json['count']),
+        max: (json['max'] as num?)?.toInt(),
+        earned: _int(json['earned']),
+      );
+
+  /// invite, otherCampus, pioneer, friendSection, joinSection, bloodDonor,
+  /// busShare, sectionSetup.
+  final String key;
+  final int points;
+  final MissionPer per;
+
+  /// Times counted: friends, days, sections; 0 or 1 for a once.
+  final int count;
+
+  /// The limit; null: no limit (friends).
+  final int? max;
+  final int earned;
+
+  /// A once mission done, or a limited one used up.
+  bool get done => max != null && count >= max!;
+}
+
+/// My CR section that doesn't count yet, and how far it is (`section`).
+class CampaignSectionProgress {
+  const CampaignSectionProgress({
+    required this.groupId,
+    required this.name,
+    this.slots = 0,
+    this.members = 0,
+  });
+
+  factory CampaignSectionProgress.fromJson(Map<String, Object?> json) =>
+      CampaignSectionProgress(
+        groupId: json['groupId'] as String? ?? '',
+        name: json['name'] as String? ?? '',
+        slots: _int(json['slots']),
+        members: _int(json['members']),
+      );
+
+  final String groupId;
+  final String name;
+
+  /// Classes in the weekly routine, and verified members besides me; each
+  /// needs [need].
+  final int slots;
+  final int members;
+
+  static const need = 5;
+}
+
 /// A prize campaign (`GET /campaigns`, `GET /campaigns/{id}`). Text is in
 /// the student's language.
 class Campaign {
@@ -333,6 +460,9 @@ class Campaign {
     this.rulesUrl = '',
     this.won,
     this.bannerUrl,
+    this.scoring = const CampaignScoring(),
+    this.missions = const [],
+    this.section,
   });
 
   factory Campaign.fromJson(Map<String, Object?> json) => Campaign(
@@ -354,6 +484,14 @@ class Campaign {
         ? null
         : CampaignWin.fromJson(_map(json['iWon'])!),
     bannerUrl: json['bannerUrl'] as String?,
+    scoring: CampaignScoring.fromJson(_map(json['scoring'])),
+    missions: [
+      for (final m in (json['missions'] as List<Object?>?) ?? const [])
+        CampaignMission.fromJson(m! as Map<String, Object?>),
+    ],
+    section: _map(json['section']) == null
+        ? null
+        : CampaignSectionProgress.fromJson(_map(json['section'])!),
   );
 
   final String id;
@@ -364,9 +502,11 @@ class Campaign {
   final DateTime? endsAt;
   final DateTime? settlesAt;
   final List<CampaignPrize> prizes;
+
+  /// My points.
   final int myScore;
 
-  /// Null when not ranked (no qualified invites yet, or not taking part).
+  /// Null when not ranked (no points yet, or not taking part).
   final int? myRank;
   final String rulesUrl;
 
@@ -376,6 +516,15 @@ class Campaign {
   /// The team's banner photo, a path under the API base
   /// ("/campaigns/{id}/banner?v=…"); null: the app draws its own.
   final String? bannerUrl;
+
+  /// The point values.
+  final CampaignScoring scoring;
+
+  /// Ways to earn, with my progress (`GET /campaigns/{id}` only).
+  final List<CampaignMission> missions;
+
+  /// My CR section that doesn't count yet (detail only).
+  final CampaignSectionProgress? section;
 
   /// Running at [now].
   bool isLive(DateTime now) =>
@@ -405,6 +554,9 @@ class Campaign {
     rulesUrl: rulesUrl,
     won: won ?? this.won,
     bannerUrl: bannerUrl,
+    scoring: scoring,
+    missions: missions,
+    section: section,
   );
 }
 

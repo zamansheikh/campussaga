@@ -104,11 +104,19 @@ void main() {
           const PendingFriend(name: 'Rafi', verified: true, activeDays: 2),
           const PendingFriend(name: 'Mim', activeDays: 0),
         ],
+        recent: ['Tania Islam', 'Sami Khan'],
       );
+      growth.campaignList = [sampleCampaign(now: now)];
       await start(tester);
       await openProfileTab(tester);
       expect(find.text('INVITE FRIENDS'), findsOneWidget);
       expect(find.text('Invited 12 · 8 joined'), findsOneWidget);
+      expect(find.text('TI'), findsOneWidget, reason: 'faces of who joined');
+      expect(find.text('17 more friends for Silver Connector'), findsOneWidget);
+      expect(
+        find.text('+10 points a friend · +5 more from another university'),
+        findsOneWidget,
+      );
       expect(find.text('Rafi · verified · 2 of 3 days'), findsOneWidget);
       expect(find.text('Mim · not verified yet · 0 of 3 days'), findsOneWidget);
 
@@ -391,7 +399,7 @@ void main() {
       expect(find.text('Invite and win'), findsOneWidget);
       expect(find.text('Top prize: A phone'), findsOneWidget);
       expect(find.text('LIVE · 5d 3h left'), findsOneWidget);
-      expect(find.text('Rank 12 · 4 invites'), findsOneWidget);
+      expect(find.text('Rank 12 · 4 points'), findsOneWidget);
       await tester.tap(find.widgetWithText(FilledButton, 'Invite friends'));
       await tester.pumpAndSettle();
       expect(shared.single, contains('/r/abcd1234'));
@@ -416,7 +424,7 @@ void main() {
       await start(tester);
       expect(find.text('LIVE · 2h 10m left'), findsOneWidget);
       expect(
-        find.text('Not ranked yet · invite friends to climb'),
+        find.text('Not ranked yet · earn points to climb'),
         findsOneWidget,
       );
     });
@@ -473,7 +481,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.text('9 invites'), findsOneWidget);
+      expect(find.text('9 points'), findsOneWidget);
       expect(find.text('Rafi'), findsOneWidget, reason: 'my row, pinned');
       expect(
         find.text(
@@ -499,6 +507,89 @@ void main() {
       expect(growth.scopesAsked.last, LeaderboardScope.university);
       expect(find.text('Tania'), findsOneWidget);
       expect(find.text('Mim Akter'), findsNothing);
+    });
+
+    testWidgets('ways to earn: rules, my progress, the CR section, share', (
+      tester,
+    ) async {
+      growth.campaignList = [
+        sampleCampaign(
+          now: now,
+          score: 42,
+          missions: const [
+            CampaignMission(
+              key: 'invite',
+              points: 10,
+              per: MissionPer.friend,
+              count: 3,
+              earned: 30,
+            ),
+            CampaignMission(
+              key: 'otherCampus',
+              points: 5,
+              per: MissionPer.friend,
+              count: 1,
+              earned: 5,
+            ),
+            CampaignMission(
+              key: 'joinSection',
+              points: 2,
+              per: MissionPer.once,
+              count: 1,
+              max: 1,
+              earned: 2,
+            ),
+            CampaignMission(
+              key: 'bloodDonor',
+              points: 3,
+              per: MissionPer.once,
+              max: 1,
+            ),
+            CampaignMission(
+              key: 'busShare',
+              points: 2,
+              per: MissionPer.day,
+              count: 2,
+              max: 10,
+              earned: 4,
+            ),
+            CampaignMission(
+              key: 'sectionSetup',
+              points: 15,
+              per: MissionPer.section,
+              max: 2,
+            ),
+          ],
+          section: const CampaignSectionProgress(
+            groupId: 'g-cse',
+            name: 'CSE 40 A',
+            slots: 3,
+            members: 7,
+          ),
+        ),
+      ];
+      await start(tester);
+      expect(find.text('Next: Become a blood donor · +3'), findsOneWidget);
+      await open(tester, Routes.campaign('c1'));
+
+      expect(find.text('WAYS TO EARN POINTS'), findsOneWidget);
+      expect(find.text('42 points'), findsOneWidget);
+      expect(find.text('+10 for each friend who joins'), findsOneWidget);
+      expect(find.text('3 friends · +35'), findsOneWidget);
+      expect(find.text('+5 other university'), findsOneWidget);
+      expect(find.text('A friend from another university'), findsNothing);
+      expect(find.text('Done · +2'), findsOneWidget);
+      expect(find.text('+3, once'), findsOneWidget);
+      expect(
+        find.text('+2 a day when someone watches · up to 10 days'),
+        findsOneWidget,
+      );
+      expect(find.text('2/10 days · +4'), findsOneWidget);
+      expect(find.text('CSE 40 A: 3/5 classes · 5/5 members'), findsOneWidget);
+
+      await scrollAndTap(tester, find.text('Invite a friend'));
+      await tester.pumpAndSettle();
+      expect(shared.single, contains('/r/abcd1234'));
     });
 
     testWidgets('winner: the claim form checks the fields, then sends', (

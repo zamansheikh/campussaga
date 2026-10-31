@@ -4807,7 +4807,7 @@ class AppLocalizationsBn extends AppLocalizations {
   }
 
   @override
-  String get campaignNoRank => 'এখনো র‍্যাংক নেই · বন্ধুদের ডেকে এগিয়ে যাও';
+  String get campaignNoRank => 'এখনো র‍্যাংক নেই · পয়েন্ট পেয়ে এগিয়ে যাও';
 
   @override
   String campaignScore(int count) {
@@ -4815,7 +4815,7 @@ class AppLocalizationsBn extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String countString = countNumberFormat.format(count);
 
-    return '$countStringটি আমন্ত্রণ';
+    return '$countString পয়েন্ট';
   }
 
   @override
@@ -4966,4 +4966,224 @@ class AppLocalizationsBn extends AppLocalizations {
 
     return 'অর্জিত · $countString';
   }
+
+  @override
+  String get campaignWaysTitle => 'পয়েন্ট পাওয়ার উপায়';
+
+  @override
+  String get missionInvite => 'বন্ধুকে ডাকো';
+
+  @override
+  String missionInviteRule(int points) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return 'যোগ দেওয়া প্রতি বন্ধুর জন্য +$pointsString';
+  }
+
+  @override
+  String get missionOtherCampus => 'অন্য বিশ্ববিদ্যালয়ের বন্ধু';
+
+  @override
+  String missionExtraRule(int points) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return 'প্রতিজনে আরও +$pointsString';
+  }
+
+  @override
+  String get missionPioneer => 'নতুন ক্যাম্পাস খোলো';
+
+  @override
+  String missionPioneerRule(int points, int first) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+    final intl.NumberFormat firstNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String firstString = firstNumberFormat.format(first);
+
+    return 'বন্ধু তার বিশ্ববিদ্যালয়ের প্রথম $firstString জনের মধ্যে হলে আরও +$pointsString';
+  }
+
+  @override
+  String get missionFriendSection => 'বন্ধু তার সেকশনে যোগ দিলে';
+
+  @override
+  String get missionJoinSection => 'তোমার সেকশনে যোগ দাও';
+
+  @override
+  String missionOnceRule(int points) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return 'একবার +$pointsString';
+  }
+
+  @override
+  String get missionBloodDonor => 'রক্তদাতা হও';
+
+  @override
+  String get missionBusShare => 'বাস লাইভ শেয়ার করো';
+
+  @override
+  String missionBusShareRule(int points, int days) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return 'কেউ দেখলে দিনে +$pointsString · সর্বোচ্চ $daysString দিন';
+  }
+
+  @override
+  String get missionSectionSetup => 'সিআর হিসেবে সেকশন সাজাও';
+
+  @override
+  String missionSectionSetupRule(int points, int max) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return '৫+ ক্লাস আর ৫+ ভেরিফায়েড সদস্য · প্রতিটিতে +$pointsString, সর্বোচ্চ $maxStringটি';
+  }
+
+  @override
+  String missionFriends(int count, int points) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return '$countString জন · +$pointsString';
+  }
+
+  @override
+  String missionDays(int count, int max, int points) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return '$countString/$maxString দিন · +$pointsString';
+  }
+
+  @override
+  String missionSections(int count, int max, int points) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return '$countString/$maxString সেকশন · +$pointsString';
+  }
+
+  @override
+  String missionDone(int points) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return 'হয়েছে · +$pointsString';
+  }
+
+  @override
+  String missionSectionProgress(String name, int slots, int members) {
+    final intl.NumberFormat slotsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String slotsString = slotsNumberFormat.format(slots);
+    final intl.NumberFormat membersNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String membersString = membersNumberFormat.format(members);
+
+    return '$name: $slotsString/৫ ক্লাস · $membersString/৫ সদস্য';
+  }
+
+  @override
+  String campaignNext(String mission, int points) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return 'পরের ধাপ: $mission · +$pointsString';
+  }
+
+  @override
+  String invitePointsHint(int points, int extra) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+    final intl.NumberFormat extraNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String extraString = extraNumberFormat.format(extra);
+
+    return 'প্রতি বন্ধুতে +$pointsString পয়েন্ট · অন্য বিশ্ববিদ্যালয়ের হলে আরও +$extraString';
+  }
+
+  @override
+  String inviteNextTier(int count, String tier) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'আর $countString জন হলে $tier কানেক্টর';
+  }
+
+  @override
+  String get inviteJoinedNone => 'এখনো কোনো বন্ধু যোগ দেয়নি';
+
+  @override
+  String missionBonusOtherCampus(int points) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return 'অন্য বিশ্ববিদ্যালয় +$pointsString';
+  }
+
+  @override
+  String missionBonusPioneer(int points) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return 'নতুন ক্যাম্পাস +$pointsString';
+  }
+
+  @override
+  String missionBonusSection(int points) {
+    final intl.NumberFormat pointsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pointsString = pointsNumberFormat.format(points);
+
+    return 'সেকশনে যোগ দিলে +$pointsString';
+  }
+
+  @override
+  String get missionInviteBonuses => 'প্রতি বন্ধুতে বাড়তি:';
 }

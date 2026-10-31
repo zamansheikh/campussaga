@@ -7829,13 +7829,13 @@ abstract class AppLocalizations {
   /// No description provided for @campaignNoRank.
   ///
   /// In en, this message translates to:
-  /// **'Not ranked yet · invite friends to climb'**
+  /// **'Not ranked yet · earn points to climb'**
   String get campaignNoRank;
 
   /// No description provided for @campaignScore.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 invite} other{{count} invites}}'**
+  /// **'{count, plural, =1{1 point} other{{count} points}}'**
   String campaignScore(int count);
 
   /// No description provided for @campaignPrizes.
@@ -8023,6 +8023,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Earned · {count}'**
   String badgesEarnedTitle(int count);
+
+  /// No description provided for @campaignWaysTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ways to earn points'**
+  String get campaignWaysTitle;
+
+  /// No description provided for @missionInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite a friend'**
+  String get missionInvite;
+
+  /// No description provided for @missionInviteRule.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points} for each friend who joins'**
+  String missionInviteRule(int points);
+
+  /// No description provided for @missionOtherCampus.
+  ///
+  /// In en, this message translates to:
+  /// **'A friend from another university'**
+  String get missionOtherCampus;
+
+  /// No description provided for @missionExtraRule.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points} extra for each'**
+  String missionExtraRule(int points);
+
+  /// No description provided for @missionPioneer.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a new campus'**
+  String get missionPioneer;
+
+  /// No description provided for @missionPioneerRule.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points} extra if they\'re among the first {first} at their university'**
+  String missionPioneerRule(int points, int first);
+
+  /// No description provided for @missionFriendSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Your friend joins their section'**
+  String get missionFriendSection;
+
+  /// No description provided for @missionJoinSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Join your section'**
+  String get missionJoinSection;
+
+  /// No description provided for @missionOnceRule.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points}, once'**
+  String missionOnceRule(int points);
+
+  /// No description provided for @missionBloodDonor.
+  ///
+  /// In en, this message translates to:
+  /// **'Become a blood donor'**
+  String get missionBloodDonor;
+
+  /// No description provided for @missionBusShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your bus live'**
+  String get missionBusShare;
+
+  /// No description provided for @missionBusShareRule.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points} a day when someone watches · up to {days} days'**
+  String missionBusShareRule(int points, int days);
+
+  /// No description provided for @missionSectionSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up your section as CR'**
+  String get missionSectionSetup;
+
+  /// No description provided for @missionSectionSetupRule.
+  ///
+  /// In en, this message translates to:
+  /// **'5+ classes and 5+ verified members · +{points} each, up to {max}'**
+  String missionSectionSetupRule(int points, int max);
+
+  /// No description provided for @missionFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 friend} other{{count} friends}} · +{points}'**
+  String missionFriends(int count, int points);
+
+  /// No description provided for @missionDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}/{max} days · +{points}'**
+  String missionDays(int count, int max, int points);
+
+  /// No description provided for @missionSections.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}/{max} sections · +{points}'**
+  String missionSections(int count, int max, int points);
+
+  /// No description provided for @missionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done · +{points}'**
+  String missionDone(int points);
+
+  /// No description provided for @missionSectionProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {slots}/5 classes · {members}/5 members'**
+  String missionSectionProgress(String name, int slots, int members);
+
+  /// No description provided for @campaignNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {mission} · +{points}'**
+  String campaignNext(String mission, int points);
+
+  /// No description provided for @invitePointsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points} points a friend · +{extra} more from another university'**
+  String invitePointsHint(int points, int extra);
+
+  /// No description provided for @inviteNextTier.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 more friend} other{{count} more friends}} for {tier} Connector'**
+  String inviteNextTier(int count, String tier);
+
+  /// No description provided for @inviteJoinedNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No friends joined yet'**
+  String get inviteJoinedNone;
+
+  /// No description provided for @missionBonusOtherCampus.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points} other university'**
+  String missionBonusOtherCampus(int points);
+
+  /// No description provided for @missionBonusPioneer.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points} new campus'**
+  String missionBonusPioneer(int points);
+
+  /// No description provided for @missionBonusSection.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points} joins a section'**
+  String missionBonusSection(int points);
+
+  /// No description provided for @missionInviteBonuses.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra for each friend:'**
+  String get missionInviteBonuses;
 }
 
 class _AppLocalizationsDelegate

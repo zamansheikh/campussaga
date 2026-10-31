@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../app/clock.dart';
 import '../../../../app/di.dart';
 import '../../../../app/env.dart';
 import '../../../../app/router.dart';
 import '../growth_text.dart';
 import '../widgets/campaign_banner.dart';
+import '../widgets/missions_section.dart';
 import '../widgets/prize_claim_card.dart';
 
 /// One prize campaign: prizes, the leaderboard (Bangladesh or my
@@ -192,6 +194,8 @@ class _CampaignPageState extends State<CampaignPage> {
           const SizedBox(height: CsSpace.lg),
           PrizeClaimCard(campaignId: c.id, win: win),
         ],
+        const SizedBox(height: CsSpace.lg),
+        MissionsSection(campaign: c, live: c.isLive(appNow())),
         if (c.prizes.isNotEmpty) ...[
           const SizedBox(height: CsSpace.lg),
           CsSection(
@@ -262,19 +266,6 @@ class _CampaignPageState extends State<CampaignPage> {
               ],
             ),
           ),
-        const SizedBox(height: CsSpace.lg),
-        CsSection(
-          title: l10n.campaignHowTitle,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(CsSpace.md),
-              child: Text(
-                l10n.inviteCountsRule,
-                style: context.text.bodyMedium,
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }

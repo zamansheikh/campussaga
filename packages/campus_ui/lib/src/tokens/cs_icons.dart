@@ -32,6 +32,7 @@ abstract final class CsIcons {
   static const IconData changeDay = PhosphorIconsRegular.calendarPlus;
   static const IconData changeStatus = PhosphorIconsRegular.arrowsClockwise;
   static const IconData checkCircle = PhosphorIconsFill.checkCircle;
+  static const IconData check = PhosphorIconsBold.check;
   static const IconData chevronRight = PhosphorIconsRegular.caretRight;
   static const IconData circle = PhosphorIconsRegular.circle;
   static const IconData clear = PhosphorIconsFill.xCircle;

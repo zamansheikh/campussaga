@@ -117,6 +117,8 @@ Campaign sampleCampaign({
   int? rank = 12,
   int score = 4,
   CampaignWin? won,
+  List<CampaignMission> missions = const [],
+  CampaignSectionProgress? section,
 }) => Campaign(
   id: 'c1',
   title: 'Invite and win',
@@ -132,4 +134,6 @@ Campaign sampleCampaign({
   myScore: score,
   myRank: rank,
   won: won,
+  missions: missions,
+  section: section,
 );
