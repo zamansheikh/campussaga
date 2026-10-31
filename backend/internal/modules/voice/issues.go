@@ -76,8 +76,19 @@ func (s *Service) handleFeed(ctx context.Context, in *feedReq) (*Page[IssueCard]
 		return nil, err
 	}
 	uni := v.uni
-	if in.UniversityID != "" && v.isMod() {
-		uni = uuid.MustParse(in.UniversityID)
+	visitor := false
+	if in.UniversityID != "" {
+		target := uuid.MustParse(in.UniversityID)
+		switch {
+		case v.isMod():
+			uni = target
+		case !v.isStaff() && target != v.uni:
+			// A student looking at another university (docs/CAMPUS_VISITS.md §3.2).
+			if !v.visitOn {
+				return nil, ErrFeatureDisabled
+			}
+			uni, visitor = target, true
+		}
 	}
 	if uni == uuid.Nil {
 		return nil, ErrUniversityRequired
@@ -94,6 +105,13 @@ func (s *Service) handleFeed(ctx context.Context, in *feedReq) (*Page[IssueCard]
 	search := strings.TrimSpace(in.Q)
 	out := &Page[IssueCard]{Items: []IssueCard{}}
 	now := s.now()
+	if visitor {
+		// Issues never leave their university; the rest is public posts only.
+		kinds = slices.DeleteFunc(slices.Clone(kinds), func(k string) bool { return k == "issue" })
+		if len(kinds) == 0 || in.Sort == "solved" || in.Private == "true" {
+			return out, nil
+		}
+	}
 	var rows []store.GetIssueRow
 	switch in.Sort {
 	case "new":
@@ -102,7 +120,7 @@ func (s *Service) handleFeed(ctx context.Context, in *feedReq) (*Page[IssueCard]
 			return nil, err
 		}
 		rs, err := q.FeedNew(ctx, store.FeedNewParams{Viewer: v.id, UniversityID: uni, Private: private,
-			Kinds: kinds, Category: in.Category, Q: search, QLike: like(search), BeforeAt: at, BeforeID: id, Lim: feedPageSize})
+			Kinds: kinds, Visitor: visitor, Category: in.Category, Q: search, QLike: like(search), BeforeAt: at, BeforeID: id, Lim: feedPageSize})
 		if err != nil {
 			return nil, err
 		}
@@ -142,7 +160,7 @@ func (s *Service) handleFeed(ctx context.Context, in *feedReq) (*Page[IssueCard]
 		}
 		rs, err := q.FeedTrending(ctx, store.FeedTrendingParams{Viewer: v.id,
 			NowEpoch: float64(now.UnixNano()) / 1e9, UniversityID: uni, Private: private,
-			Since: now.Add(-trendingDays * 24 * time.Hour), Kinds: kinds, Category: in.Category, Q: search, QLike: like(search),
+			Since: now.Add(-trendingDays * 24 * time.Hour), Kinds: kinds, Visitor: visitor, Category: in.Category, Q: search, QLike: like(search),
 			Off: int32(off), Lim: feedPageSize})
 		if err != nil {
 			return nil, err
@@ -277,6 +295,10 @@ func (s *Service) ownIssue(ctx context.Context, q *store.Queries, v viewer, id u
 		return store.Issue{}, err
 	}
 	if !mine {
+		// A visitor who can read the post is told it is read-only.
+		if _, err := s.getIssueWrite(ctx, q, v, id); err != nil {
+			return store.Issue{}, err
+		}
 		return store.Issue{}, ErrIssueNotFound
 	}
 	return q.LockIssue(ctx, id)
@@ -322,7 +344,7 @@ func (s *Service) follow(ctx context.Context, in *issueReq, on bool) (*followRes
 		return nil, err
 	}
 	id := uuid.MustParse(in.ID)
-	if _, err := s.getIssue(ctx, q, v, id); err != nil {
+	if _, err := s.getIssueWrite(ctx, q, v, id); err != nil {
 		return nil, err
 	}
 	if on {

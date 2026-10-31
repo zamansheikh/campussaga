@@ -85,6 +85,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 
 	tokens := auth.NewTokens(cfg.JWTSecret, cfg.AccessTTL, now)
 	uniSvc := universities.NewService(d)
+	uniSvc.SetClock(now)
 	toAccounts := func(u *universities.Summary) *accounts.University {
 		if u == nil {
 			return nil

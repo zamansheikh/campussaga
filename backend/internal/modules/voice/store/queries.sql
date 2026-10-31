@@ -7,6 +7,10 @@
 SELECT coalesce((value->>'campusVoice')::bool, false)::bool AS enabled
 FROM app_config WHERE key = 'features';
 
+-- name: VisitCampusOn :one
+SELECT coalesce((value->>'visitCampus')::bool, false)::bool AS enabled
+FROM app_config WHERE key = 'features';
+
 -- name: Staff :one
 SELECT kind, university_id, title FROM staff WHERE user_id = @user_id;
 
@@ -30,7 +34,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
@@ -54,7 +58,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
@@ -70,6 +74,7 @@ FROM issues i
 LEFT JOIN users u ON u.id = i.named_author_id
 WHERE i.university_id = @university_id AND i.visibility = 'visible' AND i.private = @private
   AND i.kind = ANY(@kinds::text[])
+  AND (NOT @visitor::bool OR (NOT i.campus_only AND i.kind <> 'issue'))
   AND (@category::text = '' OR i.category = @category)
   AND (@q::text = '' OR i.title ILIKE @q_like OR i.body ILIKE @q_like)
   AND (sqlc.narg(before_at)::timestamptz IS NULL OR (i.created_at, i.id) < (sqlc.narg(before_at)::timestamptz, sqlc.narg(before_id)::uuid))
@@ -84,7 +89,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
@@ -117,7 +122,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
@@ -138,6 +143,7 @@ CROSS JOIN LATERAL (
 ) t
 WHERE i.university_id = @university_id AND i.visibility = 'visible' AND i.private = @private
   AND i.kind = ANY(@kinds::text[])
+  AND (NOT @visitor::bool OR (NOT i.campus_only AND i.kind <> 'issue'))
   AND i.status NOT IN ('solved', 'rejected') AND i.created_at > @since
   AND (@category::text = '' OR i.category = @category)
   AND (@q::text = '' OR i.title ILIKE @q_like OR i.body ILIKE @q_like)
@@ -152,7 +158,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
@@ -180,7 +186,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = @viewer), '')::text AS my_reaction,
@@ -229,9 +235,9 @@ SELECT user_id FROM issue_authors WHERE issue_id = @issue_id;
 
 -- name: CreateIssue :one
 INSERT INTO issues (university_id, kind, category, private, title, body, location_label, visibility,
-                    hold_reason, named, named_author_id, poll_closes_at, created_at, status_changed_at)
+                    hold_reason, named, named_author_id, poll_closes_at, campus_only, created_at, status_changed_at)
 VALUES (@university_id, @kind, @category, @private, @title, @body, @location_label, @visibility,
-        @hold_reason, @named, sqlc.narg(named_author_id), sqlc.narg(poll_closes_at), @now, @now)
+        @hold_reason, @named, sqlc.narg(named_author_id), sqlc.narg(poll_closes_at), @campus_only, @now, @now)
 RETURNING id;
 
 -- name: InsertIssueAuthor :exec

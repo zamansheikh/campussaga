@@ -5,6 +5,7 @@ package universities
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -15,14 +16,20 @@ import (
 
 // Service is the universities module.
 type Service struct {
-	d *db.DB
+	d   *db.DB
+	now func() time.Time
 }
 
-func NewService(d *db.DB) *Service { return &Service{d: d} }
+func NewService(d *db.DB) *Service { return &Service{d: d, now: time.Now} }
+
+// SetClock replaces the clock (the app's fake time in tests).
+func (s *Service) SetClock(now func() time.Time) { s.now = now }
 
 // Routes mounts the module's endpoints.
 func (s *Service) Routes(r *httpx.Router) {
 	r.Public().Get("/universities", httpx.Handle(s.list))
+	r.Student().Get("/campuses", httpx.Handle(s.listCampuses))
+	r.Student().Get("/campuses/{slug}", httpx.Handle(s.getCampus))
 }
 
 // View is a university as the app sees it. The domain list is public so the

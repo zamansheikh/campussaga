@@ -43,10 +43,14 @@ type IssueCard struct {
 	Reactions  map[string]int `json:"reactions"`
 	MyReaction *string        `json:"myReaction"`
 	Poll       *Poll          `json:"poll"`
+	// CampusOnly: the author kept it inside their university.
+	CampusOnly bool `json:"campusOnly"`
+	// Visitor: the caller is visiting another university.
+	Visitor bool `json:"visitor"`
 }
 
 // Poll: option votes are nil (hidden) until the caller has voted, unless it
-// is the caller's own poll or it is closed. Counts only, never who.
+// is the caller's own poll, it is closed or the caller is a visitor. Counts only, never who.
 type Poll struct {
 	Options    []PollOption `json:"options"`
 	TotalVotes int          `json:"totalVotes"`
@@ -181,6 +185,10 @@ func cardView(v viewer, r store.GetIssueRow, now time.Time) IssueCard {
 	if r.Mine || v.isMod() {
 		c.Visibility = r.Visibility
 	}
+	c.CampusOnly = r.CampusOnly
+	if isVisitor(v, r) {
+		c.Visitor, c.Mine, c.Following = true, false, false
+	}
 	if r.Kind == "poll" && r.PollClosesAt != nil {
 		c.Poll = pollView(v, r, now)
 	}
@@ -195,7 +203,7 @@ func pollView(v viewer, r store.GetIssueRow, now time.Time) *Poll {
 	if id, err := uuid.Parse(r.PollMyVote); err == nil {
 		p.MyVote = &id
 	}
-	show := p.MyVote != nil || r.Mine || p.Closed || v.isMod()
+	show := p.MyVote != nil || r.Mine || p.Closed || v.isMod() || isVisitor(v, r)
 	for _, o := range rows {
 		p.TotalVotes += o.Votes
 		opt := PollOption{ID: o.ID, Label: o.Label}
@@ -220,6 +228,9 @@ func (s *Service) issueView(v viewer, r store.GetIssueRow, timeline []TimelineEn
 	}
 	if v.isMod() {
 		out.ReportCount = int(r.ReportCount)
+	}
+	if isVisitor(v, r) {
+		return out // can: all false
 	}
 	removed := r.Visibility == "removed"
 	isIssue := r.Kind == "issue"

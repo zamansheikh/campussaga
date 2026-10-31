@@ -79,7 +79,7 @@ func (s *Service) handleComment(ctx context.Context, in *commentInput) (*Comment
 			return err
 		}
 		issueID := uuid.MustParse(in.ID)
-		r, err := s.getIssue(ctx, q, v, issueID)
+		r, err := s.getIssueWrite(ctx, q, v, issueID)
 		if err != nil {
 			return err
 		}
@@ -260,7 +260,7 @@ func (s *Service) likeComment(ctx context.Context, in *commentReq, on bool) (*li
 		if err != nil {
 			return err
 		}
-		r, err := s.getIssue(ctx, q, v, uuid.MustParse(in.ID))
+		r, err := s.getIssueWrite(ctx, q, v, uuid.MustParse(in.ID))
 		if err != nil {
 			return err
 		}

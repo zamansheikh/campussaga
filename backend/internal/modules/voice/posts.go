@@ -29,6 +29,8 @@ type IssueInput struct {
 	ImageIDs      []string `json:"imageIds" validate:"max=4,dive,uuid"`
 	PollOptions   []string `json:"pollOptions"`
 	PollDays      int      `json:"pollDays"`
+	// CampusOnly keeps a post, question or poll inside the university (ignored for issues).
+	CampusOnly bool `json:"campusOnly"`
 }
 
 // checkLengths applies the rules of the post's kind. images is the number
@@ -195,7 +197,7 @@ func (s *Service) handleCreate(ctx context.Context, in *IssueInput) (*Issue, err
 		params := store.CreateIssueParams{
 			UniversityID: v.uni, Kind: kind, Category: category, Private: category == "safety", Title: in.Title,
 			Body: in.Body, LocationLabel: in.LocationLabel, Visibility: visibility, HoldReason: hold, Named: !anonymous,
-			Now: now,
+			CampusOnly: in.CampusOnly && kind != "issue", Now: now,
 		}
 		if !anonymous {
 			params.NamedAuthorID = &v.id
@@ -374,8 +376,10 @@ func (s *Service) vote(ctx context.Context, in *voteReq, on bool) (*voteRes, err
 				}
 			}
 			delta = int32(n)
-			if err := q.Follow(ctx, store.FollowParams{IssueID: id, UserID: v.id}); err != nil {
-				return err
+			if !isVisitor(v, r) { // visitors follow nothing (no pushes)
+				if err := q.Follow(ctx, store.FollowParams{IssueID: id, UserID: v.id}); err != nil {
+					return err
+				}
 			}
 		} else {
 			n, err := q.Unvote(ctx, store.UnvoteParams{IssueID: id, UserID: v.id})
@@ -421,7 +425,7 @@ func (s *Service) handlePollVote(ctx context.Context, in *pollVoteReq) (*Poll, e
 			return err
 		}
 		id := uuid.MustParse(in.ID)
-		r, err := s.getIssue(ctx, q, v, id)
+		r, err := s.getIssueWrite(ctx, q, v, id)
 		if err != nil {
 			return err
 		}

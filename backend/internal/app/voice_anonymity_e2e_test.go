@@ -108,8 +108,30 @@ func TestVoiceAnonymitySweep(t *testing.T) {
 			"/moderation/queue?kind=private", "/moderation/issues/" + id, "/moderation/issues/" + safety.ID,
 		}
 	}
+	// A visitor from another university (docs/CAMPUS_VISITS.md): reads and
+	// reacts, and learns nothing about authors that classmates don't.
+	h.addUni("visiting", "Visiting University")
+	visitor := h.named("visitor@visiting.ac.bd", "Visitor Vee")
+	home := "universityId=" + h.universityID("test-uni")
+	require.Equal(t, http.StatusOK, h.do("PUT", "/issues/"+post.ID+"/vote", visitor, map[string]string{"reaction": "clap"}).Status)
+	visitorReads := []string{
+		"/issues?" + home + "&kinds=all", "/issues?" + home + "&kinds=all&sort=new", "/issues?" + home + "&kinds=all&sort=solved",
+		"/issues?" + home + "&kinds=issue", "/issues?" + home + "&kinds=all&private=true",
+		"/issues/" + post.ID, "/issues/" + question.ID, "/issues/" + question.ID + "/comments",
+		"/issues/" + poll.ID, "/issues/" + mateQuestion.ID, "/issues/" + mateQuestion.ID + "/comments",
+		"/issues/" + pub.ID, "/issues/" + pub.ID + "/comments", "/issues/" + safety.ID,
+		"/campuses", "/campuses/test-uni",
+	}
 	sweep := func(t *testing.T, stage string) {
 		t.Helper()
+		for _, p := range visitorReads {
+			status, body := h.raw(visitor, p)
+			require.Less(t, status, 500, "%s visitor %s", stage, p)
+			forbidden(t, string(body))
+			if p == "/issues/"+pub.ID || p == "/issues/"+safety.ID || p == "/issues/"+pub.ID+"/comments" {
+				assert.Equal(t, http.StatusNotFound, status, "issues stay inside: %s", p)
+			}
+		}
 		for name, tok := range map[string]string{"student": c.mate, "authority": c.authority, "moderator": c.mod, "admin": c.admin} {
 			paths := voiceReads(pub.ID)
 			if name == "moderator" || name == "admin" {

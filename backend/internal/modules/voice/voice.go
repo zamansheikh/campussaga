@@ -73,6 +73,8 @@ type viewer struct {
 	uni      uuid.UUID // uuid.Nil: no university yet
 	role     string
 	verified bool
+	// visitOn: features.visitCampus (students may read other universities).
+	visitOn bool
 	// Staff scope/title (authority and moderator only).
 	staffUni   *uuid.UUID
 	staffTitle string
@@ -116,6 +118,9 @@ func (s *Service) begin(ctx context.Context, q *store.Queries) (viewer, error) {
 		if !on {
 			return v, ErrFeatureDisabled
 		}
+		if v.visitOn, err = q.VisitCampusOn(ctx); err != nil && !db.IsNoRows(err) {
+			return v, err
+		}
 	}
 	return v, nil
 }
@@ -132,13 +137,20 @@ func (s *Service) requireNoBan(ctx context.Context, q *store.Queries, v viewer) 
 	return ErrBanned.WithDetails(map[string]*time.Time{"until": until})
 }
 
+// isVisitor: a student reading another university's post.
+func isVisitor(v viewer, r store.GetIssueRow) bool {
+	return !v.isStaff() && r.UniversityID != v.uni
+}
+
 // canSee: may the viewer read this issue at all?
 func canSee(v viewer, r store.GetIssueRow) bool {
 	if v.isMod() {
 		return v.modOf(r.UniversityID)
 	}
 	if r.UniversityID != v.uni {
-		return false
+		// A visitor (docs/CAMPUS_VISITS.md §1): posts, questions and polls
+		// that are visible, public and not kept inside their university.
+		return isVisitor(v, r) && v.visitOn && r.Kind != "issue" && r.Visibility == "visible" && !r.Private && !r.CampusOnly
 	}
 	if r.Mine {
 		return true
@@ -164,6 +176,19 @@ func (s *Service) getIssue(ctx context.Context, q *store.Queries, v viewer, id u
 	}
 	if !canSee(v, r) {
 		return r, ErrIssueNotFound
+	}
+	return r, nil
+}
+
+// getIssueWrite is getIssue for routes visitors may not use: a visitor who
+// can read the post gets VISITOR_READ_ONLY.
+func (s *Service) getIssueWrite(ctx context.Context, q *store.Queries, v viewer, id uuid.UUID) (store.GetIssueRow, error) {
+	r, err := s.getIssue(ctx, q, v, id)
+	if err != nil {
+		return r, err
+	}
+	if isVisitor(v, r) {
+		return r, ErrVisitorReadOnly
 	}
 	return r, nil
 }

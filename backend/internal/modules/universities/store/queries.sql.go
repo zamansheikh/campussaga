@@ -7,9 +7,60 @@ package store
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
+
+const getCampus = `-- name: GetCampus :one
+SELECT u.id, u.slug, u.name, u.name_bn, u.city, u.kind, u.website,
+       (SELECT count(*) FROM users x WHERE x.university_id = u.id)::int AS students,
+       (SELECT count(*) FROM issues i
+         WHERE i.university_id = u.id AND i.kind <> 'issue' AND i.visibility = 'visible'
+           AND NOT i.private AND NOT i.campus_only AND i.created_at > $1)::int AS posts7d,
+       (SELECT count(*) FROM class_groups g WHERE g.university_id = u.id)::int AS class_groups,
+       (SELECT count(*) FROM bus_routes b WHERE b.university_id = u.id AND b.active)::int AS bus_routes
+FROM universities u
+WHERE u.slug = $2 AND u.is_active AND NOT u.is_demo
+`
+
+type GetCampusParams struct {
+	Since time.Time
+	Slug  string
+}
+
+type GetCampusRow struct {
+	ID          uuid.UUID
+	Slug        string
+	Name        string
+	NameBn      *string
+	City        *string
+	Kind        *string
+	Website     *string
+	Students    int32
+	Posts7d     int32
+	ClassGroups int32
+	BusRoutes   int32
+}
+
+func (q *Queries) GetCampus(ctx context.Context, arg GetCampusParams) (GetCampusRow, error) {
+	row := q.db.QueryRow(ctx, getCampus, arg.Since, arg.Slug)
+	var i GetCampusRow
+	err := row.Scan(
+		&i.ID,
+		&i.Slug,
+		&i.Name,
+		&i.NameBn,
+		&i.City,
+		&i.Kind,
+		&i.Website,
+		&i.Students,
+		&i.Posts7d,
+		&i.ClassGroups,
+		&i.BusRoutes,
+	)
+	return i, err
+}
 
 const getUniversity = `-- name: GetUniversity :one
 SELECT u.id, u.slug, u.name, u.name_bn, u.city, u.is_demo,
@@ -93,6 +144,78 @@ func (q *Queries) ListActive(ctx context.Context) ([]ListActiveRow, error) {
 	return items, nil
 }
 
+const listCampuses = `-- name: ListCampuses :many
+SELECT u.id, u.slug, u.name, u.name_bn, u.city, u.kind, u.website,
+       (SELECT count(*) FROM users x WHERE x.university_id = u.id)::int AS students,
+       (SELECT count(*) FROM issues i
+         WHERE i.university_id = u.id AND i.kind <> 'issue' AND i.visibility = 'visible'
+           AND NOT i.private AND NOT i.campus_only AND i.created_at > $1)::int AS posts7d
+FROM universities u
+WHERE u.is_active AND NOT u.is_demo AND u.id <> $2
+  AND ($3::text = '' OR u.name ILIKE $4 OR u.name_bn ILIKE $4 OR u.slug ILIKE $4 OR u.city ILIKE $4)
+ORDER BY posts7d DESC, students DESC, u.name, u.id
+LIMIT $6 OFFSET $5
+`
+
+type ListCampusesParams struct {
+	Since time.Time
+	Own   uuid.UUID
+	Q     string
+	QLike string
+	Off   int32
+	Lim   int32
+}
+
+type ListCampusesRow struct {
+	ID       uuid.UUID
+	Slug     string
+	Name     string
+	NameBn   *string
+	City     *string
+	Kind     *string
+	Website  *string
+	Students int32
+	Posts7d  int32
+}
+
+// Active, non-demo universities except the caller's own, most active first.
+func (q *Queries) ListCampuses(ctx context.Context, arg ListCampusesParams) ([]ListCampusesRow, error) {
+	rows, err := q.db.Query(ctx, listCampuses,
+		arg.Since,
+		arg.Own,
+		arg.Q,
+		arg.QLike,
+		arg.Off,
+		arg.Lim,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListCampusesRow{}
+	for rows.Next() {
+		var i ListCampusesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Slug,
+			&i.Name,
+			&i.NameBn,
+			&i.City,
+			&i.Kind,
+			&i.Website,
+			&i.Students,
+			&i.Posts7d,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const matchDomain = `-- name: MatchDomain :one
 SELECT u.id, u.slug, u.name, u.name_bn, u.is_demo
 FROM university_domains d
@@ -123,4 +246,19 @@ func (q *Queries) MatchDomain(ctx context.Context, candidates []string) (MatchDo
 		&i.IsDemo,
 	)
 	return i, err
+}
+
+const visitCampusOn = `-- name: VisitCampusOn :one
+
+SELECT coalesce((value->>'visitCampus')::bool, false)::bool AS enabled
+FROM app_config WHERE key = 'features'
+`
+
+// ---- visit other campuses (docs/CAMPUS_VISITS.md §3.3) ---------------------------
+// Counts are plain subqueries; posts7d counts what a visitor could read.
+func (q *Queries) VisitCampusOn(ctx context.Context) (bool, error) {
+	row := q.db.QueryRow(ctx, visitCampusOn)
+	var enabled bool
+	err := row.Scan(&enabled)
+	return enabled, err
 }

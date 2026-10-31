@@ -28,5 +28,6 @@ var (
 	ErrAlreadyVoted       = apperr.New(http.StatusConflict, "ALREADY_VOTED", "You already voted in this poll")
 	ErrNotAnIssue         = apperr.New(http.StatusConflict, "NOT_AN_ISSUE", "This is not an issue")
 	ErrBadCursor          = apperr.New(http.StatusBadRequest, "BAD_CURSOR", "This page link is no longer valid")
+	ErrVisitorReadOnly    = apperr.New(http.StatusForbidden, "VISITOR_READ_ONLY", "You are visiting this university: you can read and react, nothing else")
 	ErrForbidden          = apperr.New(http.StatusForbidden, "FORBIDDEN", "You can't do this")
 )

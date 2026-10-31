@@ -209,9 +209,9 @@ func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (u
 const createIssue = `-- name: CreateIssue :one
 
 INSERT INTO issues (university_id, kind, category, private, title, body, location_label, visibility,
-                    hold_reason, named, named_author_id, poll_closes_at, created_at, status_changed_at)
+                    hold_reason, named, named_author_id, poll_closes_at, campus_only, created_at, status_changed_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8,
-        $9, $10, $11, $12, $13, $13)
+        $9, $10, $11, $12, $13, $14, $14)
 RETURNING id
 `
 
@@ -228,6 +228,7 @@ type CreateIssueParams struct {
 	Named         bool
 	NamedAuthorID *uuid.UUID
 	PollClosesAt  *time.Time
+	CampusOnly    bool
 	Now           time.Time
 }
 
@@ -246,6 +247,7 @@ func (q *Queries) CreateIssue(ctx context.Context, arg CreateIssueParams) (uuid.
 		arg.Named,
 		arg.NamedAuthorID,
 		arg.PollClosesAt,
+		arg.CampusOnly,
 		arg.Now,
 	)
 	var id uuid.UUID
@@ -300,7 +302,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = $1), '')::text AS my_reaction,
@@ -316,11 +318,12 @@ FROM issues i
 LEFT JOIN users u ON u.id = i.named_author_id
 WHERE i.university_id = $2 AND i.visibility = 'visible' AND i.private = $3
   AND i.kind = ANY($4::text[])
-  AND ($5::text = '' OR i.category = $5)
-  AND ($6::text = '' OR i.title ILIKE $7 OR i.body ILIKE $7)
-  AND ($8::timestamptz IS NULL OR (i.created_at, i.id) < ($8::timestamptz, $9::uuid))
+  AND (NOT $5::bool OR (NOT i.campus_only AND i.kind <> 'issue'))
+  AND ($6::text = '' OR i.category = $6)
+  AND ($7::text = '' OR i.title ILIKE $8 OR i.body ILIKE $8)
+  AND ($9::timestamptz IS NULL OR (i.created_at, i.id) < ($9::timestamptz, $10::uuid))
 ORDER BY i.created_at DESC, i.id DESC
-LIMIT $10
+LIMIT $11
 `
 
 type FeedNewParams struct {
@@ -328,6 +331,7 @@ type FeedNewParams struct {
 	UniversityID uuid.UUID
 	Private      bool
 	Kinds        []string
+	Visitor      bool
 	Category     string
 	Q            string
 	QLike        string
@@ -363,6 +367,7 @@ type FeedNewRow struct {
 	ImageCount      int32
 	Thumbnail       string
 	Kind            string
+	CampusOnly      bool
 	PollClosesAt    *time.Time
 	Reactions       json.RawMessage
 	MyReaction      string
@@ -380,6 +385,7 @@ func (q *Queries) FeedNew(ctx context.Context, arg FeedNewParams) ([]FeedNewRow,
 		arg.UniversityID,
 		arg.Private,
 		arg.Kinds,
+		arg.Visitor,
 		arg.Category,
 		arg.Q,
 		arg.QLike,
@@ -421,6 +427,7 @@ func (q *Queries) FeedNew(ctx context.Context, arg FeedNewParams) ([]FeedNewRow,
 			&i.ImageCount,
 			&i.Thumbnail,
 			&i.Kind,
+			&i.CampusOnly,
 			&i.PollClosesAt,
 			&i.Reactions,
 			&i.MyReaction,
@@ -449,7 +456,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = $1), '')::text AS my_reaction,
@@ -512,6 +519,7 @@ type FeedSolvedRow struct {
 	ImageCount      int32
 	Thumbnail       string
 	Kind            string
+	CampusOnly      bool
 	PollClosesAt    *time.Time
 	Reactions       json.RawMessage
 	MyReaction      string
@@ -569,6 +577,7 @@ func (q *Queries) FeedSolved(ctx context.Context, arg FeedSolvedParams) ([]FeedS
 			&i.ImageCount,
 			&i.Thumbnail,
 			&i.Kind,
+			&i.CampusOnly,
 			&i.PollClosesAt,
 			&i.Reactions,
 			&i.MyReaction,
@@ -597,7 +606,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = $1), '')::text AS my_reaction,
@@ -617,11 +626,12 @@ CROSS JOIN LATERAL (
 ) t
 WHERE i.university_id = $3 AND i.visibility = 'visible' AND i.private = $4
   AND i.kind = ANY($5::text[])
-  AND i.status NOT IN ('solved', 'rejected') AND i.created_at > $6
-  AND ($7::text = '' OR i.category = $7)
-  AND ($8::text = '' OR i.title ILIKE $9 OR i.body ILIKE $9)
+  AND (NOT $6::bool OR (NOT i.campus_only AND i.kind <> 'issue'))
+  AND i.status NOT IN ('solved', 'rejected') AND i.created_at > $7
+  AND ($8::text = '' OR i.category = $8)
+  AND ($9::text = '' OR i.title ILIKE $10 OR i.body ILIKE $10)
 ORDER BY t.score DESC, i.created_at DESC, i.id DESC
-LIMIT $11 OFFSET $10
+LIMIT $12 OFFSET $11
 `
 
 type FeedTrendingParams struct {
@@ -630,6 +640,7 @@ type FeedTrendingParams struct {
 	UniversityID uuid.UUID
 	Private      bool
 	Kinds        []string
+	Visitor      bool
 	Since        time.Time
 	Category     string
 	Q            string
@@ -665,6 +676,7 @@ type FeedTrendingRow struct {
 	ImageCount      int32
 	Thumbnail       string
 	Kind            string
+	CampusOnly      bool
 	PollClosesAt    *time.Time
 	Reactions       json.RawMessage
 	MyReaction      string
@@ -686,6 +698,7 @@ func (q *Queries) FeedTrending(ctx context.Context, arg FeedTrendingParams) ([]F
 		arg.UniversityID,
 		arg.Private,
 		arg.Kinds,
+		arg.Visitor,
 		arg.Since,
 		arg.Category,
 		arg.Q,
@@ -727,6 +740,7 @@ func (q *Queries) FeedTrending(ctx context.Context, arg FeedTrendingParams) ([]F
 			&i.ImageCount,
 			&i.Thumbnail,
 			&i.Kind,
+			&i.CampusOnly,
 			&i.PollClosesAt,
 			&i.Reactions,
 			&i.MyReaction,
@@ -886,7 +900,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = $1), '')::text AS my_reaction,
@@ -935,6 +949,7 @@ type GetIssueRow struct {
 	ImageCount      int32
 	Thumbnail       string
 	Kind            string
+	CampusOnly      bool
 	PollClosesAt    *time.Time
 	Reactions       json.RawMessage
 	MyReaction      string
@@ -980,6 +995,7 @@ func (q *Queries) GetIssue(ctx context.Context, arg GetIssueParams) (GetIssueRow
 		&i.ImageCount,
 		&i.Thumbnail,
 		&i.Kind,
+		&i.CampusOnly,
 		&i.PollClosesAt,
 		&i.Reactions,
 		&i.MyReaction,
@@ -1549,7 +1565,7 @@ func (q *Queries) LockComment(ctx context.Context, id uuid.UUID) (Comment, error
 }
 
 const lockIssue = `-- name: LockIssue :one
-SELECT id, university_id, category, private, title, body, location_label, status, visibility, hold_reason, removed_reason, deleted_by_author, named, named_author_id, me_too_count, comment_count, report_count, status_changed_at, solved_at, edited_at, created_at, updated_at, kind, poll_closes_at FROM issues WHERE id = $1 FOR UPDATE
+SELECT id, university_id, category, private, title, body, location_label, status, visibility, hold_reason, removed_reason, deleted_by_author, named, named_author_id, me_too_count, comment_count, report_count, status_changed_at, solved_at, edited_at, created_at, updated_at, kind, poll_closes_at, campus_only FROM issues WHERE id = $1 FOR UPDATE
 `
 
 func (q *Queries) LockIssue(ctx context.Context, id uuid.UUID) (Issue, error) {
@@ -1580,6 +1596,7 @@ func (q *Queries) LockIssue(ctx context.Context, id uuid.UUID) (Issue, error) {
 		&i.UpdatedAt,
 		&i.Kind,
 		&i.PollClosesAt,
+		&i.CampusOnly,
 	)
 	return i, err
 }
@@ -1592,7 +1609,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = $1), '')::text AS my_reaction,
@@ -1648,6 +1665,7 @@ type MyIssuesRow struct {
 	ImageCount      int32
 	Thumbnail       string
 	Kind            string
+	CampusOnly      bool
 	PollClosesAt    *time.Time
 	Reactions       json.RawMessage
 	MyReaction      string
@@ -1701,6 +1719,7 @@ func (q *Queries) MyIssues(ctx context.Context, arg MyIssuesParams) ([]MyIssuesR
 			&i.ImageCount,
 			&i.Thumbnail,
 			&i.Kind,
+			&i.CampusOnly,
 			&i.PollClosesAt,
 			&i.Reactions,
 			&i.MyReaction,
@@ -2040,7 +2059,7 @@ SELECT i.id, i.university_id, i.category, i.private, i.title, i.body, i.status, 
        i.location_label, i.created_at, i.status_changed_at, i.solved_at, i.edited_at,
        (SELECT count(*) FROM issue_images im WHERE im.issue_id = i.id)::int AS image_count,
        coalesce((SELECT im.id::text FROM issue_images im WHERE im.issue_id = i.id ORDER BY im.position LIMIT 1), '')::text AS thumbnail,
-       i.kind, i.poll_closes_at,
+       i.kind, i.campus_only, i.poll_closes_at,
        coalesce((SELECT jsonb_object_agg(r.reaction, r.n) FROM (
            SELECT v.reaction, count(*)::int AS n FROM issue_votes v WHERE v.issue_id = i.id GROUP BY v.reaction) r), '{}'::jsonb)::jsonb AS reactions,
        coalesce((SELECT v.reaction FROM issue_votes v WHERE v.issue_id = i.id AND v.user_id = $1), '')::text AS my_reaction,
@@ -2094,6 +2113,7 @@ type SimilarIssuesRow struct {
 	ImageCount      int32
 	Thumbnail       string
 	Kind            string
+	CampusOnly      bool
 	PollClosesAt    *time.Time
 	Reactions       json.RawMessage
 	MyReaction      string
@@ -2146,6 +2166,7 @@ func (q *Queries) SimilarIssues(ctx context.Context, arg SimilarIssuesParams) ([
 			&i.ImageCount,
 			&i.Thumbnail,
 			&i.Kind,
+			&i.CampusOnly,
 			&i.PollClosesAt,
 			&i.Reactions,
 			&i.MyReaction,
@@ -2358,6 +2379,18 @@ type UpsertBanParams struct {
 func (q *Queries) UpsertBan(ctx context.Context, arg UpsertBanParams) error {
 	_, err := q.db.Exec(ctx, upsertBan, arg.UserID, arg.Until, arg.Reason)
 	return err
+}
+
+const visitCampusOn = `-- name: VisitCampusOn :one
+SELECT coalesce((value->>'visitCampus')::bool, false)::bool AS enabled
+FROM app_config WHERE key = 'features'
+`
+
+func (q *Queries) VisitCampusOn(ctx context.Context) (bool, error) {
+	row := q.db.QueryRow(ctx, visitCampusOn)
+	var enabled bool
+	err := row.Scan(&enabled)
+	return enabled, err
 }
 
 const vote = `-- name: Vote :execrows

@@ -54,6 +54,7 @@ type Issue struct {
 	UpdatedAt       time.Time
 	Kind            string
 	PollClosesAt    *time.Time
+	CampusOnly      bool
 }
 
 type Upload struct {
