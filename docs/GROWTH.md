@@ -301,6 +301,92 @@ Every admin write is audited (`campaign.*`, `referral.*`).
     delivery);
   - profiles (what others see; photo rule; anonymous posts never shown).
 
+## 8. Points: invites plus missions that fill the app (migration `00760_campaign_points.sql`)
+
+The app is still empty at most universities. A campaign's score is now
+**points**: invites stay the main way to earn, and the things that make the
+app useful for everyone (sections with routines, blood donors, live buses)
+earn too. Every mission needs something real that others benefit from, so
+it's hard to farm.
+
+### 8.1 Point values
+Stored per campaign in `campaigns.scoring jsonb NOT NULL DEFAULT <defaults>`.
+Editable while the campaign is a **draft** only (changing rules mid-campaign
+is unfair). Each value is an integer 0–100 (0 turns that one off);
+`busShareDays` 0–60, `sectionSetupMax` 0–10, `pioneerFirst` 1–1000. Missing
+keys take the default. Error `INVALID_SCORING` (400).
+
+| key | default | earned for |
+|---|---|---|
+| `invite` | 10 | each counted invite (§5 rules: created in the window, qualified by `settles_at`, not disqualified, not same phone) |
+| `otherCampus` | 5 | extra, per counted invite whose friend is at a **different university** than me |
+| `pioneer` | 5 | extra, per counted invite whose friend was among the first `pioneerFirst` (20) verified students of their university (fewer than 20 students of that university have `verified_at` earlier than the friend's) |
+| `friendSection` | 3 | extra, per counted invite whose friend is a member of any class group now |
+| `joinSection` | 2 | once: I'm a member of a class group now |
+| `bloodDonor` | 3 | once: I'm a registered blood donor now |
+| `busShare` | 2 | per Dhaka day in `[starts_at, ends_at]` on which I shared a live bus (`bus_live_sessions.user_id` = me) that lasted at least 10 minutes, didn't end `off_route`, and that **another student watched** (`bus_live_views` row for the same route, direction, service date and departure, with a different `user_id`) |
+| `busShareDays` | 10 | the most bus days that count |
+| `sectionSetup` | 15 | per class group where I'm CR now and it has **≥ 5 routine slots** and **≥ 5 verified members besides me** |
+| `sectionSetupMax` | 2 | the most sections that count |
+| `pioneerFirst` | 20 | see `pioneer` |
+
+- One-time missions and sections count by their state when scored (a
+  student who was already a donor gets the points too).
+- **Who takes part** is unchanged (verified, not team, not blocked, not
+  disqualified, in the campaign's universities); anyone with at least 1
+  point is ranked.
+- **Ties:** points, then whoever reached them earlier: the latest of the
+  counted invites' `qualified_at`, the counted bus sessions' `started_at`,
+  the first section `joined_at` and the donor's `created_at`; then by id.
+- A disqualified invite or participant loses its points as before.
+
+### 8.2 API changes
+- `GET /campaigns`, `GET /campaigns/{id}`, `GET /campaigns/{id}/public`:
+  add `scoring` (the values above). `myScore` is now points.
+- `GET /campaigns/{id}` also adds:
+  - `missions`: one row per key with points > 0, in the table's order
+    (`busShareDays`, `sectionSetupMax`, `pioneerFirst` are limits, not rows):
+    `{key, points, per: "friend"|"once"|"day"|"section", count, max|null, earned}`.
+    `count` = times counted (invites, days, sections; 0/1 for once), `max` =
+    the limit (`busShareDays`, `sectionSetupMax`, 1 for once, null for
+    friends), `earned` = points from it.
+  - `section`: my best class group as CR that doesn't count yet
+    `{groupId, name, slots, members}` (members = verified, besides me), or null.
+    Name as the app shows a group (department, batch, section).
+- Leaderboard `score` is points (shape unchanged).
+- **Admin:**
+  - create and PATCH take `scoring` (draft only, merged over defaults);
+    list and detail return it;
+  - standings rows add `points: {invite, otherCampus, pioneer, friendSection, joinSection, bloodDonor, busShare, sectionSetup}` (points per key);
+  - each invite adds `otherCampus`, `pioneer` and `inSection` booleans;
+  - a new flag `self_vouched`: a friend was verified through the inviter's
+    own vouch (or the inviter as CR verified them).
+- Audit as before. Error codes: `INVALID_SCORING`.
+
+### 8.3 App
+- Score text is points: "Rank 3 · 42 points" / "র‍্যাংক ৩ · ৪২ পয়েন্ট".
+  Leaderboard rows show "42 pts".
+- **Campaign page: "Ways to earn"** (after the poster, before Prizes): one
+  row per mission with its icon, title, the rule ("+10 per friend", "+5 extra
+  when they're at another university", "+2 a day · up to 10 days", "+15 per
+  section · up to 2") and my progress ("3 friends · 30 pts", a check for a
+  done one-time mission). The section row shows "3/5 classes · 2/5 members"
+  from `section`. Each row opens where you do it: Invite (share), Join your
+  section, Become a blood donor, Bus, your section's routine.
+- **Today card:** rank and points, and a small "Ways to earn" nudge with the
+  next undone mission.
+- **Invite card (Profile):** creative but compact: joined friends as
+  stacked initials, progress to the next Connector tier, and while a
+  campaign is live, "+10 points a friend, +5 from another campus".
+
+### 8.4 Web
+- **Rules page** (`/campaigns/[id]`): a "How to earn points" table (EN and
+  BN) from `scoring`, in place of "how invites count".
+- **Admin campaign form:** a "Points" group with a number field per key
+  (draft only; read-only once live), defaults filled in.
+- **Standings:** the points breakdown per participant, the new invite
+  booleans, and the `self_vouched` flag.
+
 ## As implemented (API, migration `00740_growth.sql`)
 
 Paths, fields and error codes are as in §5. Where the spec left a choice:
