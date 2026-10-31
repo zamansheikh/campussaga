@@ -1,4 +1,4 @@
-import { ArrowLeft, ExternalLink, Pencil } from "lucide-react";
+import { ArrowLeft, CalendarClock, ExternalLink, ImagePlus, Pencil } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -27,7 +27,7 @@ import {
 import { load } from "@/lib/admin/load";
 import { api, requestNow, requireAdmin } from "@/lib/admin/session";
 import { allUniversities } from "@/lib/admin/universities";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatNumber } from "@/lib/format";
 
 import { AnnounceWinners, DeliveredButton, FinisherSentButton, PublishButton } from "./campaign-controls";
 import { StandingsTable } from "./standings";
@@ -88,40 +88,59 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
         <ErrorPanel message={res.error ?? "Not found."} />
       ) : (
         <div className="space-y-6">
-          {c.bannerUrl ? (
-            // The website serves the API's banner path too (src/app/(site)/campaigns/[id]/banner).
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={c.bannerUrl} alt="Campaign banner" className="aspect-[2/1] w-full max-w-xl rounded-xl border bg-muted object-cover" />
-          ) : null}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <h1 className="text-2xl font-semibold tracking-tight">{c.titleEn}</h1>
-              <p lang="bn" className="text-muted-foreground">
-                {c.titleBn}
-              </p>
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <Badge variant={statusTone[c.status] ?? "outline"}>{statusLabel[c.status] ?? c.status}</Badge>
-                {!c.bannerUrl && c.status !== "announced" ? (
-                  <Link href={`/admin/campaigns/${c.id}/edit`} className="text-sm text-muted-foreground hover:text-foreground hover:underline">
-                    No banner yet: add one
-                  </Link>
-                ) : null}
-                {c.status !== "draft" ? (
-                  <Link href={`/campaigns/${c.id}`} target="_blank" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
-                    Public rules page <ExternalLink className="size-3.5" aria-hidden />
-                  </Link>
-                ) : null}
+          {/* The poster on the left, everything at a glance on the right. */}
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-stretch">
+            {c.bannerUrl ? (
+              // The website serves the API's banner path too (src/app/(site)/campaigns/[id]/banner).
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={c.bannerUrl} alt="Campaign banner" className="aspect-[2/1] w-full rounded-xl border bg-muted object-cover" />
+            ) : (
+              <Link
+                href={`/admin/campaigns/${c.id}/edit`}
+                className="flex aspect-[2/1] w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed bg-muted/40 text-sm text-muted-foreground hover:bg-muted"
+              >
+                <ImagePlus className="size-6" aria-hidden />
+                No banner yet: add one (2:1, e.g. 1600×800)
+              </Link>
+            )}
+            <div className="flex min-w-0 flex-col gap-4">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant={statusTone[c.status] ?? "outline"}>{statusLabel[c.status] ?? c.status}</Badge>
+                  <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <CalendarClock className="size-4" aria-hidden />
+                    {whenText(c, now)}
+                  </span>
+                </div>
+                <h1 className="mt-2 text-2xl font-semibold tracking-tight text-balance">{c.titleEn}</h1>
+                <p lang="bn" className="mt-1 text-muted-foreground">
+                  {c.titleBn}
+                </p>
               </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {c.status !== "announced" ? (
+              <dl className="grid grid-cols-2 gap-3">
+                <Stat label="Students with points" value={standings?.data ? formatNumber(standings.data.length) : "–"} />
+                <Stat
+                  label="In the prize race"
+                  value={standings?.data ? formatNumber(standings.data.filter((r) => r.rank !== null && r.eligible !== false).length) : "–"}
+                />
+                <Stat label="Finishers" value={finishers?.data ? formatNumber(finishers.data.length) : "–"} />
+                <Stat label="Top prize" value={topPrize(c) ?? "–"} small />
+              </dl>
+              <div className="mt-auto flex flex-wrap items-center gap-2">
                 <Button variant="outline" asChild>
                   <Link href={`/admin/campaigns/${c.id}/edit`}>
                     <Pencil /> Edit
                   </Link>
                 </Button>
-              ) : null}
-              {c.status === "draft" ? <PublishButton id={c.id} title={c.titleEn} /> : null}
+                {c.status === "draft" ? <PublishButton id={c.id} title={c.titleEn} /> : null}
+                {c.status !== "draft" ? (
+                  <Button variant="ghost" asChild>
+                    <Link href={`/campaigns/${c.id}`} target="_blank">
+                      Public rules page <ExternalLink aria-hidden />
+                    </Link>
+                  </Button>
+                ) : null}
+              </div>
             </div>
           </div>
 
@@ -431,6 +450,41 @@ function pointsSummary(s: CampaignScoring): string {
       .join(" · ") || "Nothing earns points";
   const race = raceRule(s.minOwnCampus, s.minOtherCampus);
   return race ? `${earn}. To win, counted friends: ${race}.` : earn;
+}
+
+/** One number at a glance. [small] for a short text value (the top prize). */
+function Stat({ label, value, small = false }: { label: string; value: string; small?: boolean }) {
+  return (
+    <div className="rounded-xl border bg-card px-4 py-3">
+      <dt className="truncate text-xs text-muted-foreground">{label}</dt>
+      <dd className={small ? "mt-1 truncate text-sm font-semibold" : "mt-1 text-xl font-semibold tabular-nums"} title={value}>
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+/** The prize for rank 1 (or the lowest rank). */
+function topPrize(c: AdminCampaign): string | null {
+  const first = [...(c.prizes ?? [])].sort((a, b) => a.rankFrom - b.rankFrom)[0];
+  return first?.titleEn ?? null;
+}
+
+/** "Starts in 3 days", "Ends in 5 h", "Ended 2 days ago" or "Winners announced". */
+function whenText(c: AdminCampaign, now: number): string {
+  if (c.status === "announced") return "Winners announced";
+  const starts = Date.parse(c.startsAt);
+  const ends = Date.parse(c.endsAt);
+  const span = (ms: number) => {
+    const h = Math.round(Math.abs(ms) / 3_600_000);
+    if (h < 1) return "less than an hour";
+    if (h < 48) return `${h} h`;
+    return `${Math.round(h / 24)} days`;
+  };
+  if (c.status === "draft") return now < starts ? `Draft · would start in ${span(starts - now)}` : "Draft";
+  if (now < starts) return `Starts in ${span(starts - now)}`;
+  if (now < ends) return `Ends in ${span(ends - now)}`;
+  return `Ended ${span(now - ends)} ago`;
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
