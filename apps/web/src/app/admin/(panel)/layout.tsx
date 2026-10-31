@@ -7,6 +7,7 @@ import { SidebarNav } from "@/components/admin/sidebar-nav";
 import { UserMenu } from "@/components/admin/user-menu";
 import { BrandMark } from "@/components/site/brand-mark";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { navCounts } from "@/lib/admin/inbox";
 import { getAdmin } from "@/lib/admin/session";
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const me = await getAdmin();
+  const counts = me.role === "admin" ? await navCounts() : {};
   return (
     <div className="flex min-h-dvh">
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r bg-sidebar p-4 lg:flex">
@@ -28,12 +30,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </span>
           </span>
         </Link>
-        <SidebarNav role={me.role} />
+        <SidebarNav role={me.role} counts={counts} />
         <p className="mt-auto px-2 text-xs text-muted-foreground">Every change is recorded in the audit log.</p>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur">
-          <MobileNav role={me.role} />
+          <MobileNav role={me.role} counts={counts} />
           <Link href={homeFor(me.role)} className="flex items-center gap-2 font-semibold lg:hidden">
             <BrandMark className="size-7" />
             <span className="sr-only sm:not-sr-only">Admin</span>

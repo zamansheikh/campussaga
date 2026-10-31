@@ -4,14 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { navFor } from "@/components/admin/nav";
+import type { NavCounts } from "@/components/admin/nav";
 import type { PanelRole } from "@/lib/admin/types";
 import { cn } from "@/lib/utils";
 
-export function SidebarNav({ role, onNavigate }: { role: PanelRole; onNavigate?: () => void }) {
+export function SidebarNav({ role, onNavigate, counts = {} }: { role: PanelRole; onNavigate?: () => void; counts?: NavCounts }) {
   const pathname = usePathname();
   return (
     <nav aria-label="Admin" className="flex flex-col gap-1">
-      {navFor(role).map(({ href, label, icon: Icon }) => {
+      {navFor(role).map(({ href, label, icon: Icon, badge }) => {
         const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
         return (
           <Link
@@ -27,6 +28,12 @@ export function SidebarNav({ role, onNavigate }: { role: PanelRole; onNavigate?:
           >
             <Icon className="size-4" aria-hidden />
             {label}
+            {badge && (counts[badge] ?? 0) > 0 ? (
+              <span className="ms-auto rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground tabular-nums">
+                <span className="sr-only">{counts[badge]} open: </span>
+                {(counts[badge] ?? 0) > 99 ? "99+" : counts[badge]}
+              </span>
+            ) : null}
           </Link>
         );
       })}

@@ -1,11 +1,12 @@
 "use client";
 
-import { Ban, Bell, Building2, Loader2, ShieldCheck, ShieldOff, Trash2, UserCheck, UserX } from "lucide-react";
+import { Ban, Bell, Building2, Loader2, ShieldCheck, ShieldOff, Trash2, UserCheck, UserRoundCog, UserX } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { appointCampusAdmin, removeCampusAdmin } from "@/app/admin/(panel)/inbox/actions";
 import { deleteUser, updateUser, type UserPatch } from "@/app/admin/(panel)/users/actions";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { UniversityCombobox, type UniversityOption } from "@/components/admin/university-combobox";
@@ -25,10 +26,12 @@ import type { AdminUserDetail } from "@/lib/admin/types";
 export function UserActions({
   user,
   isSelf,
+  isCampusAdmin,
   universities,
 }: {
   user: AdminUserDetail;
   isSelf: boolean;
+  isCampusAdmin: boolean;
   universities: UniversityOption[];
 }) {
   const router = useRouter();
@@ -80,6 +83,43 @@ export function UserActions({
           <Bell /> Send a push
         </Link>
       </Button>
+
+      {isCampusAdmin ? (
+        <ConfirmAction
+          trigger={
+            <Button variant="outline" className="justify-start">
+              <UserRoundCog /> Remove campus admin
+            </Button>
+          }
+          title={`Remove ${name} as campus admin?`}
+          description={<p>They stay a verified student but lose the Campus admin tools in the app.</p>}
+          confirmLabel="Remove campus admin"
+          action={() => removeCampusAdmin(user.id)}
+          success="Campus admin removed"
+          onDone={() => router.refresh()}
+        />
+      ) : (
+        <ConfirmAction
+          trigger={
+            <Button variant="outline" className="justify-start" disabled={!user.verified || !user.university}>
+              <UserRoundCog /> Make campus admin
+            </Button>
+          }
+          title={`Make ${name} a campus admin?`}
+          description={
+            <p>
+              They will verify classmates, settle sections and handle reports for <strong>{user.university?.name}</strong> in the app. They never see email addresses. A university can have 5.
+            </p>
+          }
+          confirmLabel="Make campus admin"
+          action={() => appointCampusAdmin(user.id)}
+          success="Now a campus admin"
+          onDone={() => router.refresh()}
+        />
+      )}
+      {!isCampusAdmin && (!user.verified || !user.university) ? (
+        <p className="text-xs text-muted-foreground">Only a verified student can be a campus admin.</p>
+      ) : null}
 
       {user.role === "admin" ? (
         <ConfirmAction

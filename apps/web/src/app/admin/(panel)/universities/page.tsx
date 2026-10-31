@@ -1,7 +1,11 @@
+import { HeartPulse } from "lucide-react";
+import Link from "next/link";
+
 import { ListFilters } from "@/components/admin/list-filters";
 import { EmptyState, ErrorPanel } from "@/components/admin/notice";
 import { PageHeader } from "@/components/admin/page-header";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { load } from "@/lib/admin/load";
 import { query, requireAdmin } from "@/lib/admin/session";
@@ -9,6 +13,7 @@ import { allUniversities } from "@/lib/admin/universities";
 import { formatNumber } from "@/lib/format";
 
 import { ActiveSwitch } from "./active-switch";
+import { CampusAdminsDialog } from "./campus-admins-dialog";
 import { DomainsDialog, UniversityDialog } from "./university-dialog";
 
 export const metadata = { title: "Universities" };
@@ -16,7 +21,7 @@ export const metadata = { title: "Universities" };
 export default async function UniversitiesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; active?: string }>;
+  searchParams: Promise<{ q?: string; active?: string; campusAdminsFor?: string }>;
 }) {
   await requireAdmin();
   const sp = await searchParams;
@@ -29,7 +34,16 @@ export default async function UniversitiesPage({
         description={
           res.data ? `${formatNumber(res.data.length)} shown. Students pick from active ones.` : "Universities students can pick."
         }
-        actions={<UniversityDialog />}
+        actions={
+          <>
+            <Button variant="outline" asChild>
+              <Link href="/admin/universities/health">
+                <HeartPulse /> University health
+              </Link>
+            </Button>
+            <UniversityDialog />
+          </>
+        }
       />
       <ListFilters
         searchPlaceholder="Name, slug or domain"
@@ -83,6 +97,9 @@ export default async function UniversitiesPage({
                     <span className="md:hidden">
                       <DomainsDialog university={u} />
                     </span>
+                    <div>
+                      <CampusAdminsDialog universityId={u.id} name={u.name} defaultOpen={sp.campusAdminsFor === u.id} />
+                    </div>
                   </TableCell>
                   <TableCell className="hidden max-w-64 md:table-cell">
                     <div className="flex flex-wrap gap-1">

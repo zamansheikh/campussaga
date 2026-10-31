@@ -3,13 +3,14 @@
 import { Menu } from "lucide-react";
 import { useState } from "react";
 
+import type { NavCounts } from "@/components/admin/nav";
 import { SidebarNav } from "@/components/admin/sidebar-nav";
 import { BrandMark } from "@/components/site/brand-mark";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import type { PanelRole } from "@/lib/admin/types";
 
-export function MobileNav({ role }: { role: PanelRole }) {
+export function MobileNav({ role, counts }: { role: PanelRole; counts?: NavCounts }) {
   const [open, setOpen] = useState(false);
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -24,7 +25,7 @@ export function MobileNav({ role }: { role: PanelRole }) {
             <BrandMark /> VarsityKotha admin
           </SheetTitle>
         </SheetHeader>
-        <SidebarNav role={role} onNavigate={() => setOpen(false)} />
+        <SidebarNav role={role} counts={counts} onNavigate={() => setOpen(false)} />
       </SheetContent>
     </Sheet>
   );

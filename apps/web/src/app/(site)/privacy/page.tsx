@@ -211,6 +211,14 @@ export default function PrivacyPage() {
           blood donation, and we never see photos or files you don&apos;t choose to attach. The app does not use advertising identifiers.
         </p>
 
+        <h2>Verification by classmates and CRs</h2>
+        <p>
+          A student with no university email can be confirmed by their section&apos;s CR, or by two verified classmates
+          who follow a link the student shares. Who vouched or confirmed is kept with the student&apos;s verification
+          history. It is shown to the campus admins of that university (trusted students appointed by VarsityKotha) and
+          to our admins. Campus admins see names, department, batch and photo, and never email addresses.
+        </p>
+
         <h2>Who else handles your information</h2>
         <p>
           We use a small number of service providers, only for the purposes below. They may process data outside
@@ -472,6 +480,14 @@ export default function PrivacyPage() {
         <p>
           আমরা তোমার কন্টাক্ট বা লোকেশনের ইতিহাস নিই না; রক্তদানের জন্য নিজে না দিলে তোমার ফোন নম্বরও নিই না; আর
           তুমি নিজে যুক্ত না করলে কোনো ছবি বা ফাইল দেখি না। অ্যাপে বিজ্ঞাপনের আইডি ব্যবহার হয় না।
+        </p>
+
+        <h2>সহপাঠী ও CR-এর মাধ্যমে ভেরিফিকেশন</h2>
+        <p>
+          যার বিশ্ববিদ্যালয়ের ইমেইল নেই, তাকে তার সেকশনের CR, অথবা তার শেয়ার করা লিংকের মাধ্যমে দুজন ভেরিফায়েড সহপাঠী
+          নিশ্চিত করতে পারে। কে নিশ্চিত করেছে তা শিক্ষার্থীর ভেরিফিকেশনের ইতিহাসের সাথে রাখা হয়। সেটি ওই
+          বিশ্ববিদ্যালয়ের ক্যাম্পাস অ্যাডমিন (ভার্সিটি কথার নিযুক্ত বিশ্বস্ত শিক্ষার্থী) ও আমাদের অ্যাডমিনরা দেখতে পারে।
+          ক্যাম্পাস অ্যাডমিন নাম, বিভাগ, ব্যাচ ও ছবি দেখে, ইমেইল ঠিকানা কখনো দেখে না।
         </p>
 
         <h2>আর কারা তথ্য ব্যবহার করে</h2>

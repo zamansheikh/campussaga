@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { load } from "@/lib/admin/load";
 import { api, getAdmin, requestNow, requireAdmin } from "@/lib/admin/session";
-import type { AdminUserDetail } from "@/lib/admin/types";
+import type { AdminUserDetail, CampusAdmin } from "@/lib/admin/types";
 import { allUniversities } from "@/lib/admin/universities";
 import { formatDateTime, timeAgo } from "@/lib/format";
 
@@ -27,6 +27,11 @@ export default async function UserPage({ params }: { params: Promise<{ id: strin
     load(() => allUniversities()),
   ]);
   const now = requestNow();
+  // Whether they are a campus admin of their university (the list is small: 5 at most).
+  const uni = res.data?.university;
+  const admins = uni ? await load(() => api<CampusAdmin[] | { items: CampusAdmin[] }>(`/admin/campus-admins?universityId=${uni.id}`)) : undefined;
+  const adminList = admins?.data ? (Array.isArray(admins.data) ? admins.data : admins.data.items ?? []) : [];
+  const isCampusAdmin = adminList.some((a) => a.user.id === id);
 
   return (
     <>
@@ -42,6 +47,7 @@ export default async function UserPage({ params }: { params: Promise<{ id: strin
           user={res.data}
           now={now}
           isSelf={me.id === res.data.id}
+          isCampusAdmin={isCampusAdmin}
           universities={(unis.data ?? []).map((u) => ({ id: u.id, slug: u.slug, name: u.name }))}
         />
       )}
@@ -53,11 +59,13 @@ function UserView({
   user,
   now,
   isSelf,
+  isCampusAdmin,
   universities,
 }: {
   user: AdminUserDetail;
   now: number;
   isSelf: boolean;
+  isCampusAdmin: boolean;
   universities: { id: string; slug: string; name: string }[];
 }) {
   const name = user.displayName || "No name yet";
@@ -150,7 +158,7 @@ function UserView({
             <CardTitle className="text-base">Actions</CardTitle>
           </CardHeader>
           <CardContent>
-            <UserActions user={user} isSelf={isSelf} universities={universities} />
+            <UserActions user={user} isSelf={isSelf} isCampusAdmin={isCampusAdmin} universities={universities} />
           </CardContent>
         </Card>
       </div>

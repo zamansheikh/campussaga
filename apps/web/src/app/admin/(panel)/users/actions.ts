@@ -49,11 +49,11 @@ export async function deleteUser(userId: string): Promise<ActionResult> {
 }
 
 /** For pickers (push to one user): top matches by email or name. */
-export async function searchUsers(q: string): Promise<ActionResult<Pick<AdminUser, "id" | "email" | "displayName">[]>> {
+export async function searchUsers(q: string, universityId?: string): Promise<ActionResult<Pick<AdminUser, "id" | "email" | "displayName">[]>> {
   const term = q.trim().slice(0, 100);
   if (term.length < 2) return { ok: true, data: [] };
   try {
-    const res = await api<{ items: AdminUser[] }>(`/admin/users?q=${encodeURIComponent(term)}&pageSize=8`);
+    const res = await api<{ items: AdminUser[] }>(`/admin/users?q=${encodeURIComponent(term)}&pageSize=8${universityId && id.safeParse(universityId).success ? `&universityId=${universityId}` : ""}`);
     return { ok: true, data: res.items.map((u) => ({ id: u.id, email: u.email, displayName: u.displayName })) };
   } catch (e) {
     return failure(e);

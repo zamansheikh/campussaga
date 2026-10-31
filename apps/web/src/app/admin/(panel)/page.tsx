@@ -1,4 +1,4 @@
-import { Building2, Bus, Droplet, Megaphone, School, Smartphone, UserCheck, UserRoundPlus, Users, UsersRound } from "lucide-react";
+import { Building2, Bus, Droplet, Megaphone, MessageSquareText, School, Smartphone, UserCheck, UserRoundPlus, Users, UsersRound } from "lucide-react";
 import Link from "next/link";
 
 import { SignupsChart } from "@/components/admin/dashboard/signups-chart";
@@ -116,6 +116,7 @@ export default async function DashboardPage() {
           {s.campus ? <CampusCard c={s.campus} /> : null}
           {s.blood ? <BloodCard b={s.blood} /> : null}
           {s.bus ? <BusCard b={s.bus} /> : null}
+          {s.feedback ? <FeedbackCard f={s.feedback} /> : null}
 
           <div className="grid gap-4 sm:grid-cols-3">
             <MiniStat label="Admins" value={s.users.admins} href="/admin/users?status=admin" />
@@ -212,6 +213,24 @@ function BusCard({ b }: { b: BusStats }) {
         <MiniStat label="Shares, last day" value={b.sharesLast7Days ?? 0} />
         <MiniStat label="Trips shared, all time" value={b.tripsShared ?? 0} />
         <MiniStat label="Ratings, 30 days" value={b.ratingsLast30Days ?? 0} />
+      </CardContent>
+    </Card>
+  );
+}
+
+function FeedbackCard({ f }: { f: NonNullable<Stats["feedback"]> }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <MessageSquareText className="size-4 text-muted-foreground" /> Feedback
+        </CardTitle>
+        <CardDescription>Bug reports and ideas from students</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-3 sm:grid-cols-3">
+        <MiniStat label="New" value={f.new ?? 0} href="/admin/feedback" />
+        <MiniStat label="Open" value={f.open ?? 0} href="/admin/feedback" />
+        <MiniStat label="Last 7 days" value={f.last7Days ?? 0} href="/admin/feedback?status=all" />
       </CardContent>
     </Card>
   );

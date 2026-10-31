@@ -45,6 +45,7 @@ export type Stats = {
   campus?: CampusStats;
   blood?: BloodStats;
   bus?: BusStats;
+  feedback?: { new?: number; open?: number; last7Days?: number };
 };
 
 export type CampusStats = {
@@ -315,3 +316,105 @@ export type StaffItem = {
   title: string;
   createdAt: string;
 };
+
+// Campus admins and verification by people (docs/CAMPUS_ADMINS.md, section 3).
+
+export type CampusAdmin = {
+  user: { id: string; name: string | null; email: string };
+  university: { id: string; name: string };
+  appointedAt: string;
+};
+
+export type EscalationKind = "student" | "section" | "report" | "other";
+
+export type Escalation = {
+  id: string;
+  universityId: string;
+  universityName?: string | null;
+  university?: { id: string; name: string } | null;
+  kind: EscalationKind | string;
+  targetId: string | null;
+  note: string;
+  createdBy?: { id: string; name: string | null } | null;
+  createdByName?: string | null;
+  createdAt: string;
+};
+
+export type DomainRequest = {
+  id: string;
+  domain: string;
+  email: string;
+  universityId: string | null;
+  universityName: string | null;
+  mxOk: boolean;
+  requester?: { id: string; name: string | null } | null;
+  createdAt: string;
+};
+
+export type AutoVouchBlock = {
+  userId: string;
+  user?: { id: string; name: string | null } | null;
+  name?: string | null;
+  reason: string | null;
+  createdAt: string;
+};
+
+export type AdminInbox = {
+  escalations: Escalation[];
+  domainRequests: DomainRequest[];
+  universitiesWithoutCampusAdmin: { id: string; name: string; students: number }[];
+  autoVouchBlocks: AutoVouchBlock[];
+  reportsWaiting: number;
+  /** Feedback that is new or has student replies the team hasn't opened. */
+  feedbackNew?: number;
+};
+
+export type AttentionReason = "no_campus_admin" | "sections_without_cr" | "reports_waiting" | "low_verified";
+
+export type UniversityHealth = {
+  id: string;
+  name: string;
+  students: number;
+  verified: number;
+  verifiedPct: number;
+  campusAdmins: number;
+  sections: number;
+  sectionsWithCr: number;
+  busRoutes: number;
+  openReports: number;
+  openEscalations: number;
+  attention: (AttentionReason | string)[];
+};
+
+export type FeedbackKind = "bug" | "idea" | "other";
+export type FeedbackStatus = "new" | "seen" | "planned" | "in_progress" | "done" | "wont_do";
+
+export type FeedbackImage = { url: string; thumbUrl: string };
+
+export type FeedbackItem = {
+  id: string;
+  kind: FeedbackKind | string;
+  message: string;
+  status: FeedbackStatus | string;
+  images: FeedbackImage[];
+  createdAt: string;
+  lastMessageAt: string;
+  unread?: number | boolean;
+  user: { id: string; name: string | null; email: string; university: string | { id: string; name: string } | null } | null;
+  teamUnread: number;
+  device: string | null;
+  os: string | null;
+  appVersion: string | null;
+  build: number | null;
+  platform: string | null;
+};
+
+export type FeedbackMessage = {
+  id: string;
+  fromTeam: boolean;
+  body: string;
+  createdAt: string;
+  author?: { id: string; name: string | null } | null;
+};
+
+export type FeedbackDetail = FeedbackItem & { messages: FeedbackMessage[] };

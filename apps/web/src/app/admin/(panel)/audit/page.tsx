@@ -45,7 +45,33 @@ const actions: Record<string, string> = {
   "transport.live.end": "Ended live bus sharing",
   "staff.add": "Added staff",
   "staff.remove": "Removed staff",
+  "campus.verify": "Campus admin verified a student",
+  "campus.unverify": "Campus admin removed a student's verification",
+  "campus.vouch": "A student vouched for a classmate",
+  "campus.confirm": "A CR confirmed a student",
+  "campus.vouch_block": "Blocked someone from vouching",
+  "campus.vouch_unblock": "Let someone vouch again",
+  "campus.cr.set": "Campus admin made a CR",
+  "campus.cr.remove": "Campus admin removed a CR",
+  "campus.escalate": "Campus admin asked the team for help",
+  "admin.campus_admin.add": "Appointed a campus admin",
+  "admin.campus_admin.remove": "Removed a campus admin",
+  "admin.escalation.resolve": "Resolved an escalation",
+  "admin.domain_request.approve": "Approved a university domain request",
+  "admin.domain_request.reject": "Rejected a university domain request",
+  "feedback.reply": "Replied to feedback",
+  "feedback.status": "Changed a feedback status",
 };
+
+/** A readable label; unknown campus.* and campus-admin actions get a tidy fallback. */
+function actionLabel(action: string): string {
+  const known = actions[action];
+  if (known) return known;
+  const tidy = (s: string) => s.replace(/[._]/g, " ");
+  if (action.startsWith("admin.campus_admin.")) return `Campus admin: ${tidy(action.slice("admin.campus_admin.".length))}`;
+  if (action.startsWith("campus.")) return `Campus: ${tidy(action.slice("campus.".length))}`;
+  return action;
+}
 
 function targetHref(
   type: string | null,
@@ -55,6 +81,8 @@ function targetHref(
   if (type === "user") return `/admin/users/${id}`;
   if (type === "group") return `/admin/groups/${id}`;
   if (type === "issue") return `/admin/moderation/issues/${id}`;
+  if (type === "feedback") return `/admin/feedback/${id}`;
+  if (type === "university") return `/admin/universities?campusAdminsFor=${id}`;
   if (type === "bus_route") return `/admin/transport/${id}`;
   if (type === "blood_request") return "/admin/blood?status=all";
   return undefined;
@@ -125,7 +153,7 @@ export default async function AuditPage({
                         )}
                       </TableCell>
                       <TableCell className="max-w-56 whitespace-normal">
-                        <p>{actions[a.action] ?? a.action}</p>
+                        <p>{actionLabel(a.action)}</p>
                         <Badge
                           variant="outline"
                           className="mt-1 font-mono text-[11px]"

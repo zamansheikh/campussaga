@@ -17,10 +17,13 @@ export function UserPicker({
   value,
   onChange,
   id,
+  universityId,
 }: {
   value: PickedUser | undefined;
   onChange: (u: PickedUser) => void;
   id?: string;
+  /** Only search students of this university. */
+  universityId?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -33,7 +36,7 @@ export function UserPicker({
     let live = true;
     const t = setTimeout(async () => {
       setLoading(true);
-      const res = await searchUsers(term);
+      const res = await searchUsers(term, universityId);
       if (!live) return;
       setLoading(false);
       if (res.ok) setResults(res.data ?? []);
@@ -43,7 +46,7 @@ export function UserPicker({
       live = false;
       clearTimeout(t);
     };
-  }, [q]);
+  }, [q, universityId]);
 
   const shown = q.trim().length < 2 ? [] : results;
 
