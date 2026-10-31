@@ -357,6 +357,8 @@ BEGIN
     END IF;
 
     -- ---- bus routes (stops in to-campus order; minutes from the start) ------
+    DELETE FROM bus_run_stops WHERE route_id IN
+        (SELECT id FROM bus_routes WHERE university_id = v_uni AND name LIKE 'Demo %');
     DELETE FROM bus_routes WHERE university_id = v_uni AND name LIKE 'Demo %';
 
     INSERT INTO bus_routes (university_id, name, color, notes, active, driver_name, driver_phone)
@@ -376,6 +378,19 @@ BEGIN
         (v_route, 'to_campus',   480, '{6,7,1,2,3,4}', ''),
         (v_route, 'from_campus', 810, '{6,7,1,2,3,4}', ''),
         (v_route, 'from_campus', 1035, '{6,7,1,2,3,4}', 'Last bus');
+    -- Live buses (docs/BUS_LIVE.md): classmates rated the 8:00 bus ("Usually
+    -- on time · Often crowded"), and the 7:00 was shared live on three days,
+    -- 8-10 min late ("Often ~9 min late").
+    INSERT INTO bus_trip_feedback (route_id, user_id, direction, service_date, departs, status, crowded)
+    SELECT v_route, u, 'to_campus', v_today - d, 480, 'on_time', u <> v_c
+    FROM unnest(ARRAY[v_a, v_b, v_c]) u, generate_series(1, 2) d;
+    INSERT INTO bus_run_stops (route_id, direction, service_date, departs, stop_id, passed_at, scheduled_at, riders)
+    SELECT v_route, 'to_campus', v_today - d, 420, s.id,
+           ((v_today - d) + make_interval(mins => 420 + s.to_campus_min + 7 + d)) AT TIME ZONE 'Asia/Dhaka',
+           ((v_today - d) + make_interval(mins => 420 + s.to_campus_min)) AT TIME ZONE 'Asia/Dhaka',
+           2
+    FROM bus_stops s, generate_series(1, 3) d
+    WHERE s.route_id = v_route;
 
     INSERT INTO bus_routes (university_id, name, color, notes, active, driver_name, driver_phone)
     VALUES (v_uni, 'Demo 2 · Farmgate – Shyamoli – Campus', '#2563EB', '', true, 'Jamal Uddin', '01000000002') RETURNING id INTO v_route;
