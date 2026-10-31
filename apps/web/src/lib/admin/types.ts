@@ -48,6 +48,7 @@ export type Stats = {
   feedback?: { new?: number; open?: number; last7Days?: number };
   /** Invites and campaigns (an older API doesn't send them). */
   growth?: { invitesLast7Days?: number; qualifiedLast7Days?: number; liveCampaigns?: number };
+  sponsors?: { livePromos?: number; viewsToday?: number; tapsToday?: number };
 };
 
 export type CampusStats = {

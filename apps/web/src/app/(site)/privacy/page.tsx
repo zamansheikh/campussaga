@@ -39,7 +39,7 @@ export default function PrivacyPage() {
     <article className="prose-page mx-auto max-w-3xl px-4 py-12">
       <section lang="en">
         <h1>Privacy Policy</h1>
-        <p className="text-muted-foreground">Effective 31 October 2026</p>
+        <p className="text-muted-foreground">Effective 1 November 2026</p>
         <p>
           <a href="#bn">বাংলায় পড়ো</a>
         </p>
@@ -252,6 +252,32 @@ export default function PrivacyPage() {
           </li>
         </ul>
 
+        <h2>Sponsored content</h2>
+        <ul>
+          <li>
+            <strong>What it is:</strong> some cards, posts, deals and short lines in the app are from sponsors (brands
+            that support VarsityKotha). Our team makes each one in our admin panel and the app shows it with a
+            &quot;Sponsored&quot; label. There are no ad networks in the app, and sponsored content never comes as a
+            push notification.
+          </li>
+          <li>
+            <strong>Who sees what:</strong> a sponsor can choose universities or cities. We pick what to show from your
+            university and its city, which we already have. &quot;Why am I seeing this?&quot; on each one says why.
+          </li>
+          <li>
+            <strong>What we count:</strong> to limit how often you see the same thing, and to tell sponsors how their
+            content did, we count per day which sponsored items were shown to you and which you tapped, copied or hid.
+          </li>
+          <li>
+            <strong>What sponsors get:</strong> only totals, such as &quot;1,200 views and 85 taps&quot;. We never give
+            a sponsor your name, email, phone, university details or anything that identifies you. If you open a
+            sponsor&apos;s website from the app, that website&apos;s own privacy policy applies there.
+          </li>
+          <li>
+            <strong>Your choice:</strong> &quot;Hide this ad&quot; hides an item for 7 days.
+          </li>
+        </ul>
+
         <h2>Who else handles your information</h2>
         <p>
           We use a small number of service providers, only for the purposes below. They may process data outside
@@ -327,6 +353,10 @@ export default function PrivacyPage() {
             <strong>Server logs:</strong> deleted after at most 30 days.
           </li>
           <li>
+            <strong>Sponsored content counts:</strong> which sponsored items were shown to you and what you did with them,
+            per day: deleted after 90 days. Daily totals per item, with no link to any student, are kept for reports.
+          </li>
+          <li>
             <strong>Backups:</strong> encrypted database backups are kept for up to 6 months for disaster recovery,
             then deleted. Deleted accounts are never restored from a backup except to recover the whole service after a
             failure, and are then deleted again.
@@ -382,7 +412,7 @@ export default function PrivacyPage() {
 
       <section lang="bn" id="bn" className="mt-16 border-t-2 pt-10">
         <h1>গোপনীয়তা নীতি</h1>
-        <p className="text-muted-foreground">কার্যকর: ৩১ অক্টোবর ২০২৬</p>
+        <p className="text-muted-foreground">কার্যকর: ১ নভেম্বর ২০২৬</p>
         <p>
           ভার্সিটি কথা (&quot;অ্যাপ&quot;, &quot;আমরা&quot;) বাংলাদেশের বিশ্ববিদ্যালয়ের শিক্ষার্থীদের জন্য একটি অ্যাপ,
           তৈরি করেছে <a href="https://silifton.com">সিলিফটন</a>। এই নীতিতে বলা হয়েছে অ্যাপ ও এর সার্ভার কী তথ্য নেয়, কেন
@@ -554,6 +584,31 @@ export default function PrivacyPage() {
           </li>
         </ul>
 
+        <h2>স্পন্সরড কনটেন্ট</h2>
+        <ul>
+          <li>
+            <strong>এটা কী:</strong> অ্যাপের কিছু কার্ড, পোস্ট, ডিল ও ছোট লাইন স্পন্সরদের (যেসব ব্র্যান্ড ভার্সিটি কথাকে সহায়তা করে)।
+            প্রতিটি আমাদের টিম অ্যাডমিন প্যানেলে বানায়, আর অ্যাপে &quot;স্পন্সরড&quot; লেখা থাকে। অ্যাপে কোনো বিজ্ঞাপন নেটওয়ার্ক নেই, আর
+            স্পন্সরড কনটেন্ট কখনো পুশ নোটিফিকেশন হিসেবে আসে না।
+          </li>
+          <li>
+            <strong>কে কী দেখে:</strong> স্পন্সর বিশ্ববিদ্যালয় বা শহর বেছে নিতে পারে। তোমার বিশ্ববিদ্যালয় ও তার শহর দেখে আমরা ঠিক
+            করি কী দেখাব; এ তথ্য আমাদের কাছে আগে থেকেই আছে। প্রতিটির &quot;কেন দেখছি?&quot; অংশে কারণ লেখা থাকে।
+          </li>
+          <li>
+            <strong>আমরা কী গুনি:</strong> একই জিনিস বারবার না দেখাতে, আর স্পন্সরকে ফল জানাতে, আমরা দিনভিত্তিক গুনি কোন স্পন্সরড
+            জিনিস তোমাকে দেখানো হয়েছে এবং তুমি কোনটা ট্যাপ, কপি বা লুকিয়েছ।
+          </li>
+          <li>
+            <strong>স্পন্সর কী পায়:</strong> শুধু মোট সংখ্যা, যেমন &quot;১,২০০ বার দেখা, ৮৫ বার ট্যাপ&quot;। তোমার নাম, ইমেইল, ফোন,
+            বিশ্ববিদ্যালয়ের তথ্য বা তোমাকে চেনা যায় এমন কিছু কখনো স্পন্সরকে দেওয়া হয় না। অ্যাপ থেকে কোনো স্পন্সরের ওয়েবসাইটে গেলে
+            সেখানে সেই ওয়েবসাইটের নিজের গোপনীয়তা নীতি প্রযোজ্য।
+          </li>
+          <li>
+            <strong>তোমার পছন্দ:</strong> &quot;এই বিজ্ঞাপন লুকাও&quot; দিলে সেটি ৭ দিন দেখাবে না।
+          </li>
+        </ul>
+
         <h2>আর কারা তথ্য ব্যবহার করে</h2>
         <ul>
           <li>
@@ -614,6 +669,10 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>সার্ভার লগ:</strong> সর্বোচ্চ ৩০ দিন পর মুছে ফেলা হয়।
+          </li>
+          <li>
+            <strong>স্পন্সরড কনটেন্টের গণনা:</strong> কোন স্পন্সরড জিনিস তোমাকে দেখানো হয়েছে আর তুমি কী করেছ, দিনভিত্তিক: ৯০ দিন পর
+            মুছে ফেলা হয়। প্রতিটির দিনভিত্তিক মোট সংখ্যা, কোনো শিক্ষার্থীর সাথে যুক্ত নয়, রিপোর্টের জন্য রাখা হয়।
           </li>
           <li>
             <strong>ব্যাকআপ:</strong> এনক্রিপ্টেড ব্যাকআপ সর্বোচ্চ ৬ মাস রাখা হয়, তারপর মুছে ফেলা হয়। মুছে ফেলা অ্যাকাউন্ট

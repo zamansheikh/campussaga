@@ -52,6 +52,13 @@ const messages: Record<string, string> = {
   INVALID_IMAGE: "That file isn't a photo we can use. Send a JPEG, PNG or WebP.",
   MEDIA_UNAVAILABLE: "Photos can't be stored right now. Try again later.",
   BANNER_NOT_FOUND: "This campaign has no banner.",
+  INVALID_PROMO: "Something in this ad isn't valid. Check the fields and the preview.",
+  PROMO_NOT_FOUND: "That ad doesn't exist (maybe a deleted draft).",
+  SPONSOR_NOT_FOUND: "That sponsor doesn't exist.",
+  PROMO_LOCKED: "This can't change in the ad's current status. Pause a live ad to change more than its end, views, times a day and priority; an ended ad can only be duplicated.",
+  IMAGE_NOT_FOUND: "There's no image here.",
+  HEALTH_SPONSOR_ONLY:
+    "The blood page only takes Health sponsors (hospitals, clinics, health NGOs). Choose another page, or mark the sponsor as Health.",
   NOT_A_FINISHER: "That student hasn't entered this campaign's prize race.",
   NO_REWARD: "That finisher is after the ones who get the reward.",
   INVALID_PHONE: "That isn't a Bangladesh mobile number (11 digits, 01…).",
@@ -81,6 +88,31 @@ const messages: Record<string, string> = {
   INTERNAL_ERROR: "Something went wrong on the server. Try again.",
 };
 
+/** Field names in INVALID_PROMO details, as the panel calls them. */
+const promoFieldNames: Record<string, string> = {
+  name: "The name",
+  website: "The website",
+  contactEmail: "The email",
+  archived: "Archived",
+  kind: "The kind",
+  placement: "The place",
+  campaignId: "The campaign",
+  code: "The promo code",
+  link: "The link",
+  linkKind: "The link",
+  startsAt: "The start",
+  endsAt: "The end",
+  expiresAt: "The deal's end date",
+  universityIds: "Universities",
+  cities: "Cities",
+  totalViews: "Total views",
+  sponsorId: "The sponsor",
+  status: "The status",
+  titleEn: "The English title",
+  image: "The image",
+  from: "The start date",
+};
+
 function seconds(n: number) {
   return n < 60 ? `${n} s` : `${Math.ceil(n / 60)} min`;
 }
@@ -95,6 +127,13 @@ export function errorMessage(code: string, details?: unknown, fallback?: string)
   if ((code === "CODE_RESEND_TOO_SOON" || code === "CODE_LIMIT_REACHED" || code === "TOO_MANY_REQUESTS") &&
       typeof d.retryAfterSeconds === "number") {
     return `${messages[code]} (${seconds(d.retryAfterSeconds)})`;
+  }
+  // The API names the field and the problem ({field: reason}); that says more than a generic line.
+  if (code === "INVALID_PROMO") {
+    const parts = Object.entries(d)
+      .filter(([, v]) => typeof v === "string" && v)
+      .map(([k, v]) => `${promoFieldNames[k] ?? k} ${String(v)}.`);
+    if (parts.length) return parts.join(" ");
   }
   if (code === "VALIDATION_FAILED" && d.fields && typeof d.fields === "object") {
     const list = Object.entries(d.fields as Record<string, unknown>)

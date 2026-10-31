@@ -74,6 +74,22 @@ const actions: Record<string, string> = {
   "campaign.participant.restore": "Restored a campaign participant",
   "referral.disqualify": "Disqualified an invite",
   "referral.restore": "Restored an invite",
+  "sponsor.create": "Added a sponsor",
+  "sponsor.update": "Changed a sponsor",
+  "sponsor.archive": "Archived a sponsor",
+  "sponsor.delete": "Archived a sponsor",
+  "sponsor.logo": "Changed a sponsor's logo",
+  "sponsor.logo_remove": "Removed a sponsor's logo",
+  "promo.create": "Created an ad",
+  "promo.update": "Changed an ad",
+  "promo.status": "Changed an ad's status",
+  "promo.publish": "Published an ad",
+  "promo.pause": "Paused an ad",
+  "promo.end": "Ended an ad",
+  "promo.duplicate": "Duplicated an ad",
+  "promo.delete": "Deleted a draft ad",
+  "promo.image": "Changed an ad's image",
+  "promo.image_remove": "Removed an ad's image",
 };
 
 /** A readable label; unknown campus.* and campus-admin actions get a tidy fallback. */
@@ -85,6 +101,8 @@ function actionLabel(action: string): string {
   if (action.startsWith("campus.")) return `Campus: ${tidy(action.slice("campus.".length))}`;
   if (action.startsWith("campaign.")) return `Campaign: ${tidy(action.slice("campaign.".length))}`;
   if (action.startsWith("referral.")) return `Invite: ${tidy(action.slice("referral.".length))}`;
+  if (action.startsWith("sponsor.")) return `Sponsor: ${tidy(action.slice("sponsor.".length))}`;
+  if (action.startsWith("promo.")) return `Ad: ${tidy(action.slice("promo.".length))}`;
   return action;
 }
 
@@ -99,6 +117,8 @@ function targetHref(
   if (type === "feedback") return `/admin/feedback/${id}`;
   if (type === "university") return `/admin/universities?campusAdminsFor=${id}`;
   if (type === "campaign") return `/admin/campaigns/${id}`;
+  if (type === "sponsor") return `/admin/sponsors/${id}`;
+  if (type === "promo") return `/admin/ads/${id}`;
   if (type === "referral") return `/admin/users/${id}`;
   if (type === "bus_route") return `/admin/transport/${id}`;
   if (type === "blood_request") return "/admin/blood?status=all";

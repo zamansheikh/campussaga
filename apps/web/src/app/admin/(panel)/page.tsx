@@ -1,4 +1,4 @@
-import { Building2, Bus, Droplet, Megaphone, MessageSquareText, School, Share2, Smartphone, UserCheck, UserRoundPlus, Users, UsersRound } from "lucide-react";
+import { BadgePercent, Building2, Bus, Droplet, Megaphone, MessageSquareText, School, Share2, Smartphone, UserCheck, UserRoundPlus, Users, UsersRound } from "lucide-react";
 import Link from "next/link";
 
 import { SignupsChart } from "@/components/admin/dashboard/signups-chart";
@@ -118,6 +118,7 @@ export default async function DashboardPage() {
           {s.bus ? <BusCard b={s.bus} /> : null}
           {s.feedback ? <FeedbackCard f={s.feedback} /> : null}
           {s.growth ? <GrowthCard g={s.growth} /> : null}
+          {s.sponsors ? <SponsorsCard v={s.sponsors} /> : null}
 
           <div className="grid gap-4 sm:grid-cols-3">
             <MiniStat label="Admins" value={s.users.admins} href="/admin/users?status=admin" />
@@ -250,6 +251,27 @@ function GrowthCard({ g }: { g: NonNullable<Stats["growth"]> }) {
         <MiniStat label="Invites, 7 days" value={g.invitesLast7Days ?? 0} href="/admin/referrals" />
         <MiniStat label="Qualified, 7 days" value={g.qualifiedLast7Days ?? 0} href="/admin/referrals" />
         <MiniStat label="Live campaigns" value={g.liveCampaigns ?? 0} href="/admin/campaigns" />
+      </CardContent>
+    </Card>
+  );
+}
+
+/** Sponsored content today: what's running and how students respond. */
+function SponsorsCard({ v }: { v: NonNullable<Stats["sponsors"]> }) {
+  const views = v.viewsToday ?? 0;
+  const taps = v.tapsToday ?? 0;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <BadgePercent className="size-4 text-muted-foreground" /> Sponsors
+        </CardTitle>
+        <CardDescription>Ads today, Bangladesh time{views > 0 ? ` · ${percent(taps, views)} of views were tapped` : ""}</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-3 sm:grid-cols-3">
+        <MiniStat label="Live ads" value={v.livePromos ?? 0} href="/admin/ads?status=live" />
+        <MiniStat label="Views today" value={views} href="/admin/ads" />
+        <MiniStat label="Taps today" value={taps} href="/admin/ads" />
       </CardContent>
     </Card>
   );
