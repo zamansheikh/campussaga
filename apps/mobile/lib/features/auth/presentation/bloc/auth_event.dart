@@ -52,6 +52,12 @@ final class AuthAccountDeleteRequested extends AuthEvent {
   const AuthAccountDeleteRequested();
 }
 
+/// The app is back in the foreground: after an offline start, check the
+/// session and profile with the server.
+final class AuthRefreshRequested extends AuthEvent {
+  const AuthRefreshRequested();
+}
+
 /// "Sign out" tapped.
 final class AuthSignOutRequested extends AuthEvent {
   const AuthSignOutRequested();

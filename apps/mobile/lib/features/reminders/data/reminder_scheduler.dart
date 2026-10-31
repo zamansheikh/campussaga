@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
@@ -88,18 +89,27 @@ class LocalNotificationScheduler implements ReminderScheduler {
     } on Object {
       tz.setLocalLocation(tz.getLocation('Asia/Dhaka'));
     }
-    await _plugin.initialize(
-      settings: const InitializationSettings(
-        android: AndroidInitializationSettings('ic_notification'),
-        // Permission is asked from the app at the right moment, not at start.
-        iOS: DarwinInitializationSettings(
-          requestAlertPermission: false,
-          requestBadgePermission: false,
-          requestSoundPermission: false,
-        ),
-      ),
-    );
+    try {
+      await _initializePlugin('ic_notification');
+    } on PlatformException catch (e) {
+      // The small icon wasn't found by name (seen once on an Android 11
+      // OnePlus): use the app icon rather than leave reminders off.
+      if (e.code != 'invalid_icon') rethrow;
+      await _initializePlugin('@mipmap/ic_launcher');
+    }
   }
+
+  Future<void> _initializePlugin(String icon) => _plugin.initialize(
+    settings: InitializationSettings(
+      android: AndroidInitializationSettings(icon),
+      // Permission is asked from the app at the right moment, not at start.
+      iOS: const DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+      ),
+    ),
+  );
 
   @override
   Future<bool> permissionGranted() async {

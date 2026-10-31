@@ -12,6 +12,7 @@ import 'package:varsitykotha/app/settings/settings_storage.dart';
 import 'package:varsitykotha/app/version/app_version.dart';
 import 'package:varsitykotha/features/announcements/data/seen_store.dart';
 import 'package:varsitykotha/features/auth/data/google_auth.dart';
+import 'package:varsitykotha/features/auth/data/profile_cache.dart';
 import 'package:varsitykotha/features/classes/data/routine_cache.dart';
 import 'package:varsitykotha/features/push/push_messaging.dart';
 import 'package:varsitykotha/features/reminders/data/phone_info.dart';
@@ -85,8 +86,14 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Stream<void> get sessionEnded => ended.stream;
 
+  /// restoreSession fails with this (no internet at start).
+  Failure? restoreFailure;
+
   @override
-  Future<UserProfile?> restoreSession() async => savedUser;
+  Future<UserProfile?> restoreSession() async {
+    if (restoreFailure case final f?) throw f;
+    return savedUser;
+  }
 
   @override
   Future<SignInResult> signInWithGoogle(
@@ -344,6 +351,7 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   SettingsStorage? settings,
   FakeClassGroupRepository? classes,
   RoutineCache? routineCache,
+  ProfileCache? profileCache,
   ReminderStore? reminderStore,
   ReminderScheduler? reminderScheduler,
   SeenStore? seenStore,
@@ -376,6 +384,7 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
       classes ?? FakeClassGroupRepository(),
     )
     ..registerSingleton<RoutineCache>(routineCache ?? MemoryRoutineCache())
+    ..registerSingleton<ProfileCache>(profileCache ?? MemoryProfileCache())
     ..registerSingleton<ReminderStore>(reminderStore ?? MemoryReminderStore())
     ..registerSingleton<ReminderScheduler>(
       reminderScheduler ?? MemoryReminderScheduler(),

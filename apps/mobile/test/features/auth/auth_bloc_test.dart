@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:campus_core/campus_core.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:varsitykotha/features/auth/data/profile_cache.dart';
 import 'package:varsitykotha/features/auth/presentation/bloc/auth_bloc.dart';
 
 import '../../helpers/fakes.dart';
@@ -25,6 +26,70 @@ void main() {
       const AuthState(status: AuthStatus.signedIn, user: testUser),
     ],
   );
+
+  group('without internet at start', () {
+    late MemoryProfileCache cache;
+    setUp(() {
+      cache = MemoryProfileCache();
+      repo.restoreFailure = const NetworkFailure();
+    });
+    AuthBloc offline() =>
+        AuthBloc(repository: repo, google: google, profileCache: cache);
+
+    blocTest<AuthBloc, AuthState>(
+      'opens with the saved profile instead of signing out',
+      setUp: () => cache.saved = testUser,
+      build: offline,
+      act: (b) => b.add(const AuthStarted()),
+      expect: () => [
+        const AuthState(status: AuthStatus.signedIn, user: testUser),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'never signed in on this phone: signed out as before',
+      build: offline,
+      act: (b) => b.add(const AuthStarted()),
+      expect: () => [
+        const AuthState(
+          status: AuthStatus.signedOut,
+          failure: NetworkFailure(),
+        ),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'back online, the session is checked again (ended: signed out)',
+      setUp: () => cache.saved = testUser,
+      build: offline,
+      act: (b) async {
+        b.add(const AuthStarted());
+        await Future<void>.delayed(Duration.zero);
+        repo
+          ..restoreFailure = null
+          ..savedUser = null; // the session ended meanwhile
+        b.add(const AuthRefreshRequested());
+      },
+      expect: () => [
+        const AuthState(status: AuthStatus.signedIn, user: testUser),
+        const AuthState(status: AuthStatus.signedOut),
+      ],
+      verify: (_) => expect(cache.saved, isNull),
+    );
+  });
+
+  test('the profile on the phone follows sign-in and sign-out', () async {
+    final cache = MemoryProfileCache();
+    repo.savedUser = testUser;
+    final b = AuthBloc(repository: repo, google: google, profileCache: cache)
+      ..add(const AuthStarted());
+    await Future<void>.delayed(Duration.zero);
+    expect(cache.saved?.id, testUser.id);
+    b.add(const AuthSignOutRequested());
+    await Future<void>.delayed(Duration.zero);
+    expect(cache.saved, isNull);
+    await b.close();
+  });
 
   blocTest<AuthBloc, AuthState>(
     'no saved session means signed out',

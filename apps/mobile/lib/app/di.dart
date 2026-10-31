@@ -5,6 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../features/announcements/data/seen_store.dart';
 import '../features/auth/data/google_auth.dart';
+import '../features/auth/data/profile_cache.dart';
 import '../features/classes/data/routine_cache.dart';
 import '../features/push/push_messaging.dart';
 import '../features/reminders/data/phone_info.dart';
@@ -60,6 +61,7 @@ Future<void> configureDependencies({
       () => ApiClassGroupRepository(getIt<ApiClient>()),
     )
     ..registerLazySingleton<RoutineCache>(PrefsRoutineCache.new)
+    ..registerLazySingleton<ProfileCache>(PrefsProfileCache.new)
     ..registerLazySingleton<ReminderStore>(PrefsReminderStore.new)
     ..registerLazySingleton<SeenStore>(PrefsSeenStore.new)
     ..registerLazySingleton<DeviceRepository>(

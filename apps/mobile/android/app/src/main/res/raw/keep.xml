@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Resources looked up by name at runtime (getIdentifier), so release
+     resource shrinking must keep them under their names: the notification
+     small icon (flutter_local_notifications, Firebase Messaging) and the
+     home-screen widget's icons. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_notification,@drawable/ic_widget_*,@mipmap/ic_launcher" />

@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../features/announcements/data/seen_store.dart';
 import '../features/announcements/presentation/seen_cubit.dart';
 import '../features/auth/data/google_auth.dart';
+import '../features/auth/data/profile_cache.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/classes/data/routine_cache.dart';
 import '../features/classes/presentation/bloc/my_classes_cubit.dart';
@@ -41,6 +42,7 @@ class _CampusAppState extends State<CampusApp> {
   late final AuthBloc _auth = AuthBloc(
     repository: getIt<AuthRepository>(),
     google: getIt<GoogleAuth>(),
+    profileCache: getIt<ProfileCache>(),
   )..add(const AuthStarted());
   late final MyClassesCubit _classes = MyClassesCubit(
     getIt<ClassGroupRepository>(),
@@ -73,6 +75,7 @@ class _CampusAppState extends State<CampusApp> {
   // routine.
   late final AppLifecycleListener _lifecycle = AppLifecycleListener(
     onResume: () {
+      _auth.add(const AuthRefreshRequested());
       _versionGate.check();
       unawaited(_classes.refresh());
       unawaited(_reminders.refresh());

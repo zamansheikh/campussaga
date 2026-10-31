@@ -1,6 +1,10 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
 
 /// Sends crashes and unexpected errors somewhere we can see them.
 /// Privacy: no user id, email or profile data is ever attached.
@@ -42,10 +46,18 @@ class MemoryCrashReporter implements CrashReporter {
 }
 
 /// Routes every uncaught error to [reporter]: framework errors, errors
-/// outside Flutter (async, platform channels) and bloc errors.
+/// outside Flutter (async, platform channels) and bloc errors. An image
+/// that fails to load (a map tile, a photo) is not a crash: offline ones
+/// aren't reported at all, others as non-fatal.
 void installErrorReporting(CrashReporter reporter) {
   FlutterError.onError = (details) {
     FlutterError.presentError(details); // still visible in the console
+    if (isImageLoadError(details)) {
+      if (!isNetworkError(details.exception)) {
+        reporter.recordError(details.exception, details.stack);
+      }
+      return;
+    }
     reporter.recordFlutterError(details);
   };
   PlatformDispatcher.instance.onError = (error, stack) {
@@ -67,3 +79,16 @@ class AppBlocObserver extends BlocObserver {
     super.onError(bloc, error, stackTrace);
   }
 }
+
+/// A failed image load (map tiles, photos): Flutter reports these through
+/// FlutterError, but the app keeps working (the image stays blank).
+bool isImageLoadError(FlutterErrorDetails d) =>
+    d.library == 'image resource service';
+
+/// No connection, or the connection broke: expected on a phone.
+bool isNetworkError(Object e) =>
+    e is SocketException ||
+    e is HttpException ||
+    e is HandshakeException ||
+    e is TimeoutException ||
+    e is http.ClientException;

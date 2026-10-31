@@ -30,6 +30,15 @@ class University {
   /// Student email domains, e.g. `diu.edu.bd`.
   final List<String> domains;
 
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'slug': slug,
+    'name': name,
+    'nameBn': nameBn,
+    'city': city,
+    'domains': domains,
+  };
+
   /// Bangla name when the app is in Bangla and one exists.
   String localName(String languageCode) =>
       languageCode == 'bn' && nameBn != null ? nameBn! : name;
@@ -190,6 +199,21 @@ class UserProfile {
   /// The Google account photo (signed in with Google), shown when there's
   /// no uploaded photo.
   final String? googlePhotoUrl;
+
+  /// As [UserProfile.fromJson] reads it (kept on the phone for offline use).
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'email': email,
+    'university': university?.toJson(),
+    'role': role,
+    'displayName': displayName,
+    'department': department,
+    'batch': batch,
+    'verified': verified,
+    'universityEmail': universityEmail,
+    'photoVersion': photoVersion,
+    'googlePhotoUrl': googlePhotoUrl,
+  };
 
   /// Name, department and batch are all filled in.
   bool get isComplete =>
