@@ -4,8 +4,8 @@ import "encoding/json"
 
 // Scoring is a campaign's point values (docs/GROWTH.md §8.1). A 0 turns one
 // off. BusShareDays, SectionSetupMax and PioneerFirst are limits, not points;
-// MinOtherCampus is how many counted friends at other universities a student
-// needs to be ranked (§8.5, 0: none).
+// MinOwnCampus and MinOtherCampus are how many counted friends at my own and
+// at other universities a student needs to be ranked (§8.5, 0: none).
 type Scoring struct {
 	Invite          int `json:"invite"`
 	OtherCampus     int `json:"otherCampus"`
@@ -18,13 +18,19 @@ type Scoring struct {
 	SectionSetup    int `json:"sectionSetup"`
 	SectionSetupMax int `json:"sectionSetupMax"`
 	PioneerFirst    int `json:"pioneerFirst"`
+	MinOwnCampus    int `json:"minOwnCampus"`
 	MinOtherCampus  int `json:"minOtherCampus"`
+}
+
+// eligible: in the prize race (§8.5).
+func (sc Scoring) eligible(t tally) bool {
+	return t.OwnCampus >= sc.MinOwnCampus && t.OtherCampus >= sc.MinOtherCampus
 }
 
 // DefaultScoring matches the column default of 00760_campaign_points.sql.
 var DefaultScoring = Scoring{
 	Invite: 10, OtherCampus: 5, Pioneer: 5, FriendSection: 3, JoinSection: 2, BloodDonor: 3,
-	BusShare: 2, BusShareDays: 10, SectionSetup: 15, SectionSetupMax: 2, PioneerFirst: 20, MinOtherCampus: 2,
+	BusShare: 2, BusShareDays: 10, SectionSetup: 15, SectionSetupMax: 2, PioneerFirst: 20, MinOwnCampus: 3, MinOtherCampus: 2,
 }
 
 // Mission rules that aren't point values.
@@ -47,6 +53,7 @@ type ScoringInput struct {
 	SectionSetup    *int `json:"sectionSetup"`
 	SectionSetupMax *int `json:"sectionSetupMax"`
 	PioneerFirst    *int `json:"pioneerFirst"`
+	MinOwnCampus    *int `json:"minOwnCampus"`
 	MinOtherCampus  *int `json:"minOtherCampus"`
 }
 
@@ -82,6 +89,7 @@ func (in *ScoringInput) mergeOver(base Scoring) (Scoring, error) {
 		{&out.SectionSetup, in.SectionSetup, 0, 100},
 		{&out.SectionSetupMax, in.SectionSetupMax, 0, 10},
 		{&out.PioneerFirst, in.PioneerFirst, 1, 1000},
+		{&out.MinOwnCampus, in.MinOwnCampus, 0, 20},
 		{&out.MinOtherCampus, in.MinOtherCampus, 0, 20},
 	} {
 		if err := set(f.dst, f.v, f.lo, f.hi); err != nil {
@@ -105,6 +113,7 @@ func parseScoring(raw []byte) Scoring {
 type tally struct {
 	Invites       int // counted invites
 	OtherCampus   int // of them, friends at another university
+	OwnCampus     int // of them, friends at my university (for eligibility, not points)
 	Pioneer       int // of them, among the first students of their university
 	FriendSection int // of them, friends in a class group
 	JoinSection   int // 0 or 1

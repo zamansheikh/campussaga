@@ -106,7 +106,7 @@ type gwStanding struct {
 // count and everyone is ranked (TestGrowthPoints covers the rest).
 var invitesOnly = map[string]any{
 	"invite": 1, "otherCampus": 0, "pioneer": 0, "friendSection": 0, "joinSection": 0, "bloodDonor": 0, "busShare": 0, "sectionSetup": 0,
-	"minOtherCampus": 0,
+	"minOwnCampus": 0, "minOtherCampus": 0,
 }
 
 func campaignBody(start, end time.Time, extra map[string]any) map[string]any {

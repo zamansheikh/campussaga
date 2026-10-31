@@ -466,9 +466,11 @@ type StandingRow struct {
 	// Disqualified participants are listed after the ranked ones (rank null)
 	// so they can be restored.
 	Disqualified bool `json:"disqualified"`
-	// Eligible: at least minOtherCampus counted friends at other
-	// universities (OtherCampus), so ranked; the others have rank null (§8.5).
+	// Eligible: at least minOwnCampus counted friends at their university
+	// (OwnCampus) and minOtherCampus at others (OtherCampus), so ranked; the
+	// others have rank null (§8.5).
 	Eligible    bool `json:"eligible"`
+	OwnCampus   int  `json:"ownCampus"`
 	OtherCampus int  `json:"otherCampus"`
 	// Points per key (zero for a disqualified participant).
 	Points  Points       `json:"points"`
@@ -505,7 +507,7 @@ func (s *Service) handleAdminStandings(ctx context.Context, in *campaignReq) (*[
 			rank = &r
 		}
 		users[x.UserID] = len(out)
-		out = append(out, StandingRow{Rank: rank, Score: x.Score, Hidden: x.Hidden, Eligible: x.Eligible, OtherCampus: x.Tally.OtherCampus,
+		out = append(out, StandingRow{Rank: rank, Score: x.Score, Hidden: x.Hidden, Eligible: x.Eligible, OwnCampus: x.Tally.OwnCampus, OtherCampus: x.Tally.OtherCampus,
 			Points: x.Tally.points(c.Scoring), Invites: []InviteView{}, Flags: []string{},
 			User: StandingUser{ID: x.UserID, Name: x.Name, University: x.UniName}})
 	}

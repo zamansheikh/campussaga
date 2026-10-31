@@ -126,9 +126,10 @@ func (c campaign) prizeFor(rank int) (Prize, bool) {
 // the campaign, qualified by settles_at, not disqualified, not on the same
 // phone) with their bonuses, plus the missions. Only verified, non-team
 // students take part; anyone with a point has a row. Only the eligible
-// (at least minOtherCampus counted friends at other universities, §8.5) are
-// ranked, first; the rest follow with rank 0. Ranks go by points, then by who
-// reached them first (the latest counted event), then by id.
+// (counted friends: at least minOwnCampus at my university and minOtherCampus
+// at others, §8.5) are ranked, first; the rest follow with rank 0. Ranks go
+// by points, then by who reached them first (the latest counted event), then
+// by id.
 type standing struct {
 	Rank      int // 0: not eligible
 	Eligible  bool
@@ -150,7 +151,7 @@ type standing struct {
 // off), $13 CR sections that count (0: off), $14 routine slots and $15
 // verified members a section needs, $16 a bus share's minimum minutes,
 // $17..$24 the points per key, $25 invites worth points (their time breaks
-// ties), $26 minOtherCampus.
+// ties), $26 minOtherCampus, $27 minOwnCampus.
 //
 // Bus: a Dhaka day counts when I shared a live bus that day that ran at least
 // $16 minutes (by its last ping), didn't end off the route, and another
@@ -159,6 +160,7 @@ const standingsSQL = `
 WITH counted AS (
 	SELECT r.referrer_id AS user_id, r.qualified_at,
 	       (f.university_id IS NOT NULL AND f.university_id IS DISTINCT FROM rr.university_id) AS other_campus,
+	       (f.university_id IS NOT NULL AND f.university_id = rr.university_id) AS own_campus,
 	       (f.verified_at IS NOT NULL AND f.university_id IS NOT NULL
 	        AND (SELECT count(*) FROM users x WHERE x.university_id = f.university_id AND x.verified_at < f.verified_at) < $9::int) AS pioneer,
 	       EXISTS (SELECT 1 FROM class_group_members m WHERE m.user_id = f.id) AS in_section
@@ -185,22 +187,23 @@ parts AS (
 	SELECT user_id, count(*)::int AS invites, (count(*) FILTER (WHERE other_campus))::int AS other_campus,
 	       (count(*) FILTER (WHERE pioneer))::int AS pioneer, (count(*) FILTER (WHERE in_section))::int AS friend_section,
 	       0 AS join_section, 0 AS blood_donor, 0 AS bus_days, 0 AS sections,
-	       CASE WHEN $25::bool THEN max(qualified_at) END AS reached_at
+	       CASE WHEN $25::bool THEN max(qualified_at) END AS reached_at, (count(*) FILTER (WHERE own_campus))::int AS own_campus
 	FROM counted GROUP BY user_id
 	UNION ALL
-	SELECT user_id, 0, 0, 0, 0, 1, 0, 0, 0, min(joined_at) FROM class_group_members WHERE $10::bool GROUP BY user_id
+	SELECT user_id, 0, 0, 0, 0, 1, 0, 0, 0, min(joined_at), 0 FROM class_group_members WHERE $10::bool GROUP BY user_id
 	UNION ALL
-	SELECT user_id, 0, 0, 0, 0, 0, 1, 0, 0, created_at FROM blood_donors WHERE $11::bool
+	SELECT user_id, 0, 0, 0, 0, 0, 1, 0, 0, created_at, 0 FROM blood_donors WHERE $11::bool
 	UNION ALL
-	SELECT user_id, 0, 0, 0, 0, 0, 0, count(*)::int, 0, max(started)
+	SELECT user_id, 0, 0, 0, 0, 0, 0, count(*)::int, 0, max(started), 0
 	FROM (SELECT b.user_id, b.started, row_number() OVER (PARTITION BY b.user_id ORDER BY b.day) AS k FROM bus_days b) x
 	WHERE k <= $12::int GROUP BY user_id
 	UNION ALL
-	SELECT user_id, 0, 0, 0, 0, 0, 0, 0, count(*)::int, NULL::timestamptz FROM cr_sections WHERE k <= $13::int GROUP BY user_id),
+	SELECT user_id, 0, 0, 0, 0, 0, 0, 0, count(*)::int, NULL::timestamptz, 0 FROM cr_sections WHERE k <= $13::int GROUP BY user_id),
 tallied AS (
 	SELECT user_id, sum(invites)::int AS invites, sum(other_campus)::int AS other_campus, sum(pioneer)::int AS pioneer,
 	       sum(friend_section)::int AS friend_section, sum(join_section)::int AS join_section, sum(blood_donor)::int AS blood_donor,
-	       sum(bus_days)::int AS bus_days, sum(sections)::int AS sections, max(reached_at) AS reached_at
+	       sum(bus_days)::int AS bus_days, sum(sections)::int AS sections, max(reached_at) AS reached_at,
+	       sum(own_campus)::int AS own_campus
 	FROM parts GROUP BY user_id),
 scored AS (
 	SELECT t.*, (t.invites * $17::int + t.other_campus * $18::int + t.pioneer * $19::int + t.friend_section * $20::int
@@ -209,8 +212,9 @@ scored AS (
 ranked AS (
 	SELECT s.user_id, s.score, s.reached_at, coalesce(u.display_name, '') AS name, u.leaderboard_hidden, u.university_id, un.name AS uni_name,
 	       fb.badge, fb.tier, s.invites, s.other_campus, s.pioneer, s.friend_section, s.join_section, s.blood_donor, s.bus_days, s.sections,
-	       s.other_campus >= $26::int AS eligible,
-	       row_number() OVER (PARTITION BY s.other_campus >= $26::int ORDER BY s.score DESC, s.reached_at NULLS LAST, s.user_id)::int AS k
+	       s.own_campus, s.own_campus >= $27::int AND s.other_campus >= $26::int AS eligible,
+	       row_number() OVER (PARTITION BY s.own_campus >= $27::int AND s.other_campus >= $26::int
+	                          ORDER BY s.score DESC, s.reached_at NULLS LAST, s.user_id)::int AS k
 	FROM scored s JOIN users u ON u.id = s.user_id JOIN universities un ON un.id = u.university_id
 	LEFT JOIN user_badges fb ON fb.user_id = u.id AND fb.badge = u.featured_badge AND NOT fb.private
 	WHERE s.score > 0 AND u.verified_at IS NOT NULL AND u.role NOT IN ('admin', 'moderator') AND u.blocked_at IS NULL
@@ -218,7 +222,7 @@ ranked AS (
 	  AND ($6::uuid IS NULL OR u.university_id = $6)
 	  AND NOT EXISTS (SELECT 1 FROM campaign_disqualified d WHERE d.campaign_id = $1 AND d.user_id = u.id))
 SELECT user_id, score, reached_at, name, leaderboard_hidden, university_id, uni_name, badge, tier,
-       invites, other_campus, pioneer, friend_section, join_section, blood_donor, bus_days, sections,
+       invites, other_campus, pioneer, friend_section, join_section, blood_donor, bus_days, sections, own_campus,
        eligible, CASE WHEN eligible THEN k ELSE 0 END
 FROM ranked ORDER BY eligible DESC, k LIMIT $7`
 
@@ -234,10 +238,10 @@ func (s *Service) standings(ctx context.Context, c campaign, scopeUni *uuid.UUID
 	invitesWorth := sc.Invite+sc.OtherCampus+sc.Pioneer+sc.FriendSection > 0
 	rows, err := s.d.Q(ctx).Query(ctx, standingsSQL,
 		c.ID, c.StartsAt, c.EndsAt, c.SettlesAt, c.UniversityIDs, scopeUni, limit,
-		invitesWorth || sc.MinOtherCampus > 0, sc.PioneerFirst, sc.JoinSection > 0, sc.BloodDonor > 0,
+		invitesWorth || sc.MinOtherCampus > 0 || sc.MinOwnCampus > 0, sc.PioneerFirst, sc.JoinSection > 0, sc.BloodDonor > 0,
 		busDays, sections, SectionSlotsNeed, SectionMembersNeed, BusShareMinMinutes,
 		sc.Invite, sc.OtherCampus, sc.Pioneer, sc.FriendSection, sc.JoinSection, sc.BloodDonor, sc.BusShare, sc.SectionSetup,
-		invitesWorth, sc.MinOtherCampus)
+		invitesWorth, sc.MinOtherCampus, sc.MinOwnCampus)
 	if err != nil {
 		return nil, err
 	}
@@ -250,7 +254,7 @@ func (s *Service) standings(ctx context.Context, c campaign, scopeUni *uuid.UUID
 		t := &x.Tally
 		if err := rows.Scan(&x.UserID, &x.Score, &x.ReachedAt, &x.Name, &x.Hidden, &x.UniID, &x.UniName, &badge, &tier,
 			&t.Invites, &t.OtherCampus, &t.Pioneer, &t.FriendSection, &t.JoinSection, &t.BloodDonor, &t.BusDays, &t.Sections,
-			&x.Eligible, &x.Rank); err != nil {
+			&t.OwnCampus, &x.Eligible, &x.Rank); err != nil {
 			return nil, err
 		}
 		if badge != nil && tier != nil {
@@ -345,8 +349,10 @@ type CampaignView struct {
 	Prizes    []PrizeView `json:"prizes"`
 	MyScore   int         `json:"myScore"`
 	MyRank    *int        `json:"myRank"` // null: no points, or not eligible
-	// MyOtherCampus: my counted friends at other universities; Eligible:
-	// at least scoring.minOtherCampus of them, so I'm ranked (§8.5).
+	// MyOwnCampus / MyOtherCampus: my counted friends at my / other
+	// universities; Eligible: at least scoring.minOwnCampus and
+	// scoring.minOtherCampus of them, so I'm ranked (§8.5).
+	MyOwnCampus   int     `json:"myOwnCampus"`
 	MyOtherCampus int     `json:"myOtherCampus"`
 	Eligible      bool    `json:"eligible"`
 	RulesURL      string  `json:"rulesUrl"`
@@ -378,8 +384,8 @@ func (s *Service) view(ctx context.Context, c campaign, uid uuid.UUID) (Campaign
 		return v, me, err
 	}
 	v.MyScore = me.Score
-	v.MyOtherCampus = me.Tally.OtherCampus
-	v.Eligible = me.Tally.OtherCampus >= c.Scoring.MinOtherCampus
+	v.MyOwnCampus, v.MyOtherCampus = me.Tally.OwnCampus, me.Tally.OtherCampus
+	v.Eligible = c.Scoring.eligible(me.Tally)
 	if me.Rank > 0 {
 		rank := me.Rank
 		v.MyRank = &rank
