@@ -128,10 +128,9 @@ class _VisitCampusesPageState extends State<VisitCampusesPage> {
                 prefixIcon: const Icon(CsIcons.search),
               ),
             ),
+            const SizedBox(height: CsSpace.lg),
             if (_search.text.trim().isEmpty)
-              CsSectionTitle(title: l10n.visitMostActive)
-            else
-              const SizedBox(height: CsSpace.md),
+              CsSectionTitle(title: l10n.visitMostActive),
             if (_loading && _items.isEmpty)
               const Padding(
                 padding: EdgeInsets.all(CsSpace.xl),

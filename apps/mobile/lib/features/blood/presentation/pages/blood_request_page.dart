@@ -298,7 +298,7 @@ class _Body extends StatelessWidget {
     return [
       if (r.notified > 0)
         Padding(
-          padding: const EdgeInsets.only(bottom: CsSpace.sm),
+          padding: const EdgeInsets.only(bottom: CsSpace.md),
           child: Text(
             l10n.bloodNotified(r.notified, r.bloodGroup.label),
             style: context.text.bodyMedium,

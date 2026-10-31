@@ -81,6 +81,7 @@ class _BloodView extends StatelessWidget {
             ),
             children: [
               const _DonorCard(),
+              const SizedBox(height: CsSpace.lg),
               CsSectionTitle(
                 title: l10n.bloodRequests,
                 action: s.donor == null
@@ -112,6 +113,7 @@ class _BloodView extends StatelessWidget {
                     ),
                   ),
               if (s.mine.isNotEmpty) ...[
+                const SizedBox(height: CsSpace.lg),
                 CsSectionTitle(title: l10n.bloodMyRequests),
                 for (final r in s.mine)
                   Padding(
