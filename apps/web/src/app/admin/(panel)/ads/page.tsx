@@ -129,14 +129,14 @@ export default async function AdsPage({ searchParams }: { searchParams: Promise<
                         {formatDate(p.startsAt)} – {formatDate(p.endsAt)}
                       </TableCell>
                       <TableCell className="hidden text-right tabular-nums lg:table-cell">
-                        {formatNumber(p.viewsToday ?? 0)} <span className="text-muted-foreground">views</span>
+                        {formatNumber(p.viewsToday ?? 0)} <span className="text-muted-foreground">{plural(p.viewsToday ?? 0, "view")}</span>
                         <br />
-                        {formatNumber(p.tapsToday ?? 0)} <span className="text-muted-foreground">taps</span>
+                        {formatNumber(p.tapsToday ?? 0)} <span className="text-muted-foreground">{plural(p.tapsToday ?? 0, "tap")}</span>
                       </TableCell>
                       <TableCell className="hidden text-right tabular-nums sm:table-cell">
-                        {formatNumber(views)} <span className="text-muted-foreground">views</span>
+                        {formatNumber(views)} <span className="text-muted-foreground">{plural(views, "view")}</span>
                         <br />
-                        {formatNumber(taps)} <span className="text-muted-foreground">taps · {percentText(ctrOf(views, taps))}</span>
+                        {formatNumber(taps)} <span className="text-muted-foreground">{plural(taps, "tap")} · {percentText(ctrOf(views, taps))}</span>
                       </TableCell>
                     </TableRow>
                   );
@@ -168,4 +168,9 @@ function Thumb({ promo }: { promo: AdminPromo }) {
       <ImageIcon className="size-4" aria-hidden />
     </span>
   );
+}
+
+/** "view" or "views" for [n]. */
+function plural(n: number, word: string): string {
+  return n === 1 ? word : `${word}s`;
 }
