@@ -342,15 +342,34 @@ void main() {
     expect(voice.issues.single.card.myReaction, Reaction.like);
     expect(find.text('3'), findsOneWidget);
 
-    await tester.longPress(find.text('Like'));
+    // Hold, slide to Wow without lifting, lift: Wow.
+    final hold = await tester.startGesture(tester.getCenter(find.text('Like')));
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Wow'));
+    await hold.moveTo(tester.getCenter(find.bySemanticsLabel('Wow')));
+    await tester.pump(const Duration(milliseconds: 200));
+    await hold.up();
     await tester.pumpAndSettle();
     expect(voice.issues.single.card.myReaction, Reaction.wow);
     expect(find.text('Wow'), findsOneWidget, reason: 'the button says so');
     expect(find.text('3'), findsOneWidget, reason: 'still one each');
+    expect(find.bySemanticsLabel('Sad'), findsNothing, reason: 'closed');
 
-    await tester.tap(find.text('Wow'));
+    // Hold and lift in place: the reactions stay open to tap.
+    await tester.longPress(find.text('Wow'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Sad'));
+    await tester.pumpAndSettle();
+    expect(voice.issues.single.card.myReaction, Reaction.sad);
+    // Tapping outside closes them without a change.
+    await tester.longPress(find.text('Sad'));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(200, 120));
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel('Haha'), findsNothing);
+    expect(voice.issues.single.card.myReaction, Reaction.sad);
+
+    await tester.tap(find.text('Sad'));
     await tester.pumpAndSettle();
     expect(voice.issues.single.card.myReaction, isNull);
     expect(find.text('2'), findsOneWidget);

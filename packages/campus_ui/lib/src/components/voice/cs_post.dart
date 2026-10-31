@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../theme/cs_tokens.dart';
 import '../../tokens/dimensions.dart';
@@ -332,19 +331,34 @@ class CsActionButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (emoji != null)
-                Text(emoji!, style: const TextStyle(fontSize: 18, height: 1.1))
-              else if (icon != null)
-                Icon(icon, size: 20, color: color),
+              // A new reaction pops in with a little bounce.
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 420),
+                reverseDuration: const Duration(milliseconds: 120),
+                switchInCurve: Curves.elasticOut,
+                switchOutCurve: Curves.easeIn,
+                transitionBuilder: (child, a) =>
+                    ScaleTransition(scale: a, child: child),
+                child: emoji != null
+                    ? Text(
+                        emoji!,
+                        key: ValueKey(emoji),
+                        style: const TextStyle(fontSize: 19, height: 1.1),
+                      )
+                    : icon != null
+                    ? Icon(icon, key: ValueKey(icon), size: 20, color: color)
+                    : const SizedBox.shrink(),
+              ),
               const SizedBox(width: 6),
               Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.text.labelLarge?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w700,
+                child: AnimatedDefaultTextStyle(
+                  duration: CsMotion.fast,
+                  style: (context.text.labelLarge ?? const TextStyle())
+                      .copyWith(color: color, fontWeight: FontWeight.w700),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
@@ -430,151 +444,6 @@ class CsReactionSummary extends StatelessWidget {
       ],
     );
   }
-}
-
-/// The reaction picker: a pill of emojis over the button that was held.
-/// Answers the index picked, or null.
-abstract final class CsReactionPicker {
-  static Future<int?> show(
-    BuildContext context, {
-    required List<(String emoji, String label)> options,
-    required Rect anchor,
-    int? selected,
-  }) {
-    HapticFeedback.mediumImpact();
-    return Navigator.of(context, rootNavigator: true).push<int>(
-      PageRouteBuilder(
-        opaque: false,
-        barrierDismissible: true,
-        barrierColor: Colors.black12,
-        barrierLabel: MaterialLocalizations.of(context)
-            .modalBarrierDismissLabel,
-        transitionDuration: CsMotion.fast,
-        reverseTransitionDuration: CsMotion.fast,
-        pageBuilder: (context, _, _) =>
-            _Picker(options: options, anchor: anchor, selected: selected),
-        transitionsBuilder: (_, a, _, child) =>
-            FadeTransition(opacity: a, child: child),
-      ),
-    );
-  }
-}
-
-class _Picker extends StatelessWidget {
-  const _Picker({
-    required this.options,
-    required this.anchor,
-    required this.selected,
-  });
-
-  final List<(String, String)> options;
-  final Rect anchor;
-  final int? selected;
-
-  static const _item = 48.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = context.cs;
-    final screen = MediaQuery.sizeOf(context);
-    final width = _item * options.length + CsSpace.sm * 2;
-    final left = (anchor.left - CsSpace.xs).clamp(
-      CsSpace.sm,
-      screen.width - width - CsSpace.sm,
-    );
-    final above = anchor.top - _item - CsSpace.md * 2;
-    final top = above > MediaQuery.paddingOf(context).top
-        ? above
-        : anchor.bottom + CsSpace.sm;
-    return Stack(
-      children: [
-        Positioned(
-          left: left,
-          top: top,
-          child: Material(
-            color: cs.surface,
-            elevation: 8,
-            shadowColor: Colors.black38,
-            shape: StadiumBorder(side: BorderSide(color: cs.border)),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: CsSpace.sm,
-                vertical: CsSpace.xs,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (var i = 0; i < options.length; i++)
-                    _PickerItem(
-                      emoji: options[i].$1,
-                      label: options[i].$2,
-                      delay: i,
-                      selected: selected == i,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        Navigator.of(context).pop(i);
-                      },
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _PickerItem extends StatelessWidget {
-  const _PickerItem({
-    required this.emoji,
-    required this.label,
-    required this.delay,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String emoji;
-  final String label;
-  final int delay;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => Tooltip(
-    message: label,
-    child: Semantics(
-      button: true,
-      selected: selected,
-      label: label,
-      excludeSemantics: true,
-      child: InkResponse(
-        onTap: onTap,
-        radius: 26,
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
-          duration: Duration(milliseconds: 180 + delay * 40),
-          curve: Curves.easeOutBack,
-          builder: (_, t, child) => Transform.scale(scale: t, child: child),
-          child: Container(
-            width: 48,
-            height: 48,
-            alignment: Alignment.center,
-            decoration: selected
-                ? BoxDecoration(
-                    color: context.cs.primaryContainer,
-                    shape: BoxShape.circle,
-                  )
-                : null,
-            child: Text(
-              emoji,
-              style: const TextStyle(fontSize: 30, height: 1.1),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
 }
 
 /// One answer of a poll, as the screen shows it.

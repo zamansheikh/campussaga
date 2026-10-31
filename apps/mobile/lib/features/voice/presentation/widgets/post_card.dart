@@ -228,34 +228,27 @@ class _ReactButton extends StatelessWidget {
       );
     }
     final react = onReact;
-    return CsActionButton(
-      icon: CsIcons.heart,
+    return CsReactionButton(
+      idleIcon: CsIcons.heart,
       emoji: mine?.emoji,
       label: reactionLabel(l10n, mine ?? Reaction.like),
-      active: mine != null,
       activeColor: mine == null
           ? null
           : CsReactionStyle.color(context, mine.wire),
       semanticLabel: semantics,
+      options: [
+        for (final r in Reaction.forPosts) (r.emoji, reactionLabel(l10n, r)),
+      ],
+      selected: mine == null ? null : Reaction.forPosts.indexOf(mine),
       onTap: react == null
           ? null
           : () => react(mine != null ? null : Reaction.like),
-      onLongPress: react == null
+      onPicked: react == null
           ? null
-          : () async {
-              final box = context.findRenderObject() as RenderBox?;
-              if (box == null) return;
-              final anchor = box.localToGlobal(Offset.zero) & box.size;
-              final i = await CsReactionPicker.show(
-                context,
-                anchor: anchor,
-                selected: mine == null ? null : Reaction.forPosts.indexOf(mine),
-                options: [
-                  for (final r in Reaction.forPosts)
-                    (r.emoji, reactionLabel(l10n, r)),
-                ],
-              );
-              if (i != null) react(Reaction.forPosts[i]);
+          : (i) {
+              final r = Reaction.forPosts[i];
+              // Picking the reaction you already gave keeps it.
+              if (r != mine) react(r);
             },
     );
   }

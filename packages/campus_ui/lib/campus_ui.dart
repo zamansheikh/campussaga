@@ -20,6 +20,7 @@ export 'src/components/voice/cs_image_grid.dart';
 export 'src/components/voice/cs_issue_card.dart';
 export 'src/components/voice/cs_me_too_button.dart';
 export 'src/components/voice/cs_post.dart';
+export 'src/components/voice/cs_reaction_button.dart';
 export 'src/components/voice/cs_status_chip.dart';
 export 'src/components/voice/cs_status_timeline.dart';
 export 'src/theme/cs_theme.dart';
