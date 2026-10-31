@@ -344,7 +344,8 @@ export type DomainRequest = {
   id: string;
   domain: string;
   email: string;
-  universityId: string | null;
+  universityId?: string | null;
+  university?: { id: string; name: string } | null;
   universityName: string | null;
   mxOk: boolean;
   requester?: { id: string; name: string | null } | null;
@@ -352,7 +353,7 @@ export type DomainRequest = {
 };
 
 export type AutoVouchBlock = {
-  userId: string;
+  userId?: string;
   user?: { id: string; name: string | null } | null;
   name?: string | null;
   reason: string | null;

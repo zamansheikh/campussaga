@@ -111,7 +111,7 @@ export default async function InboxPage() {
                         </p>
                       </div>
                       <div className="flex shrink-0 gap-2">
-                        <ApproveDomainDialog requestId={r.id} domain={r.domain} universityId={r.universityId} universities={universities} />
+                        <ApproveDomainDialog requestId={r.id} domain={r.domain} universityId={r.university?.id ?? r.universityId ?? null} universities={universities} />
                         <RejectDomainButton requestId={r.id} domain={r.domain} />
                       </div>
                     </li>
@@ -158,9 +158,9 @@ export default async function InboxPage() {
               ) : (
                 <ul className="divide-y">
                   {blocks.map((b) => (
-                    <li key={b.userId} className="flex items-center justify-between gap-3 py-2.5">
+                    <li key={b.user?.id ?? b.userId} className="flex items-center justify-between gap-3 py-2.5">
                       <div className="min-w-0">
-                        <Link href={`/admin/users/${b.userId}`} className="truncate text-sm font-medium hover:underline">
+                        <Link href={`/admin/users/${b.user?.id ?? b.userId}`} className="truncate text-sm font-medium hover:underline">
                           {blockName(b)}
                         </Link>
                         {b.reason ? <p className="truncate text-xs text-muted-foreground">{b.reason}</p> : null}

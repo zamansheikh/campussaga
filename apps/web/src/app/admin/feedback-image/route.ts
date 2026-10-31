@@ -9,7 +9,10 @@ import { API_URL, COOKIE } from "@/lib/admin/tokens";
  * the bytes on. Only addresses on the API's own host are fetched.
  */
 export async function GET(req: NextRequest) {
-  const src = req.nextUrl.searchParams.get("src") ?? "";
+  let src = req.nextUrl.searchParams.get("src") ?? "";
+  // The API gives the student's address (/feedback/{id}/images/…), which
+  // only the owner may open; the panel uses the admin one.
+  if (src.startsWith("/feedback/")) src = `/admin${src}`;
   const api = new URL(API_URL);
   let target: URL;
   try {
