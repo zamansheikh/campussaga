@@ -25,6 +25,8 @@ DECLARE
     v_dow    int  := extract(isodow FROM (now() AT TIME ZONE 'Asia/Dhaka'))::int;
     v_slot   uuid;
     v_issue  uuid;
+    v_cmt    uuid;
+    v_opt    uuid;
     v_route  uuid;
     v_domain text;
 BEGIN
@@ -175,6 +177,100 @@ BEGIN
     INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_a);
     INSERT INTO status_updates (issue_id, actor_kind, actor_title, from_status, to_status, note, created_at)
     VALUES (v_issue, 'authority', 'Maintenance Office', 'open', 'solved', 'All three fans were replaced.', now() - interval '2 days');
+
+    -- ---- Campus social: posts, questions, polls (docs/CAMPUS_SOCIAL.md) -------
+    -- Counts are demo numbers; the reaction emojis come from the rows below.
+    -- Your own account is left out, so you can react and vote yourself.
+
+    -- An event, posted with a name.
+    INSERT INTO issues (university_id, kind, category, private, title, body, location_label, status, named, named_author_id,
+                        me_too_count, comment_count, created_at, status_changed_at)
+    VALUES (v_uni, 'post', 'event', false, '',
+            E'🎉 Cultural night on the central field this Thursday at 6 PM!\nBands, food stalls and a stand-up set. Bring your friends, entry is free.',
+            'Central field', 'open', true, v_cr2, 37, 3, now() - interval '3 hours', now() - interval '3 hours')
+    RETURNING id INTO v_issue;
+    INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_cr2);
+    INSERT INTO issue_votes (issue_id, user_id, reaction) VALUES (v_issue, v_a, 'like'), (v_issue, v_b, 'like'), (v_issue, v_c, 'clap');
+    INSERT INTO comments (issue_id, kind, handle, body, created_at) VALUES
+        (v_issue, 'student', 'Q7MD', 'Count me in! 🎶', now() - interval '2 hours') RETURNING id INTO v_cmt;
+    INSERT INTO comment_authors (comment_id, user_id) VALUES (v_cmt, v_b);
+    INSERT INTO comments (issue_id, kind, handle, body, like_count, created_at) VALUES
+        (v_issue, 'student', 'H3ZT', 'Will there be food for vegetarians?', 2, now() - interval '100 minutes') RETURNING id INTO v_cmt;
+    INSERT INTO comment_authors (comment_id, user_id) VALUES (v_cmt, v_c);
+    INSERT INTO comment_likes (comment_id, user_id) VALUES (v_cmt, v_a), (v_cmt, v_b);
+    INSERT INTO comments (issue_id, kind, named, named_author_id, body, parent_id, created_at) VALUES
+        (v_issue, 'student', true, v_cr2, 'Yes! Two stalls have veg khichuri and singara.', v_cmt, now() - interval '90 minutes');
+    INSERT INTO comment_authors (comment_id, user_id) SELECT id, v_cr2 FROM comments WHERE parent_id = v_cmt;
+
+    -- A poll.
+    INSERT INTO issues (university_id, kind, category, private, title, body, status, me_too_count, comment_count,
+                        poll_closes_at, created_at, status_changed_at)
+    VALUES (v_uni, 'poll', 'food', false, '', 'Best cha spot near campus? ☕', 'open', 12, 1,
+            now() + interval '2 days', now() - interval '5 hours', now() - interval '5 hours')
+    RETURNING id INTO v_issue;
+    INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_b);
+    INSERT INTO poll_options (issue_id, position, label, vote_count) VALUES
+        (v_issue, 0, 'Bot tola', 18), (v_issue, 1, 'TSC canteen', 11), (v_issue, 2, 'The tong at the hall gate', 7), (v_issue, 3, 'Library café', 3);
+    SELECT id INTO v_opt FROM poll_options WHERE issue_id = v_issue AND position = 0;
+    INSERT INTO poll_votes (issue_id, user_id, option_id) VALUES (v_issue, v_a, v_opt), (v_issue, v_cr2, v_opt);
+    SELECT id INTO v_opt FROM poll_options WHERE issue_id = v_issue AND position = 1;
+    INSERT INTO poll_votes (issue_id, user_id, option_id) VALUES (v_issue, v_c, v_opt);
+    INSERT INTO issue_votes (issue_id, user_id, reaction) VALUES (v_issue, v_a, 'haha'), (v_issue, v_c, 'like');
+    INSERT INTO comments (issue_id, kind, handle, body, created_at) VALUES
+        (v_issue, 'student', 'W4KP', 'Bot tola after the 4:30 class is unbeatable', now() - interval '4 hours') RETURNING id INTO v_cmt;
+    INSERT INTO comment_authors (comment_id, user_id) VALUES (v_cmt, v_a);
+
+    -- A question with answers, one marked from the asker.
+    INSERT INTO issues (university_id, kind, category, private, title, body, status, me_too_count, comment_count,
+                        created_at, status_changed_at)
+    VALUES (v_uni, 'question', 'transport', false, '',
+            'Does the Savar bus run on Friday mornings? I have a 9 AM make-up class this week.',
+            'open', 6, 3, now() - interval '7 hours', now() - interval '7 hours')
+    RETURNING id INTO v_issue;
+    INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_c);
+    INSERT INTO issue_votes (issue_id, user_id, reaction) VALUES (v_issue, v_a, 'like'), (v_issue, v_b, 'wow');
+    INSERT INTO comments (issue_id, kind, handle, body, like_count, created_at) VALUES
+        (v_issue, 'student', 'N8RF', 'Yes, the 7:30 one runs on Fridays too. It leaves from the Savar bus stand.', 3, now() - interval '6 hours')
+    RETURNING id INTO v_cmt;
+    INSERT INTO comment_authors (comment_id, user_id) VALUES (v_cmt, v_b);
+    INSERT INTO comment_likes (comment_id, user_id) VALUES (v_cmt, v_a), (v_cmt, v_c), (v_cmt, v_cr2);
+    INSERT INTO comments (issue_id, kind, handle, body, parent_id, created_at) VALUES
+        (v_issue, 'student', 'T2VJ', 'Thanks a lot! 🙏', v_cmt, now() - interval '5 hours');
+    INSERT INTO comment_authors (comment_id, user_id) SELECT id, v_c FROM comments WHERE parent_id = v_cmt;
+    INSERT INTO comments (issue_id, kind, handle, body, created_at) VALUES
+        (v_issue, 'student', 'C5XH', 'Check the Bus routes page in the app, it has the Friday times.', now() - interval '4 hours')
+    RETURNING id INTO v_cmt;
+    INSERT INTO comment_authors (comment_id, user_id) VALUES (v_cmt, v_a);
+
+    -- Fun.
+    INSERT INTO issues (university_id, kind, category, private, title, body, status, me_too_count, comment_count,
+                        created_at, status_changed_at)
+    VALUES (v_uni, 'post', 'fun', false, '',
+            'When the teacher says "just one more slide" at 4:59 PM 😅', 'open', 64, 0,
+            now() - interval '9 hours', now() - interval '9 hours')
+    RETURNING id INTO v_issue;
+    INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_a);
+    INSERT INTO issue_votes (issue_id, user_id, reaction) VALUES (v_issue, v_b, 'haha'), (v_issue, v_c, 'haha'), (v_issue, v_cr2, 'like');
+
+    -- Lost and found.
+    INSERT INTO issues (university_id, kind, category, private, title, body, location_label, status, me_too_count, comment_count,
+                        created_at, status_changed_at)
+    VALUES (v_uni, 'post', 'lost_found', false, '',
+            E'Found a blue water bottle and a Casio calculator (fx-991) in Room 302 after the 11 AM class.\nI left them at the department office.',
+            'Room 302', 'open', 9, 0, now() - interval '26 hours', now() - interval '26 hours')
+    RETURNING id INTO v_issue;
+    INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_b);
+    INSERT INTO issue_votes (issue_id, user_id, reaction) VALUES (v_issue, v_c, 'like');
+
+    -- Buy and sell, with a name.
+    INSERT INTO issues (university_id, kind, category, private, title, body, location_label, status, named, named_author_id,
+                        me_too_count, comment_count, created_at, status_changed_at)
+    VALUES (v_uni, 'post', 'buy_sell', false, '',
+            'Selling my Introduction to Algorithms (CLRS, 3rd ed.), barely used. 450 tk. Pick it up at Hall 2.',
+            'Hall 2', 'open', true, v_a, 4, 0, now() - interval '2 days', now() - interval '2 days')
+    RETURNING id INTO v_issue;
+    INSERT INTO issue_authors (issue_id, user_id) VALUES (v_issue, v_a);
+    INSERT INTO issue_votes (issue_id, user_id, reaction) VALUES (v_issue, v_c, 'like');
 
     -- ---- bus routes (stops in to-campus order; minutes from the start) ------
     DELETE FROM bus_routes WHERE university_id = v_uni AND name LIKE 'Demo %';
