@@ -68,6 +68,7 @@ const actions: Record<string, string> = {
   "campaign.banner_remove": "Removed a campaign banner",
   "campaign.announce": "Announced campaign winners",
   "campaign.delivered": "Marked a prize as delivered",
+  "campaign.finisher_sent": "Marked a finisher reward as sent",
   "campaign.winner.delivered": "Marked a prize as delivered",
   "campaign.participant.disqualify": "Disqualified a campaign participant",
   "campaign.participant.restore": "Restored a campaign participant",

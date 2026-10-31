@@ -98,7 +98,12 @@ export default async function UniversitiesPage({
                       <DomainsDialog university={u} />
                     </span>
                     <div>
-                      <CampusAdminsDialog universityId={u.id} name={u.name} defaultOpen={sp.campusAdminsFor === u.id} />
+                      <CampusAdminsDialog universityId={u.id} name={u.name} defaultOpen={sp.campusAdminsFor === u.id} ambassador={u.ambassador} />
+                      {u.ambassador ? (
+                        <p className="text-xs whitespace-normal text-muted-foreground">
+                          Ambassador: {u.ambassador.name || u.ambassador.email} · {u.ambassador.invites} {u.ambassador.invites === 1 ? "friend" : "friends"}
+                        </p>
+                      ) : null}
                     </div>
                   </TableCell>
                   <TableCell className="hidden max-w-64 md:table-cell">

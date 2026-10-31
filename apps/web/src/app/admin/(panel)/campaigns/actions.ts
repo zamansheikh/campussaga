@@ -61,10 +61,26 @@ const campaign = z
     prizes: z.array(prize).min(1, "Add at least one prize.").max(20),
     // Only drafts send points (they can't change once live).
     scoring: scoring.optional(),
+    // Section challenge prize (§9.1): empty means badges only.
+    sectionPrizeEn: z.string().trim().max(120, "The section prize (English) can be at most 120 characters."),
+    sectionPrizeBn: z.string().trim().max(120, "The section prize (Bangla) can be at most 120 characters."),
+    // Race finisher reward (§9.2): count 0 means none.
+    finisherRewardEn: z.string().trim().max(120, "The finisher reward (English) can be at most 120 characters."),
+    finisherRewardBn: z.string().trim().max(120, "The finisher reward (Bangla) can be at most 120 characters."),
+    finisherRewardCount: z
+      .number({ error: "How many finishers get the reward must be a whole number from 0 to 10000." })
+      .int("How many finishers get the reward must be a whole number from 0 to 10000.")
+      .min(0, "How many finishers get the reward must be a whole number from 0 to 10000.")
+      .max(10000, "How many finishers get the reward must be a whole number from 0 to 10000."),
   })
   .refine((c) => Date.parse(c.endsAt) > Date.parse(c.startsAt), "The end must be after the start.")
   .refine((c) => Date.parse(c.settlesAt) >= Date.parse(c.endsAt), "The settle date can't be before the end.")
-  .refine((c) => c.universityIds === null || c.universityIds.length > 0, "Choose at least one university, or all of them.");
+  .refine((c) => c.universityIds === null || c.universityIds.length > 0, "Choose at least one university, or all of them.")
+  .refine((c) => (c.sectionPrizeEn === "") === (c.sectionPrizeBn === ""), "Give the section prize in both English and Bangla, or leave both empty.")
+  .refine(
+    (c) => c.finisherRewardCount === 0 || (c.finisherRewardEn !== "" && c.finisherRewardBn !== ""),
+    "Say what the finishers get, in English and Bangla, or set how many to 0.",
+  );
 
 export type CampaignInput = z.input<typeof campaign>;
 
@@ -75,9 +91,16 @@ function refresh(id?: string) {
 
 /**
  * Creates a draft, or saves one. [live] campaigns only change end, settle,
- * rules and prizes, so only those are sent.
+ * rules and prizes, so only those are sent, plus the number of finishers
+ * who get the reward, which may only go up ([liveFinisherCount] is the
+ * current one).
  */
-export async function saveCampaign(id: string | null, input: CampaignInput, live: boolean): Promise<ActionResult<{ id: string }>> {
+export async function saveCampaign(
+  id: string | null,
+  input: CampaignInput,
+  live: boolean,
+  liveFinisherCount = 0,
+): Promise<ActionResult<{ id: string }>> {
   await requireAdmin();
   if (id !== null && !uuid.safeParse(id).success) return { ok: false, error: "That campaign isn't valid." };
   const parsed = campaign.safeParse(live ? { ...input, scoring: undefined } : input);
@@ -89,8 +112,19 @@ export async function saveCampaign(id: string | null, input: CampaignInput, live
       refresh();
       return { ok: true, data: { id: created.id } };
     }
+    if (live && c.finisherRewardCount < liveFinisherCount) {
+      return { ok: false, error: `While the campaign is live, the number of finishers who get the reward can only go up (now ${liveFinisherCount}).` };
+    }
     const body = live
-      ? { endsAt: c.endsAt, settlesAt: c.settlesAt, rulesEn: c.rulesEn, rulesBn: c.rulesBn, prizes: c.prizes }
+      ? {
+          endsAt: c.endsAt,
+          settlesAt: c.settlesAt,
+          rulesEn: c.rulesEn,
+          rulesBn: c.rulesBn,
+          prizes: c.prizes,
+          // Sent only when raised, so an older server never sees it.
+          ...(c.finisherRewardCount > liveFinisherCount ? { finisherRewardCount: c.finisherRewardCount } : {}),
+        }
       : c;
     await api(`/admin/campaigns/${id}`, { method: "PATCH", body });
     refresh(id);
@@ -195,6 +229,19 @@ export async function markDelivered(campaignId: string, userId: string): Promise
   if (!uuid.safeParse(campaignId).success || !uuid.safeParse(userId).success) return { ok: false, error: "That change isn't valid." };
   try {
     await api(`/admin/campaigns/${campaignId}/winners/${userId}/delivered`, { method: "POST" });
+    refresh(campaignId);
+    return { ok: true };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
+/** A finisher's reward was sent to their phone (§9.2). */
+export async function markFinisherSent(campaignId: string, userId: string): Promise<ActionResult> {
+  await requireAdmin();
+  if (!uuid.safeParse(campaignId).success || !uuid.safeParse(userId).success) return { ok: false, error: "That change isn't valid." };
+  try {
+    await api(`/admin/campaigns/${campaignId}/finishers/${userId}/sent`, { method: "POST" });
     refresh(campaignId);
     return { ok: true };
   } catch (e) {

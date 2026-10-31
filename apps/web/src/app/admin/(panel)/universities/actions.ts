@@ -3,9 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { type ActionResult, failure } from "@/lib/admin/errors";
+import { type ActionResult, ApiError, failure } from "@/lib/admin/errors";
 import { api } from "@/lib/admin/session";
-import type { AdminUniversity } from "@/lib/admin/types";
+import type { AdminUniversity, Ambassador } from "@/lib/admin/types";
 
 const domain = z
   .string()
@@ -118,6 +118,22 @@ export async function setDomains(id: string, domains: string[]): Promise<ActionR
     revalidate();
     return { ok: true, data: uni };
   } catch (e) {
+    return failure(e);
+  }
+}
+
+/**
+ * The university's Campus ambassador (§9.3) from `GET /admin/universities/{id}`;
+ * null when there is none or the server doesn't have that endpoint.
+ */
+export async function getAmbassador(universityId: string): Promise<ActionResult<Ambassador | null>> {
+  const parsedId = z.uuid().safeParse(universityId);
+  if (!parsedId.success) return { ok: false, error: "That university isn't valid." };
+  try {
+    const uni = await api<AdminUniversity>(`/admin/universities/${parsedId.data}`);
+    return { ok: true, data: uni?.ambassador ?? null };
+  } catch (e) {
+    if (e instanceof ApiError && (e.status === 404 || e.status === 405)) return { ok: true, data: null };
     return failure(e);
   }
 }

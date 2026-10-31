@@ -107,6 +107,13 @@ export type AdminCampaign = {
   bannerUrl?: string | null;
   /** Point values; missing on an older API (use `withDefaults`). */
   scoring?: Partial<CampaignScoring> | null;
+  /** The section challenge's prize (§9.1); empty: badges only. */
+  sectionPrizeEn?: string;
+  sectionPrizeBn?: string;
+  /** What the first `finisherRewardCount` students to enter the prize race get (§9.2); count 0: no reward. */
+  finisherRewardEn?: string;
+  finisherRewardBn?: string;
+  finisherRewardCount?: number;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -114,8 +121,52 @@ export type AdminCampaign = {
 /** `GET /campaigns/{id}/public`: both languages, no sign-in. */
 export type PublicCampaign = Pick<
   AdminCampaign,
-  "id" | "titleEn" | "titleBn" | "bodyEn" | "bodyBn" | "rulesEn" | "rulesBn" | "startsAt" | "endsAt" | "settlesAt" | "prizes" | "bannerUrl" | "scoring"
-> & { status?: CampaignStatus };
+    | "id"
+  | "titleEn"
+  | "titleBn"
+  | "bodyEn"
+  | "bodyBn"
+  | "rulesEn"
+  | "rulesBn"
+  | "startsAt"
+  | "endsAt"
+  | "settlesAt"
+  | "prizes"
+  | "bannerUrl"
+  | "scoring"
+  | "sectionPrizeEn"
+  | "sectionPrizeBn"
+  | "finisherRewardEn"
+  | "finisherRewardBn"
+  | "finisherRewardCount"
+> & { status?: CampaignStatus; sectionChallenge?: SectionChallenge | null };
+
+/** What makes a Champion section (§9.1). The API sends it; these are its constants. */
+export type SectionChallenge = { members: number; slots: number };
+export const defaultSectionChallenge: SectionChallenge = { members: 25, slots: 5 };
+
+/** `GET /admin/campaigns/{id}/finishers` rows (§9.2). */
+export type CampaignFinisher = {
+  position: number;
+  user: PersonRef;
+  finishedAt: string;
+  /** Within the first `finisherRewardCount`. */
+  inReward: boolean;
+  phone?: string | null;
+  claimedAt?: string | null;
+  sentAt?: string | null;
+};
+
+/** A row of the top sections board (§9.1). */
+export type SectionBoardRow = {
+  rank: number;
+  groupId: string;
+  name: string;
+  university?: string | { id?: string; name: string } | null;
+  members: number;
+  slots: number;
+  champion: boolean;
+};
 
 export type PersonRef = { id: string; name: string | null; email?: string | null; university?: string | { id?: string; name: string } | null };
 

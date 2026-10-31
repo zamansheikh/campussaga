@@ -6,13 +6,18 @@ import { EmptyState, ErrorPanel } from "@/components/admin/notice";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ApiError } from "@/lib/admin/errors";
 import {
   type AdminCampaign,
+  type CampaignFinisher,
   type CampaignScoring,
   type CampaignWinner,
+  defaultSectionChallenge,
   normalizeWinner,
   prizeForRank,
   raceRule,
+  type SectionBoardRow,
   type Standing,
   statusLabel,
   statusTone,
@@ -24,7 +29,7 @@ import { api, requestNow, requireAdmin } from "@/lib/admin/session";
 import { allUniversities } from "@/lib/admin/universities";
 import { formatDateTime } from "@/lib/format";
 
-import { AnnounceWinners, DeliveredButton, PublishButton } from "./campaign-controls";
+import { AnnounceWinners, DeliveredButton, FinisherSentButton, PublishButton } from "./campaign-controls";
 import { StandingsTable } from "./standings";
 
 export const metadata: Metadata = { title: "Campaign" };
@@ -33,19 +38,42 @@ function list<T>(r: T[] | { items?: T[] } | null | undefined): T[] {
   return Array.isArray(r) ? r : (r?.items ?? []);
 }
 
+/** For an endpoint an older server doesn't have: null when it answers 404 or 405. */
+async function maybe<T>(fn: () => Promise<T>): Promise<T | null> {
+  try {
+    return await fn();
+  } catch (e) {
+    if (e instanceof ApiError && (e.status === 404 || e.status === 405)) return null;
+    throw e;
+  }
+}
+
+type Board = SectionBoardRow[] | { rows?: SectionBoardRow[]; items?: SectionBoardRow[] };
+
 export default async function CampaignPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
   const { id } = await params;
   const eid = encodeURIComponent(id);
   const res = await load(() => api<AdminCampaign>(`/admin/campaigns/${eid}`));
   const c = res.data;
-  const [standings, winners, unis] = c
+  const [standings, winners, unis, finishers, sections] = c
     ? await Promise.all([
         c.status === "draft" ? undefined : load(async () => list(await api<Standing[] | { items: Standing[] }>(`/admin/campaigns/${eid}/standings`))),
         c.status === "announced" ? load(async () => list(await api<CampaignWinner[] | { items: CampaignWinner[] }>(`/admin/campaigns/${eid}/winners`)).map(normalizeWinner)) : undefined,
         c.universityIds ? load(() => allUniversities()) : undefined,
+        c.status === "draft"
+          ? undefined
+          : load(() => maybe(async () => list(await api<CampaignFinisher[] | { items: CampaignFinisher[] }>(`/admin/campaigns/${eid}/finishers`)))),
+        c.status === "draft"
+          ? undefined
+          : load(() =>
+              maybe(async () => {
+                const b = await api<Board>(`/admin/campaigns/${eid}/sections`);
+                return Array.isArray(b) ? b : (b?.rows ?? b?.items ?? []);
+              }),
+            ),
       ])
-    : [undefined, undefined, undefined];
+    : [undefined, undefined, undefined, undefined, undefined];
   const now = requestNow();
   const uniNames = new Map((unis?.data ?? []).map((u) => [u.id, u.name]));
 
@@ -131,6 +159,22 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
                       </span>
                     </li>
                   ))}
+                  {c.sectionPrizeEn ? (
+                    <li>
+                      <span className="font-medium">Champion section (picked by you):</span> {c.sectionPrizeEn}{" "}
+                      <span lang="bn" className="text-muted-foreground">
+                        / {c.sectionPrizeBn}
+                      </span>
+                    </li>
+                  ) : null}
+                  {(c.finisherRewardCount ?? 0) > 0 ? (
+                    <li>
+                      <span className="font-medium">First {c.finisherRewardCount} in the race:</span> {c.finisherRewardEn}{" "}
+                      <span lang="bn" className="text-muted-foreground">
+                        / {c.finisherRewardBn}
+                      </span>
+                    </li>
+                  ) : null}
                 </ul>
               </CardContent>
             </Card>
@@ -158,6 +202,14 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
               ) : null}
             </section>
           ) : null}
+
+          {finishers?.error ? (
+            <ErrorPanel message={finishers.error} />
+          ) : finishers?.data ? (
+            <FinishersSection campaign={c} rows={finishers.data} />
+          ) : null}
+
+          {sections?.error ? <ErrorPanel message={sections.error} /> : sections?.data ? <TopSections campaign={c} rows={sections.data} /> : null}
 
           {c.status === "live" || c.status === "ended" ? (
             <section className="space-y-3">
@@ -240,6 +292,123 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
         </div>
       )}
     </>
+  );
+}
+
+/** Students who entered the prize race, in order, with the first N's reward (§9.2). */
+function FinishersSection({ campaign: c, rows }: { campaign: AdminCampaign; rows: CampaignFinisher[] }) {
+  const count = c.finisherRewardCount ?? 0;
+  const claimed = rows.filter((f) => f.claimedAt).length;
+  const sent = rows.filter((f) => f.sentAt).length;
+  return (
+    <section className="space-y-3">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h2 className="text-lg font-semibold">Race finishers</h2>
+          <p className="text-sm text-muted-foreground">
+            Students who entered the prize race while it was live, in order. Each gets the Race finisher badge
+            {count > 0 ? `; the first ${count} get ${c.finisherRewardEn || "the reward"} and add their mobile number in the app.` : "."}
+          </p>
+        </div>
+        {count > 0 ? (
+          <p className="text-sm font-medium tabular-nums">
+            Sent {sent} / claimed {claimed} / reward for first {count}
+          </p>
+        ) : null}
+      </div>
+      {rows.length === 0 ? (
+        <EmptyState title="No finishers yet" />
+      ) : (
+        <div className="overflow-hidden rounded-xl border bg-card">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">#</TableHead>
+                <TableHead>Student</TableHead>
+                <TableHead>Finished</TableHead>
+                <TableHead>Reward</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Claimed</TableHead>
+                <TableHead>Sent</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((f) => (
+                <TableRow key={f.user.id}>
+                  <TableCell className="font-semibold tabular-nums">{f.position}</TableCell>
+                  <TableCell className="max-w-64 whitespace-normal">
+                    <Link href={`/admin/users/${f.user.id}`} className="font-medium hover:underline">
+                      {f.user.name || f.user.email || "No name"}
+                    </Link>
+                    <p className="text-xs break-all text-muted-foreground">{[f.user.email, uniName(f.user.university)].filter(Boolean).join(" · ")}</p>
+                  </TableCell>
+                  <TableCell className="text-sm">{formatDateTime(f.finishedAt)}</TableCell>
+                  <TableCell>{f.inReward ? <Badge variant="success">In reward</Badge> : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="font-mono text-sm">{f.phone || <span className="font-sans text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="text-sm">{f.claimedAt ? formatDateTime(f.claimedAt) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell>
+                    {f.sentAt ? (
+                      <Badge variant="info">Sent {formatDateTime(f.sentAt)}</Badge>
+                    ) : f.inReward && f.claimedAt && f.phone ? (
+                      <FinisherSentButton campaignId={c.id} userId={f.user.id} name={f.user.name || "the student"} phone={f.phone} />
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** The top sections board of the section challenge (§9.1). */
+function TopSections({ campaign: c, rows }: { campaign: AdminCampaign; rows: SectionBoardRow[] }) {
+  const goal = defaultSectionChallenge;
+  return (
+    <section className="space-y-3">
+      <div>
+        <h2 className="text-lg font-semibold">Top sections</h2>
+        <p className="text-sm text-muted-foreground">
+          By verified members. A Champion section has {goal.members}+ verified members and {goal.slots}+ classes; all its members get the badge.
+          {c.sectionPrizeEn ? ` Pick the section that wins "${c.sectionPrizeEn}" from here.` : ""}
+        </p>
+      </div>
+      {rows.length === 0 ? (
+        <EmptyState title="No sections yet" />
+      ) : (
+        <div className="overflow-hidden rounded-xl border bg-card">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">#</TableHead>
+                <TableHead>Section</TableHead>
+                <TableHead className="text-end">Verified members</TableHead>
+                <TableHead className="text-end">Classes</TableHead>
+                <TableHead />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((r) => (
+                <TableRow key={r.groupId}>
+                  <TableCell className="font-semibold tabular-nums">{r.rank}</TableCell>
+                  <TableCell className="max-w-80 whitespace-normal">
+                    <p className="font-medium">{r.name}</p>
+                    <p className="text-xs text-muted-foreground">{uniName(r.university)}</p>
+                  </TableCell>
+                  <TableCell className="text-end tabular-nums">{r.members}</TableCell>
+                  <TableCell className="text-end tabular-nums">{r.slots}</TableCell>
+                  <TableCell>{r.champion ? <Badge variant="success">Champion</Badge> : null}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </section>
   );
 }
 

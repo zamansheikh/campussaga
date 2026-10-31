@@ -131,7 +131,12 @@ export type AdminUniversity = {
   domains: string[];
   users: number;
   groups: number;
+  /** The Campus ambassador (§9.3), when the API sends it here. */
+  ambassador?: Ambassador | null;
 };
+
+/** At a university, the student who brought the most friends from it (at least 5). */
+export type Ambassador = { id: string; name: string | null; email: string; invites: number };
 
 export type AdminGroup = {
   id: string;

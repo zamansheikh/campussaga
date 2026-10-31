@@ -103,6 +103,13 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
       : [{ rankFrom: "1", rankTo: "1", titleEn: "", titleBn: "" }],
   );
   const [scoring, setScoring] = useState<Record<ScoringKey, string>>(() => scoringText(withDefaults(campaign?.scoring)));
+  const [sectionPrizeEn, setSectionPrizeEn] = useState(campaign?.sectionPrizeEn ?? "");
+  const [sectionPrizeBn, setSectionPrizeBn] = useState(campaign?.sectionPrizeBn ?? "");
+  const [finisherRewardEn, setFinisherRewardEn] = useState(campaign?.finisherRewardEn ?? "");
+  const [finisherRewardBn, setFinisherRewardBn] = useState(campaign?.finisherRewardBn ?? "");
+  // While live the count may only go up from what it is now.
+  const liveFinisherCount = campaign?.finisherRewardCount ?? 0;
+  const [finisherCount, setFinisherCount] = useState(String(liveFinisherCount));
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
 
@@ -134,8 +141,14 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
           prizes: prizes.map((p) => ({ rankFrom: Number(p.rankFrom), rankTo: Number(p.rankTo), titleEn: p.titleEn, titleBn: p.titleBn })),
           // An empty field is NaN, which the check below refuses.
           scoring: Object.fromEntries(Object.entries(scoring).map(([k, v]) => [k, v.trim() === "" ? Number.NaN : Number(v)])) as CampaignScoring,
+          sectionPrizeEn,
+          sectionPrizeBn,
+          finisherRewardEn,
+          finisherRewardBn,
+          finisherRewardCount: finisherCount.trim() === "" ? Number.NaN : Number(finisherCount),
         },
         live,
+        liveFinisherCount,
       );
       if (!res.ok) {
         setError(res.error);
@@ -153,7 +166,7 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
     <div className="max-w-3xl space-y-6">
       {live ? (
         <p className="rounded-lg border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          This campaign is live. Only the end and settle dates, the rules and the prizes can change.
+          This campaign is live. Only the end and settle dates, the rules, the prizes and how many finishers get the reward (only up) can change.
         </p>
       ) : null}
 
@@ -345,6 +358,68 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
           >
             <Plus /> Add a prize
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Section challenge</CardTitle>
+          <CardDescription>
+            Every section with 25+ verified members and 5+ classes in its routine gets the Champion section badge for all its members. Optionally, a prize
+            for one section, which you pick from the Top sections board. Empty: badges only.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-2">
+          <Field label="Section prize (English, optional)" htmlFor="c-section-en">
+            <Input
+              id="c-section-en"
+              value={sectionPrizeEn}
+              maxLength={120}
+              placeholder="e.g. A pizza party for the whole section"
+              onChange={(e) => setSectionPrizeEn(e.target.value)}
+              disabled={live}
+            />
+          </Field>
+          <Field label="Section prize (Bangla, optional)" htmlFor="c-section-bn">
+            <Input id="c-section-bn" lang="bn" value={sectionPrizeBn} maxLength={120} onChange={(e) => setSectionPrizeBn(e.target.value)} disabled={live} />
+          </Field>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Race finisher reward</CardTitle>
+          <CardDescription>
+            A small reward for the first students who enter the prize race (they get the Race finisher badge either way). They add their mobile number in
+            the app; you send it and mark it sent. 0: no reward. Once live, the number can only go up.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-[1fr_1fr_10rem]">
+          <Field label="Reward (English)" htmlFor="c-finisher-en">
+            <Input
+              id="c-finisher-en"
+              value={finisherRewardEn}
+              maxLength={120}
+              placeholder="e.g. 20 TK mobile recharge"
+              onChange={(e) => setFinisherRewardEn(e.target.value)}
+              disabled={live}
+            />
+          </Field>
+          <Field label="Reward (Bangla)" htmlFor="c-finisher-bn">
+            <Input id="c-finisher-bn" lang="bn" value={finisherRewardBn} maxLength={120} onChange={(e) => setFinisherRewardBn(e.target.value)} disabled={live} />
+          </Field>
+          <Field label="For the first" htmlFor="c-finisher-count">
+            <Input
+              id="c-finisher-count"
+              type="number"
+              inputMode="numeric"
+              min={live ? liveFinisherCount : 0}
+              max={10000}
+              step={1}
+              value={finisherCount}
+              onChange={(e) => setFinisherCount(e.target.value)}
+            />
+          </Field>
         </CardContent>
       </Card>
 

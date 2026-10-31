@@ -2,7 +2,15 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
-import { type CampaignScoring, type PointKey, pointKeys, type PublicCampaign, withDefaults } from "@/lib/admin/growth";
+import {
+  type CampaignScoring,
+  defaultSectionChallenge,
+  type PointKey,
+  pointKeys,
+  type PublicCampaign,
+  type SectionChallenge,
+  withDefaults,
+} from "@/lib/admin/growth";
 import { publicApi } from "@/lib/public-api";
 import { site } from "@/lib/site";
 
@@ -194,6 +202,15 @@ const copy = {
       `To win a prize you need friends who count (they joined with your link and qualified, as above): ${raceEn(r)}. Only students who reach this are ranked for prizes. Until then your points still add up, and you join the ranking as soon as you reach it.`,
     whoMin: (r: Race) => ` To be ranked for a prize you also need friends who count: ${raceEn(r)} (see "To win a prize").`,
     chooseMin: (r: Race) => `Winners are the people with the most points, by rank, among those who have friends who count: ${raceEn(r)}.`,
+    finisher: "Reward for the first in the race",
+    finisherBody: (n: number, reward: string, race: boolean) =>
+      `${race ? `The first ${n} students who enter the prize race (see "To win a prize")` : `The first ${n} students who earn points`} while the campaign is running get ${reward}. You get a message in the app and add your mobile number there, and we send the reward to that number. Your place is set ${race ? "when you enter the race" : "when you first earn points"} and does not change. We use your number only to send the reward and delete it 90 days after we send it.`,
+    finisherBadge: (race: boolean) => (race ? "Everyone who enters the prize race gets the Race finisher badge." : "They also get the Race finisher badge."),
+    section: "Section challenge",
+    sectionBody: (g: SectionChallenge) =>
+      `Every class section on VarsityKotha with at least ${g.members} verified members and at least ${g.slots} classes in its routine becomes a Champion section, and all its members (the CR too) get the Champion section badge. The app shows a board of the top sections.`,
+    sectionPrize: (prize: string) =>
+      ` There is also a prize for one section: ${prize}. Our team chooses the winning section from the top sections board, which ranks sections by verified members.`,
     who: "Who can take part",
     whoBody:
       "Verified VarsityKotha students in Bangladesh, at the universities this campaign covers. People who work on VarsityKotha (the team) cannot take part.",
@@ -225,6 +242,15 @@ const copy = {
     whoMin: (r: Race) => ` পুরস্কারের র‍্যাংকে থাকতে হলে গণনায় আসা বন্ধুও লাগবে: ${raceBn(r)} ("পুরস্কার জিততে হলে" দেখো)।`,
     chooseMin: (r: Race) =>
       `গণনায় আসা বন্ধু ${raceBn(r)} যাদের আছে, তাদের মধ্যে সবচেয়ে বেশি পয়েন্ট যাদের, তারাই র‍্যাংক অনুযায়ী বিজয়ী।`,
+    finisher: "দৌড়ে প্রথম দিকের পুরস্কার",
+    finisherBody: (n: number, reward: string, race: boolean) =>
+      `ক্যাম্পেইন চলার সময় ${race ? `প্রথম যে ${bn(n)} জন শিক্ষার্থী পুরস্কারের দৌড়ে ঢুকবে ("পুরস্কার জিততে হলে" দেখো)` : `প্রথম যে ${bn(n)} জন শিক্ষার্থী পয়েন্ট পাবে`}, তারা পাবে ${reward}। অ্যাপে বার্তা পাবে, সেখানে তোমার মোবাইল নম্বর দেবে, আর আমরা সেই নম্বরে পুরস্কার পাঠাব। ${race ? "দৌড়ে ঢোকার সময়েই" : "প্রথম পয়েন্ট পাওয়ার সময়েই"} তোমার ক্রম ঠিক হয়ে যায়, পরে বদলায় না। তোমার নম্বর শুধু পুরস্কার পাঠাতে ব্যবহার হয় এবং পাঠানোর ৯০ দিন পর মুছে ফেলা হয়।`,
+    finisherBadge: (race: boolean) => (race ? "পুরস্কারের দৌড়ে ঢোকা সবাই পায় \"রেস ফিনিশার\" ব্যাজ।" : "তারা \"রেস ফিনিশার\" ব্যাজও পায়।"),
+    section: "সেকশন চ্যালেঞ্জ",
+    sectionBody: (g: SectionChallenge) =>
+      `ভার্সিটি কথায় যে ক্লাস সেকশনে অন্তত ${bn(g.members)} জন ভেরিফায়েড সদস্য আর রুটিনে অন্তত ${bn(g.slots)}টি ক্লাস আছে, সেটি চ্যাম্পিয়ন সেকশন হয়, আর তার সব সদস্য (সিআরসহ) পায় "চ্যাম্পিয়ন সেকশন" ব্যাজ। অ্যাপে সেরা সেকশনগুলোর তালিকা দেখা যায়।`,
+    sectionPrize: (prize: string) =>
+      ` একটি সেকশনের জন্য পুরস্কারও আছে: ${prize}। সেরা সেকশনের তালিকা (ভেরিফায়েড সদস্য অনুযায়ী) থেকে আমাদের টিম বিজয়ী সেকশন বেছে নেবে।`,
     who: "কারা অংশ নিতে পারবে",
     whoBody:
       "এই ক্যাম্পেইন যেসব বিশ্ববিদ্যালয়ের জন্য, বাংলাদেশের সেসবের ভেরিফায়েড ভার্সিটি কথা শিক্ষার্থীরা। ভার্সিটি কথার টিমের সদস্যরা অংশ নিতে পারবে না।",
@@ -249,6 +275,10 @@ function Version({ c, lang }: { c: PublicCampaign; lang: "en" | "bn" }) {
   const scoring = withDefaults(c.scoring);
   const race: Race = { own: scoring.minOwnCampus, other: scoring.minOtherCampus };
   const hasRace = race.own > 0 || race.other > 0;
+  const finisherCount = c.finisherRewardCount ?? 0;
+  const finisherReward = ((lang === "bn" ? c.finisherRewardBn || c.finisherRewardEn : c.finisherRewardEn || c.finisherRewardBn) ?? "").trim();
+  const sectionPrize = ((lang === "bn" ? c.sectionPrizeBn || c.sectionPrizeEn : c.sectionPrizeEn || c.sectionPrizeBn) ?? "").trim();
+  const challenge = c.sectionChallenge ?? defaultSectionChallenge;
   return (
     <section lang={lang} id={lang === "bn" ? "bn" : undefined} className={lang === "bn" ? "mt-16 border-t-2 pt-10" : undefined}>
       <h1>{title}</h1>
@@ -299,6 +329,19 @@ function Version({ c, lang }: { c: PublicCampaign; lang: "en" | "bn" }) {
           </p>
         </>
       ) : null}
+      {finisherCount > 0 && finisherReward ? (
+        <>
+          <h2>{t.finisher}</h2>
+          <p>
+            {t.finisherBody(finisherCount, finisherReward, hasRace)} {t.finisherBadge(hasRace)}
+          </p>
+        </>
+      ) : null}
+      <h2>{t.section}</h2>
+      <p>
+        {t.sectionBody(challenge)}
+        {sectionPrize ? t.sectionPrize(sectionPrize) : null}
+      </p>
       <h2>{t.who}</h2>
       <p>
         {t.whoBody}

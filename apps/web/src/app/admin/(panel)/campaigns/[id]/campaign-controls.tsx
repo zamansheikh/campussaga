@@ -1,6 +1,6 @@
 "use client";
 
-import { Megaphone, PackageCheck, Plus, Rocket, X } from "lucide-react";
+import { Megaphone, PackageCheck, Plus, Rocket, Send, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { type CampaignPrize, prizeForRank } from "@/lib/admin/growth";
 
-import { announceWinners, markDelivered, publishCampaign } from "../actions";
+import { announceWinners, markDelivered, markFinisherSent, publishCampaign } from "../actions";
 
 export function PublishButton({ id, title }: { id: string; title: string }) {
   const router = useRouter();
@@ -51,6 +51,30 @@ export function DeliveredButton({ campaignId, userId, name }: { campaignId: stri
       confirmLabel="Mark delivered"
       action={() => markDelivered(campaignId, userId)}
       success="Marked as delivered"
+      onDone={() => router.refresh()}
+    />
+  );
+}
+
+/** A race finisher's reward was sent to the phone they gave (§9.2). */
+export function FinisherSentButton({ campaignId, userId, name, phone }: { campaignId: string; userId: string; name: string; phone: string }) {
+  const router = useRouter();
+  return (
+    <ConfirmAction
+      trigger={
+        <Button variant="outline" size="sm">
+          <Send /> Mark sent
+        </Button>
+      }
+      title="Mark this reward as sent?"
+      description={
+        <p>
+          You sent {name}&apos;s reward to {phone}. Their number is deleted 90 days after this.
+        </p>
+      }
+      confirmLabel="Mark sent"
+      action={() => markFinisherSent(campaignId, userId)}
+      success="Marked as sent"
       onDone={() => router.refresh()}
     />
   );
