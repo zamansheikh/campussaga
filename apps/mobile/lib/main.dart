@@ -25,6 +25,7 @@ Future<void> main() async {
   await configureDependencies(crashReporter: crashReporter);
   // A group invite waiting from a link or from installing through one.
   await PendingInvite.load();
+  await PendingReferral.load();
   unawaited(PendingInvite.checkInstallReferrer());
   runApp(const CampusApp());
 }

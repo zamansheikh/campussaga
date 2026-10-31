@@ -12,6 +12,7 @@ export 'src/campus_admin/api_campus_admin_repository.dart';
 export 'src/classes/api_class_group_repository.dart';
 export 'src/config/api_app_config_repository.dart';
 export 'src/feedback/api_feedback_repository.dart';
+export 'src/growth/api_growth_repository.dart';
 export 'src/profile/api_profile_repository.dart';
 export 'src/push/api_device_repository.dart';
 export 'src/transport/api_bus_live_repository.dart';

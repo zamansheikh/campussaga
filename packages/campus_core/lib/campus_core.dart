@@ -19,6 +19,8 @@ export 'src/classes/reminders.dart';
 export 'src/config/app_config.dart';
 export 'src/failure.dart';
 export 'src/feedback/feedback_models.dart';
+export 'src/growth/growth_models.dart';
+export 'src/growth/growth_repository.dart';
 export 'src/profile/profile_repository.dart';
 export 'src/push/device_repository.dart';
 export 'src/transport/bus_live.dart';

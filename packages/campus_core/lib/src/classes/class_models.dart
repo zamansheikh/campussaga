@@ -1,3 +1,4 @@
+import '../growth/growth_models.dart';
 import 'assessment_models.dart';
 
 /// A student's role in a class group.
@@ -34,6 +35,7 @@ class GroupMember {
     this.verified = true,
     this.photoVersion,
     this.googlePhotoUrl,
+    this.featuredBadge,
   });
 
   factory GroupMember.fromJson(Map<String, Object?> json) => GroupMember(
@@ -44,9 +46,13 @@ class GroupMember {
     verified: json['verified'] as bool? ?? true,
     photoVersion: json['photoVersion'] as String?,
     googlePhotoUrl: json['googlePhotoUrl'] as String?,
+    featuredBadge: BadgeRef.parse(json['featuredBadge']),
   );
 
   final String userId;
+
+  /// The badge they show by their name.
+  final BadgeRef? featuredBadge;
 
   /// Their profile photo: uploaded (by version), else Google, else none.
   final String? photoVersion;

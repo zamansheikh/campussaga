@@ -268,32 +268,39 @@ class _StudentView extends StatelessWidget {
               padding: const EdgeInsets.all(CsSpace.md),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      UserAvatar(
-                        userId: s.id,
-                        name: name,
-                        photoVersion: s.card.photoVersion,
-                        googlePhotoUrl: s.card.googlePhotoUrl,
-                        size: 60,
-                      ),
-                      const SizedBox(width: CsSpace.md),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(name, style: context.text.titleLarge),
-                            if (s.card.classLine.isNotEmpty)
-                              Text(
-                                s.card.classLine,
-                                style: context.text.bodyMedium?.copyWith(
-                                  color: cs.textSecondary,
-                                ),
-                              ),
-                          ],
+                  // The header opens the student's profile, as other students
+                  // see it.
+                  InkWell(
+                    borderRadius: BorderRadius.circular(CsRadius.sm),
+                    onTap: () => context.push(Routes.student(s.id)),
+                    child: Row(
+                      children: [
+                        UserAvatar(
+                          userId: s.id,
+                          name: name,
+                          photoVersion: s.card.photoVersion,
+                          googlePhotoUrl: s.card.googlePhotoUrl,
+                          size: 60,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: CsSpace.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(name, style: context.text.titleLarge),
+                              if (s.card.classLine.isNotEmpty)
+                                Text(
+                                  s.card.classLine,
+                                  style: context.text.bodyMedium?.copyWith(
+                                    color: cs.textSecondary,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Icon(CsIcons.chevronRight, color: cs.textSecondary),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: CsSpace.md),
                   Align(

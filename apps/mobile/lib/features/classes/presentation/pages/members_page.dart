@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/di.dart';
+import '../../../../app/router.dart';
+import '../../../growth/presentation/growth_text.dart';
 import '../../../profile/presentation/widgets/user_avatar.dart';
 import '../../../verification/presentation/verification_text.dart';
 import '../bloc/my_classes_cubit.dart';
@@ -130,6 +132,7 @@ class _MembersPageState extends State<MembersPage> {
                     verified: done.verified,
                     photoVersion: x.photoVersion,
                     googlePhotoUrl: x.googlePhotoUrl,
+                    featuredBadge: x.featuredBadge,
                   )
                 : x,
         ];
@@ -216,28 +219,55 @@ class _MemberRow extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(CsSpace.md, 10, CsSpace.xs, 10),
       child: Row(
         children: [
-          UserAvatar(
-            userId: member.userId,
-            name: name,
-            photoVersion: member.photoVersion,
-            googlePhotoUrl: member.googlePhotoUrl,
-            size: 38,
-          ),
-          const SizedBox(width: 12),
+          // Tap a member to open their profile.
           Expanded(
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 4,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Text(name, style: context.text.bodyLarge),
-                if (member.role == GroupRole.cr)
-                  CsBadge(label: l10n.roleCr, tone: CsBadgeTone.success),
-                if (member.isMe)
-                  CsBadge(label: l10n.youLabel, tone: CsBadgeTone.neutral),
-                if (!member.verified)
-                  CsBadge(label: l10n.notVerified, tone: CsBadgeTone.accent),
-              ],
+            child: InkWell(
+              borderRadius: BorderRadius.circular(CsRadius.sm),
+              onTap: () => context.push(Routes.student(member.userId)),
+              child: Row(
+                children: [
+                  UserAvatar(
+                    userId: member.userId,
+                    name: name,
+                    photoVersion: member.photoVersion,
+                    googlePhotoUrl: member.googlePhotoUrl,
+                    size: 38,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(name, style: context.text.bodyLarge),
+                        if (member.featuredBadge case final b?)
+                          CsBadgeIcon(
+                            badgeKey: b.key,
+                            tier: b.tier,
+                            size: 18,
+                            semanticLabel: badgeName(l10n, b.key),
+                          ),
+                        if (member.role == GroupRole.cr)
+                          CsBadge(
+                            label: l10n.roleCr,
+                            tone: CsBadgeTone.success,
+                          ),
+                        if (member.isMe)
+                          CsBadge(
+                            label: l10n.youLabel,
+                            tone: CsBadgeTone.neutral,
+                          ),
+                        if (!member.verified)
+                          CsBadge(
+                            label: l10n.notVerified,
+                            tone: CsBadgeTone.accent,
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           if (onConfirm != null)

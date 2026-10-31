@@ -41,6 +41,9 @@ import '../features/feedback/presentation/pages/feedback_form_page.dart';
 import '../features/feedback/presentation/pages/feedback_thread_page.dart';
 import '../features/feedback/presentation/pages/help_feedback_page.dart';
 import '../features/feedback/presentation/pages/my_feedback_page.dart';
+import '../features/growth/data/referral_claim.dart';
+import '../features/growth/presentation/pages/campaign_page.dart';
+import '../features/growth/presentation/pages/student_profile_page.dart';
 import '../features/onboarding/presentation/onboarding_page.dart';
 import '../features/profile/presentation/pages/edit_profile_page.dart';
 import '../features/profile/presentation/pages/profile_setup_page.dart';
@@ -88,6 +91,16 @@ abstract final class Routes {
   static const today = '/today';
   static const routine = '/routine';
   static const profile = '/profile';
+
+  /// The profile, scrolled to its invite card (`invites`) or badges
+  /// (`badges`).
+  static String profileSection(String section) => '/profile?show=$section';
+
+  /// Another student's profile.
+  static String student(String id) => '/u/${Uri.encodeComponent(id)}';
+
+  /// A prize campaign.
+  static String campaign(String id) => '/campaigns/${Uri.encodeComponent(id)}';
   static const explore = '/explore';
 
   /// CGPA calculator (on the phone only).
@@ -215,12 +228,27 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
       if (at.startsWith('/join/')) {
         final code = InviteLink.code(state.pathParameters['code']);
         if (code != null) PendingInvite.save(code);
+        // A class invite shared with the sharer's own code: that friend
+        // brought this student.
+        final ref = state.uri.queryParameters['ref'];
+        if (ref != null) PendingReferral.save(ref, source: 'join');
         if (status == AuthStatus.signedIn && !auth.state.needsProfileSetup) {
+          unawaited(claimPendingReferral());
           final c = PendingInvite.take();
           return c == null ? Routes.today : Routes.joinWith(c);
         }
         // Otherwise on as usual (welcome, sign-in, profile setup); the code
         // waits and is used right after.
+      }
+      // A personal invite link (https://varsitykotha.com/r/{code}): keep the
+      // code, to claim after sign-in; then on to Today.
+      if (at.startsWith('/r/')) {
+        final code = InviteLink.referralCode(state.pathParameters['code']);
+        if (code != null) PendingReferral.save(code, source: 'link');
+        if (status == AuthStatus.signedIn && !auth.state.needsProfileSetup) {
+          unawaited(claimPendingReferral());
+          return Routes.today;
+        }
       }
       // A vouch link (https://varsitykotha.com/v/xxxxxxxx): keep the code
       // until the student is signed in and set up.
@@ -263,6 +291,20 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
       GoRoute(
         path: '/join/:code',
         builder: (context, state) => const SizedBox.shrink(),
+      ),
+      GoRoute(
+        path: '/r/:code',
+        builder: (context, state) => const SizedBox.shrink(),
+      ),
+      GoRoute(
+        path: '/u/:id',
+        builder: (context, state) =>
+            StudentProfilePage(userId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/campaigns/:id',
+        builder: (context, state) =>
+            CampaignPage(campaignId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/v/:code',
@@ -540,7 +582,8 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
             routes: [
               GoRoute(
                 path: Routes.profile,
-                builder: (context, state) => const ProfilePage(),
+                builder: (context, state) =>
+                    ProfilePage(show: state.uri.queryParameters['show']),
                 routes: [
                   GoRoute(
                     path: 'edit',

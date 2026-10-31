@@ -13,6 +13,7 @@ import '../../../../app/router.dart';
 import '../../../announcements/presentation/announcement_widgets.dart';
 import '../../../announcements/presentation/seen_cubit.dart';
 import '../../../assessments/presentation/assessment_widgets.dart';
+import '../../../growth/presentation/invite_share.dart';
 import '../../data/invite_link.dart';
 import '../bloc/my_classes_cubit.dart';
 import '../class_format.dart';
@@ -367,10 +368,12 @@ class _InviteBar extends StatelessWidget {
 
   /// The invite: the link (opens the app, or the page with Google Play),
   /// and the code for anyone joining by hand.
-  String _message(AppLocalizations l10n) => l10n.inviteMessage(
+  /// [ref] is my own invite code: a friend who joins through the link
+  /// counts as my invite.
+  String _message(AppLocalizations l10n, String? ref) => l10n.inviteMessage(
     group.title,
     l10n.appName,
-    InviteLink.link(group.joinCode).toString(),
+    InviteLink.link(group.joinCode, ref: ref).toString(),
     group.joinCode,
   );
 
@@ -407,7 +410,8 @@ class _InviteBar extends StatelessWidget {
           IconButton(
             tooltip: l10n.copyInvite,
             onPressed: () async {
-              await Clipboard.setData(ClipboardData(text: _message(l10n)));
+              final ref = await myReferralCode(context);
+              await Clipboard.setData(ClipboardData(text: _message(l10n, ref)));
               if (!context.mounted) return;
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()
@@ -417,11 +421,12 @@ class _InviteBar extends StatelessWidget {
           ),
           IconButton(
             tooltip: l10n.shareInvite,
-            onPressed: () {
+            onPressed: () async {
               final box = context.findRenderObject() as RenderBox?;
-              SharePlus.instance.share(
+              final ref = await myReferralCode(context);
+              await SharePlus.instance.share(
                 ShareParams(
-                  text: _message(l10n),
+                  text: _message(l10n, ref),
                   subject: group.title,
                   sharePositionOrigin: box == null
                       ? null

@@ -164,4 +164,29 @@ abstract final class CsIcons {
   static const IconData crowded = PhosphorIconsRegular.usersFour;
   static const IconData late = PhosphorIconsRegular.clockCountdown;
   static const IconData thanks = PhosphorIconsRegular.handshake;
+
+  // Growth: prizes and badges.
+  static const IconData trophy = PhosphorIconsRegular.trophy;
+  static const IconData gift = PhosphorIconsRegular.gift;
+  static const IconData timer = PhosphorIconsRegular.timer;
+
+  /// The picture of a badge, by its key; a medal for keys this app doesn't
+  /// know yet.
+  static IconData badge(String key) => switch (key) {
+    'verified' => PhosphorIconsFill.sealCheck,
+    'founding' => PhosphorIconsRegular.rocketLaunch,
+    'cr' => PhosphorIconsRegular.crown,
+    'campus_admin' => PhosphorIconsRegular.shieldCheck,
+    'bus_rep' => PhosphorIconsRegular.bus,
+    'official' => PhosphorIconsRegular.buildings,
+    'blood_donor' => PhosphorIconsRegular.drop,
+    'life_saver' => PhosphorIconsRegular.heartbeat,
+    'bus_buddy' => PhosphorIconsRegular.mapPin,
+    'section_builder' => PhosphorIconsRegular.usersThree,
+    'connector' => PhosphorIconsRegular.shareNetwork,
+    'bug_hunter' => PhosphorIconsRegular.bug,
+    'helper' => PhosphorIconsRegular.handHeart,
+    'campus_voice' => PhosphorIconsRegular.megaphone,
+    _ => PhosphorIconsRegular.medal,
+  };
 }

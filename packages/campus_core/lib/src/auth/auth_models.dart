@@ -1,3 +1,5 @@
+import '../growth/growth_models.dart';
+
 /// A supported university (short form).
 class University {
   const University({
@@ -157,6 +159,9 @@ class UserProfile {
     this.photoVersion,
     this.googlePhotoUrl,
     this.campusAdmin = false,
+    this.leaderboardHidden = false,
+    this.featuredBadge,
+    this.referralCode,
   });
 
   factory UserProfile.fromJson(Map<String, Object?> json) => UserProfile(
@@ -175,6 +180,9 @@ class UserProfile {
     photoVersion: json['photoVersion'] as String?,
     googlePhotoUrl: json['googlePhotoUrl'] as String?,
     campusAdmin: json['campusAdmin'] as bool? ?? false,
+    leaderboardHidden: json['leaderboardHidden'] as bool? ?? false,
+    featuredBadge: BadgeRef.parse(json['featuredBadge']),
+    referralCode: json['referralCode'] as String?,
   );
 
   final String id;
@@ -205,6 +213,41 @@ class UserProfile {
   /// Appointed to run their own university in the app (campus admin).
   final bool campusAdmin;
 
+  /// Hidden from campaign leaderboards (shown as "A student at …").
+  final bool leaderboardHidden;
+
+  /// The badge shown next to the name, if any.
+  final BadgeRef? featuredBadge;
+
+  /// My invite code (made on first use, so it may be missing).
+  final String? referralCode;
+
+  /// A copy with the growth settings changed.
+  UserProfile withGrowth({
+    bool? leaderboardHidden,
+    BadgeRef? featuredBadge,
+    bool clearFeaturedBadge = false,
+    String? referralCode,
+  }) => UserProfile(
+    id: id,
+    email: email,
+    university: university,
+    role: role,
+    displayName: displayName,
+    department: department,
+    batch: batch,
+    verified: verified,
+    universityEmail: universityEmail,
+    photoVersion: photoVersion,
+    googlePhotoUrl: googlePhotoUrl,
+    campusAdmin: campusAdmin,
+    leaderboardHidden: leaderboardHidden ?? this.leaderboardHidden,
+    featuredBadge: clearFeaturedBadge
+        ? null
+        : (featuredBadge ?? this.featuredBadge),
+    referralCode: referralCode ?? this.referralCode,
+  );
+
   /// As [UserProfile.fromJson] reads it (kept on the phone for offline use).
   Map<String, Object?> toJson() => {
     'id': id,
@@ -219,6 +262,9 @@ class UserProfile {
     'photoVersion': photoVersion,
     'googlePhotoUrl': googlePhotoUrl,
     'campusAdmin': campusAdmin,
+    'leaderboardHidden': leaderboardHidden,
+    'featuredBadge': featuredBadge?.toJson(),
+    'referralCode': referralCode,
   };
 
   /// Name, department and batch are all filled in.

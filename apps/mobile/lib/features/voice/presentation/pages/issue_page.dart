@@ -12,6 +12,7 @@ import '../../../../app/di.dart';
 import '../../../../app/router.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../classes/presentation/class_format.dart';
+import '../../../growth/presentation/growth_text.dart';
 import '../../data/voice_cache.dart';
 import '../bloc/issue_cubit.dart';
 import '../voice_format.dart';
@@ -580,6 +581,8 @@ class _CommentTile extends StatelessWidget {
     final removed = c.visibility == ContentVisibility.removed;
     final official = c.official;
     final size = small ? 28.0 : 36.0;
+    // A named author (id present) opens their profile; anonymous ones never.
+    final profileId = official ? null : c.author?.id;
     final Widget avatar = official
         ? Container(
             width: size,
@@ -595,7 +598,12 @@ class _CommentTile extends StatelessWidget {
             ),
           )
         : c.author != null
-        ? postAvatar(c.id, c.author, size: size)
+        ? GestureDetector(
+            onTap: profileId == null
+                ? null
+                : () => context.push(Routes.student(profileId)),
+            child: postAvatar(c.id, c.author, size: size),
+          )
         // The post's anonymous author keeps the post's face.
         : CsAnonAvatar(
             seed: c.isIssueAuthor
@@ -640,12 +648,25 @@ class _CommentTile extends StatelessWidget {
                           spacing: 6,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            Text(
-                              commentWho(l10n, c),
-                              style: context.text.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w700,
+                            GestureDetector(
+                              onTap: profileId == null
+                                  ? null
+                                  : () =>
+                                        context.push(Routes.student(profileId)),
+                              child: Text(
+                                commentWho(l10n, c),
+                                style: context.text.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
+                            if (c.author?.featuredBadge case final b?)
+                              CsBadgeIcon(
+                                badgeKey: b.key,
+                                tier: b.tier,
+                                size: 18,
+                                semanticLabel: badgeName(l10n, b.key),
+                              ),
                             if (official && c.officialTitle.isNotEmpty)
                               Text(
                                 c.officialTitle,

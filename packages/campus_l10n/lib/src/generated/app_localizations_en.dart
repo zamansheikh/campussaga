@@ -4637,4 +4637,435 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedbackNotFound => 'This feedback isn\'t available.';
+
+  @override
+  String get inviteFriendsTitle => 'Invite friends';
+
+  @override
+  String inviteStats(int invited, int joined) {
+    final intl.NumberFormat invitedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String invitedString = invitedNumberFormat.format(invited);
+    final intl.NumberFormat joinedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String joinedString = joinedNumberFormat.format(joined);
+
+    return 'Invited $invitedString · $joinedString joined';
+  }
+
+  @override
+  String get inviteCountsRule =>
+      'A friend counts once they\'re verified and use the app on 3 days.';
+
+  @override
+  String get inviteShareButton => 'Share your link';
+
+  @override
+  String inviteShareText(String app, String link) {
+    return 'Join me on $app: class routine, reminders and Campus in one app. $link';
+  }
+
+  @override
+  String get invitePendingTitle => 'Waiting to count';
+
+  @override
+  String invitePendingLine(String name, String status, int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$name · $status · $daysString of 3 days';
+  }
+
+  @override
+  String get inviteStatusVerified => 'verified';
+
+  @override
+  String get inviteStatusNotVerified => 'not verified yet';
+
+  @override
+  String get badgesTitle => 'Badges';
+
+  @override
+  String get badgesEmpty => 'No badges yet. Here is how to earn them.';
+
+  @override
+  String get badgesLockedTitle => 'Not earned yet';
+
+  @override
+  String get badgeTierBronze => 'Bronze';
+
+  @override
+  String get badgeTierSilver => 'Silver';
+
+  @override
+  String get badgeTierGold => 'Gold';
+
+  @override
+  String badgeTiersLine(int bronze, int silver, int gold) {
+    final intl.NumberFormat bronzeNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String bronzeString = bronzeNumberFormat.format(bronze);
+    final intl.NumberFormat silverNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String silverString = silverNumberFormat.format(silver);
+    final intl.NumberFormat goldNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String goldString = goldNumberFormat.format(gold);
+
+    return 'Bronze $bronzeString · Silver $silverString · Gold $goldString';
+  }
+
+  @override
+  String get badgePrivateNote => 'Only you see this';
+
+  @override
+  String get badgeShowByName => 'Show by my name';
+
+  @override
+  String get badgeShownByName => 'Shown by your name';
+
+  @override
+  String get badgeStopShowing => 'Stop showing';
+
+  @override
+  String get badgeNowShown => 'Now shown by your name';
+
+  @override
+  String get badgeNoLongerShown => 'No badge by your name now';
+
+  @override
+  String get badgeNotHeld => 'You don\'t have this badge (any more).';
+
+  @override
+  String get badgePrivateCant => 'Private badges can\'t be shown by your name.';
+
+  @override
+  String badgeEarnedOn(String date) {
+    return 'Earned $date';
+  }
+
+  @override
+  String get badgeLocked => 'Not earned yet';
+
+  @override
+  String get badgeNameVerified => 'Verified student';
+
+  @override
+  String get badgeHowVerified =>
+      'Verify with your university email, your CR or classmates.';
+
+  @override
+  String get badgeNameFounding => 'Founding student';
+
+  @override
+  String get badgeHowFounding => 'Join before 1 April 2027.';
+
+  @override
+  String get badgeNameCr => 'CR';
+
+  @override
+  String get badgeHowCr => 'Be the CR of a class group.';
+
+  @override
+  String get badgeNameCampusAdmin => 'Campus admin';
+
+  @override
+  String get badgeHowCampusAdmin =>
+      'Be appointed to run your university in the app.';
+
+  @override
+  String get badgeNameBusRep => 'Transport rep';
+
+  @override
+  String get badgeHowBusRep => 'Be a transport rep for your university.';
+
+  @override
+  String get badgeNameOfficial => 'Official';
+
+  @override
+  String get badgeHowOfficial => 'Be university staff on VarsityKotha.';
+
+  @override
+  String get badgeNameBloodDonor => 'Blood donor';
+
+  @override
+  String get badgeHowBloodDonor => 'Register as a blood donor.';
+
+  @override
+  String get badgeNameLifeSaver => 'Life saver';
+
+  @override
+  String get badgeHowLifeSaver => 'Mark your blood donations in the app.';
+
+  @override
+  String get badgeNameBusBuddy => 'Bus buddy';
+
+  @override
+  String get badgeHowBusBuddy =>
+      'Share live bus trips so classmates can see the bus.';
+
+  @override
+  String get badgeNameSectionBuilder => 'Section builder';
+
+  @override
+  String get badgeHowSectionBuilder =>
+      'Be the CR of a group with many members.';
+
+  @override
+  String get badgeNameConnector => 'Connector';
+
+  @override
+  String get badgeHowConnector => 'Invite friends who join and become active.';
+
+  @override
+  String get badgeNameBugHunter => 'Bug hunter';
+
+  @override
+  String get badgeHowBugHunter => 'Send bug reports that we fix.';
+
+  @override
+  String get badgeNameHelper => 'Helper';
+
+  @override
+  String get badgeHowHelper => 'Get likes on your comments and answers.';
+
+  @override
+  String get badgeNameCampusVoice => 'Campus voice';
+
+  @override
+  String get badgeHowCampusVoice => 'Raise issues that get solved.';
+
+  @override
+  String get leaderboardShowTitle => 'Show me on leaderboards';
+
+  @override
+  String get leaderboardShowHint =>
+      'Off: you show as \"A student at your university\".';
+
+  @override
+  String profileJoined(String date) {
+    return 'Joined $date';
+  }
+
+  @override
+  String get profilePostsTitle => 'Posts';
+
+  @override
+  String get profileNoPosts => 'No named posts yet.';
+
+  @override
+  String profileInvitesJoined(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Brought $countString friends',
+      one: 'Brought 1 friend',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileNotFound => 'This profile isn\'t available.';
+
+  @override
+  String get roleCampusAdmin => 'Campus admin';
+
+  @override
+  String get roleBusRep => 'Transport rep';
+
+  @override
+  String get roleOfficial => 'Official';
+
+  @override
+  String get profileOpen => 'Open profile';
+
+  @override
+  String get campaignsTitle => 'Prize campaigns';
+
+  @override
+  String get campaignLive => 'Live';
+
+  @override
+  String get campaignEnded => 'Ended';
+
+  @override
+  String get campaignAnnounced => 'Winners announced';
+
+  @override
+  String campaignLeftDays(int days, int hours) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+    final intl.NumberFormat hoursNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String hoursString = hoursNumberFormat.format(hours);
+
+    return '${daysString}d ${hoursString}h left';
+  }
+
+  @override
+  String campaignLeftHours(int hours, int minutes) {
+    final intl.NumberFormat hoursNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String hoursString = hoursNumberFormat.format(hours);
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '${hoursString}h ${minutesString}m left';
+  }
+
+  @override
+  String campaignLeftMinutes(int minutes) {
+    final intl.NumberFormat minutesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String minutesString = minutesNumberFormat.format(minutes);
+
+    return '$minutesString min left';
+  }
+
+  @override
+  String campaignTopPrize(String prize) {
+    return 'Top prize: $prize';
+  }
+
+  @override
+  String campaignMyRank(int rank, String score) {
+    final intl.NumberFormat rankNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String rankString = rankNumberFormat.format(rank);
+
+    return 'Rank $rankString · $score';
+  }
+
+  @override
+  String get campaignNoRank => 'Not ranked yet · invite friends to climb';
+
+  @override
+  String campaignScore(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString invites',
+      one: '1 invite',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get campaignPrizes => 'Prizes';
+
+  @override
+  String campaignPrizeRank(int rank) {
+    final intl.NumberFormat rankNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String rankString = rankNumberFormat.format(rank);
+
+    return 'Rank $rankString';
+  }
+
+  @override
+  String campaignPrizeRange(int from, int to) {
+    final intl.NumberFormat fromNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String fromString = fromNumberFormat.format(from);
+    final intl.NumberFormat toNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String toString = toNumberFormat.format(to);
+
+    return 'Ranks $fromString–$toString';
+  }
+
+  @override
+  String get campaignScopeAll => 'Bangladesh';
+
+  @override
+  String get campaignScopeUniversity => 'My university';
+
+  @override
+  String get campaignLeaderboard => 'Leaderboard';
+
+  @override
+  String get campaignLeaderboardEmpty => 'No one is on the board yet.';
+
+  @override
+  String get campaignHowTitle => 'How invites count';
+
+  @override
+  String get campaignRules => 'Rules';
+
+  @override
+  String get campaignNotFound => 'This campaign isn\'t available.';
+
+  @override
+  String campaignWhenEnds(String date) {
+    return 'Ends $date';
+  }
+
+  @override
+  String get winTitle => 'You won!';
+
+  @override
+  String winPrize(int rank, String prize) {
+    final intl.NumberFormat rankNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String rankString = rankNumberFormat.format(rank);
+
+    return 'Rank $rankString · $prize';
+  }
+
+  @override
+  String get claimIntro =>
+      'Tell us where to send your prize. We use this only to deliver it.';
+
+  @override
+  String get claimFullName => 'Full name';
+
+  @override
+  String get claimPhone => 'Phone number';
+
+  @override
+  String get claimAddress => 'Delivery address';
+
+  @override
+  String get claimNote => 'Note (optional)';
+
+  @override
+  String get claimSend => 'Send';
+
+  @override
+  String get claimNameRequired => 'Write your full name.';
+
+  @override
+  String get claimPhoneInvalid => 'Write a phone number we can call.';
+
+  @override
+  String get claimAddressRequired => 'Write where to deliver the prize.';
+
+  @override
+  String get claimDone => 'We\'ll contact you';
+
+  @override
+  String get claimDoneBody =>
+      'Thanks! We have your details and will contact you about the prize.';
+
+  @override
+  String get claimNotWinner => 'Only winners can claim a prize.';
 }

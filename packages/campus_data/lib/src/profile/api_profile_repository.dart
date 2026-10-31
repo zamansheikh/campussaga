@@ -25,6 +25,13 @@ class ApiProfileRepository implements ProfileRepository {
   }
 
   @override
+  Future<UserProfile> setLeaderboardHidden({required bool hidden}) async =>
+      UserProfile.fromJson(
+        (await _api.patch('/me', {'leaderboardHidden': hidden}))!
+            as Map<String, Object?>,
+      );
+
+  @override
   Future<List<String>> departmentSuggestions(String query) async {
     final q = Uri.encodeQueryComponent(query.trim());
     final data =

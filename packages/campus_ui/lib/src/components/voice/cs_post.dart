@@ -66,6 +66,7 @@ class CsPostHeader extends StatelessWidget {
     this.subtitle = '',
     this.subtitleIcon,
     this.trailing,
+    this.onTap,
   });
 
   final Widget avatar;
@@ -78,11 +79,14 @@ class CsPostHeader extends StatelessWidget {
   final IconData? subtitleIcon;
   final Widget? trailing;
 
+  /// Tapping the person (avatar and name), e.g. to open their profile.
+  final VoidCallback? onTap;
+
   @override
   Widget build(BuildContext context) {
     final cs = context.cs;
     final muted = context.text.bodySmall?.copyWith(color: cs.textSecondary);
-    return Row(
+    final who = Row(
       children: [
         avatar,
         const SizedBox(width: CsSpace.sm + 2),
@@ -128,6 +132,19 @@ class CsPostHeader extends StatelessWidget {
                 ),
             ],
           ),
+        ),
+      ],
+    );
+    return Row(
+      children: [
+        Expanded(
+          child: onTap == null
+              ? who
+              : InkWell(
+                  onTap: onTap,
+                  borderRadius: BorderRadius.circular(CsRadius.sm),
+                  child: who,
+                ),
         ),
         if (trailing != null) ...[const SizedBox(width: CsSpace.xs), trailing!],
       ],

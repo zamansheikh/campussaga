@@ -24,6 +24,7 @@ import 'package:varsitykotha/features/voice/data/voice_cache.dart';
 
 import '../blood_fakes.dart';
 import '../campus_fakes.dart';
+import '../growth_fakes.dart';
 import '../voice_fakes.dart';
 
 const testUser = UserProfile(
@@ -220,6 +221,18 @@ class FakeProfileRepository implements ProfileRepository {
 
   @override
   Future<Uint8List> photo(String userId, String version) async => Uint8List(0);
+
+  /// The signed-in student, for [setLeaderboardHidden] to build on.
+  UserProfile current = testUser;
+  final leaderboardCalls = <bool>[];
+
+  @override
+  Future<UserProfile> setLeaderboardHidden({required bool hidden}) async {
+    if (failure != null) throw failure!;
+    leaderboardCalls.add(hidden);
+    return current = current.withGrowth(leaderboardHidden: hidden);
+  }
+
   final updates = <(String, String, String)>[];
   final suggestionQueries = <String>[];
   List<String> suggestions = const ['CSE', 'Computer Science'];
@@ -368,6 +381,7 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   FakeVerificationRepository? verification,
   FakeCampusAdminRepository? campusAdmin,
   FakeFeedbackRepository? feedback,
+  FakeGrowthRepository? growth,
   int build = 1,
 }) async {
   await getIt.reset();
@@ -412,6 +426,11 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
     )
     ..registerSingleton<FeedbackRepository>(
       feedback ?? FakeFeedbackRepository(),
+    )
+    // Most tests don't care about invites, badges and campaigns: with the
+    // default they stay hidden (offline), as on an older server.
+    ..registerSingleton<GrowthRepository>(
+      growth ?? (FakeGrowthRepository()..failure = const NetworkFailure()),
     )
     ..registerSingleton<DeviceDetailsSource>(MemoryDeviceDetails());
   return (repo, google);

@@ -6,6 +6,7 @@ library;
 
 export 'src/components/cs_avatar.dart';
 export 'src/components/cs_badge.dart';
+export 'src/components/cs_badge_icon.dart';
 export 'src/components/cs_bar_button.dart';
 export 'src/components/cs_blood_badge.dart';
 export 'src/components/cs_brand_mark.dart';

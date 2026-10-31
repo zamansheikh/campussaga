@@ -20,6 +20,7 @@ import '../../classes/presentation/bloc/my_classes_cubit.dart';
 import '../../classes/presentation/class_format.dart';
 import '../../classes/presentation/widgets/class_sheet.dart';
 import '../../classes/presentation/widgets/class_tile.dart';
+import '../../growth/presentation/widgets/campaign_card.dart';
 import '../../profile/presentation/widgets/user_avatar.dart';
 import '../../reminders/presentation/bloc/reminders_cubit.dart';
 import '../../reminders/presentation/reminder_prompt.dart';
@@ -78,6 +79,7 @@ class _TodayPageState extends State<TodayPage> {
               // Blood needed for the donor's group (eligible donors only).
               const VerifyBanner(),
               if (blood) const BloodNeededCard(),
+              const CampaignCard(),
               if (classes.failure is NetworkFailure && classes.hasGroups) ...[
                 const _OfflineNotice(),
                 const SizedBox(height: CsSpace.md),

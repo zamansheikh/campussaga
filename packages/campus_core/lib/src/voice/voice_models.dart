@@ -2,6 +2,8 @@
 // default. Nothing here ever carries who wrote anonymous content: the
 // server only says whether it is the caller's own ([IssueCard.mine]).
 
+import '../growth/growth_models.dart';
+
 /// What a post is about. Issues use the first nine; posts, questions and
 /// polls use every one but [safety] (docs/CAMPUS_SOCIAL.md §1). Unknown
 /// values from a newer server → [other].
@@ -234,17 +236,36 @@ enum ReportReason {
 
 /// A name shown on content: named posts and official replies only.
 class PostAuthor {
-  const PostAuthor({required this.name, this.verified = false});
+  const PostAuthor({
+    required this.name,
+    this.verified = false,
+    this.id,
+    this.featuredBadge,
+  });
 
   factory PostAuthor.fromJson(Map<String, Object?> json) => PostAuthor(
     name: json['name'] as String? ?? '',
     verified: json['verified'] as bool? ?? false,
+    id: json['id'] as String?,
+    featuredBadge: BadgeRef.parse(json['featuredBadge']),
   );
 
   final String name;
   final bool verified;
 
-  Map<String, Object?> toJson() => {'name': name, 'verified': verified};
+  /// Their profile id, on named content only: the name opens their profile
+  /// when it is there.
+  final String? id;
+
+  /// The badge shown by the name.
+  final BadgeRef? featuredBadge;
+
+  Map<String, Object?> toJson() => {
+    'name': name,
+    'verified': verified,
+    'id': id,
+    'featuredBadge': featuredBadge?.toJson(),
+  };
 }
 
 DateTime _time(Object? v) =>

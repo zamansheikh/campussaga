@@ -18,7 +18,8 @@ void Function(BuildContext, Uri) linkOpener(GoRouter router) => (context, uri) {
       (path.startsWith('/join/') ||
           path.startsWith('/c/') ||
           path.startsWith('/blood/') ||
-          path.startsWith('/v/'))) {
+          path.startsWith('/v/') ||
+          path.startsWith('/r/'))) {
     unawaited(router.push(path));
     return;
   }

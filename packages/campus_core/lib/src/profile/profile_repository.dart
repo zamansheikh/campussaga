@@ -11,6 +11,9 @@ abstract interface class ProfileRepository {
     required String batch,
   });
 
+  /// Shows or hides my name on campaign leaderboards.
+  Future<UserProfile> setLeaderboardHidden({required bool hidden});
+
   /// Departments other students at the same university have entered,
   /// matching [query] (any case), most used first.
   Future<List<String>> departmentSuggestions(String query);

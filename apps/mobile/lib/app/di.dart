@@ -89,6 +89,9 @@ Future<void> configureDependencies({
     ..registerLazySingleton<FeedbackRepository>(
       () => ApiFeedbackRepository(getIt<ApiClient>()),
     )
+    ..registerLazySingleton<GrowthRepository>(
+      () => ApiGrowthRepository(getIt<ApiClient>()),
+    )
     ..registerLazySingleton<DeviceDetailsSource>(PlatformDeviceDetails.new)
     ..registerLazySingleton<PhotoPicker>(ImagePickerPhotoPicker.new);
   registerTransport();

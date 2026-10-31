@@ -14,6 +14,10 @@ import '../../../app/version/app_version.dart';
 import '../../../app/version/version_gate_cubit.dart';
 import '../../auth/presentation/auth_error_text.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
+import '../../growth/presentation/widgets/badges_section.dart';
+import '../../growth/presentation/widgets/campaigns_section.dart';
+import '../../growth/presentation/widgets/invite_card.dart';
+import '../../growth/presentation/widgets/leaderboard_switch.dart';
 import '../../reminders/presentation/bloc/reminders_cubit.dart';
 import '../../verification/presentation/widgets/verify_banner.dart';
 import 'widgets/university_picker.dart';
@@ -21,7 +25,11 @@ import 'widgets/user_avatar.dart';
 
 /// Who you are, your preferences, and account actions.
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({super.key, this.show});
+
+  /// A section to scroll to when opened (from a push): `invites` or
+  /// `badges`.
+  final String? show;
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +102,9 @@ class ProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: CsSpace.lg),
             ],
+            InviteCard(reveal: show == 'invites'),
+            const CampaignsSection(),
+            BadgesSection(reveal: show == 'badges'),
             CsSection(
               title: l10n.preferences,
               children: [
@@ -136,6 +147,7 @@ class ProfilePage extends StatelessWidget {
                   title: l10n.editProfile,
                   onTap: () => context.push(Routes.editProfile),
                 ),
+                const LeaderboardSwitchRow(),
                 CsRow(
                   icon: CsIcons.signOut,
                   title: l10n.signOut,

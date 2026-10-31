@@ -7381,6 +7381,612 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This feedback isn\'t available.'**
   String get feedbackNotFound;
+
+  /// No description provided for @inviteFriendsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite friends'**
+  String get inviteFriendsTitle;
+
+  /// No description provided for @inviteStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Invited {invited} · {joined} joined'**
+  String inviteStats(int invited, int joined);
+
+  /// No description provided for @inviteCountsRule.
+  ///
+  /// In en, this message translates to:
+  /// **'A friend counts once they\'re verified and use the app on 3 days.'**
+  String get inviteCountsRule;
+
+  /// No description provided for @inviteShareButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your link'**
+  String get inviteShareButton;
+
+  /// No description provided for @inviteShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Join me on {app}: class routine, reminders and Campus in one app. {link}'**
+  String inviteShareText(String app, String link);
+
+  /// No description provided for @invitePendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting to count'**
+  String get invitePendingTitle;
+
+  /// No description provided for @invitePendingLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} · {status} · {days} of 3 days'**
+  String invitePendingLine(String name, String status, int days);
+
+  /// No description provided for @inviteStatusVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'verified'**
+  String get inviteStatusVerified;
+
+  /// No description provided for @inviteStatusNotVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'not verified yet'**
+  String get inviteStatusNotVerified;
+
+  /// No description provided for @badgesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Badges'**
+  String get badgesTitle;
+
+  /// No description provided for @badgesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No badges yet. Here is how to earn them.'**
+  String get badgesEmpty;
+
+  /// No description provided for @badgesLockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not earned yet'**
+  String get badgesLockedTitle;
+
+  /// No description provided for @badgeTierBronze.
+  ///
+  /// In en, this message translates to:
+  /// **'Bronze'**
+  String get badgeTierBronze;
+
+  /// No description provided for @badgeTierSilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver'**
+  String get badgeTierSilver;
+
+  /// No description provided for @badgeTierGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get badgeTierGold;
+
+  /// No description provided for @badgeTiersLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Bronze {bronze} · Silver {silver} · Gold {gold}'**
+  String badgeTiersLine(int bronze, int silver, int gold);
+
+  /// No description provided for @badgePrivateNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Only you see this'**
+  String get badgePrivateNote;
+
+  /// No description provided for @badgeShowByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Show by my name'**
+  String get badgeShowByName;
+
+  /// No description provided for @badgeShownByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown by your name'**
+  String get badgeShownByName;
+
+  /// No description provided for @badgeStopShowing.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop showing'**
+  String get badgeStopShowing;
+
+  /// No description provided for @badgeNowShown.
+  ///
+  /// In en, this message translates to:
+  /// **'Now shown by your name'**
+  String get badgeNowShown;
+
+  /// No description provided for @badgeNoLongerShown.
+  ///
+  /// In en, this message translates to:
+  /// **'No badge by your name now'**
+  String get badgeNoLongerShown;
+
+  /// No description provided for @badgeNotHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have this badge (any more).'**
+  String get badgeNotHeld;
+
+  /// No description provided for @badgePrivateCant.
+  ///
+  /// In en, this message translates to:
+  /// **'Private badges can\'t be shown by your name.'**
+  String get badgePrivateCant;
+
+  /// No description provided for @badgeEarnedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Earned {date}'**
+  String badgeEarnedOn(String date);
+
+  /// No description provided for @badgeLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Not earned yet'**
+  String get badgeLocked;
+
+  /// No description provided for @badgeNameVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified student'**
+  String get badgeNameVerified;
+
+  /// No description provided for @badgeHowVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify with your university email, your CR or classmates.'**
+  String get badgeHowVerified;
+
+  /// No description provided for @badgeNameFounding.
+  ///
+  /// In en, this message translates to:
+  /// **'Founding student'**
+  String get badgeNameFounding;
+
+  /// No description provided for @badgeHowFounding.
+  ///
+  /// In en, this message translates to:
+  /// **'Join before 1 April 2027.'**
+  String get badgeHowFounding;
+
+  /// No description provided for @badgeNameCr.
+  ///
+  /// In en, this message translates to:
+  /// **'CR'**
+  String get badgeNameCr;
+
+  /// No description provided for @badgeHowCr.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the CR of a class group.'**
+  String get badgeHowCr;
+
+  /// No description provided for @badgeNameCampusAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus admin'**
+  String get badgeNameCampusAdmin;
+
+  /// No description provided for @badgeHowCampusAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Be appointed to run your university in the app.'**
+  String get badgeHowCampusAdmin;
+
+  /// No description provided for @badgeNameBusRep.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport rep'**
+  String get badgeNameBusRep;
+
+  /// No description provided for @badgeHowBusRep.
+  ///
+  /// In en, this message translates to:
+  /// **'Be a transport rep for your university.'**
+  String get badgeHowBusRep;
+
+  /// No description provided for @badgeNameOfficial.
+  ///
+  /// In en, this message translates to:
+  /// **'Official'**
+  String get badgeNameOfficial;
+
+  /// No description provided for @badgeHowOfficial.
+  ///
+  /// In en, this message translates to:
+  /// **'Be university staff on VarsityKotha.'**
+  String get badgeHowOfficial;
+
+  /// No description provided for @badgeNameBloodDonor.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood donor'**
+  String get badgeNameBloodDonor;
+
+  /// No description provided for @badgeHowBloodDonor.
+  ///
+  /// In en, this message translates to:
+  /// **'Register as a blood donor.'**
+  String get badgeHowBloodDonor;
+
+  /// No description provided for @badgeNameLifeSaver.
+  ///
+  /// In en, this message translates to:
+  /// **'Life saver'**
+  String get badgeNameLifeSaver;
+
+  /// No description provided for @badgeHowLifeSaver.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark your blood donations in the app.'**
+  String get badgeHowLifeSaver;
+
+  /// No description provided for @badgeNameBusBuddy.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus buddy'**
+  String get badgeNameBusBuddy;
+
+  /// No description provided for @badgeHowBusBuddy.
+  ///
+  /// In en, this message translates to:
+  /// **'Share live bus trips so classmates can see the bus.'**
+  String get badgeHowBusBuddy;
+
+  /// No description provided for @badgeNameSectionBuilder.
+  ///
+  /// In en, this message translates to:
+  /// **'Section builder'**
+  String get badgeNameSectionBuilder;
+
+  /// No description provided for @badgeHowSectionBuilder.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the CR of a group with many members.'**
+  String get badgeHowSectionBuilder;
+
+  /// No description provided for @badgeNameConnector.
+  ///
+  /// In en, this message translates to:
+  /// **'Connector'**
+  String get badgeNameConnector;
+
+  /// No description provided for @badgeHowConnector.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite friends who join and become active.'**
+  String get badgeHowConnector;
+
+  /// No description provided for @badgeNameBugHunter.
+  ///
+  /// In en, this message translates to:
+  /// **'Bug hunter'**
+  String get badgeNameBugHunter;
+
+  /// No description provided for @badgeHowBugHunter.
+  ///
+  /// In en, this message translates to:
+  /// **'Send bug reports that we fix.'**
+  String get badgeHowBugHunter;
+
+  /// No description provided for @badgeNameHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Helper'**
+  String get badgeNameHelper;
+
+  /// No description provided for @badgeHowHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Get likes on your comments and answers.'**
+  String get badgeHowHelper;
+
+  /// No description provided for @badgeNameCampusVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus voice'**
+  String get badgeNameCampusVoice;
+
+  /// No description provided for @badgeHowCampusVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise issues that get solved.'**
+  String get badgeHowCampusVoice;
+
+  /// No description provided for @leaderboardShowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show me on leaderboards'**
+  String get leaderboardShowTitle;
+
+  /// No description provided for @leaderboardShowHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Off: you show as \"A student at your university\".'**
+  String get leaderboardShowHint;
+
+  /// No description provided for @profileJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined {date}'**
+  String profileJoined(String date);
+
+  /// No description provided for @profilePostsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts'**
+  String get profilePostsTitle;
+
+  /// No description provided for @profileNoPosts.
+  ///
+  /// In en, this message translates to:
+  /// **'No named posts yet.'**
+  String get profileNoPosts;
+
+  /// No description provided for @profileInvitesJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Brought 1 friend} other{Brought {count} friends}}'**
+  String profileInvitesJoined(int count);
+
+  /// No description provided for @profileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This profile isn\'t available.'**
+  String get profileNotFound;
+
+  /// No description provided for @roleCampusAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Campus admin'**
+  String get roleCampusAdmin;
+
+  /// No description provided for @roleBusRep.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport rep'**
+  String get roleBusRep;
+
+  /// No description provided for @roleOfficial.
+  ///
+  /// In en, this message translates to:
+  /// **'Official'**
+  String get roleOfficial;
+
+  /// No description provided for @profileOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open profile'**
+  String get profileOpen;
+
+  /// No description provided for @campaignsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Prize campaigns'**
+  String get campaignsTitle;
+
+  /// No description provided for @campaignLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get campaignLive;
+
+  /// No description provided for @campaignEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'Ended'**
+  String get campaignEnded;
+
+  /// No description provided for @campaignAnnounced.
+  ///
+  /// In en, this message translates to:
+  /// **'Winners announced'**
+  String get campaignAnnounced;
+
+  /// No description provided for @campaignLeftDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d {hours}h left'**
+  String campaignLeftDays(int days, int hours);
+
+  /// No description provided for @campaignLeftHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m left'**
+  String campaignLeftHours(int hours, int minutes);
+
+  /// No description provided for @campaignLeftMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min left'**
+  String campaignLeftMinutes(int minutes);
+
+  /// No description provided for @campaignTopPrize.
+  ///
+  /// In en, this message translates to:
+  /// **'Top prize: {prize}'**
+  String campaignTopPrize(String prize);
+
+  /// No description provided for @campaignMyRank.
+  ///
+  /// In en, this message translates to:
+  /// **'Rank {rank} · {score}'**
+  String campaignMyRank(int rank, String score);
+
+  /// No description provided for @campaignNoRank.
+  ///
+  /// In en, this message translates to:
+  /// **'Not ranked yet · invite friends to climb'**
+  String get campaignNoRank;
+
+  /// No description provided for @campaignScore.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 invite} other{{count} invites}}'**
+  String campaignScore(int count);
+
+  /// No description provided for @campaignPrizes.
+  ///
+  /// In en, this message translates to:
+  /// **'Prizes'**
+  String get campaignPrizes;
+
+  /// No description provided for @campaignPrizeRank.
+  ///
+  /// In en, this message translates to:
+  /// **'Rank {rank}'**
+  String campaignPrizeRank(int rank);
+
+  /// No description provided for @campaignPrizeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Ranks {from}–{to}'**
+  String campaignPrizeRange(int from, int to);
+
+  /// No description provided for @campaignScopeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Bangladesh'**
+  String get campaignScopeAll;
+
+  /// No description provided for @campaignScopeUniversity.
+  ///
+  /// In en, this message translates to:
+  /// **'My university'**
+  String get campaignScopeUniversity;
+
+  /// No description provided for @campaignLeaderboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaderboard'**
+  String get campaignLeaderboard;
+
+  /// No description provided for @campaignLeaderboardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No one is on the board yet.'**
+  String get campaignLeaderboardEmpty;
+
+  /// No description provided for @campaignHowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How invites count'**
+  String get campaignHowTitle;
+
+  /// No description provided for @campaignRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules'**
+  String get campaignRules;
+
+  /// No description provided for @campaignNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This campaign isn\'t available.'**
+  String get campaignNotFound;
+
+  /// No description provided for @campaignWhenEnds.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends {date}'**
+  String campaignWhenEnds(String date);
+
+  /// No description provided for @winTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You won!'**
+  String get winTitle;
+
+  /// No description provided for @winPrize.
+  ///
+  /// In en, this message translates to:
+  /// **'Rank {rank} · {prize}'**
+  String winPrize(int rank, String prize);
+
+  /// No description provided for @claimIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us where to send your prize. We use this only to deliver it.'**
+  String get claimIntro;
+
+  /// No description provided for @claimFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get claimFullName;
+
+  /// No description provided for @claimPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get claimPhone;
+
+  /// No description provided for @claimAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery address'**
+  String get claimAddress;
+
+  /// No description provided for @claimNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get claimNote;
+
+  /// No description provided for @claimSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get claimSend;
+
+  /// No description provided for @claimNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your full name.'**
+  String get claimNameRequired;
+
+  /// No description provided for @claimPhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a phone number we can call.'**
+  String get claimPhoneInvalid;
+
+  /// No description provided for @claimAddressRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Write where to deliver the prize.'**
+  String get claimAddressRequired;
+
+  /// No description provided for @claimDone.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll contact you'**
+  String get claimDone;
+
+  /// No description provided for @claimDoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks! We have your details and will contact you about the prize.'**
+  String get claimDoneBody;
+
+  /// No description provided for @claimNotWinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Only winners can claim a prize.'**
+  String get claimNotWinner;
 }
 
 class _AppLocalizationsDelegate

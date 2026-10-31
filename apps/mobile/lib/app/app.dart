@@ -15,6 +15,7 @@ import '../features/auth/data/profile_cache.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/classes/data/routine_cache.dart';
 import '../features/classes/presentation/bloc/my_classes_cubit.dart';
+import '../features/growth/data/referral_claim.dart';
 import '../features/push/push_controller.dart';
 import '../features/push/push_messaging.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
@@ -111,6 +112,9 @@ class _CampusAppState extends State<CampusApp> {
     final id = s.user?.id;
     if (s.status == AuthStatus.signedIn && id != null) {
       unawaited(_classes.start(id));
+      // Whose invite brought this student (a link, or installing through
+      // one): told to the server once.
+      unawaited(claimPendingReferral());
       if (_pushUser != id) {
         _pushUser = id;
         unawaited(_push.signedIn());
@@ -132,6 +136,13 @@ class _CampusAppState extends State<CampusApp> {
     }
   }
 
+  /// Pushes about invites, badges and prizes (nothing to refresh for them).
+  static const _growthPushes = {
+    'referral_joined',
+    'badge_earned',
+    'campaign_won',
+  };
+
   /// A push while the app is open: show it, and fetch what changed.
   void _onPush(PushNote note) {
     final type = '${note.data['type']}';
@@ -139,7 +150,8 @@ class _CampusAppState extends State<CampusApp> {
         !type.startsWith('feedback_') &&
         type != 'campus_verified' &&
         !type.startsWith('blood_') &&
-        !type.startsWith('bus_')) {
+        !type.startsWith('bus_') &&
+        !_growthPushes.contains(type)) {
       unawaited(_classes.refresh());
     }
     // Verified by a CR, classmates or a campus admin: the "Get verified"
@@ -203,6 +215,27 @@ class _CampusAppState extends State<CampusApp> {
           if (_auth.state.status == AuthStatus.signedIn) {
             unawaited(_reloadProfile());
             _router.go(Routes.profile);
+          }
+        })
+        ..ensureVisualUpdate();
+      return;
+    }
+    if (_growthPushes.contains(type)) {
+      final campaign = note.data['campaignId'];
+      final route = switch (type) {
+        'referral_joined' => Routes.profileSection('invites'),
+        'badge_earned' => Routes.profileSection('badges'),
+        _ when campaign is String => Routes.campaign(campaign),
+        _ => Routes.profile,
+      };
+      WidgetsBinding.instance
+        ..addPostFrameCallback((_) {
+          if (_auth.state.status == AuthStatus.signedIn) {
+            if (type == 'campaign_won' && campaign is String) {
+              unawaited(_router.push(route));
+            } else {
+              _router.go(route);
+            }
           }
         })
         ..ensureVisualUpdate();

@@ -2,11 +2,14 @@ import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/clock.dart';
 import '../../../../app/env.dart';
+import '../../../../app/router.dart';
 import '../../../classes/presentation/class_format.dart';
+import '../../../growth/presentation/growth_text.dart';
 import '../voice_format.dart';
 import 'voice_image.dart';
 
@@ -67,6 +70,20 @@ class PostCard extends StatelessWidget {
             : (c.author?.verified ?? false)
             ? CsIcons.verified
             : null,
+        // A named author's badge, and their name opens their profile (only
+        // when the server says who: anonymous posts never do).
+        badges: [
+          if (c.author?.featuredBadge case final b?)
+            CsBadgeIcon(
+              badgeKey: b.key,
+              tier: b.tier,
+              size: 18,
+              semanticLabel: badgeName(l10n, b.key),
+            ),
+        ],
+        onTap: c.author?.id == null
+            ? null
+            : () => context.push(Routes.student(c.author!.id!)),
         subtitle: [
           agoText(context, c.createdAt, now),
           categoryLabel(l10n, c.category),
