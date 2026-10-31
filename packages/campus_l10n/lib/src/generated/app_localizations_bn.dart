@@ -2990,7 +2990,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get campusDeletePostTitle => 'পোস্টটি মুছে ফেলবে?';
 
   @override
-  String get campusEditPost => 'পোস্ট এডিট করো';
+  String get campusEditPost => 'পোস্ট সম্পাদনা';
 
   @override
   String get campusTextLabel => 'লেখা';
@@ -3012,4 +3012,19 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get errorNotAnIssue => 'এটা শুধু ইস্যুতে করা যায়।';
+
+  @override
+  String get editAnnouncement => 'ঘোষণা সম্পাদনা করো';
+
+  @override
+  String get editedLabel => 'সম্পাদিত';
+
+  @override
+  String get announcementSaved => 'সংরক্ষণ হয়েছে। সহপাঠীরা নতুন লেখাটি দেখবে।';
+
+  @override
+  String get saveAction => 'সংরক্ষণ করো';
+
+  @override
+  String get openLinkFailed => 'লিংকটি খোলা গেল না।';
 }

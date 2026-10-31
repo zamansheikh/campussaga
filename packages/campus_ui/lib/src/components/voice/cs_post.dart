@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/cs_tokens.dart';
 import '../../tokens/dimensions.dart';
+import '../cs_link_text.dart';
 
 /// An anonymous person as a friendly face: an animal on a soft colour,
 /// picked from [seed] (a post id or a per-post handle), so the same
@@ -170,7 +171,7 @@ class CsClampedText extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            CsLinkText(
               text,
               maxLines: maxLines,
               overflow: TextOverflow.ellipsis,
@@ -684,7 +685,7 @@ class CsPostCard extends StatelessWidget {
               0,
             ),
             child: maxLines == null
-                ? SelectableText(text, style: textStyle)
+                ? CsLinkText(text, style: textStyle, selectable: true)
                 : CsClampedText(
                     text: text,
                     cut: textCut,

@@ -215,7 +215,10 @@ class _BusRoutePageState extends State<BusRoutePage> {
                         Icon(CsIcons.info, size: 18, color: context.cs.primary),
                         const SizedBox(width: CsSpace.sm),
                         Expanded(
-                          child: Text(r.notes, style: context.text.bodyMedium),
+                          child: CsLinkText(
+                            r.notes,
+                            style: context.text.bodyMedium,
+                          ),
                         ),
                       ],
                     ),

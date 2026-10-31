@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
 	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
 )
 
@@ -168,13 +169,31 @@ type announcementPath struct {
 	A  string `json:"-" path:"a" validate:"required,uuid"`
 }
 
-type pinReq struct {
+// patchAnnouncementReq changes the text, the pin, or both.
+type patchAnnouncementReq struct {
 	announcementPath
-	Pinned *bool `json:"pinned" validate:"required"`
+	Pinned *bool   `json:"pinned"`
+	Body   *string `json:"body" validate:"omitempty,max=1000"`
 }
 
-func (s *Service) handlePin(ctx context.Context, in *pinReq) (*Announcement, error) {
-	return s.SetPinned(ctx, uuid.MustParse(in.ID), uuid.MustParse(in.A), *in.Pinned)
+func (s *Service) handlePin(ctx context.Context, in *patchAnnouncementReq) (*Announcement, error) {
+	if in.Pinned == nil && in.Body == nil {
+		return nil, apperr.Validation(map[string]string{"pinned": "or body is required"})
+	}
+	groupID, id := uuid.MustParse(in.ID), uuid.MustParse(in.A)
+	var (
+		out *Announcement
+		err error
+	)
+	if in.Body != nil {
+		if out, err = s.EditAnnouncement(ctx, groupID, id, *in.Body); err != nil {
+			return nil, err
+		}
+	}
+	if in.Pinned != nil {
+		out, err = s.SetPinned(ctx, groupID, id, *in.Pinned)
+	}
+	return out, err
 }
 
 func (s *Service) handleDeleteAnnouncement(ctx context.Context, in *announcementPath) (*httpx.Empty, error) {

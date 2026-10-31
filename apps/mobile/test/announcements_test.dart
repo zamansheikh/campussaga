@@ -78,6 +78,63 @@ void main() {
     expect(classes.mine.single.announcements, isEmpty);
   });
 
+  testWidgets('the CR edits an announcement from Today; links open', (
+    tester,
+  ) async {
+    final opened = <Uri>[];
+    final classes = await signedIn(
+      tester,
+      sampleGroup(role: GroupRole.cr).copyWith(
+        announcements: [
+          note(
+            'a1',
+            'Quiz on Sunday. Form: forms.gle/quiz1',
+            tuesdayMorning.subtract(const Duration(hours: 1)),
+          ),
+        ],
+      ),
+    );
+    // The app opens links; record them instead.
+    CsLinkText.onOpen = (_, uri) => opened.add(uri);
+    await tester.ensureVisible(find.textContaining('Quiz on Sunday'));
+    await tester.pumpAndSettle();
+    await tester.tapOnText(find.textRange.ofSubstring('forms.gle/quiz1'));
+    expect(opened, [Uri.parse('https://forms.gle/quiz1')]);
+
+    await tester.tap(
+      find
+          .descendant(
+            of: find.byType(Card),
+            matching: find.byIcon(CsIcons.more),
+          )
+          .first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit announcement'), findsOneWidget);
+    expect(find.text('Pin to top'), findsNothing);
+    final save = find.widgetWithText(FilledButton, 'Save');
+    expect(
+      tester.widget<FilledButton>(save).onPressed,
+      isNull,
+      reason: 'nothing changed yet',
+    );
+    await tester.enterText(
+      find.byType(TextField),
+      'Quiz moved to Monday. Form: forms.gle/quiz1',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+
+    final a = classes.mine.single.announcements.single;
+    expect(a.body, 'Quiz moved to Monday. Form: forms.gle/quiz1');
+    expect(a.edited, isTrue);
+    expect(find.textContaining('Saved.'), findsOneWidget);
+    expect(find.textContaining('Edited'), findsOneWidget);
+  });
+
   testWidgets('classmates see new announcements on Today until they look', (
     tester,
   ) async {

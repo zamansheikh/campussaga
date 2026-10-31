@@ -1274,5 +1274,10 @@
   "campusQuestionTooShort": "Write the question in a few more words.",
   "errorPollClosed": "This poll has ended.",
   "errorAlreadyVoted": "You've already voted in this poll.",
-  "errorNotAnIssue": "This can only be done on issues."
+  "errorNotAnIssue": "This can only be done on issues.",
+  "editAnnouncement": "Edit announcement",
+  "editedLabel": "Edited",
+  "announcementSaved": "Saved. Classmates see the new text.",
+  "saveAction": "Save",
+  "openLinkFailed": "Couldn't open this link."
 }

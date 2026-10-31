@@ -303,6 +303,7 @@ class Announcement {
     required this.body,
     this.pinned = false,
     required this.createdAt,
+    this.editedAt,
   });
 
   factory Announcement.fromJson(Map<String, Object?> json) => Announcement(
@@ -310,6 +311,9 @@ class Announcement {
     body: json['body']! as String,
     pinned: json['pinned'] as bool? ?? false,
     createdAt: DateTime.parse(json['createdAt']! as String).toLocal(),
+    editedAt: json['editedAt'] is String
+        ? DateTime.tryParse(json['editedAt']! as String)?.toLocal()
+        : null,
   );
 
   final String id;
@@ -317,11 +321,17 @@ class Announcement {
   final bool pinned;
   final DateTime createdAt;
 
+  /// Set once the CR changed the text.
+  final DateTime? editedAt;
+
+  bool get edited => editedAt != null;
+
   Announcement copyWith({bool? pinned}) => Announcement(
     id: id,
     body: body,
     pinned: pinned ?? this.pinned,
     createdAt: createdAt,
+    editedAt: editedAt,
   );
 
   Map<String, Object?> toJson() => {
@@ -329,6 +339,7 @@ class Announcement {
     'body': body,
     'pinned': pinned,
     'createdAt': createdAt.toUtc().toIso8601String(),
+    'editedAt': editedAt?.toUtc().toIso8601String(),
   };
 }
 

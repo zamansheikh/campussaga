@@ -18,6 +18,7 @@ type Announcement struct {
 	CreatedBy *uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	EditedAt  *time.Time
 }
 
 type Assessment struct {

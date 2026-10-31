@@ -105,7 +105,7 @@ class AssessmentTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   if (a.topics.isNotEmpty)
-                    Text(
+                    CsLinkText(
                       a.topics,
                       style: context.text.bodySmall?.copyWith(
                         color: cs.textSecondary,
@@ -241,7 +241,7 @@ class _AssessmentSheet extends StatelessWidget {
                   color: cs.surfaceVariant,
                   borderRadius: BorderRadius.circular(CsRadius.md),
                 ),
-                child: Text(a.topics, style: context.text.bodyMedium),
+                child: CsLinkText(a.topics, style: context.text.bodyMedium),
               ),
             const SizedBox(height: CsSpace.md),
             if (a.canEdit)

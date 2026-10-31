@@ -659,9 +659,10 @@ class _CommentTile extends StatelessWidget {
                             ),
                           )
                         else
-                          SelectableText(
+                          CsLinkText(
                             c.body,
                             style: context.text.bodyMedium,
+                            selectable: true,
                           ),
                         if (c.visibility == ContentVisibility.held && c.mine)
                           Padding(

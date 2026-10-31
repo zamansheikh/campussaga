@@ -151,7 +151,7 @@ func (q *Queries) CountUserGroups(ctx context.Context, userID uuid.UUID) (int64,
 const createAnnouncement = `-- name: CreateAnnouncement :one
 INSERT INTO announcements (group_id, body, pinned, created_by)
 VALUES ($1, $2, $3, $4)
-RETURNING id, group_id, body, pinned, created_by, created_at, updated_at
+RETURNING id, group_id, body, pinned, created_by, created_at, updated_at, edited_at
 `
 
 type CreateAnnouncementParams struct {
@@ -177,6 +177,7 @@ func (q *Queries) CreateAnnouncement(ctx context.Context, arg CreateAnnouncement
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.EditedAt,
 	)
 	return i, err
 }
@@ -564,6 +565,40 @@ func (q *Queries) DeleteSlotChanges(ctx context.Context, slotID *uuid.UUID) erro
 	return err
 }
 
+const editAnnouncement = `-- name: EditAnnouncement :one
+UPDATE announcements SET body = $1, edited_at = $2::timestamptz
+WHERE id = $3 AND group_id = $4
+RETURNING id, group_id, body, pinned, created_by, created_at, updated_at, edited_at
+`
+
+type EditAnnouncementParams struct {
+	Body    string
+	Now     time.Time
+	ID      uuid.UUID
+	GroupID uuid.UUID
+}
+
+func (q *Queries) EditAnnouncement(ctx context.Context, arg EditAnnouncementParams) (Announcement, error) {
+	row := q.db.QueryRow(ctx, editAnnouncement,
+		arg.Body,
+		arg.Now,
+		arg.ID,
+		arg.GroupID,
+	)
+	var i Announcement
+	err := row.Scan(
+		&i.ID,
+		&i.GroupID,
+		&i.Body,
+		&i.Pinned,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EditedAt,
+	)
+	return i, err
+}
+
 const getAssessment = `-- name: GetAssessment :one
 SELECT id, group_id, kind, course_code, course_title, date, starts_min, ends_min, room, topics, created_by, created_at, updated_at FROM assessments WHERE id = $1 AND group_id = $2 FOR UPDATE
 `
@@ -846,7 +881,7 @@ func (q *Queries) HideNewCourseForSelective(ctx context.Context, arg HideNewCour
 
 const listAnnouncementsForUser = `-- name: ListAnnouncementsForUser :many
 
-SELECT a.id, a.group_id, a.body, a.pinned, a.created_by, a.created_at, a.updated_at FROM announcements a
+SELECT a.id, a.group_id, a.body, a.pinned, a.created_by, a.created_at, a.updated_at, a.edited_at FROM announcements a
 JOIN class_group_members m ON m.group_id = a.group_id
 WHERE m.user_id = $1 AND (a.pinned OR a.created_at >= $2)
 ORDER BY a.group_id, a.pinned DESC, a.created_at DESC, a.id
@@ -876,6 +911,7 @@ func (q *Queries) ListAnnouncementsForUser(ctx context.Context, arg ListAnnounce
 			&i.CreatedBy,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.EditedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -1406,7 +1442,7 @@ func (q *Queries) SearchGroups(ctx context.Context, arg SearchGroupsParams) ([]S
 
 const setAnnouncementPinned = `-- name: SetAnnouncementPinned :one
 UPDATE announcements SET pinned = $1 WHERE id = $2 AND group_id = $3
-RETURNING id, group_id, body, pinned, created_by, created_at, updated_at
+RETURNING id, group_id, body, pinned, created_by, created_at, updated_at, edited_at
 `
 
 type SetAnnouncementPinnedParams struct {
@@ -1426,6 +1462,7 @@ func (q *Queries) SetAnnouncementPinned(ctx context.Context, arg SetAnnouncement
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.EditedAt,
 	)
 	return i, err
 }

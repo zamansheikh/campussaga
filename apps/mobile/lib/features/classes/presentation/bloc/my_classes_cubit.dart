@@ -282,6 +282,18 @@ class MyClassesCubit extends Cubit<MyClassesState> {
     );
   }
 
+  /// The CR fixes a message's text.
+  Future<void> editAnnouncement(String groupId, String id, String body) async {
+    final a = await _repo.editAnnouncement(groupId, id, body);
+    final g = state.group(groupId);
+    if (g == null) return;
+    _replace(
+      g.copyWith(
+        announcements: [for (final x in g.announcements) x.id == id ? a : x],
+      ),
+    );
+  }
+
   Future<void> deleteAnnouncement(String groupId, String id) async {
     await _repo.deleteAnnouncement(groupId, id);
     final g = state.group(groupId);

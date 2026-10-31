@@ -841,12 +841,17 @@
   "campusEmptySearch": "এই খোঁজার সাথে কিছু মেলেনি",
   "campusSearchHint": "ক্যাম্পাসে খোঁজো",
   "campusDeletePostTitle": "পোস্টটি মুছে ফেলবে?",
-  "campusEditPost": "পোস্ট এডিট করো",
+  "campusEditPost": "পোস্ট সম্পাদনা",
   "campusTextLabel": "লেখা",
   "campusPhotoOrText": "কিছু লেখো বা একটি ছবি যোগ করো।",
   "campusPollNeedsOptions": "অন্তত দুটি আলাদা অপশন দাও।",
   "campusQuestionTooShort": "প্রশ্নটি আরেকটু বিস্তারিত লেখো।",
   "errorPollClosed": "এই পোলটি শেষ হয়ে গেছে।",
   "errorAlreadyVoted": "তুমি এই পোলে আগেই ভোট দিয়েছ।",
-  "errorNotAnIssue": "এটা শুধু ইস্যুতে করা যায়।"
+  "errorNotAnIssue": "এটা শুধু ইস্যুতে করা যায়।",
+  "editAnnouncement": "ঘোষণা সম্পাদনা করো",
+  "editedLabel": "সম্পাদিত",
+  "announcementSaved": "সংরক্ষণ হয়েছে। সহপাঠীরা নতুন লেখাটি দেখবে।",
+  "saveAction": "সংরক্ষণ করো",
+  "openLinkFailed": "লিংকটি খোলা গেল না।"
 }

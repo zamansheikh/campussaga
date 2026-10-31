@@ -23,6 +23,7 @@ import '../features/voice/data/voice_cache.dart';
 import '../features/voice/presentation/widgets/voice_image.dart';
 import '../features/widget/home_widget.dart';
 import 'di.dart';
+import 'open_link.dart';
 import 'router.dart';
 import 'settings/bloc/settings_cubit.dart';
 import 'settings/bloc/settings_state.dart';
@@ -85,6 +86,7 @@ class _CampusAppState extends State<CampusApp> {
   @override
   void initState() {
     super.initState();
+    CsLinkText.onOpen = linkOpener(_router);
     _lifecycle; // start listening
     _onAuth(_auth.state);
     _authSub = _auth.stream.listen(_onAuth);

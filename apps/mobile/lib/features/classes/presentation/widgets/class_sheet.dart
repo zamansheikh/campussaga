@@ -155,7 +155,10 @@ class _ClassSheet extends StatelessWidget {
                   color: cs.surfaceVariant,
                   borderRadius: BorderRadius.circular(CsRadius.md),
                 ),
-                child: Text(item.change!.note, style: context.text.bodyMedium),
+                child: CsLinkText(
+                  item.change!.note,
+                  style: context.text.bodyMedium,
+                ),
               ),
             if (tests.isNotEmpty) ...[
               const SizedBox(height: CsSpace.sm),
@@ -358,7 +361,7 @@ class _TestChip extends StatelessWidget {
                 Icon(assessmentIcon(test.kind), color: cs.statusRejected.fg),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
+                  child: CsLinkText(
                     [
                       assessmentKindText(l10n, test.kind),
                       if (time.isNotEmpty) time,

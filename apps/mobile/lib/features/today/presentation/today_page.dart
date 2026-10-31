@@ -472,7 +472,7 @@ class _HeroCard extends StatelessWidget {
             if ((item.change?.note ?? '').isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: CsSpace.xs),
-                child: Text(
+                child: CsLinkText(
                   item.change!.note,
                   style: soft?.copyWith(fontStyle: FontStyle.italic),
                 ),

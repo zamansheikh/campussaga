@@ -227,7 +227,7 @@ class ClassTile extends StatelessWidget {
                           Icon(CsIcons.note, size: 14, color: cs.textSecondary),
                           const SizedBox(width: 4),
                           Expanded(
-                            child: Text(
+                            child: CsLinkText(
                               note,
                               style: context.text.bodySmall?.copyWith(
                                 fontStyle: FontStyle.italic,

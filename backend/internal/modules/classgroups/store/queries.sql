@@ -136,6 +136,11 @@ UPDATE announcements SET pinned = false WHERE group_id = @group_id AND pinned;
 UPDATE announcements SET pinned = @pinned WHERE id = @id AND group_id = @group_id
 RETURNING *;
 
+-- name: EditAnnouncement :one
+UPDATE announcements SET body = @body, edited_at = @now::timestamptz
+WHERE id = @id AND group_id = @group_id
+RETURNING *;
+
 -- name: DeleteAnnouncement :execrows
 DELETE FROM announcements WHERE id = @id AND group_id = @group_id;
 

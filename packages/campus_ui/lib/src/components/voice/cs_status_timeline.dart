@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/cs_tokens.dart';
 import '../../tokens/dimensions.dart';
+import '../cs_link_text.dart';
 import 'cs_status_chip.dart';
 
 /// One step of [CsStatusTimeline].
@@ -83,7 +84,7 @@ class CsStatusTimeline extends StatelessWidget {
                               color: cs.surfaceVariant,
                               borderRadius: BorderRadius.circular(CsRadius.sm),
                             ),
-                            child: Text(
+                            child: CsLinkText(
                               steps[i].note,
                               style: context.text.bodyMedium,
                             ),

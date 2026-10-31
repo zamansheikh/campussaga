@@ -3101,4 +3101,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorNotAnIssue => 'This can only be done on issues.';
+
+  @override
+  String get editAnnouncement => 'Edit announcement';
+
+  @override
+  String get editedLabel => 'Edited';
+
+  @override
+  String get announcementSaved => 'Saved. Classmates see the new text.';
+
+  @override
+  String get saveAction => 'Save';
+
+  @override
+  String get openLinkFailed => 'Couldn\'t open this link.';
 }

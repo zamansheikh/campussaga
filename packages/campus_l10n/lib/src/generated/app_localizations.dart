@@ -5191,6 +5191,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This can only be done on issues.'**
   String get errorNotAnIssue;
+
+  /// No description provided for @editAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit announcement'**
+  String get editAnnouncement;
+
+  /// No description provided for @editedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Edited'**
+  String get editedLabel;
+
+  /// No description provided for @announcementSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved. Classmates see the new text.'**
+  String get announcementSaved;
+
+  /// No description provided for @saveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveAction;
+
+  /// No description provided for @openLinkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open this link.'**
+  String get openLinkFailed;
 }
 
 class _AppLocalizationsDelegate

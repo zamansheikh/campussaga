@@ -845,6 +845,30 @@ class FakeClassGroupRepository implements ClassGroupRepository {
   }
 
   @override
+  Future<Announcement> editAnnouncement(
+    String groupId,
+    String id,
+    String body,
+  ) async {
+    _check();
+    final g = _mine(groupId);
+    final list = [
+      for (final x in g.announcements)
+        x.id == id
+            ? Announcement(
+                id: x.id,
+                body: body.trim(),
+                pinned: x.pinned,
+                createdAt: x.createdAt,
+                editedAt: appNow(),
+              )
+            : x,
+    ];
+    _put(g.copyWith(announcements: list));
+    return list.firstWhere((x) => x.id == id);
+  }
+
+  @override
   Future<void> deleteAnnouncement(String groupId, String id) async {
     _check();
     final g = _mine(groupId);

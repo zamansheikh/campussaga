@@ -9,7 +9,7 @@ import '../../classes/presentation/bloc/my_classes_cubit.dart';
 import '../../classes/presentation/class_format.dart';
 import 'seen_cubit.dart';
 
-enum _Action { pin, unpin, delete }
+enum _Action { edit, pin, unpin, delete }
 
 /// The group's announcements on the group page. The CR posts, pins and
 /// deletes here.
@@ -115,8 +115,15 @@ class AnnouncementCard extends StatelessWidget {
       );
       if (!(ok ?? false)) return;
     }
+    if (action == _Action.edit) {
+      if (!context.mounted) return;
+      await showComposer(context, group, editing: announcement);
+      return;
+    }
     try {
       switch (action) {
+        case _Action.edit:
+          break;
         case _Action.pin:
         case _Action.unpin:
           await cubit.setAnnouncementPinned(
@@ -140,6 +147,7 @@ class AnnouncementCard extends StatelessWidget {
     final meta = [
       if (showGroup) group.title,
       agoText(context, a.createdAt, appNow()),
+      if (a.edited) l10n.editedLabel,
     ].join(' · ');
     return Card(
       color: a.pinned ? cs.primaryContainer.withValues(alpha: 0.45) : null,
@@ -184,23 +192,26 @@ class AnnouncementCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    if (maxLines == null)
-                      SelectableText(a.body, style: context.text.bodyLarge)
-                    else
-                      Text(
-                        a.body,
-                        style: context.text.bodyLarge,
-                        maxLines: maxLines,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    CsLinkText(
+                      a.body,
+                      style: context.text.bodyLarge,
+                      maxLines: maxLines,
+                      overflow: maxLines == null ? null : TextOverflow.ellipsis,
+                      selectable: maxLines == null,
+                    ),
                   ],
                 ),
               ),
-              if (group.isCr && onTap == null)
+              // The CR can change it from Today too.
+              if (group.isCr)
                 PopupMenuButton<_Action>(
                   icon: const Icon(CsIcons.more),
                   onSelected: (x) => _act(context, x),
                   itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: _Action.edit,
+                      child: Text(l10n.editAction),
+                    ),
                     if (a.pinned)
                       PopupMenuItem(
                         value: _Action.unpin,
@@ -230,8 +241,13 @@ class AnnouncementCard extends StatelessWidget {
   }
 }
 
-/// The CR writes a message (optionally pinned).
-Future<void> showComposer(BuildContext context, ClassGroup group) {
+/// The CR writes a message (optionally pinned), or changes the text of
+/// [editing].
+Future<void> showComposer(
+  BuildContext context,
+  ClassGroup group, {
+  Announcement? editing,
+}) {
   final cubit = context.read<MyClassesCubit>();
   final seen = context.read<SeenCubit>();
   return showModalBottomSheet<void>(
@@ -243,23 +259,24 @@ Future<void> showComposer(BuildContext context, ClassGroup group) {
         BlocProvider.value(value: cubit),
         BlocProvider.value(value: seen),
       ],
-      child: _Composer(group: group, host: context),
+      child: _Composer(group: group, host: context, editing: editing),
     ),
   );
 }
 
 class _Composer extends StatefulWidget {
-  const _Composer({required this.group, required this.host});
+  const _Composer({required this.group, required this.host, this.editing});
 
   final ClassGroup group;
   final BuildContext host;
+  final Announcement? editing;
 
   @override
   State<_Composer> createState() => _ComposerState();
 }
 
 class _ComposerState extends State<_Composer> {
-  final _body = TextEditingController();
+  late final _body = TextEditingController(text: widget.editing?.body);
   bool _pinned = false;
   bool _busy = false;
   Failure? _failure;
@@ -286,16 +303,31 @@ class _ComposerState extends State<_Composer> {
       _failure = null;
     });
     try {
-      await cubit.postAnnouncement(
-        widget.group.id,
-        _body.text.trim(),
-        pinned: _pinned,
-      );
-      final g = cubit.state.group(widget.group.id);
-      if (g != null) seen.markSeen(g); // your own post isn't "new" to you
+      final editing = widget.editing;
+      if (editing != null) {
+        await cubit.editAnnouncement(
+          widget.group.id,
+          editing.id,
+          _body.text.trim(),
+        );
+      } else {
+        await cubit.postAnnouncement(
+          widget.group.id,
+          _body.text.trim(),
+          pinned: _pinned,
+        );
+        final g = cubit.state.group(widget.group.id);
+        if (g != null) seen.markSeen(g); // your own post isn't "new" to you
+      }
       if (!mounted) return;
       Navigator.of(context).pop();
-      messenger.showSnackBar(SnackBar(content: Text(l10n.announcementPosted)));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            editing != null ? l10n.announcementSaved : l10n.announcementPosted,
+          ),
+        ),
+      );
     } on Failure catch (f) {
       if (mounted) setState(() => _failure = f);
     } finally {
@@ -306,7 +338,10 @@ class _ComposerState extends State<_Composer> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final editing = widget.editing;
     final empty = _body.text.trim().isEmpty;
+    // Editing: nothing to save until the text changes.
+    final same = editing != null && _body.text.trim() == editing.body.trim();
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SafeArea(
@@ -321,7 +356,10 @@ class _ComposerState extends State<_Composer> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(l10n.newAnnouncement, style: context.text.titleMedium),
+              Text(
+                editing != null ? l10n.editAnnouncement : l10n.newAnnouncement,
+                style: context.text.titleMedium,
+              ),
               Text(widget.group.title, style: context.text.bodySmall),
               const SizedBox(height: CsSpace.md),
               TextField(
@@ -334,13 +372,14 @@ class _ComposerState extends State<_Composer> {
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(hintText: l10n.announcementHint),
               ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.pinToTop),
-                subtitle: Text(l10n.pinToTopHint),
-                value: _pinned,
-                onChanged: _busy ? null : (v) => setState(() => _pinned = v),
-              ),
+              if (editing == null)
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.pinToTop),
+                  subtitle: Text(l10n.pinToTopHint),
+                  value: _pinned,
+                  onChanged: _busy ? null : (v) => setState(() => _pinned = v),
+                ),
               if (_failure != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: CsSpace.sm),
@@ -352,14 +391,18 @@ class _ComposerState extends State<_Composer> {
                   ),
                 ),
               FilledButton.icon(
-                onPressed: _busy || empty ? null : _post,
+                onPressed: _busy || empty || same ? null : _post,
                 icon: _busy
                     ? const SizedBox.square(
                         dimension: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(CsIcons.send),
-                label: Text(l10n.postAction),
+                    : Icon(
+                        editing != null ? CsIcons.checkCircle : CsIcons.send,
+                      ),
+                label: Text(
+                  editing != null ? l10n.saveAction : l10n.postAction,
+                ),
               ),
             ],
           ),

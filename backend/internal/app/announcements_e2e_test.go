@@ -12,10 +12,11 @@ import (
 )
 
 type announcementJSON struct {
-	ID        string    `json:"id"`
-	Body      string    `json:"body"`
-	Pinned    bool      `json:"pinned"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID        string     `json:"id"`
+	Body      string     `json:"body"`
+	Pinned    bool       `json:"pinned"`
+	CreatedAt time.Time  `json:"createdAt"`
+	EditedAt  *time.Time `json:"editedAt"`
 }
 
 func (h *harness) announcements(token string) []announcementJSON {
@@ -82,6 +83,25 @@ func TestAnnouncements(t *testing.T) {
 	require.Equal(t, http.StatusOK, h.do("PATCH", path+"/"+first.ID, cr, map[string]any{"pinned": false}).Status)
 	assert.Equal(t, "VALIDATION_FAILED", h.do("PATCH", path+"/"+first.ID, cr, map[string]any{}).code())
 	assert.Equal(t, "NOT_GROUP_CR", h.do("PATCH", path+"/"+first.ID, mate, map[string]any{"pinned": true}).code())
+
+	// Edit the text: classmates see the new text, marked edited; pinning
+	// alone isn't an edit.
+	assert.Nil(t, h.announcements(mate)[0].EditedAt, "pinned, not edited")
+	r = h.do("PATCH", path+"/"+first.ID, cr, map[string]any{"body": " Quiz moved to Monday \n\n\n Chapters 3-5 "})
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	var edited announcementJSON
+	r.into(t, &edited)
+	assert.Equal(t, "Quiz moved to Monday\n\nChapters 3-5", edited.Body)
+	require.NotNil(t, edited.EditedAt)
+	assert.Contains(t, bodies(h.announcements(mate)), "Quiz moved to Monday\n\nChapters 3-5")
+	assert.Equal(t, "VALIDATION_FAILED", h.do("PATCH", path+"/"+first.ID, cr, map[string]any{"body": "  "}).code())
+	assert.Equal(t, "NOT_GROUP_CR", h.do("PATCH", path+"/"+first.ID, mate, map[string]any{"body": "hacked"}).code())
+	// Text and pin together.
+	r = h.do("PATCH", path+"/"+first.ID, cr, map[string]any{"body": "Quiz on Sunday\n\nChapters 3-4", "pinned": false})
+	require.Equal(t, http.StatusOK, r.Status, r.Raw)
+	r.into(t, &edited)
+	assert.False(t, edited.Pinned)
+	assert.Equal(t, "Quiz on Sunday\n\nChapters 3-4", edited.Body)
 
 	// Delete.
 	assert.Equal(t, "NOT_GROUP_CR", h.do("DELETE", path+"/"+rules.ID, mate, nil).code())

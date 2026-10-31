@@ -26,6 +26,8 @@ type Announcement struct {
 	Body      string    `json:"body"`
 	Pinned    bool      `json:"pinned"`
 	CreatedAt time.Time `json:"createdAt"`
+	// Set once the CR changed the text.
+	EditedAt *time.Time `json:"editedAt"`
 }
 
 // AnnouncementInput posts a message (CR).
@@ -100,6 +102,34 @@ func (s *Service) SetPinned(ctx context.Context, groupID, id uuid.UUID, pinned b
 	return out, err
 }
 
+// EditAnnouncement changes a message's text (CR). Classmates aren't told
+// again; the message shows that it was edited.
+func (s *Service) EditAnnouncement(ctx context.Context, groupID, id uuid.UUID, body string) (*Announcement, error) {
+	c := auth.MustUser(ctx)
+	body = cleanBody(body)
+	if body == "" {
+		return nil, apperr.Validation(map[string]string{"body": "is required"})
+	}
+	var out *Announcement
+	err := s.d.InTx(ctx, func(ctx context.Context) error {
+		q := store.New(s.d.Q(ctx))
+		if err := s.requireCR(ctx, q, groupID, c.UserID); err != nil {
+			return err
+		}
+		a, err := q.EditAnnouncement(ctx, store.EditAnnouncementParams{ID: id, GroupID: groupID, Body: body, Now: s.now()})
+		if db.IsNoRows(err) {
+			return ErrAnnouncementNotFound
+		}
+		if err != nil {
+			return err
+		}
+		v := announcementView(a)
+		out = &v
+		return q.TouchGroup(ctx, groupID)
+	})
+	return out, err
+}
+
 // DeleteAnnouncement removes a message for everyone (CR).
 func (s *Service) DeleteAnnouncement(ctx context.Context, groupID, id uuid.UUID) error {
 	c := auth.MustUser(ctx)
@@ -143,7 +173,12 @@ func (s *Service) announcementsByGroup(ctx context.Context, q *store.Queries, us
 }
 
 func announcementView(a store.Announcement) Announcement {
-	return Announcement{ID: a.ID, Body: a.Body, Pinned: a.Pinned, CreatedAt: a.CreatedAt}
+	out := Announcement{ID: a.ID, Body: a.Body, Pinned: a.Pinned, CreatedAt: a.CreatedAt}
+	if a.EditedAt != nil {
+		t := a.EditedAt.UTC()
+		out.EditedAt = &t
+	}
+	return out
 }
 
 // cleanBody trims each line and drops runs of blank lines, keeping the

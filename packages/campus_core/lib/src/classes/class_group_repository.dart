@@ -90,6 +90,13 @@ abstract interface class ClassGroupRepository {
     required bool pinned,
   });
 
+  /// Changes a message's text (CR); classmates aren't notified again.
+  Future<Announcement> editAnnouncement(
+    String groupId,
+    String announcementId,
+    String body,
+  );
+
   Future<void> deleteAnnouncement(String groupId, String announcementId);
 
   /// Courses the student doesn't take in this group (hidden from their

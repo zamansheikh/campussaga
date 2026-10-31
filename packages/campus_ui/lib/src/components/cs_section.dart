@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/cs_tokens.dart';
+import 'cs_link_text.dart';
 import '../tokens/cs_icons.dart';
 import '../tokens/dimensions.dart';
 
@@ -105,7 +106,7 @@ class CsRow extends StatelessWidget {
                       ),
                     ),
                     if (subtitle != null)
-                      Text(subtitle!, style: context.text.bodySmall),
+                      CsLinkText(subtitle!, style: context.text.bodySmall),
                   ],
                 ),
               ),
