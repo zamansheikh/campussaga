@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -57,6 +59,9 @@ abstract interface class ReminderScheduler {
     required String body,
     String? payload,
   });
+
+  /// The payload of each notification the student taps while the app runs.
+  Stream<String> get taps;
 }
 
 /// The Android channel for pushes (changes, announcements); the server
@@ -65,6 +70,10 @@ const updatesChannelId = 'class_updates';
 
 class LocalNotificationScheduler implements ReminderScheduler {
   final _plugin = FlutterLocalNotificationsPlugin();
+  final _taps = StreamController<String>.broadcast();
+
+  @override
+  Stream<String> get taps => _taps.stream;
   Future<void>? _ready;
   bool? _exact;
 
@@ -100,6 +109,10 @@ class LocalNotificationScheduler implements ReminderScheduler {
   }
 
   Future<void> _initializePlugin(String icon) => _plugin.initialize(
+    onDidReceiveNotificationResponse: (r) {
+      final p = r.payload;
+      if (p != null && p.isNotEmpty) _taps.add(p);
+    },
     settings: InitializationSettings(
       android: AndroidInitializationSettings(icon),
       // Permission is asked from the app at the right moment, not at start.
@@ -263,7 +276,14 @@ class MemoryReminderScheduler implements ReminderScheduler {
   }) async => pending = List.of(reminders);
 
   final shown = <(String, String)>[];
+  final shownPayloads = <String?>[];
   String? updatesChannel;
+
+  /// Add a payload to act as if the student tapped that notification.
+  final tapController = StreamController<String>.broadcast();
+
+  @override
+  Stream<String> get taps => tapController.stream;
 
   @override
   Future<void> prepareUpdatesChannel({
@@ -276,5 +296,8 @@ class MemoryReminderScheduler implements ReminderScheduler {
     required String title,
     required String body,
     String? payload,
-  }) async => shown.add((title, body));
+  }) async {
+    shown.add((title, body));
+    shownPayloads.add(payload);
+  }
 }

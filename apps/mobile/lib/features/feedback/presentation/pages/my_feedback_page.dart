@@ -115,10 +115,7 @@ class _FeedbackRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: CsSpace.sm),
-            CsPill(
-              label: feedbackStatusLabel(l10n, entry.status),
-              highlight: !entry.status.closed,
-            ),
+            CsPill(label: feedbackStatusLabel(l10n, entry.status)),
           ],
         ),
       ),

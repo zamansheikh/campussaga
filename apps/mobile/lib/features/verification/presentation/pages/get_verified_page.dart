@@ -154,7 +154,6 @@ class _Ways extends StatelessWidget {
                         CsPill(
                           icon: CsIcons.verifiedOutline,
                           label: l10n.verifyProgress(mine.vouches, mine.needed),
-                          highlight: true,
                         ),
                         for (final p in mine.vouchedBy)
                           CsPill(icon: CsIcons.profile, label: p.name),

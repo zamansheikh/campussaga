@@ -238,7 +238,6 @@ class StudentTile extends StatelessWidget {
                     ? l10n.verifiedStudent
                     : l10n.notVerified,
                 icon: student.verified ? CsIcons.verified : CsIcons.help,
-                highlight: !student.verified,
               ),
           ],
         ),

@@ -63,7 +63,7 @@ export default async function FeedbackDetailPage({ params }: { params: Promise<{
                       <li key={m.id} className={cn("flex", m.fromTeam && "justify-end")}>
                         <div className={cn("max-w-[85%] rounded-xl px-3 py-2 text-sm", m.fromTeam ? "bg-primary-soft text-primary-soft-foreground" : "bg-muted")}>
                           <p className="mb-0.5 text-xs text-muted-foreground">
-                            {m.fromTeam ? (m.author?.name ?? "VarsityKotha team") : (f.user?.name ?? "Student")} · {formatDateTime(m.createdAt)}
+                            {m.fromTeam ? m.author?.name || "VarsityKotha team" : f.user?.name || "Student"} · {formatDateTime(m.createdAt)}
                           </p>
                           <p className="whitespace-pre-wrap break-words">{m.body}</p>
                         </div>
@@ -102,7 +102,14 @@ export default async function FeedbackDetailPage({ params }: { params: Promise<{
                   <Field label="App">{f.appVersion ? `${f.appVersion}${f.build ? ` (build ${f.build})` : ""}` : "—"}</Field>
                   <Field label="Phone">{f.device || "—"}</Field>
                   <Field label="System">
-                    <span className="capitalize">{f.platform ?? ""}</span> {f.os ?? ""}
+                    {/* The app sends "Android 17": add the platform only when the OS text lacks it. */}
+                    {f.os && f.platform && f.os.toLowerCase().includes(f.platform.toLowerCase()) ? (
+                      f.os
+                    ) : (
+                      <>
+                        <span className="capitalize">{f.platform ?? ""}</span> {f.os ?? ""}
+                      </>
+                    )}
                   </Field>
                 </dl>
               </CardContent>

@@ -97,10 +97,7 @@ class _ThreadViewState extends State<_ThreadView> {
                 runSpacing: CsSpace.sm,
                 children: [
                   CsPill(label: feedbackKindLabel(l10n, f.kind)),
-                  CsPill(
-                    label: feedbackStatusLabel(l10n, f.status),
-                    highlight: !f.status.closed,
-                  ),
+                  CsPill(label: feedbackStatusLabel(l10n, f.status)),
                 ],
               ),
               const SizedBox(height: CsSpace.md),

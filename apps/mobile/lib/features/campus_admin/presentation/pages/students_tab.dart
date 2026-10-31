@@ -307,7 +307,6 @@ class _StudentView extends StatelessWidget {
                           label: s.verified
                               ? l10n.verifiedStudent
                               : l10n.notVerified,
-                          highlight: !s.verified,
                         ),
                         CsPill(
                           icon: CsIcons.verifiedOutline,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
@@ -56,6 +57,7 @@ class _CampusAppState extends State<CampusApp> {
     getIt<ReminderScheduler>(),
   );
   late final StreamSubscription<List<ClassGroup>> _classesSub;
+  late final StreamSubscription<String> _tapSub;
   late final SeenCubit _seen = SeenCubit(getIt<SeenStore>());
   late final PushController _push = PushController(
     getIt<PushMessaging>(),
@@ -96,6 +98,7 @@ class _CampusAppState extends State<CampusApp> {
     unawaited(_reminders.start());
     unawaited(_seen.start());
     _push.start();
+    _tapSub = getIt<ReminderScheduler>().taps.listen(_onNotificationTap);
     _homeWidget.attach(classes: _classes, auth: _auth, settings: _settings);
     _classesSub = _classes.stream
         .map((s) => s.routine)
@@ -139,15 +142,44 @@ class _CampusAppState extends State<CampusApp> {
         !type.startsWith('bus_')) {
       unawaited(_classes.refresh());
     }
+    // Verified by a CR, classmates or a campus admin: the "Get verified"
+    // banners go away at once.
+    if (type == 'campus_verified') unawaited(_reloadProfile());
     final title = note.title;
     if (title == null) return;
     unawaited(
       getIt<ReminderScheduler>().showUpdate(
         title: title,
         body: note.body ?? '',
-        payload: note.groupId,
+        // Tapping it then does what tapping the push itself does.
+        payload: jsonEncode({'push': note.data}),
       ),
     );
+  }
+
+  /// Fetches the profile again (e.g. just verified by people).
+  Future<void> _reloadProfile() async {
+    if (_auth.state.status != AuthStatus.signedIn) return;
+    try {
+      final user = await getIt<AuthRepository>().restoreSession();
+      if (user != null && mounted) _auth.add(AuthProfileUpdated(user));
+    } on Failure {
+      // Offline: the next start shows it.
+    }
+  }
+
+  /// A notification shown while the app was open was tapped. Class
+  /// reminders carry a plain group id and keep just opening the app.
+  void _onNotificationTap(String payload) {
+    if (!payload.startsWith('{')) return;
+    try {
+      final data = (jsonDecode(payload) as Map)['push'];
+      if (data is Map) {
+        _onPushOpened(PushNote(data: data.cast<String, Object?>()));
+      }
+    } on FormatException {
+      // Not one of ours.
+    }
   }
 
   /// A push was tapped: open its issue (Campus Voice) or, after fetching
@@ -169,7 +201,7 @@ class _CampusAppState extends State<CampusApp> {
       WidgetsBinding.instance
         ..addPostFrameCallback((_) {
           if (_auth.state.status == AuthStatus.signedIn) {
-            _auth.add(const AuthRefreshRequested());
+            unawaited(_reloadProfile());
             _router.go(Routes.profile);
           }
         })
@@ -224,6 +256,7 @@ class _CampusAppState extends State<CampusApp> {
     _lifecycle.dispose();
     unawaited(_authSub.cancel());
     unawaited(_classesSub.cancel());
+    unawaited(_tapSub.cancel());
     _push.dispose();
     _homeWidget.dispose();
     _reminders.close();
