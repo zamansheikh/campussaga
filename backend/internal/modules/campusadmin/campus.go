@@ -214,6 +214,8 @@ type studentsReq struct {
 	Page
 	Status string `json:"-" query:"status" validate:"omitempty,oneof=unverified verified all"`
 	Q      string `json:"-" query:"q" validate:"max=100"`
+	// GroupID: only members of this section (its page lists them).
+	GroupID string `json:"-" query:"groupId" validate:"omitempty,uuid"`
 }
 
 func (s *Service) handleCampusStudents(ctx context.Context, in *studentsReq) (*Paged[Student], error) {
@@ -224,18 +226,19 @@ func (s *Service) handleCampusStudents(ctx context.Context, in *studentsReq) (*P
 	page, size := in.limits()
 	search := strings.TrimSpace(in.Q)
 	where := `u.university_id = $1 AND ($2 = 'all' OR ($2 = 'verified') = (u.verified_at IS NOT NULL))
-		AND ($3 = '' OR u.display_name ILIKE $4 OR u.department ILIKE $4 OR u.batch ILIKE $4)`
+		AND ($3 = '' OR u.display_name ILIKE $4 OR u.department ILIKE $4 OR u.batch ILIKE $4)
+		AND ($5 = '' OR EXISTS (SELECT 1 FROM class_group_members m WHERE m.group_id::text = $5 AND m.user_id = u.id))`
 	status := in.Status
 	if status == "" {
 		status = "all"
 	}
 	q := s.d.Q(ctx)
 	out := &Paged[Student]{Items: []Student{}, Page: page, PageSize: size}
-	if err := q.QueryRow(ctx, `SELECT count(*)::int FROM users u WHERE `+where, uni, status, search, like(search)).Scan(&out.Total); err != nil {
+	if err := q.QueryRow(ctx, `SELECT count(*)::int FROM users u WHERE `+where, uni, status, search, like(search), in.GroupID).Scan(&out.Total); err != nil {
 		return nil, err
 	}
-	rows, err := q.Query(ctx, `SELECT `+studentCols+` FROM users u WHERE `+where+` ORDER BY u.created_at DESC, u.id LIMIT $5 OFFSET $6`,
-		uni, status, search, like(search), size, (page-1)*size)
+	rows, err := q.Query(ctx, `SELECT `+studentCols+` FROM users u WHERE `+where+` ORDER BY u.created_at DESC, u.id LIMIT $6 OFFSET $7`,
+		uni, status, search, like(search), in.GroupID, size, (page-1)*size)
 	if err != nil {
 		return nil, err
 	}

@@ -591,6 +591,19 @@ func TestCampusSections(t *testing.T) {
 	require.Len(t, secs[0].CR, 1)
 	assert.Equal(t, "Rafi CR", secs[0].CR[0].Name)
 
+	// The section page lists its members through the student list.
+	var members struct {
+		Items []struct {
+			ID string `json:"id"`
+		} `json:"items"`
+		Total int `json:"total"`
+	}
+	r0 := h.do("GET", "/campus-admin/students?status=all&groupId="+g.ID, ca.Tok, nil)
+	require.Equal(t, http.StatusOK, r0.Status, r0.Raw)
+	r0.into(t, &members)
+	assert.Equal(t, 3, members.Total, "CR, mate and the Gmail student; not the campus admin")
+	assert.Equal(t, "VALIDATION_FAILED", h.do("GET", "/campus-admin/students?groupId=nope", ca.Tok, nil).code())
+
 	path := "/campus-admin/sections/" + g.ID
 	assert.Equal(t, "NOT_VERIFIED", h.do("PUT", path+"/cr", ca.Tok, map[string]string{"userId": gmail.ID}).code())
 	assert.Equal(t, "GROUP_NOT_FOUND", h.do("PUT", "/campus-admin/sections/"+og.ID+"/cr", ca.Tok, map[string]string{"userId": zed.ID}).code())

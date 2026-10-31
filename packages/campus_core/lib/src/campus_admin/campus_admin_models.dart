@@ -47,8 +47,9 @@ class VerificationEvent {
         actor: json['actor'] is Map<String, Object?>
             ? PersonRef.fromJson(_map(json['actor']))
             : null,
-        user: json['user'] is Map<String, Object?>
-            ? PersonRef.fromJson(_map(json['user']))
+        // The inbox's recent list names the student; history items don't.
+        user: (json['user'] ?? json['student']) is Map<String, Object?>
+            ? PersonRef.fromJson(_map(json['user'] ?? json['student']))
             : null,
         at: _time(json['at'] ?? json['createdAt']),
         revokedAt: _time(json['revokedAt']),
