@@ -1,3 +1,4 @@
+import '../sponsors/sponsor_models.dart';
 import '../voice/voice_models.dart';
 
 DateTime? _time(Object? v) =>
@@ -606,6 +607,7 @@ class Campaign {
     this.sectionChallenge = const SectionChallenge(),
     this.finisherReward,
     this.finisher,
+    this.sponsor,
   });
 
   factory Campaign.fromJson(Map<String, Object?> json) => Campaign(
@@ -646,6 +648,7 @@ class Campaign {
     finisher: _map(json['finisher']) == null
         ? null
         : CampaignFinisher.fromJson(_map(json['finisher'])!),
+    sponsor: CampaignSponsor.fromJson(json['sponsor']),
   );
 
   final String id;
@@ -709,6 +712,9 @@ class Campaign {
   /// My finisher place, once I'm in the race (detail only).
   final CampaignFinisher? finisher;
 
+  /// The brand behind the campaign ("Powered by"), or null.
+  final CampaignSponsor? sponsor;
+
   /// Running at [now].
   bool isLive(DateTime now) =>
       status == CampaignStatus.live &&
@@ -747,6 +753,7 @@ class Campaign {
     sectionChallenge: sectionChallenge,
     finisherReward: finisherReward,
     finisher: finisher ?? this.finisher,
+    sponsor: sponsor,
   );
 }
 

@@ -19,6 +19,7 @@ class CsPrizeBanner extends StatelessWidget {
     this.tag,
     this.image,
     this.height = 168,
+    this.topRight,
   });
 
   final String title;
@@ -30,6 +31,9 @@ class CsPrizeBanner extends StatelessWidget {
   final String? tag;
   final ImageProvider? image;
   final double height;
+
+  /// At the top right, across from [tag] ("Powered by" a sponsor).
+  final Widget? topRight;
 
   static const _amber = Color(0xFFFBBF24);
   static const _gradient = [
@@ -57,11 +61,11 @@ class CsPrizeBanner extends StatelessWidget {
           ),
           if (img == null) ...[
             const CustomPaint(painter: _ConfettiPainter()),
-            const Positioned(
+            Positioned(
               right: 18,
-              top: 18,
+              top: topRight == null ? 18 : 44,
               bottom: 18,
-              child: _GlowingGift(),
+              child: const _GlowingGift(),
             ),
           ] else
             Image(
@@ -87,7 +91,25 @@ class CsPrizeBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (tag != null) _Tag(text: tag!),
+                if (tag != null || topRight != null)
+                  Row(
+                    children: [
+                      // Both shrink (ellipsis) on a narrow poster or in
+                      // long Bangla; the tag keeps more of the room.
+                      if (tag != null)
+                        Flexible(flex: 3, child: _Tag(text: tag!)),
+                      if (topRight != null) ...[
+                        const SizedBox(width: CsSpace.sm),
+                        Expanded(
+                          flex: 2,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: topRight,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 const Spacer(),
                 Padding(
                   // Leave the gift room when it's drawn.
@@ -165,6 +187,8 @@ class _Tag extends StatelessWidget {
     ),
     child: Text(
       text,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
       style: context.text.labelSmall?.copyWith(
         color: Colors.white,
         fontWeight: FontWeight.w700,

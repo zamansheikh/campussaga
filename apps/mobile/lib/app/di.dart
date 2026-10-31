@@ -12,6 +12,7 @@ import '../features/push/push_messaging.dart';
 import '../features/reminders/data/phone_info.dart';
 import '../features/reminders/data/reminder_scheduler.dart';
 import '../features/reminders/data/reminder_store.dart';
+import '../features/sponsors/promo_tracker.dart';
 import '../features/transport/data/bus_sharing.dart';
 import '../features/transport/data/transport_store.dart';
 import '../features/transport/presentation/bus_cubit.dart';
@@ -91,6 +92,12 @@ Future<void> configureDependencies({
     )
     ..registerLazySingleton<GrowthRepository>(
       () => ApiGrowthRepository(getIt<ApiClient>()),
+    )
+    ..registerLazySingleton<SponsorsRepository>(
+      () => ApiSponsorsRepository(getIt<ApiClient>()),
+    )
+    ..registerLazySingleton<PromoTracker>(
+      () => PromoTracker(getIt<SponsorsRepository>()),
     )
     ..registerLazySingleton<DeviceDetailsSource>(PlatformDeviceDetails.new)
     ..registerLazySingleton<PhotoPicker>(ImagePickerPhotoPicker.new);

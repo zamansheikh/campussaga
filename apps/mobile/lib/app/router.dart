@@ -52,6 +52,7 @@ import '../features/profile/presentation/pages/verify_email_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 import '../features/reminders/presentation/reminders_page.dart';
 import '../features/routine/presentation/routine_page.dart';
+import '../features/sponsors/deals_page.dart';
 import '../features/today/presentation/today_page.dart';
 import '../features/transport/presentation/pages/bus_route_edit_page.dart';
 import '../features/transport/presentation/pages/bus_route_map_page.dart';
@@ -205,6 +206,9 @@ abstract final class Routes {
 
   /// Blood donation: requests and the donor profile.
   static const blood = '/blood';
+
+  /// Student deals (sponsored offers).
+  static const deals = '/deals';
   static const bloodNew = '/blood/new';
   static String bloodRequest(String id) => '/blood/requests/$id';
   static const busNew = '/bus/new';
@@ -448,6 +452,10 @@ GoRouter buildRouter(AuthBloc auth, SettingsCubit settings) {
           issueId: state.pathParameters['id']!,
           focusComment: state.uri.queryParameters['comment'] == '1',
         ),
+      ),
+      GoRoute(
+        path: Routes.deals,
+        builder: (context, state) => const DealsPage(),
       ),
       // Find your class: search, then a group's routine preview.
       GoRoute(

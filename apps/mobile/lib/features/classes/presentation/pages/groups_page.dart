@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/router.dart';
+import '../../../sponsors/promo_slot.dart';
 import '../bloc/my_classes_cubit.dart';
 
 /// The student's class groups, and ways to join or create one.
@@ -44,6 +45,10 @@ class GroupsPage extends StatelessWidget {
               const SizedBox(height: CsSpace.lg),
             ],
             const JoinOrCreate(),
+            const PromoSlot(
+              placement: PromoPlacement.lineGroups,
+              padding: EdgeInsets.only(top: CsSpace.md),
+            ),
           ],
         ),
       ),

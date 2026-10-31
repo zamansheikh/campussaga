@@ -15,6 +15,7 @@ export 'src/feedback/api_feedback_repository.dart';
 export 'src/growth/api_growth_repository.dart';
 export 'src/profile/api_profile_repository.dart';
 export 'src/push/api_device_repository.dart';
+export 'src/sponsors/api_sponsors_repository.dart';
 export 'src/transport/api_bus_live_repository.dart';
 export 'src/transport/api_transport_repository.dart';
 export 'src/verification/api_verification_repository.dart';

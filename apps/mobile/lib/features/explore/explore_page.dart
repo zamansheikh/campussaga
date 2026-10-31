@@ -1,16 +1,52 @@
+import 'dart:async';
+
+import 'package:campus_core/campus_core.dart';
 import 'package:campus_l10n/campus_l10n.dart';
 import 'package:campus_ui/campus_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/di.dart';
 import '../../app/router.dart';
 import '../../app/version/version_gate_cubit.dart';
 
 /// Everything the app does beyond the main tabs, as a grid of cards. New
 /// features land here first; ones being built show "Coming soon".
-class ExplorePage extends StatelessWidget {
+class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
+
+  @override
+  State<ExplorePage> createState() => _ExplorePageState();
+}
+
+class _ExplorePageState extends State<ExplorePage> {
+  /// Live student deals for me; the tile shows only when there are some.
+  int _deals = 0;
+  String? _lang;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final lang = Localizations.localeOf(context).languageCode;
+    if (lang != _lang) {
+      _lang = lang;
+      unawaited(_loadDeals());
+    }
+  }
+
+  Future<void> _loadDeals() async {
+    if (!getIt.isRegistered<SponsorsRepository>()) return;
+    try {
+      final list = await getIt<SponsorsRepository>().promos(
+        PromoPlacement.deals,
+        lang: _lang ?? 'en',
+      );
+      if (mounted) setState(() => _deals = list.length);
+    } on Failure {
+      // The tile just doesn't show.
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +61,17 @@ class ExplorePage extends StatelessWidget {
         voice &&
         context.select((VersionGateCubit g) => g.state.feature('visitCampus'));
     final tools = [
+      if (_deals > 0)
+        _Feature(
+          icon: CsIcons.deals,
+          title: l10n.dealsTitle,
+          hint: l10n.dealsCount(_deals),
+          highlight: true,
+          onTap: () async {
+            await context.push(Routes.deals);
+            await _loadDeals();
+          },
+        ),
       if (blood)
         _Feature(
           icon: CsIcons.bloodFill,
@@ -170,6 +217,7 @@ class _Feature {
     required this.hint,
     this.onTap,
     this.soon = false,
+    this.highlight = false,
   });
 
   final IconData icon;
@@ -177,6 +225,9 @@ class _Feature {
   final String hint;
   final VoidCallback? onTap;
   final bool soon;
+
+  /// An amber icon tile (deals), so offers stand out a little.
+  final bool highlight;
 }
 
 class _FeatureCard extends StatelessWidget {
@@ -206,10 +257,17 @@ class _FeatureCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: cs.primaryContainer,
+                  color: f.highlight
+                      ? const Color(0x29F59E0B)
+                      : cs.primaryContainer,
                   borderRadius: BorderRadius.circular(CsRadius.md),
                 ),
-                child: Icon(f.icon, color: cs.onPrimaryContainer),
+                child: Icon(
+                  f.icon,
+                  color: f.highlight
+                      ? const Color(0xFFF59E0B)
+                      : cs.onPrimaryContainer,
+                ),
               ),
               const Spacer(),
               if (f.soon) ...[

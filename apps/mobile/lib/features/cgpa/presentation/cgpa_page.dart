@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
+import '../../sponsors/promo_slot.dart';
 import 'cgpa_cubit.dart';
 import 'cgpa_format.dart';
 import 'target_sheet.dart';
@@ -91,6 +92,10 @@ class CgpaPage extends StatelessWidget {
                         onAction: (a) => _act(context, cubit, s, a),
                       ),
                   ],
+                ),
+                const PromoSlot(
+                  placement: PromoPlacement.lineCgpa,
+                  padding: EdgeInsets.only(top: CsSpace.md),
                 ),
               ],
             ),

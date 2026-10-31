@@ -12,6 +12,7 @@ import '../../../../app/di.dart';
 import '../../../../app/router.dart';
 import '../../../../app/version/version_gate_cubit.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../sponsors/promo_slot.dart';
 import '../bus_cubit.dart';
 import '../bus_format.dart';
 
@@ -166,6 +167,8 @@ class _RoutesView extends StatelessWidget {
             ),
             const SizedBox(height: CsSpace.sm),
           ],
+          // "Supported by …", one quiet line under the routes.
+          const PromoSlot(placement: PromoPlacement.lineBus),
         ],
       );
     }

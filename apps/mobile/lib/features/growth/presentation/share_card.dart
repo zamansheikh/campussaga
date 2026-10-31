@@ -15,6 +15,7 @@ import '../../../app/di.dart';
 import '../../../app/env.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../classes/data/invite_link.dart';
+import '../../sponsors/promo_actions.dart';
 import 'growth_text.dart';
 import 'invite_share.dart';
 
@@ -273,6 +274,13 @@ class _StoryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             CsPrizeBanner(
+              topRight: c.sponsor == null
+                  ? null
+                  : CsPoweredBy(
+                      label: l10n.promoPoweredBy,
+                      brand: c.sponsor!.name,
+                      logo: promoImage(c.sponsor!.logoUrl),
+                    ),
               title: c.title,
               prize: prize == null ? null : l10n.campaignTopPrize(prize.title),
               tag: l10n.appName,

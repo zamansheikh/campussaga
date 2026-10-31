@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/clock.dart';
 import '../../../../app/di.dart';
 import '../../../../app/router.dart';
+import '../../../sponsors/promo_slot.dart';
 import '../blood_cubit.dart';
 import '../blood_format.dart';
 import '../widgets/blood_widgets.dart';
@@ -124,6 +125,11 @@ class _BloodView extends StatelessWidget {
                     ),
                   ),
               ],
+              // Only health partners (hospitals, NGOs) can be here.
+              const PromoSlot(
+                placement: PromoPlacement.lineBlood,
+                padding: EdgeInsets.only(top: CsSpace.md),
+              ),
             ],
           ),
         },

@@ -11,6 +11,8 @@ import '../../../../app/di.dart';
 import '../../../../app/router.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../profile/presentation/widgets/user_avatar.dart';
+import '../../../sponsors/promo_actions.dart';
+import '../../../sponsors/promo_slot.dart';
 import '../../data/voice_cache.dart';
 import '../bloc/feed_cubit.dart';
 import '../voice_format.dart';
@@ -57,6 +59,13 @@ class _CampusViewState extends State<_CampusView> {
   bool _searching = false;
   late final StreamSubscription<VoiceUpdate> _updates;
 
+  /// Sponsored posts for this visit (≤ 3, pictures ready), and the ones
+  /// hidden; one goes after every [_promoEvery] posts, at most two.
+  List<Promo> _promos = const [];
+  final _promoHidden = <String>{};
+  String? _promoLang;
+  static const _promoEvery = 12;
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +84,57 @@ class _CampusViewState extends State<_CampusView> {
           feed.removed(id);
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final lang = Localizations.localeOf(context).languageCode;
+    if (lang != _promoLang) {
+      _promoLang = lang;
+      unawaited(_loadPromos());
+    }
+  }
+
+  Future<void> _loadPromos() async {
+    if (!getIt.isRegistered<SponsorsRepository>()) return;
+    try {
+      final list = await getIt<SponsorsRepository>().promos(
+        PromoPlacement.campus,
+        lang: _promoLang ?? 'en',
+      );
+      final ready = <Promo>[];
+      for (final p in list) {
+        final image = promoImage(p.imageUrl);
+        if (image == null || !mounted) {
+          ready.add(p);
+          continue;
+        }
+        var failed = false;
+        await precacheImage(image, context, onError: (_, _) => failed = true);
+        if (!failed) ready.add(p);
+      }
+      if (mounted) setState(() => _promos = ready);
+    } on Failure {
+      // Ads are extras.
+    }
+  }
+
+  /// The feed with sponsored posts after every 12th post (not while
+  /// searching or offline).
+  List<Object> _entries(FeedState s) {
+    final promos = s.query.isNotEmpty || s.offline
+        ? const <Promo>[]
+        : _promos.where((p) => !_promoHidden.contains(p.id)).take(2).toList();
+    final out = <Object>[];
+    var next = 0;
+    for (var i = 0; i < s.items.length; i++) {
+      out.add(s.items[i]);
+      if ((i + 1) % _promoEvery == 0 && next < promos.length) {
+        out.add(promos[next++]);
+      }
+    }
+    return out;
   }
 
   @override
@@ -308,20 +368,28 @@ class _CampusViewState extends State<_CampusView> {
         ),
       ];
     }
+    final entries = _entries(s);
     return [
       SliverPadding(
         padding: const EdgeInsets.symmetric(horizontal: CsSpace.md),
         sliver: SliverList.separated(
-          itemCount: s.items.length + (s.loadingMore ? 1 : 0),
+          itemCount: entries.length + (s.loadingMore ? 1 : 0),
           separatorBuilder: (_, _) => const SizedBox(height: CsSpace.sm + 4),
           itemBuilder: (context, i) {
-            if (i == s.items.length) {
+            if (i == entries.length) {
               return const Padding(
                 padding: EdgeInsets.all(CsSpace.md),
                 child: Center(child: CircularProgressIndicator()),
               );
             }
-            final card = s.items[i];
+            if (entries[i] case final Promo promo) {
+              return PromoView(
+                key: ValueKey('promo-${promo.id}'),
+                promo: promo,
+                onHide: () => setState(() => _promoHidden.add(promo.id)),
+              );
+            }
+            final card = entries[i] as IssueCard;
             void open({bool comment = false}) => unawaited(
               context.push(Routes.campusIssue(card.id, comment: comment)),
             );

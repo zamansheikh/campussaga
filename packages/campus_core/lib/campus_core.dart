@@ -23,6 +23,8 @@ export 'src/growth/growth_models.dart';
 export 'src/growth/growth_repository.dart';
 export 'src/profile/profile_repository.dart';
 export 'src/push/device_repository.dart';
+export 'src/sponsors/sponsor_models.dart';
+export 'src/sponsors/sponsors_repository.dart';
 export 'src/transport/bus_live.dart';
 export 'src/transport/transport_edit.dart';
 export 'src/transport/transport_models.dart';

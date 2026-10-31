@@ -8533,6 +8533,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Class routine, live bus, blood donors and your campus, in one app.'**
   String get shareCardPitch;
+
+  /// No description provided for @promoSponsored.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored'**
+  String get promoSponsored;
+
+  /// No description provided for @promoSupportedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Supported by'**
+  String get promoSupportedBy;
+
+  /// No description provided for @promoPoweredBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Powered by'**
+  String get promoPoweredBy;
+
+  /// No description provided for @promoWhyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Why am I seeing this?'**
+  String get promoWhyTitle;
+
+  /// No description provided for @promoWhyPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsors never see who you are. We only count views and taps in total.'**
+  String get promoWhyPrivacy;
+
+  /// No description provided for @promoWhyCurated.
+  ///
+  /// In en, this message translates to:
+  /// **'Ads on VarsityKotha are chosen by our team, never by an ad network.'**
+  String get promoWhyCurated;
+
+  /// No description provided for @promoHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide this ad'**
+  String get promoHide;
+
+  /// No description provided for @promoHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden for 7 days'**
+  String get promoHidden;
+
+  /// No description provided for @promoBy.
+  ///
+  /// In en, this message translates to:
+  /// **'By {brand}'**
+  String promoBy(String brand);
+
+  /// No description provided for @dealsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Student deals'**
+  String get dealsTitle;
+
+  /// No description provided for @dealsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Offers for students, picked by the VarsityKotha team.'**
+  String get dealsHint;
+
+  /// No description provided for @dealsNearYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Near you'**
+  String get dealsNearYou;
+
+  /// No description provided for @dealsEverywhere.
+  ///
+  /// In en, this message translates to:
+  /// **'For every student'**
+  String get dealsEverywhere;
+
+  /// No description provided for @dealsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No deals right now. Check back soon.'**
+  String get dealsEmpty;
+
+  /// No description provided for @dealsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{None yet} =1{1 offer} other{{count} offers}}'**
+  String dealsCount(int count);
+
+  /// No description provided for @dealsSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search deals'**
+  String get dealsSearch;
+
+  /// No description provided for @dealCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get dealCopy;
+
+  /// No description provided for @dealCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Code {code} copied'**
+  String dealCopied(String code);
+
+  /// No description provided for @dealUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Until {date}'**
+  String dealUntil(String date);
+
+  /// No description provided for @dealTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms'**
+  String get dealTerms;
+
+  /// No description provided for @dealVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit'**
+  String get dealVisit;
 }
 
 class _AppLocalizationsDelegate

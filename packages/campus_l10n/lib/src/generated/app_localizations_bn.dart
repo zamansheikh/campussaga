@@ -5508,4 +5508,82 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get shareCardPitch =>
       'ক্লাস রুটিন, লাইভ বাস, রক্তদাতা আর তোমার ক্যাম্পাস, এক অ্যাপে।';
+
+  @override
+  String get promoSponsored => 'স্পন্সরড';
+
+  @override
+  String get promoSupportedBy => 'সহযোগিতায়';
+
+  @override
+  String get promoPoweredBy => 'সহযোগিতায়';
+
+  @override
+  String get promoWhyTitle => 'এটা কেন দেখছি?';
+
+  @override
+  String get promoWhyPrivacy =>
+      'স্পন্সর কখনো জানে না তুমি কে। আমরা শুধু মোট কতবার দেখা ও ট্যাপ হয়েছে তা গুনি।';
+
+  @override
+  String get promoWhyCurated =>
+      'ভার্সিটি কথার বিজ্ঞাপন আমাদের টিম বাছাই করে, কোনো অ্যাড নেটওয়ার্ক নয়।';
+
+  @override
+  String get promoHide => 'এই বিজ্ঞাপন লুকাও';
+
+  @override
+  String get promoHidden => '৭ দিনের জন্য লুকানো হলো';
+
+  @override
+  String promoBy(String brand) {
+    return '$brand';
+  }
+
+  @override
+  String get dealsTitle => 'স্টুডেন্ট ডিল';
+
+  @override
+  String get dealsHint =>
+      'শিক্ষার্থীদের জন্য অফার, ভার্সিটি কথা টিমের বাছাই করা।';
+
+  @override
+  String get dealsNearYou => 'তোমার কাছে';
+
+  @override
+  String get dealsEverywhere => 'সব শিক্ষার্থীর জন্য';
+
+  @override
+  String get dealsEmpty => 'এখন কোনো ডিল নেই। পরে আবার দেখো।';
+
+  @override
+  String dealsCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countStringটি অফার';
+  }
+
+  @override
+  String get dealsSearch => 'ডিল খোঁজো';
+
+  @override
+  String get dealCopy => 'কপি';
+
+  @override
+  String dealCopied(String code) {
+    return 'কোড $code কপি হয়েছে';
+  }
+
+  @override
+  String dealUntil(String date) {
+    return '$date পর্যন্ত';
+  }
+
+  @override
+  String get dealTerms => 'শর্ত';
+
+  @override
+  String get dealVisit => 'দেখো';
 }

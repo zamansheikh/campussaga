@@ -19,6 +19,7 @@ import 'package:varsitykotha/features/push/push_messaging.dart';
 import 'package:varsitykotha/features/reminders/data/phone_info.dart';
 import 'package:varsitykotha/features/reminders/data/reminder_scheduler.dart';
 import 'package:varsitykotha/features/reminders/data/reminder_store.dart';
+import 'package:varsitykotha/features/sponsors/promo_tracker.dart';
 import 'package:varsitykotha/features/voice/data/photo_picker.dart';
 import 'package:varsitykotha/features/voice/data/voice_cache.dart';
 
@@ -382,6 +383,7 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
   FakeCampusAdminRepository? campusAdmin,
   FakeFeedbackRepository? feedback,
   FakeGrowthRepository? growth,
+  SponsorsRepository? sponsors,
   int build = 1,
 }) async {
   await getIt.reset();
@@ -433,6 +435,12 @@ Future<(FakeAuthRepository, FakeGoogleAuth)> registerFakes({
       growth ?? (FakeGrowthRepository()..failure = const NetworkFailure()),
     )
     ..registerSingleton<DeviceDetailsSource>(MemoryDeviceDetails());
+  // Ads show only in tests that ask for them.
+  if (sponsors != null) {
+    getIt
+      ..registerSingleton<SponsorsRepository>(sponsors)
+      ..registerSingleton<PromoTracker>(PromoTracker(sponsors));
+  }
   return (repo, google);
 }
 

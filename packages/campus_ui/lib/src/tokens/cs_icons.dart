@@ -34,6 +34,9 @@ abstract final class CsIcons {
   static const IconData checkCircle = PhosphorIconsFill.checkCircle;
   static const IconData check = PhosphorIconsBold.check;
   static const IconData chevronRight = PhosphorIconsRegular.caretRight;
+  static const IconData chevronDown = PhosphorIconsRegular.caretDown;
+  static const IconData chevronUp = PhosphorIconsRegular.caretUp;
+  static const IconData deals = PhosphorIconsRegular.tag;
   static const IconData circle = PhosphorIconsRegular.circle;
   static const IconData clear = PhosphorIconsFill.xCircle;
   static const IconData close = PhosphorIconsRegular.x;

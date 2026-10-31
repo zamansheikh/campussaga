@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/clock.dart';
 import '../../../../app/env.dart';
+import '../../../sponsors/promo_actions.dart';
 import '../growth_text.dart';
 import '../invite_share.dart';
 
@@ -30,7 +31,15 @@ class CampaignBanner extends StatelessWidget {
         ? l10n.campaignAnnounced
         : l10n.campaignEnded;
     final banner = c.bannerUrl;
+    final sponsor = c.sponsor;
     return CsPrizeBanner(
+      topRight: sponsor == null
+          ? null
+          : CsPoweredBy(
+              label: l10n.promoPoweredBy,
+              brand: sponsor.name,
+              logo: promoImage(sponsor.logoUrl),
+            ),
       title: c.title,
       prize: prize == null ? null : l10n.campaignTopPrize(prize.title),
       tag: tag,

@@ -24,6 +24,7 @@ import '../../growth/presentation/widgets/campaign_card.dart';
 import '../../profile/presentation/widgets/user_avatar.dart';
 import '../../reminders/presentation/bloc/reminders_cubit.dart';
 import '../../reminders/presentation/reminder_prompt.dart';
+import '../../sponsors/promo_slot.dart';
 import '../../verification/presentation/widgets/verify_banner.dart';
 
 /// Home screen: the next class with a countdown, then the rest of today.
@@ -155,6 +156,11 @@ class _TodayPageState extends State<TodayPage> {
     return [
       hero,
       if (ask) ...[const SizedBox(height: CsSpace.md), const ReminderPrompt()],
+      // At most one sponsored card a day, below the routine.
+      const PromoSlot(
+        placement: PromoPlacement.today,
+        padding: EdgeInsets.only(top: CsSpace.lg),
+      ),
       _RecentAnnouncements(
         groups: groups.where((g) => !g.isPersonal).toList(),
         now: now,

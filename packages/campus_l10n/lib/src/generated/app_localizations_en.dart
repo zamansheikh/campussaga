@@ -5698,4 +5698,89 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get shareCardPitch =>
       'Class routine, live bus, blood donors and your campus, in one app.';
+
+  @override
+  String get promoSponsored => 'Sponsored';
+
+  @override
+  String get promoSupportedBy => 'Supported by';
+
+  @override
+  String get promoPoweredBy => 'Powered by';
+
+  @override
+  String get promoWhyTitle => 'Why am I seeing this?';
+
+  @override
+  String get promoWhyPrivacy =>
+      'Sponsors never see who you are. We only count views and taps in total.';
+
+  @override
+  String get promoWhyCurated =>
+      'Ads on VarsityKotha are chosen by our team, never by an ad network.';
+
+  @override
+  String get promoHide => 'Hide this ad';
+
+  @override
+  String get promoHidden => 'Hidden for 7 days';
+
+  @override
+  String promoBy(String brand) {
+    return 'By $brand';
+  }
+
+  @override
+  String get dealsTitle => 'Student deals';
+
+  @override
+  String get dealsHint =>
+      'Offers for students, picked by the VarsityKotha team.';
+
+  @override
+  String get dealsNearYou => 'Near you';
+
+  @override
+  String get dealsEverywhere => 'For every student';
+
+  @override
+  String get dealsEmpty => 'No deals right now. Check back soon.';
+
+  @override
+  String dealsCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString offers',
+      one: '1 offer',
+      zero: 'None yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dealsSearch => 'Search deals';
+
+  @override
+  String get dealCopy => 'Copy';
+
+  @override
+  String dealCopied(String code) {
+    return 'Code $code copied';
+  }
+
+  @override
+  String dealUntil(String date) {
+    return 'Until $date';
+  }
+
+  @override
+  String get dealTerms => 'Terms';
+
+  @override
+  String get dealVisit => 'Visit';
 }
