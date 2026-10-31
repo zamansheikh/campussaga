@@ -101,8 +101,15 @@ type gwStanding struct {
 	Flags []string `json:"flags"`
 }
 
+// invitesOnly: one point per counted invite and nothing else, so the score
+// is the invite count (TestGrowthPoints covers the other keys).
+var invitesOnly = map[string]any{
+	"invite": 1, "otherCampus": 0, "pioneer": 0, "friendSection": 0, "joinSection": 0, "bloodDonor": 0, "busShare": 0, "sectionSetup": 0,
+}
+
 func campaignBody(start, end time.Time, extra map[string]any) map[string]any {
 	b := map[string]any{
+		"scoring": invitesOnly,
 		"titleEn": "Invite and win", "titleBn": "আমন্ত্রণ করো, জেতো",
 		"bodyEn": "Bring friends who really use VarsityKotha", "bodyBn": "যারা সত্যিই ব্যবহার করে তাদের আনো",
 		"rulesEn": "Free to enter. Winners are chosen by rank. Google is not a sponsor.", "rulesBn": "",

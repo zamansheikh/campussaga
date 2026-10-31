@@ -474,3 +474,49 @@ Paths, fields and error codes are as in §5. Where the spec left a choice:
 - **Sweeps:** hourly (`Sweep`): re-check pending invites, recompute badges,
   mark ended campaigns, delete active days older than 30 days and prize claims
   90 days after delivery.
+
+## As implemented (points, migration `00760_campaign_points.sql`)
+
+- **Stored:** `campaigns.scoring jsonb`, default as in §8.1. A stored value is
+  read over the defaults, so a key added later takes its default.
+  `POST /admin/campaigns` and `PATCH` take a partial `scoring` object (keys left
+  out keep their value: the defaults on create, the stored ones on PATCH).
+  Ranges as in §8.1; outside them `INVALID_SCORING` (400). A `scoring` PATCH on a
+  campaign that is no longer a draft is `CAMPAIGN_LOCKED` (409), like the other
+  locked fields.
+- **`scoring`** on every campaign JSON (student list and detail, public, admin
+  list and detail): all eleven keys,
+  `{invite, otherCampus, pioneer, friendSection, joinSection, bloodDonor, busShare, busShareDays, sectionSetup, sectionSetupMax, pioneerFirst}`.
+- **One query** (`standingsSQL` in `campaigns.go`) scores everyone. Thresholds
+  are constants in `scoring.go`: a section needs 5 routine slots and 5 verified
+  members besides the CR (any member, `courses_only` ones too); a bus share needs
+  10 minutes from `started_at` to its **last ping** (`last_at`, not `ended_at`, so
+  an expired session doesn't count its idle time). A bus day is the Dhaka date
+  of `started_at`, and only shares started inside `[starts_at, ends_at]` count.
+  When over `busShareDays`, the earliest days count; over `sectionSetupMax`, the
+  oldest sections.
+- **Pioneer** compares `verified_at`: fewer than `pioneerFirst` students of the
+  friend's university were verified before them. A friend with no
+  university is never "other campus" or a pioneer.
+- **Ties:** the latest of the counted invites' `qualified_at`, the counted bus
+  days' first `started_at`, the first `joined_at` of a section and the donor's
+  `created_at`, only for keys worth points; sections add no time. No time at all
+  sorts last, then by id.
+- **`missions`** reflect counted points only: a student who isn't a participant
+  (unverified, team, disqualified) gets every row with `count: 0`, and
+  `myScore` is the sum of `earned`. `max` is 1 for once, `busShareDays` for
+  day, `sectionSetupMax` for section, null for friend. `busShare` and
+  `sectionSetup` rows are left out when their limit is 0 too.
+- **`section`**: of my CR sections that don't meet both thresholds, the one
+  closest to them (`min(slots,5) + min(members,5)`), then the oldest; null when I
+  already have `sectionSetupMax` that count. `members` counts verified members
+  besides me; `name` is `{department} {batch} · {section}` (no ` · ` without a
+  section).
+- **Admin:** standings rows add `points` (all eight keys, zero for a
+  disqualified participant). Every invite view (standings, `/admin/referrals`,
+  `/admin/users/{id}/growth`) adds `otherCampus`, `pioneer` (with the
+  campaign's `pioneerFirst` in standings, the default 20 elsewhere) and
+  `inSection` (the friend is in a class group now). Flag `self_vouched`: the
+  friend is verified by people (`verified_via` cr, vouch or campus_admin) and the
+  inviter has a live verification event for them or a vouch that isn't void.
+  `/admin/referrals?flag=self_vouched` filters on it.

@@ -57,6 +57,7 @@ var (
 	ErrNotSettled         = apperr.New(http.StatusConflict, "CAMPAIGN_NOT_SETTLED", "Winners can be announced after the campaign settles")
 	ErrNotAnnounceable    = apperr.New(http.StatusConflict, "CAMPAIGN_NOT_ANNOUNCEABLE", "Only a live campaign can be announced, once")
 	ErrWinners            = apperr.New(http.StatusUnprocessableEntity, "CAMPAIGN_WINNERS", "The winners are not valid")
+	ErrInvalidScoring     = apperr.New(http.StatusBadRequest, "INVALID_SCORING", "Point values must be whole numbers in their range")
 )
 
 // NoticeText is a push in one language.

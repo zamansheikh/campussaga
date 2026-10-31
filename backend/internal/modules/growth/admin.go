@@ -48,6 +48,7 @@ type AdminCampaign struct {
 	CreatedAt     time.Time   `json:"createdAt"`
 	UpdatedAt     time.Time   `json:"updatedAt"`
 	BannerURL     *string     `json:"bannerUrl"`
+	Scoring       Scoring     `json:"scoring"`
 }
 
 func (s *Service) adminView(c campaign) AdminCampaign {
@@ -55,22 +56,24 @@ func (s *Service) adminView(c campaign) AdminCampaign {
 		ID: c.ID, TitleEn: c.TitleEn, TitleBn: c.TitleBn, BodyEn: c.BodyEn, BodyBn: c.BodyBn, RulesEn: c.RulesEn, RulesBn: c.RulesBn,
 		StartsAt: c.StartsAt.UTC(), EndsAt: c.EndsAt.UTC(), SettlesAt: c.SettlesAt.UTC(), UniversityIDs: c.UniversityIDs,
 		Prizes: c.Prizes, Status: c.state(s.now()), CreatedAt: c.CreatedAt.UTC(), UpdatedAt: c.UpdatedAt.UTC(),
-		BannerURL: c.bannerURL(),
+		BannerURL: c.bannerURL(), Scoring: c.Scoring,
 	}
 }
 
 type campaignInput struct {
-	TitleEn       string      `json:"titleEn" validate:"required,max=120"`
-	TitleBn       string      `json:"titleBn" validate:"max=120"`
-	BodyEn        string      `json:"bodyEn" validate:"max=2000"`
-	BodyBn        string      `json:"bodyBn" validate:"max=2000"`
-	RulesEn       string      `json:"rulesEn" validate:"max=8000"`
-	RulesBn       string      `json:"rulesBn" validate:"max=8000"`
-	StartsAt      time.Time   `json:"startsAt" validate:"required"`
-	EndsAt        time.Time   `json:"endsAt" validate:"required"`
-	SettlesAt     *time.Time  `json:"settlesAt"`
-	UniversityIDs []uuid.UUID `json:"universityIds" validate:"max=200"`
-	Prizes        []Prize     `json:"prizes" validate:"max=20,dive"`
+	// Scoring: point values merged over the defaults (§8.1).
+	Scoring       *ScoringInput `json:"scoring"`
+	TitleEn       string        `json:"titleEn" validate:"required,max=120"`
+	TitleBn       string        `json:"titleBn" validate:"max=120"`
+	BodyEn        string        `json:"bodyEn" validate:"max=2000"`
+	BodyBn        string        `json:"bodyBn" validate:"max=2000"`
+	RulesEn       string        `json:"rulesEn" validate:"max=8000"`
+	RulesBn       string        `json:"rulesBn" validate:"max=8000"`
+	StartsAt      time.Time     `json:"startsAt" validate:"required"`
+	EndsAt        time.Time     `json:"endsAt" validate:"required"`
+	SettlesAt     *time.Time    `json:"settlesAt"`
+	UniversityIDs []uuid.UUID   `json:"universityIds" validate:"max=200"`
+	Prizes        []Prize       `json:"prizes" validate:"max=20,dive"`
 }
 
 func checkDates(starts, ends, settles time.Time) error {
@@ -128,14 +131,19 @@ func (s *Service) handleAdminCreate(ctx context.Context, in *campaignInput) (*Ad
 	if err := s.checkUniversities(ctx, in.UniversityIDs); err != nil {
 		return nil, err
 	}
+	sc, err := in.Scoring.mergeOver(DefaultScoring)
+	if err != nil {
+		return nil, err
+	}
 	prizes, _ := json.Marshal(append([]Prize{}, in.Prizes...))
+	scoring, _ := json.Marshal(sc)
 	var out *AdminCampaign
-	err := s.d.InTx(ctx, func(ctx context.Context) error {
+	err = s.d.InTx(ctx, func(ctx context.Context) error {
 		c, err := scanCampaign(s.d.Q(ctx).QueryRow(ctx, `INSERT INTO campaigns AS c (title_en, title_bn, body_en, body_bn, rules_en, rules_bn,
-				starts_at, ends_at, settles_at, university_ids, prizes, created_by)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING `+campaignCols,
+				starts_at, ends_at, settles_at, university_ids, prizes, created_by, scoring)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING `+campaignCols,
 			in.TitleEn, in.TitleBn, in.BodyEn, in.BodyBn, in.RulesEn, in.RulesBn, in.StartsAt, in.EndsAt, settles,
-			universitiesOrNil(in.UniversityIDs), prizes, auth.MustUser(ctx).UserID))
+			universitiesOrNil(in.UniversityIDs), prizes, auth.MustUser(ctx).UserID, scoring))
 		if err != nil {
 			return err
 		}
@@ -217,6 +225,8 @@ type patchReq struct {
 	UniversityIDs *[]uuid.UUID `json:"universityIds" validate:"omitnil,max=200"`
 	Prizes        *[]Prize     `json:"prizes" validate:"omitnil,max=20,dive"`
 	Status        *string      `json:"status" validate:"omitnil,oneof=live"`
+	// Scoring: point values merged over the current ones; draft only.
+	Scoring *ScoringInput `json:"scoring"`
 }
 
 func (s *Service) handleAdminPatch(ctx context.Context, in *patchReq) (*AdminCampaign, error) {
@@ -230,12 +240,15 @@ func (s *Service) handleAdminPatch(ctx context.Context, in *patchReq) (*AdminCam
 			return ErrCampaignLocked
 		}
 		// A draft can change freely; once live only the end, the settle
-		// date, the rules and the prizes can.
+		// date, the rules and the prizes can (never the point values).
 		if c.Status != "draft" {
 			if in.TitleEn != nil || in.TitleBn != nil || in.BodyEn != nil || in.BodyBn != nil || in.StartsAt != nil ||
-				in.UniversityIDs != nil || in.Status != nil {
+				in.UniversityIDs != nil || in.Status != nil || in.Scoring != nil {
 				return ErrCampaignLocked
 			}
+		}
+		if c.Scoring, err = in.Scoring.mergeOver(c.Scoring); err != nil {
+			return err
 		}
 		set := func(dst *string, v *string) {
 			if v != nil {
@@ -286,10 +299,11 @@ func (s *Service) handleAdminPatch(ctx context.Context, in *patchReq) (*AdminCam
 			c.Status = c.state(s.now())
 		}
 		prizes, _ := json.Marshal(c.Prizes)
+		scoring, _ := json.Marshal(c.Scoring)
 		if _, err := s.d.Q(ctx).Exec(ctx, `UPDATE campaigns SET title_en = $2, title_bn = $3, body_en = $4, body_bn = $5, rules_en = $6, rules_bn = $7,
-				starts_at = $8, ends_at = $9, settles_at = $10, university_ids = $11, prizes = $12, status = $13 WHERE id = $1`,
+				starts_at = $8, ends_at = $9, settles_at = $10, university_ids = $11, prizes = $12, status = $13, scoring = $14 WHERE id = $1`,
 			c.ID, c.TitleEn, c.TitleBn, c.BodyEn, c.BodyBn, c.RulesEn, c.RulesBn, c.StartsAt, c.EndsAt, c.SettlesAt,
-			c.UniversityIDs, prizes, c.Status); err != nil {
+			c.UniversityIDs, prizes, c.Status, scoring); err != nil {
 			return err
 		}
 		action := "campaign.update"
@@ -332,11 +346,25 @@ type invite struct {
 	ReferrerIsNew  bool
 	ReferrerEmail  string
 	ReferrerCreate time.Time
+	OtherCampus    bool
+	// VerifiedBefore: students of the friend's university verified before
+	// them (nil: the friend isn't verified); pioneer when under pioneerFirst.
+	VerifiedBefore *int
+	InSection      bool
+	SelfVouched    bool
 }
+
+// selfVouchedSQL: the friend (u) is verified by people (CR, vouches, campus
+// admin) and the inviter (r.referrer_id) was one of them: a live verification
+// event they made, or a vouch of theirs that still counts.
+const selfVouchedSQL = `(u.verified_at IS NOT NULL AND u.verified_via IN ('cr', 'vouch', 'campus_admin') AND (
+	EXISTS (SELECT 1 FROM verification_events e WHERE e.user_id = u.id AND e.actor_id = r.referrer_id AND e.revoked_at IS NULL)
+	OR EXISTS (SELECT 1 FROM vouches v WHERE v.user_id = u.id AND v.voucher_id = r.referrer_id AND v.void_at IS NULL)))`
 
 // inviteSelect: the shared SELECT. burst: some 1-hour window that holds this
 // invite has 10 or more invites of the same inviter. new_account: the inviter's
-// first invite came within 7 days of their own sign-up.
+// first invite came within 7 days of their own sign-up. self_vouched: see
+// selfVouchedSQL.
 const inviteSelect = `
 SELECT r.referred_id, coalesce(u.display_name, ''), coalesce(uu.name, ''), r.referrer_id, coalesce(rr.display_name, ''), coalesce(ru.name, ''),
        r.source, r.created_at, u.verified_via,
@@ -348,7 +376,12 @@ SELECT r.referred_id, coalesce(u.display_name, ''), coalesce(uu.name, ''), r.ref
                  AND (SELECT count(*) FROM referrals y WHERE y.referrer_id = x.referrer_id
                         AND y.created_at >= x.created_at AND y.created_at < x.created_at + interval '1 hour') >= 10),
        (SELECT min(x.created_at) FROM referrals x WHERE x.referrer_id = r.referrer_id) - rr.created_at < interval '7 days',
-       rr.email, rr.created_at
+       rr.email, rr.created_at,
+       (u.university_id IS NOT NULL AND u.university_id IS DISTINCT FROM rr.university_id),
+       CASE WHEN u.verified_at IS NOT NULL AND u.university_id IS NOT NULL THEN
+         (SELECT count(*)::int FROM users x WHERE x.university_id = u.university_id AND x.verified_at < u.verified_at) END,
+       EXISTS (SELECT 1 FROM class_group_members m WHERE m.user_id = u.id),
+       ` + selfVouchedSQL + `
 FROM referrals r
 JOIN users u ON u.id = r.referred_id LEFT JOIN universities uu ON uu.id = u.university_id
 JOIN users rr ON rr.id = r.referrer_id LEFT JOIN universities ru ON ru.id = rr.university_id`
@@ -357,7 +390,8 @@ func scanInvite(r scanner) (invite, error) {
 	var x invite
 	err := r.Scan(&x.ReferredID, &x.ReferredName, &x.ReferredUni, &x.ReferrerID, &x.ReferrerName, &x.ReferrerUni,
 		&x.Source, &x.CreatedAt, &x.VerifiedVia, &x.ActiveDays, &x.QualifiedAt, &x.SameDevice, &x.Disqualified, &x.Reason,
-		&x.Burst, &x.ReferrerIsNew, &x.ReferrerEmail, &x.ReferrerCreate)
+		&x.Burst, &x.ReferrerIsNew, &x.ReferrerEmail, &x.ReferrerCreate,
+		&x.OtherCampus, &x.VerifiedBefore, &x.InSection, &x.SelfVouched)
 	return x, err
 }
 
@@ -371,6 +405,9 @@ func (x invite) flags() []string {
 	}
 	if x.ReferrerIsNew {
 		out = append(out, "new_account")
+	}
+	if x.SelfVouched {
+		out = append(out, "self_vouched")
 	}
 	return out
 }
@@ -391,12 +428,19 @@ type InviteView struct {
 	SameDevice   bool       `json:"sameDevice"`
 	Disqualified bool       `json:"disqualified"`
 	Reason       string     `json:"reason"`
+	// The bonuses (§8.1): the friend is at another university, among the
+	// first verified students of theirs, in a class group.
+	OtherCampus bool `json:"otherCampus"`
+	Pioneer     bool `json:"pioneer"`
+	InSection   bool `json:"inSection"`
 }
 
-func (x invite) view() InviteView {
+// view: pioneerFirst is the campaign's (the default outside a campaign).
+func (x invite) view(pioneerFirst int) InviteView {
 	v := InviteView{
 		Referred: Ref{ID: x.ReferredID, Name: x.ReferredName, University: x.ReferredUni}, Source: x.Source, CreatedAt: x.CreatedAt.UTC(),
 		VerifiedVia: x.VerifiedVia, ActiveDays: x.ActiveDays, SameDevice: x.SameDevice, Disqualified: x.Disqualified, Reason: x.Reason,
+		OtherCampus: x.OtherCampus, Pioneer: x.VerifiedBefore != nil && *x.VerifiedBefore < pioneerFirst, InSection: x.InSection,
 	}
 	if x.QualifiedAt != nil {
 		t := x.QualifiedAt.UTC()
@@ -421,9 +465,11 @@ type StandingRow struct {
 	Hidden bool         `json:"hidden"`
 	// Disqualified participants are listed after the ranked ones (rank null)
 	// so they can be restored.
-	Disqualified bool         `json:"disqualified"`
-	Invites      []InviteView `json:"invites"`
-	Flags        []string     `json:"flags"`
+	Disqualified bool `json:"disqualified"`
+	// Points per key (zero for a disqualified participant).
+	Points  Points       `json:"points"`
+	Invites []InviteView `json:"invites"`
+	Flags   []string     `json:"flags"`
 }
 
 const standingsSize = 100
@@ -442,8 +488,8 @@ func (s *Service) handleAdminStandings(ctx context.Context, in *campaignReq) (*[
 	for _, x := range top {
 		rank := x.Rank
 		users[x.UserID] = len(out)
-		out = append(out, StandingRow{Rank: &rank, Score: x.Score, Hidden: x.Hidden, Invites: []InviteView{}, Flags: []string{},
-			User: StandingUser{ID: x.UserID, Name: x.Name, University: x.UniName}})
+		out = append(out, StandingRow{Rank: &rank, Score: x.Score, Hidden: x.Hidden, Points: x.Tally.points(c.Scoring),
+			Invites: []InviteView{}, Flags: []string{}, User: StandingUser{ID: x.UserID, Name: x.Name, University: x.UniName}})
 	}
 	// Disqualified participants, after the ranked ones.
 	rows, err := s.d.Q(ctx).Query(ctx, `SELECT d.user_id, coalesce(u.display_name, ''), un.name, u.leaderboard_hidden
@@ -492,7 +538,7 @@ func (s *Service) handleAdminStandings(ctx context.Context, in *campaignReq) (*[
 		}
 		row := &out[users[x.ReferrerID]]
 		row.User.Email = x.ReferrerEmail
-		row.Invites = append(row.Invites, x.view())
+		row.Invites = append(row.Invites, x.view(c.Scoring.PioneerFirst))
 		for _, f := range x.flags() {
 			if !slices.Contains(row.Flags, f) {
 				row.Flags = append(row.Flags, f)
@@ -749,7 +795,7 @@ type referralsReq struct {
 	Page     string `json:"-" query:"page" validate:"omitempty,number,min=1,max=10000"`
 	PageSize string `json:"-" query:"pageSize" validate:"omitempty,number"`
 	Q        string `json:"-" query:"q" validate:"max=100"`
-	Flag     string `json:"-" query:"flag" validate:"omitempty,oneof=same_device burst new_account disqualified qualified pending"`
+	Flag     string `json:"-" query:"flag" validate:"omitempty,oneof=same_device burst new_account self_vouched disqualified qualified pending"`
 }
 
 type ReferralItem struct {
@@ -777,6 +823,7 @@ func (s *Service) handleAdminReferrals(ctx context.Context, in *referralsReq) (*
 			AND x.created_at <= r.created_at AND x.created_at > r.created_at - interval '1 hour'
 			AND (SELECT count(*) FROM referrals y WHERE y.referrer_id = x.referrer_id AND y.created_at >= x.created_at AND y.created_at < x.created_at + interval '1 hour') >= 10))
 		OR ($3 = 'new_account' AND (SELECT min(x.created_at) FROM referrals x WHERE x.referrer_id = r.referrer_id) - rr.created_at < interval '7 days')
+		OR ($3 = 'self_vouched' AND ` + selfVouchedSQL + `)
 		OR ($3 = 'disqualified' AND r.disqualified_at IS NOT NULL)
 		OR ($3 = 'qualified' AND r.qualified_at IS NOT NULL AND r.disqualified_at IS NULL)
 		OR ($3 = 'pending' AND r.qualified_at IS NULL AND r.disqualified_at IS NULL))`
@@ -797,7 +844,7 @@ func (s *Service) handleAdminReferrals(ctx context.Context, in *referralsReq) (*
 		if err != nil {
 			return nil, err
 		}
-		out.Items = append(out.Items, ReferralItem{InviteView: x.view(), Referrer: Ref{ID: x.ReferrerID, Name: x.ReferrerName, University: x.ReferrerUni}, Flags: x.flags()})
+		out.Items = append(out.Items, ReferralItem{InviteView: x.view(DefaultScoring.PioneerFirst), Referrer: Ref{ID: x.ReferrerID, Name: x.ReferrerName, University: x.ReferrerUni}, Flags: x.flags()})
 	}
 	return out, rows.Err()
 }
@@ -843,7 +890,7 @@ func (s *Service) handleAdminUserGrowth(ctx context.Context, in *userIDReq) (*Us
 			rows.Close()
 			return nil, err
 		}
-		out.Invited = append(out.Invited, x.view())
+		out.Invited = append(out.Invited, x.view(DefaultScoring.PioneerFirst))
 	}
 	rows.Close()
 	if err := rows.Err(); err != nil {
