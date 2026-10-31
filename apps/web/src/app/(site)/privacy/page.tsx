@@ -39,7 +39,7 @@ export default function PrivacyPage() {
     <article className="prose-page mx-auto max-w-3xl px-4 py-12">
       <section lang="en">
         <h1>Privacy Policy</h1>
-        <p className="text-muted-foreground">Effective 28 October 2026</p>
+        <p className="text-muted-foreground">Effective 31 October 2026</p>
         <p>
           <a href="#bn">বাংলায় পড়ো</a>
         </p>
@@ -219,6 +219,39 @@ export default function PrivacyPage() {
           to our admins. Campus admins see names, department, batch and photo, and never email addresses.
         </p>
 
+        <h2>Invites, badges, profiles and prize campaigns</h2>
+        <ul>
+          <li>
+            <strong>Invites:</strong> every student has a personal invite link. When someone joins with it (or with a
+            class invite link you shared), we keep who invited whom, when, and whether the friend became verified and
+            used the app on enough days for the invite to count. We also check whether two accounts share a phone, to
+            stop fake invites. The inviter and the friend can each see the other&apos;s name in the app, and our admins
+            see the whole record.
+          </li>
+          <li>
+            <strong>Badges:</strong> we give badges for roles (such as CR) and activity (such as sharing bus trips).
+            Badges earned from anonymous activity are private: only you see them, and you can&apos;t show them by your
+            name. Anonymous posts are never linked to your name, your profile or your badges.
+          </li>
+          <li>
+            <strong>Leaderboards:</strong> a campaign leaderboard shows your name and university and your score. You
+            can hide yourself with &quot;Show me on leaderboards&quot; in your profile, and then you appear as &quot;A
+            student at&quot; your university.
+          </li>
+          <li>
+            <strong>Profiles:</strong> other signed-in students can open your profile. It shows your name, whether you
+            are verified, university, department, batch, the month you joined, your public badges and your named
+            Campus posts (never anonymous ones). Your photo is shown only to people who share a class group with you
+            (and our admins); everyone else sees your initials. We never show your email address.
+          </li>
+          <li>
+            <strong>Prize campaigns:</strong> winners are chosen by rank, never by a draw, and the team checks the
+            standings for cheating first. Taking part is free and never needs a rating or review. If you win, you may
+            send your full name, phone number and address so we can deliver the prize. We use them only for that, show
+            them to our admins, and delete them 90 days after delivery. Google is not a sponsor of these campaigns.
+          </li>
+        </ul>
+
         <h2>Who else handles your information</h2>
         <p>
           We use a small number of service providers, only for the purposes below. They may process data outside
@@ -349,7 +382,7 @@ export default function PrivacyPage() {
 
       <section lang="bn" id="bn" className="mt-16 border-t-2 pt-10">
         <h1>গোপনীয়তা নীতি</h1>
-        <p className="text-muted-foreground">কার্যকর: ২৮ অক্টোবর ২০২৬</p>
+        <p className="text-muted-foreground">কার্যকর: ৩১ অক্টোবর ২০২৬</p>
         <p>
           ভার্সিটি কথা (&quot;অ্যাপ&quot;, &quot;আমরা&quot;) বাংলাদেশের বিশ্ববিদ্যালয়ের শিক্ষার্থীদের জন্য একটি অ্যাপ,
           তৈরি করেছে <a href="https://silifton.com">সিলিফটন</a>। এই নীতিতে বলা হয়েছে অ্যাপ ও এর সার্ভার কী তথ্য নেয়, কেন
@@ -489,6 +522,37 @@ export default function PrivacyPage() {
           বিশ্ববিদ্যালয়ের ক্যাম্পাস অ্যাডমিন (ভার্সিটি কথার নিযুক্ত বিশ্বস্ত শিক্ষার্থী) ও আমাদের অ্যাডমিনরা দেখতে পারে।
           ক্যাম্পাস অ্যাডমিন নাম, বিভাগ, ব্যাচ ও ছবি দেখে, ইমেইল ঠিকানা কখনো দেখে না।
         </p>
+
+        <h2>আমন্ত্রণ, ব্যাজ, প্রোফাইল ও পুরস্কারের ক্যাম্পেইন</h2>
+        <ul>
+          <li>
+            <strong>আমন্ত্রণ:</strong> প্রত্যেক শিক্ষার্থীর একটি নিজের আমন্ত্রণ লিংক আছে। কেউ সেই লিংক (বা তোমার শেয়ার করা ক্লাস
+            আমন্ত্রণ লিংক) দিয়ে যোগ দিলে আমরা রাখি কে কাকে আমন্ত্রণ করেছে, কবে, আর বন্ধুটি ভেরিফায়েড হয়েছে কি না এবং
+            আমন্ত্রণটি গোনার মতো যথেষ্ট দিন অ্যাপ ব্যবহার করেছে কি না। ভুয়া আমন্ত্রণ ঠেকাতে দুটি অ্যাকাউন্ট একই ফোন ব্যবহার করছে কি না
+            তাও দেখি। আমন্ত্রণকারী ও বন্ধু অ্যাপে একে অপরের নাম দেখতে পারে, আর আমাদের অ্যাডমিনরা পুরো তথ্য দেখে।
+          </li>
+          <li>
+            <strong>ব্যাজ:</strong> ভূমিকা (যেমন CR) ও কাজের (যেমন বাসের ট্রিপ শেয়ার) জন্য ব্যাজ দেওয়া হয়। বেনামি কাজ থেকে পাওয়া
+            ব্যাজ ব্যক্তিগত: শুধু তুমি দেখো, আর নামের পাশে দেখানো যায় না। বেনামি পোস্ট কখনো তোমার নাম, প্রোফাইল বা ব্যাজের সাথে
+            যুক্ত করা হয় না।
+          </li>
+          <li>
+            <strong>লিডারবোর্ড:</strong> ক্যাম্পেইনের লিডারবোর্ডে তোমার নাম, বিশ্ববিদ্যালয় ও স্কোর দেখা যায়। প্রোফাইলের &quot;আমাকে
+            লিডারবোর্ডে দেখাও&quot; বন্ধ করলে তুমি &quot;বিশ্ববিদ্যালয়ের একজন শিক্ষার্থী&quot; হিসেবে দেখা যাবে।
+          </li>
+          <li>
+            <strong>প্রোফাইল:</strong> সাইন ইন করা অন্য শিক্ষার্থীরা তোমার প্রোফাইল খুলতে পারে। সেখানে থাকে তোমার নাম, ভেরিফায়েড কি না,
+            বিশ্ববিদ্যালয়, বিভাগ, ব্যাচ, কোন মাসে যোগ দিয়েছ, প্রকাশ্য ব্যাজ এবং নামসহ ক্যাম্পাস পোস্ট (বেনামি পোস্ট কখনো নয়)।
+            তোমার ছবি শুধু তারাই দেখে যারা তোমার সাথে একই ক্লাস গ্রুপে আছে (আর আমাদের অ্যাডমিন); বাকিরা নামের আদ্যক্ষর দেখে।
+            তোমার ইমেইল ঠিকানা কখনো দেখানো হয় না।
+          </li>
+          <li>
+            <strong>পুরস্কারের ক্যাম্পেইন:</strong> বিজয়ী ঠিক হয় র‍্যাংক দিয়ে, লটারিতে নয়, আর আগে আমাদের টিম জালিয়াতি আছে কি না
+            দেখে। অংশ নেওয়া বিনামূল্যে এবং এর জন্য রেটিং বা রিভিউ লাগে না। তুমি জিতলে পুরস্কার পাঠাতে পূর্ণ নাম, ফোন নম্বর ও
+            ঠিকানা দিতে পারো। এগুলো শুধু সেই কাজেই ব্যবহার হয়, আমাদের অ্যাডমিনরা দেখে, এবং পুরস্কার পৌঁছানোর ৯০ দিন পর মুছে
+            ফেলা হয়। এসব ক্যাম্পেইনের স্পনসর Google নয়।
+          </li>
+        </ul>
 
         <h2>আর কারা তথ্য ব্যবহার করে</h2>
         <ul>

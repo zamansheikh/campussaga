@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { load } from "@/lib/admin/load";
 import { api, getAdmin, requestNow, requireAdmin } from "@/lib/admin/session";
+import { badgeLabel, tierLabel, type UserProfileLite } from "@/lib/admin/growth";
 import type { AdminUserDetail, CampusAdmin } from "@/lib/admin/types";
 import { allUniversities } from "@/lib/admin/universities";
 import { formatDateTime, timeAgo } from "@/lib/format";
@@ -32,6 +33,8 @@ export default async function UserPage({ params }: { params: Promise<{ id: strin
   const admins = uni ? await load(() => api<CampusAdmin[] | { items: CampusAdmin[] }>(`/admin/campus-admins?universityId=${uni.id}`)) : undefined;
   const adminList = admins?.data ? (Array.isArray(admins.data) ? admins.data : admins.data.items ?? []) : [];
   const isCampusAdmin = adminList.some((a) => a.user.id === id);
+  // Badges and invites come from the student profile; if that can't be read (older API, blocked user) the card is simply left out.
+  const profile = res.data ? await load(() => api<UserProfileLite>(`/users/${encodeURIComponent(id)}/profile`)) : undefined;
 
   return (
     <>
@@ -48,6 +51,7 @@ export default async function UserPage({ params }: { params: Promise<{ id: strin
           now={now}
           isSelf={me.id === res.data.id}
           isCampusAdmin={isCampusAdmin}
+          profile={profile?.data}
           universities={(unis.data ?? []).map((u) => ({ id: u.id, slug: u.slug, name: u.name }))}
         />
       )}
@@ -60,12 +64,14 @@ function UserView({
   now,
   isSelf,
   isCampusAdmin,
+  profile,
   universities,
 }: {
   user: AdminUserDetail;
   now: number;
   isSelf: boolean;
   isCampusAdmin: boolean;
+  profile?: UserProfileLite;
   universities: { id: string; slug: string; name: string }[];
 }) {
   const name = user.displayName || "No name yet";
@@ -108,6 +114,34 @@ function UserView({
               </dl>
             </CardContent>
           </Card>
+
+          {profile ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Badges and invites</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <p>
+                  <span className="font-medium">{profile.invitesJoined ?? 0}</span>{" "}
+                  <span className="text-muted-foreground">friends joined with their invite (qualified)</span>
+                </p>
+                {(profile.badges ?? []).length === 0 ? (
+                  <p className="text-muted-foreground">No public badges.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1.5">
+                    {(profile.badges ?? []).map((b) => (
+                      <Badge key={b.key} variant={profile.featuredBadge?.key === b.key ? "soft" : "outline"}>
+                        {badgeLabel[b.key] ?? b.key}
+                        {b.tier > 0 ? ` · ${tierLabel[b.tier] ?? b.tier}` : ""}
+                        {profile.featuredBadge?.key === b.key ? " · featured" : ""}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">Public badges only; private ones are seen by the student alone.</p>
+              </CardContent>
+            </Card>
+          ) : null}
 
           <Card>
             <CardHeader>

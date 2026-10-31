@@ -18,3 +18,8 @@ export function playUrl(join?: string): string {
   return `${site.playStore.url}&referrer=${encodeURIComponent(referrer)}`;
 }
 
+
+/** The Play listing for a personal invite link: the install referrer carries the inviter's code. */
+export function inviteUrl(ref: string): string {
+  return `${site.playStore.url}&referrer=${encodeURIComponent(`utm_source=invite&ref=${ref}`)}`;
+}

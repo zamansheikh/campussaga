@@ -61,6 +61,16 @@ const actions: Record<string, string> = {
   "admin.domain_request.reject": "Rejected a university domain request",
   "feedback.reply": "Replied to feedback",
   "feedback.status": "Changed a feedback status",
+  "campaign.create": "Created a campaign",
+  "campaign.update": "Changed a campaign",
+  "campaign.publish": "Published a campaign",
+  "campaign.announce": "Announced campaign winners",
+  "campaign.delivered": "Marked a prize as delivered",
+  "campaign.winner.delivered": "Marked a prize as delivered",
+  "campaign.participant.disqualify": "Disqualified a campaign participant",
+  "campaign.participant.restore": "Restored a campaign participant",
+  "referral.disqualify": "Disqualified an invite",
+  "referral.restore": "Restored an invite",
 };
 
 /** A readable label; unknown campus.* and campus-admin actions get a tidy fallback. */
@@ -70,6 +80,8 @@ function actionLabel(action: string): string {
   const tidy = (s: string) => s.replace(/[._]/g, " ");
   if (action.startsWith("admin.campus_admin.")) return `Campus admin: ${tidy(action.slice("admin.campus_admin.".length))}`;
   if (action.startsWith("campus.")) return `Campus: ${tidy(action.slice("campus.".length))}`;
+  if (action.startsWith("campaign.")) return `Campaign: ${tidy(action.slice("campaign.".length))}`;
+  if (action.startsWith("referral.")) return `Invite: ${tidy(action.slice("referral.".length))}`;
   return action;
 }
 
@@ -83,6 +95,8 @@ function targetHref(
   if (type === "issue") return `/admin/moderation/issues/${id}`;
   if (type === "feedback") return `/admin/feedback/${id}`;
   if (type === "university") return `/admin/universities?campusAdminsFor=${id}`;
+  if (type === "campaign") return `/admin/campaigns/${id}`;
+  if (type === "referral") return `/admin/users/${id}`;
   if (type === "bus_route") return `/admin/transport/${id}`;
   if (type === "blood_request") return "/admin/blood?status=all";
   return undefined;

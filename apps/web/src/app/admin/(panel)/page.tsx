@@ -1,4 +1,4 @@
-import { Building2, Bus, Droplet, Megaphone, MessageSquareText, School, Smartphone, UserCheck, UserRoundPlus, Users, UsersRound } from "lucide-react";
+import { Building2, Bus, Droplet, Megaphone, MessageSquareText, School, Share2, Smartphone, UserCheck, UserRoundPlus, Users, UsersRound } from "lucide-react";
 import Link from "next/link";
 
 import { SignupsChart } from "@/components/admin/dashboard/signups-chart";
@@ -117,6 +117,7 @@ export default async function DashboardPage() {
           {s.blood ? <BloodCard b={s.blood} /> : null}
           {s.bus ? <BusCard b={s.bus} /> : null}
           {s.feedback ? <FeedbackCard f={s.feedback} /> : null}
+          {s.growth ? <GrowthCard g={s.growth} /> : null}
 
           <div className="grid gap-4 sm:grid-cols-3">
             <MiniStat label="Admins" value={s.users.admins} href="/admin/users?status=admin" />
@@ -231,6 +232,24 @@ function FeedbackCard({ f }: { f: NonNullable<Stats["feedback"]> }) {
         <MiniStat label="New" value={f.new ?? 0} href="/admin/feedback" />
         <MiniStat label="Open" value={f.open ?? 0} href="/admin/feedback" />
         <MiniStat label="Last 7 days" value={f.last7Days ?? 0} href="/admin/feedback?status=all" />
+      </CardContent>
+    </Card>
+  );
+}
+
+function GrowthCard({ g }: { g: NonNullable<Stats["growth"]> }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Share2 className="size-4 text-muted-foreground" /> Growth
+        </CardTitle>
+        <CardDescription>Invites and prize campaigns</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-3 sm:grid-cols-3">
+        <MiniStat label="Invites, 7 days" value={g.invitesLast7Days ?? 0} href="/admin/referrals" />
+        <MiniStat label="Qualified, 7 days" value={g.qualifiedLast7Days ?? 0} href="/admin/referrals" />
+        <MiniStat label="Live campaigns" value={g.liveCampaigns ?? 0} href="/admin/campaigns" />
       </CardContent>
     </Card>
   );
