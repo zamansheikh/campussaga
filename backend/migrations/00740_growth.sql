@@ -106,7 +106,12 @@ CREATE TABLE campaign_claims (
     FOREIGN KEY (campaign_id, user_id) REFERENCES campaign_winners (campaign_id, user_id) ON DELETE CASCADE
 );
 
+-- Feedback messages sent in the same instant keep the order they were sent
+-- in (ids are random). Fills existing rows.
+ALTER TABLE feedback_messages ADD COLUMN seq bigint GENERATED ALWAYS AS IDENTITY;
+
 -- +goose Down
+ALTER TABLE feedback_messages DROP COLUMN seq;
 DROP TABLE campaign_claims;
 DROP TABLE campaign_winners;
 DROP TABLE campaign_disqualified;

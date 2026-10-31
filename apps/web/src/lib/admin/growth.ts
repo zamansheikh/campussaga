@@ -66,6 +66,14 @@ export type CampaignWinner = {
   claim?: { fullName: string; phone: string; address: string; note?: string | null } | null;
 };
 
+/** The API sends a winner's person fields flat ({userId, name, email, university}); the panel uses `user`. */
+type ApiWinner = Omit<CampaignWinner, "user"> & { user?: PersonRef; userId?: string; name?: string | null; email?: string | null; university?: string | null };
+
+export function normalizeWinner(w: ApiWinner): CampaignWinner {
+  const user = w.user ?? { id: w.userId ?? "", name: w.name ?? null, email: w.email ?? null, university: w.university ?? null };
+  return { ...w, user };
+}
+
 /** `GET /admin/referrals` rows. */
 export type AdminReferral = {
   referrer: PersonRef;

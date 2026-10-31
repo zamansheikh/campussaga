@@ -320,7 +320,7 @@ func (s *Service) messages(ctx context.Context, id uuid.UUID) ([]adminMessage, e
 	rs, err := s.d.Q(ctx).Query(ctx, `
 		SELECT m.id, m.from_team, m.body, m.created_at, u.id, coalesce(u.display_name, '')
 		FROM feedback_messages m LEFT JOIN users u ON u.id = m.author_id
-		WHERE m.feedback_id = $1 ORDER BY m.created_at, m.id`, id)
+		WHERE m.feedback_id = $1 ORDER BY m.created_at, m.seq`, id)
 	if err != nil {
 		return nil, err
 	}

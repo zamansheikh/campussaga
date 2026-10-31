@@ -6,7 +6,7 @@ import { EmptyState, ErrorPanel } from "@/components/admin/notice";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { type AdminCampaign, type CampaignWinner, prizeForRank, type Standing, statusLabel, statusTone, uniName } from "@/lib/admin/growth";
+import { type AdminCampaign, type CampaignWinner, normalizeWinner, prizeForRank, type Standing, statusLabel, statusTone, uniName } from "@/lib/admin/growth";
 import { load } from "@/lib/admin/load";
 import { api, requestNow, requireAdmin } from "@/lib/admin/session";
 import { allUniversities } from "@/lib/admin/universities";
@@ -30,7 +30,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
   const [standings, winners, unis] = c
     ? await Promise.all([
         c.status === "draft" ? undefined : load(async () => list(await api<Standing[] | { items: Standing[] }>(`/admin/campaigns/${eid}/standings`))),
-        c.status === "announced" ? load(async () => list(await api<CampaignWinner[] | { items: CampaignWinner[] }>(`/admin/campaigns/${eid}/winners`))) : undefined,
+        c.status === "announced" ? load(async () => list(await api<CampaignWinner[] | { items: CampaignWinner[] }>(`/admin/campaigns/${eid}/winners`)).map(normalizeWinner)) : undefined,
         c.universityIds ? load(() => allUniversities()) : undefined,
       ])
     : [undefined, undefined, undefined];
