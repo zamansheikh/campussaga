@@ -387,6 +387,32 @@ keys take the default. Error `INVALID_SCORING` (400).
 - **Standings:** the points breakdown per participant, the new invite
   booleans, and the `self_vouched` flag.
 
+### 8.5 Minimum: friends from other universities
+To win, a student must bring friends from **other universities** too, so
+the app spreads beyond one campus.
+
+- `scoring.minOtherCampus`, default **2**, 0–20 (0: no minimum). Editable
+  while draft like the other values. Migration 00760's column default
+  includes it (00760 isn't deployed yet); a stored `scoring` without it takes
+  the default.
+- **Eligible** = my counted invites (the `invite` rules) whose friend is at a
+  different university ≥ `minOtherCampus`.
+- **Only eligible students are ranked:** leaderboards, `myRank` and the
+  ranks prizes go by count only them. A student who isn't eligible still
+  collects points (`myScore`) and sees their progress; `myRank` is null.
+- **Student API:** campaign list and detail add `myOtherCampus` (my counted
+  friends at other universities) and `eligible` (bool).
+- **Admin standings:** the eligible ranked first, then up to 100 not
+  eligible with `rank: null`; every row adds `eligible` and `otherCampus`
+  (count). **Announce** refuses a winner who isn't eligible:
+  `NOT_ELIGIBLE` (422).
+- **App:** an "Enter the prize race" line at the top of Ways to earn
+  ("Friends from other universities: 1/2", tap to share); the standing text
+  when not eligible: "{points} · 1 more friend from another university to
+  enter"; the Today nudge puts this first.
+- **Web:** the rules page states the minimum (EN/BN); the admin form has the
+  field; standings mark who isn't eligible.
+
 ## As implemented (API, migration `00740_growth.sql`)
 
 Paths, fields and error codes are as in §5. Where the spec left a choice:
