@@ -8171,19 +8171,19 @@ abstract class AppLocalizations {
   /// No description provided for @missionBonusOtherCampus.
   ///
   /// In en, this message translates to:
-  /// **'+{points} other university'**
+  /// **'Another university +{points} pts'**
   String missionBonusOtherCampus(int points);
 
   /// No description provided for @missionBonusPioneer.
   ///
   /// In en, this message translates to:
-  /// **'+{points} new campus'**
+  /// **'New campus +{points} pts'**
   String missionBonusPioneer(int points);
 
   /// No description provided for @missionBonusSection.
   ///
   /// In en, this message translates to:
-  /// **'+{points} joins a section'**
+  /// **'Joins a section +{points} pts'**
   String missionBonusSection(int points);
 
   /// No description provided for @missionInviteBonuses.

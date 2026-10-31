@@ -576,7 +576,8 @@ void main() {
       expect(find.text('42 points'), findsOneWidget);
       expect(find.text('+10 for each friend who joins'), findsOneWidget);
       expect(find.text('3 friends · +35'), findsOneWidget);
-      expect(find.text('+5 other university'), findsOneWidget);
+      expect(find.text('Extra for each friend:'), findsOneWidget);
+      expect(find.text('Another university +5 pts'), findsOneWidget);
       expect(find.text('A friend from another university'), findsNothing);
       expect(find.text('Done · +2'), findsOneWidget);
       expect(find.text('+3, once'), findsOneWidget);

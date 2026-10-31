@@ -300,6 +300,13 @@ class _MissionRow extends StatelessWidget {
                   ),
                   if (bonuses.isNotEmpty) ...[
                     const SizedBox(height: 6),
+                    Text(
+                      l10n.missionInviteBonuses,
+                      style: context.text.labelSmall?.copyWith(
+                        color: cs.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
                     Wrap(
                       spacing: 6,
                       runSpacing: 6,

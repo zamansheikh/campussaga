@@ -1345,8 +1345,8 @@
   "invitePointsHint": "প্রতি বন্ধুতে +{points} পয়েন্ট · অন্য বিশ্ববিদ্যালয়ের হলে আরও +{extra}",
   "inviteNextTier": "আর {count} জন হলে {tier} কানেক্টর",
   "inviteJoinedNone": "এখনো কোনো বন্ধু যোগ দেয়নি",
-  "missionBonusOtherCampus": "অন্য বিশ্ববিদ্যালয় +{points}",
-  "missionBonusPioneer": "নতুন ক্যাম্পাস +{points}",
-  "missionBonusSection": "সেকশনে যোগ দিলে +{points}",
+  "missionBonusOtherCampus": "অন্য বিশ্ববিদ্যালয় +{points} পয়েন্ট",
+  "missionBonusPioneer": "নতুন ক্যাম্পাস +{points} পয়েন্ট",
+  "missionBonusSection": "সেকশনে যোগ দিলে +{points} পয়েন্ট",
   "missionInviteBonuses": "প্রতি বন্ধুতে বাড়তি:"
 }

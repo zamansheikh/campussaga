@@ -1881,11 +1881,11 @@
   "inviteNextTier": "{count, plural, =1{1 more friend} other{{count} more friends}} for {tier} Connector",
   "@inviteNextTier": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}, "tier": {"type": "String"}}},
   "inviteJoinedNone": "No friends joined yet",
-  "missionBonusOtherCampus": "+{points} other university",
+  "missionBonusOtherCampus": "Another university +{points} pts",
   "@missionBonusOtherCampus": {"placeholders": {"points": {"type": "int", "format": "decimalPattern"}}},
-  "missionBonusPioneer": "+{points} new campus",
+  "missionBonusPioneer": "New campus +{points} pts",
   "@missionBonusPioneer": {"placeholders": {"points": {"type": "int", "format": "decimalPattern"}}},
-  "missionBonusSection": "+{points} joins a section",
+  "missionBonusSection": "Joins a section +{points} pts",
   "@missionBonusSection": {"placeholders": {"points": {"type": "int", "format": "decimalPattern"}}},
   "missionInviteBonuses": "Extra for each friend:"
 }

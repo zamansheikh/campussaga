@@ -5163,7 +5163,7 @@ class AppLocalizationsBn extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String pointsString = pointsNumberFormat.format(points);
 
-    return 'অন্য বিশ্ববিদ্যালয় +$pointsString';
+    return 'অন্য বিশ্ববিদ্যালয় +$pointsString পয়েন্ট';
   }
 
   @override
@@ -5172,7 +5172,7 @@ class AppLocalizationsBn extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String pointsString = pointsNumberFormat.format(points);
 
-    return 'নতুন ক্যাম্পাস +$pointsString';
+    return 'নতুন ক্যাম্পাস +$pointsString পয়েন্ট';
   }
 
   @override
@@ -5181,7 +5181,7 @@ class AppLocalizationsBn extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String pointsString = pointsNumberFormat.format(points);
 
-    return 'সেকশনে যোগ দিলে +$pointsString';
+    return 'সেকশনে যোগ দিলে +$pointsString পয়েন্ট';
   }
 
   @override

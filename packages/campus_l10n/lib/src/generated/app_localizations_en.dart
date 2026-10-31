@@ -5322,7 +5322,7 @@ class AppLocalizationsEn extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String pointsString = pointsNumberFormat.format(points);
 
-    return '+$pointsString other university';
+    return 'Another university +$pointsString pts';
   }
 
   @override
@@ -5331,7 +5331,7 @@ class AppLocalizationsEn extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String pointsString = pointsNumberFormat.format(points);
 
-    return '+$pointsString new campus';
+    return 'New campus +$pointsString pts';
   }
 
   @override
@@ -5340,7 +5340,7 @@ class AppLocalizationsEn extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String pointsString = pointsNumberFormat.format(points);
 
-    return '+$pointsString joins a section';
+    return 'Joins a section +$pointsString pts';
   }
 
   @override
