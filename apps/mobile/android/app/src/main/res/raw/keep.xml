@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Resources looked up by name at runtime (getIdentifier), so release
      resource shrinking must keep them under their names: the notification
-     small icon (flutter_local_notifications, Firebase Messaging) and the
-     home-screen widget's icons. -->
+     small icon (flutter_local_notifications, Firebase Messaging), the
+     home-screen widget's icons, and the Google web client ID that Google
+     sign-in (google_sign_in_android) asks Google for an ID token with.
+     Without it, sign-in fails in release builds only. -->
 <resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@drawable/ic_notification,@drawable/ic_widget_*,@mipmap/ic_launcher" />
+    tools:keep="@drawable/ic_notification,@drawable/ic_widget_*,@mipmap/ic_launcher,@string/default_web_client_id" />
