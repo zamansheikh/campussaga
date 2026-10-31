@@ -64,6 +64,8 @@ const actions: Record<string, string> = {
   "campaign.create": "Created a campaign",
   "campaign.update": "Changed a campaign",
   "campaign.publish": "Published a campaign",
+  "campaign.banner": "Changed a campaign banner",
+  "campaign.banner_remove": "Removed a campaign banner",
   "campaign.announce": "Announced campaign winners",
   "campaign.delivered": "Marked a prize as delivered",
   "campaign.winner.delivered": "Marked a prize as delivered",

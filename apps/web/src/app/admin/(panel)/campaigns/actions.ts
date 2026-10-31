@@ -82,7 +82,21 @@ export async function publishCampaign(id: string): Promise<ActionResult> {
   }
 }
 
-const reasonSchema = z.string().trim().min(3, "Say why, in a few words.").max(300, "Keep the reason under 300 characters.");
+/** Removes a campaign's banner photo (uploads go through /admin/campaign-banner/{id}). */
+export async function removeCampaignBanner(id: string): Promise<ActionResult> {
+  await requireAdmin();
+  if (!uuid.safeParse(id).success) return { ok: false, error: "That campaign isn't valid." };
+  try {
+    await api(`/admin/campaigns/${id}/banner`, { method: "DELETE" });
+    refresh(id);
+    revalidatePath(`/campaigns/${id}`);
+    return { ok: true };
+  } catch (e) {
+    return failure(e);
+  }
+}
+
+const reasonSchema =z.string().trim().min(3, "Say why, in a few words.").max(300, "Keep the reason under 300 characters.");
 
 /** Disqualifies (or restores) one invite, found by the invited student. */
 export async function setInviteDisqualified(referredId: string, disqualify: boolean, reason: string): Promise<ActionResult> {

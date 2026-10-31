@@ -198,11 +198,37 @@ Ranks are ordered by score, then by whoever reached that score earlier.
 | POST | `/admin/campaigns/{id}/announce` | Allowed after `settles_at`. `{winners: [{userId, rank}]}`; prizes are taken from the ranks. Sets `announced` and pushes `campaign_won` to winners (EN "You won: {prize}!" / BN "তুমি জিতেছ: {prize}!"). |
 | GET | `/admin/campaigns/{id}/winners` | Winners, with claim details (full name, phone, address). |
 | POST | `/admin/campaigns/{id}/winners/{userId}/delivered` | Marks a prize delivered. |
+| POST / DELETE | `/admin/campaigns/{id}/banner` | Banner photo (§5.1). POST: multipart `image`; DELETE removes it. Both return the admin campaign. |
 | GET | `/admin/referrals` | Paged, `?q=&flag=`. Every invite, with its flags. |
 
 Every admin write is audited (`campaign.*`, `referral.*`).
 
 `/admin/stats` adds `growth: {invitesLast7Days, qualifiedLast7Days, liveCampaigns}`.
+
+### 5.1 Campaign banners (migration `00750_campaign_banner.sql`)
+- **Upload** (`POST /admin/campaigns/{id}/banner`, admin): multipart field
+  `image`, JPEG, PNG or WebP up to 8 MB (the body cap for this path is 9 MB).
+  It is re-encoded as a JPEG at most 1600 px on a side, keeping its shape
+  (2:1 recommended, e.g. 1600×800), and stored in the media store as
+  `campaign-{id}-banner-{version}.jpg`. Each upload gets a new random
+  `banner_version` (10 hex characters) and deletes the old file. Errors:
+  `INVALID_IMAGE` (400), `IMAGE_TOO_LARGE` (413), `MEDIA_UNAVAILABLE` (503).
+  Audited as `campaign.banner`; removal as `campaign.banner_remove`.
+- **`bannerUrl`** on every campaign JSON (student list and detail,
+  `/campaigns/{id}/public`, admin list and detail):
+  `"/campaigns/{id}/banner?v={version}"`, relative to the API prefix, or
+  `null`.
+- **Image** (`GET /campaigns/{id}/banner`, no sign-in, rate-limited per IP):
+  `image/jpeg`; `Cache-Control: public, max-age=31536000, immutable` when `v`
+  is the current version, otherwise `max-age=300`. 404 `BANNER_NOT_FOUND`
+  without a banner. A draft's banner needs the current `v` (only the admin
+  panel has it), so the team can preview it before publishing.
+- **Website:** `/campaigns/{id}/banner` on the website passes the API's image
+  on (browsers can't reach the API in production), so `bannerUrl` works there
+  as it is. The rules page shows the banner and uses it as its link-preview
+  image. The admin panel uploads through `/admin/campaign-banner/{id}`, which
+  forwards the file with the admin's token; the browser first shrinks photos
+  over 900 KB, because nginx takes 1 MB per request on the website.
 
 ## 6. App
 - **Profile (own):**
@@ -357,7 +383,7 @@ Paths, fields and error codes are as in §5. Where the spec left a choice:
   Extra: `GET /admin/users/{id}/growth` (`referralCode`, `invitedBy`, `invited`,
   `badges`) for the user page; `/admin/stats.growth.liveCampaigns` counts live
   campaigns inside their dates.
-- **Audit actions:** `campaign.create|update|publish|disqualify|restore|announce|delivered`,
+- **Audit actions:** `campaign.create|update|publish|disqualify|restore|announce|delivered|banner|banner_remove`,
   `referral.disqualify|restore`.
 - **Sweeps:** hourly (`Sweep`): re-check pending invites, recompute badges,
   mark ended campaigns, delete active days older than 30 days and prize claims

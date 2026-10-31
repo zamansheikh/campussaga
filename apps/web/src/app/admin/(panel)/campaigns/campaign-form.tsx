@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { type AdminCampaign, fromDhakaInput, toDhakaInput } from "@/lib/admin/growth";
 
 import { saveCampaign } from "./actions";
+import { BannerField } from "./banner-field";
 
 type PrizeRow = { rankFrom: string; rankTo: string; titleEn: string; titleBn: string };
 
@@ -131,6 +132,17 @@ export function CampaignForm({ campaign, universities }: { campaign?: AdminCampa
           </p>
         </CardContent>
       </Card>
+
+      {campaign ? (
+        <BannerField campaignId={campaign.id} bannerUrl={campaign.bannerUrl} />
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Banner</CardTitle>
+            <CardDescription>A photo for the campaign, 2:1, e.g. 1600×800. You can add it once the draft is created.</CardDescription>
+          </CardHeader>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

@@ -47,6 +47,7 @@ type AdminCampaign struct {
 	Status        string      `json:"status"`
 	CreatedAt     time.Time   `json:"createdAt"`
 	UpdatedAt     time.Time   `json:"updatedAt"`
+	BannerURL     *string     `json:"bannerUrl"`
 }
 
 func (s *Service) adminView(c campaign) AdminCampaign {
@@ -54,6 +55,7 @@ func (s *Service) adminView(c campaign) AdminCampaign {
 		ID: c.ID, TitleEn: c.TitleEn, TitleBn: c.TitleBn, BodyEn: c.BodyEn, BodyBn: c.BodyBn, RulesEn: c.RulesEn, RulesBn: c.RulesBn,
 		StartsAt: c.StartsAt.UTC(), EndsAt: c.EndsAt.UTC(), SettlesAt: c.SettlesAt.UTC(), UniversityIDs: c.UniversityIDs,
 		Prizes: c.Prizes, Status: c.state(s.now()), CreatedAt: c.CreatedAt.UTC(), UpdatedAt: c.UpdatedAt.UTC(),
+		BannerURL: c.bannerURL(),
 	}
 }
 

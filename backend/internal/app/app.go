@@ -249,6 +249,7 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 	growthSvc := growth.NewService(d, now, growth.Ports{
 		Posts: func(ctx context.Context, author uuid.UUID) (any, error) { return voiceSvc.ProfilePosts(ctx, author) },
 	}, log)
+	growthSvc.SetMedia(store)
 	growthSvc.SetNotifier(func(userIDs []uuid.UUID, n growth.Notice) {
 		texts := make(map[string]push.Text, len(n.Texts))
 		for lang, t := range n.Texts {
@@ -287,8 +288,9 @@ func New(cfg *config.Config, log *slog.Logger, d *db.DB, opts ...Options) *App {
 
 	var h http.Handler = root
 	h = httpx.MaxBody(64<<10, map[string]int64{
-		cfg.APIPrefix + "/uploads":  voice.UploadLimit,
-		cfg.APIPrefix + "/me/photo": photos.UploadLimit,
+		cfg.APIPrefix + "/uploads":                  voice.UploadLimit,
+		cfg.APIPrefix + "/me/photo":                 photos.UploadLimit,
+		cfg.APIPrefix + "/admin/campaigns/*/banner": growth.BannerUploadLimit,
 	})(h)
 	h = httpx.SecurityHeaders(h)
 	h = httpx.AccessLog(h)

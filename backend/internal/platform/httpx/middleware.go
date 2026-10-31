@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/netip"
+	"path"
 	"runtime/debug"
 	"strings"
 	"time"
@@ -173,8 +174,9 @@ func SecurityHeaders(next http.Handler) http.Handler {
 	})
 }
 
-// MaxBody caps request bodies. larger raises the cap for exact paths
-// (photo uploads), e.g. {"/api/v1/uploads": 9 << 20}.
+// MaxBody caps request bodies. larger raises the cap for paths (photo
+// uploads), e.g. {"/api/v1/uploads": 9 << 20}; a key with * matches one
+// path segment there (path.Match), e.g. "/api/v1/admin/campaigns/*/banner".
 func MaxBody(limit int64, larger ...map[string]int64) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -183,6 +185,14 @@ func MaxBody(limit int64, larger ...map[string]int64) func(http.Handler) http.Ha
 				for _, m := range larger {
 					if v, ok := m[r.URL.Path]; ok {
 						l = v
+						continue
+					}
+					for k, v := range m {
+						if strings.Contains(k, "*") {
+							if ok, _ := path.Match(k, r.URL.Path); ok {
+								l = v
+							}
+						}
 					}
 				}
 				r.Body = http.MaxBytesReader(w, r.Body, l)

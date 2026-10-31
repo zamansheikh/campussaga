@@ -14,7 +14,20 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const c = await getCampaign(id);
   const title = c ? `${c.titleEn}: official rules` : "Campaign rules";
-  return { title, description: `Official rules of a ${site.name} campaign.`, robots: { index: false, follow: false } };
+  const description = `Official rules of a ${site.name} campaign.`;
+  // The banner (served by ./banner/route.ts) is the link preview's picture.
+  const images = c?.bannerUrl ? [{ url: `${site.url}${c.bannerUrl}`, width: 1600, height: 800, alt: c.titleEn }] : undefined;
+  return {
+    title,
+    description,
+    robots: { index: false, follow: false },
+    ...(images
+      ? {
+          openGraph: { type: "website", siteName: site.name, title, description, url: `${site.url}/campaigns/${c?.id}`, images },
+          twitter: { card: "summary_large_image", title, description, images: images.map((i) => i.url) },
+        }
+      : {}),
+  };
 }
 
 function dhaka(iso: string, lang: "en" | "bn"): string {
@@ -173,6 +186,10 @@ export default async function CampaignRulesPage({ params }: { params: Promise<{ 
   if (!c) notFound();
   return (
     <article className="prose-page mx-auto max-w-3xl px-4 py-12">
+      {c.bannerUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={c.bannerUrl} alt={c.titleEn} width={1600} height={800} className="mb-8 aspect-[2/1] w-full rounded-xl border bg-muted object-cover" />
+      ) : null}
       <Version c={c} lang="en" />
       <Version c={c} lang="bn" />
     </article>

@@ -74,6 +74,32 @@ func Process(data []byte) (*Processed, error) {
 	return &Processed{Full: fb, Thumb: tb, Width: b.Dx(), Height: b.Dy()}, nil
 }
 
+// BannerWidth: campaign banners are at most this wide (2:1 recommended).
+const BannerWidth = 1600
+
+// ProcessBanner checks a banner photo and re-encodes it as a JPEG at most
+// BannerWidth wide (and at most BannerWidth tall), keeping its shape.
+func ProcessBanner(data []byte) ([]byte, error) {
+	if len(data) > MaxBytes {
+		return nil, ErrTooLarge
+	}
+	cfg, format, err := image.DecodeConfig(bytes.NewReader(data))
+	if err != nil || (format != "jpeg" && format != "png" && format != "webp") {
+		return nil, ErrInvalid
+	}
+	if cfg.Width < 1 || cfg.Height < 1 || cfg.Width > maxPixelSide || cfg.Height > maxPixelSide {
+		return nil, ErrTooLarge
+	}
+	img, _, err := image.Decode(bytes.NewReader(data))
+	if err != nil {
+		return nil, ErrInvalid
+	}
+	if format == "jpeg" {
+		img = orient(img, jpegOrientation(data))
+	}
+	return encode(scale(img, BannerWidth), 80)
+}
+
 func encode(img image.Image, quality int) ([]byte, error) {
 	var buf bytes.Buffer
 	if err := jpeg.Encode(&buf, img, &jpeg.Options{Quality: quality}); err != nil {

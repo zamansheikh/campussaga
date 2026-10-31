@@ -38,18 +38,31 @@ type campaign struct {
 	Status        string
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
+	// BannerKey / BannerVersion: the banner photo, if one was uploaded.
+	BannerKey     *string
+	BannerVersion *string
 }
 
 const campaignCols = `c.id, c.title_en, c.title_bn, c.body_en, c.body_bn, c.rules_en, c.rules_bn, c.starts_at, c.ends_at, c.settles_at,
-	c.university_ids, c.prizes, c.status, c.created_at, c.updated_at`
+	c.university_ids, c.prizes, c.status, c.created_at, c.updated_at, c.banner_key, c.banner_version`
 
 type scanner interface{ Scan(dest ...any) error }
+
+// bannerURL: the public banner address, relative to the API prefix
+// ("/campaigns/{id}/banner?v={version}"), or nil without a banner.
+func (c campaign) bannerURL() *string {
+	if c.BannerKey == nil || c.BannerVersion == nil {
+		return nil
+	}
+	u := "/campaigns/" + c.ID.String() + "/banner?v=" + *c.BannerVersion
+	return &u
+}
 
 func scanCampaign(r scanner) (campaign, error) {
 	var c campaign
 	var prizes []byte
 	err := r.Scan(&c.ID, &c.TitleEn, &c.TitleBn, &c.BodyEn, &c.BodyBn, &c.RulesEn, &c.RulesBn, &c.StartsAt, &c.EndsAt, &c.SettlesAt,
-		&c.UniversityIDs, &prizes, &c.Status, &c.CreatedAt, &c.UpdatedAt)
+		&c.UniversityIDs, &prizes, &c.Status, &c.CreatedAt, &c.UpdatedAt, &c.BannerKey, &c.BannerVersion)
 	if err != nil {
 		return c, err
 	}
@@ -205,6 +218,7 @@ type CampaignView struct {
 	MyScore   int         `json:"myScore"`
 	MyRank    *int        `json:"myRank"`
 	RulesURL  string      `json:"rulesUrl"`
+	BannerURL *string     `json:"bannerUrl"`
 }
 
 // CampaignDetail adds whether the student won.
@@ -218,7 +232,7 @@ func (s *Service) view(ctx context.Context, c campaign, uid uuid.UUID) (Campaign
 	v := CampaignView{
 		ID: c.ID, Title: pick(l, c.TitleEn, c.TitleBn), Body: pick(l, c.BodyEn, c.BodyBn),
 		StartsAt: c.StartsAt.UTC(), EndsAt: c.EndsAt.UTC(), SettlesAt: c.SettlesAt.UTC(), Status: c.state(s.now()),
-		Prizes: []PrizeView{}, RulesURL: RulesBase + c.ID.String(),
+		Prizes: []PrizeView{}, RulesURL: RulesBase + c.ID.String(), BannerURL: c.bannerURL(),
 	}
 	for _, p := range c.Prizes {
 		v.Prizes = append(v.Prizes, PrizeView{RankFrom: p.RankFrom, RankTo: p.RankTo, Title: pick(l, p.TitleEn, p.TitleBn)})
@@ -453,6 +467,7 @@ type PublicCampaign struct {
 	SettlesAt time.Time `json:"settlesAt"`
 	Status    string    `json:"status"`
 	Prizes    []Prize   `json:"prizes"`
+	BannerURL *string   `json:"bannerUrl"`
 }
 
 func (s *Service) handlePublicCampaign(ctx context.Context, in *campaignReq) (*PublicCampaign, error) {
@@ -467,5 +482,6 @@ func (s *Service) handlePublicCampaign(ctx context.Context, in *campaignReq) (*P
 	return &PublicCampaign{
 		ID: c.ID, TitleEn: c.TitleEn, TitleBn: c.TitleBn, BodyEn: c.BodyEn, BodyBn: c.BodyBn, RulesEn: c.RulesEn, RulesBn: c.RulesBn,
 		StartsAt: c.StartsAt.UTC(), EndsAt: c.EndsAt.UTC(), SettlesAt: c.SettlesAt.UTC(), Status: c.state(s.now()), Prizes: c.Prizes,
+		BannerURL: c.bannerURL(),
 	}, nil
 }

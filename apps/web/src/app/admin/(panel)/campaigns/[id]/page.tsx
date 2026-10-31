@@ -48,6 +48,11 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
         <ErrorPanel message={res.error ?? "Not found."} />
       ) : (
         <div className="space-y-6">
+          {c.bannerUrl ? (
+            // The website serves the API's banner path too (src/app/(site)/campaigns/[id]/banner).
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={c.bannerUrl} alt="Campaign banner" className="aspect-[2/1] w-full max-w-xl rounded-xl border bg-muted object-cover" />
+          ) : null}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <h1 className="text-2xl font-semibold tracking-tight">{c.titleEn}</h1>
@@ -56,6 +61,11 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <Badge variant={statusTone[c.status] ?? "outline"}>{statusLabel[c.status] ?? c.status}</Badge>
+                {!c.bannerUrl && c.status !== "announced" ? (
+                  <Link href={`/admin/campaigns/${c.id}/edit`} className="text-sm text-muted-foreground hover:text-foreground hover:underline">
+                    No banner yet: add one
+                  </Link>
+                ) : null}
                 {c.status !== "draft" ? (
                   <Link href={`/campaigns/${c.id}`} target="_blank" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
                     Public rules page <ExternalLink className="size-3.5" aria-hidden />

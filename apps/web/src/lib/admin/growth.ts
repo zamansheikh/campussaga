@@ -19,6 +19,8 @@ export type AdminCampaign = {
   universityIds: string[] | null;
   prizes: CampaignPrize[];
   status: CampaignStatus;
+  /** The banner photo, `/campaigns/{id}/banner?v=…` (the website serves that path too), or null. */
+  bannerUrl?: string | null;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -26,7 +28,7 @@ export type AdminCampaign = {
 /** `GET /campaigns/{id}/public`: both languages, no sign-in. */
 export type PublicCampaign = Pick<
   AdminCampaign,
-  "id" | "titleEn" | "titleBn" | "bodyEn" | "bodyBn" | "rulesEn" | "rulesBn" | "startsAt" | "endsAt" | "settlesAt" | "prizes"
+  "id" | "titleEn" | "titleBn" | "bodyEn" | "bodyBn" | "rulesEn" | "rulesBn" | "startsAt" | "endsAt" | "settlesAt" | "prizes" | "bannerUrl"
 > & { status?: CampaignStatus };
 
 export type PersonRef = { id: string; name: string | null; email?: string | null; university?: string | { id?: string; name: string } | null };

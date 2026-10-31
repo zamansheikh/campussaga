@@ -25,6 +25,7 @@ import (
 	"github.com/zamansheikh/varsitykotha/backend/internal/platform/apperr"
 	"github.com/zamansheikh/varsitykotha/backend/internal/platform/db"
 	"github.com/zamansheikh/varsitykotha/backend/internal/platform/httpx"
+	"github.com/zamansheikh/varsitykotha/backend/internal/platform/media"
 )
 
 // Rules of docs/GROWTH.md.
@@ -82,6 +83,7 @@ type Service struct {
 	log    *slog.Logger
 	notify Notifier
 	ports  Ports
+	media  media.Store // banner photos; nil until SetMedia
 
 	mu      sync.Mutex
 	seenDay string
@@ -119,12 +121,15 @@ func (s *Service) Routes(r *httpx.Router) {
 	loc.Get("/campaigns/{id}/leaderboard", httpx.Handle(s.handleLeaderboard))
 	st.Post("/campaigns/{id}/claim", httpx.Handle(s.handlePrizeClaim, httpx.NoContent()))
 	r.Public().With(r.Limit("campaign-public", 120, time.Minute)).Get("/campaigns/{id}/public", httpx.Handle(s.handlePublicCampaign))
+	r.Public().With(r.Limit("campaign-banner", 240, time.Minute)).Get("/campaigns/{id}/banner", s.handleBanner)
 
 	a := r.Admin()
 	a.Get("/admin/campaigns", httpx.Handle(s.handleAdminCampaigns))
 	a.Post("/admin/campaigns", httpx.Handle(s.handleAdminCreate, httpx.Status(http.StatusCreated)))
 	a.Get("/admin/campaigns/{id}", httpx.Handle(s.handleAdminCampaign))
 	a.Patch("/admin/campaigns/{id}", httpx.Handle(s.handleAdminPatch))
+	a.Post("/admin/campaigns/{id}/banner", s.handleAdminBanner)
+	a.Delete("/admin/campaigns/{id}/banner", httpx.Handle(s.handleAdminBannerDelete))
 	a.Get("/admin/campaigns/{id}/standings", httpx.Handle(s.handleAdminStandings))
 	a.Post("/admin/campaigns/{id}/participants/{userId}/disqualify", httpx.Handle(s.handleAdminDisqualifyUser, httpx.NoContent()))
 	a.Delete("/admin/campaigns/{id}/participants/{userId}/disqualify", httpx.Handle(s.handleAdminRestoreUser, httpx.NoContent()))
