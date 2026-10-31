@@ -281,74 +281,83 @@ class _StoryCard extends StatelessWidget {
                   ? null
                   : NetworkImage('${Env.apiBaseUrl}$banner'),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: Row(
-                children: [
-                  if (badge != null)
-                    CsBadgeIcon(badgeKey: badge.key, tier: badge.tier, size: 52)
-                  else
-                    CsAvatar(name: name.isEmpty ? '?' : name, size: 48),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            // Me, my place and the pitch, centred between the poster and
+            // the QR so the card never has a hole.
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        Text(
-                          name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: context.text.titleMedium?.copyWith(
-                            color: white,
-                            fontWeight: FontWeight.w800,
+                        if (badge != null)
+                          CsBadgeIcon(
+                            badgeKey: badge.key,
+                            tier: badge.tier,
+                            size: 52,
+                          )
+                        else
+                          CsAvatar(name: name.isEmpty ? '?' : name, size: 48),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: context.text.titleMedium?.copyWith(
+                                  color: white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              if (user?.university case final u?)
+                                Text(
+                                  u.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: context.text.bodySmall?.copyWith(
+                                    color: white.withValues(alpha: 0.75),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                        if (user?.university case final u?)
-                          Text(
-                            u.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.text.bodySmall?.copyWith(
-                              color: white.withValues(alpha: 0.75),
-                            ),
-                          ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-              child: FittedBox(
-                // One line, whatever the language.
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  status,
-                  maxLines: 1,
-                  style: context.text.titleLarge?.copyWith(
-                    color: const Color(0xFFFBBF24),
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-            ),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                l10n.shareCardPitch,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: context.text.bodyMedium?.copyWith(
-                  color: white.withValues(alpha: 0.85),
-                  height: 1.3,
+                    const SizedBox(height: 12),
+                    FittedBox(
+                      // One line, whatever the language.
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        status,
+                        maxLines: 1,
+                        style: context.text.headlineSmall?.copyWith(
+                          color: const Color(0xFFFBBF24),
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.shareCardPitch,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.text.bodyMedium?.copyWith(
+                        color: white.withValues(alpha: 0.85),
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
             Container(
-              margin: const EdgeInsets.all(14),
+              margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: white,
