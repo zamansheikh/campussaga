@@ -218,6 +218,9 @@ class _Tray extends StatefulWidget {
 }
 
 class _TrayState extends State<_Tray> with SingleTickerProviderStateMixin {
+  /// The last reaction held, so the bump sinks where it was.
+  int? _lastHover;
+
   late final _show = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 260),
@@ -257,36 +260,70 @@ class _TrayState extends State<_Tray> with SingleTickerProviderStateMixin {
             child: ScaleTransition(
               scale: Tween(begin: 0.7, end: 1.0).animate(grow),
               alignment: Alignment.bottomLeft,
+              // Text styles for the emojis and names (no underline).
               child: Material(
-                color: cs.surface,
-                elevation: 10,
-                shadowColor: Colors.black45,
-                shape: StadiumBorder(side: BorderSide(color: cs.border)),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: _TrayGeometry.pad,
-                  ),
-                  child: ValueListenableBuilder<int?>(
-                    valueListenable: widget.hovered,
-                    builder: (context, hovered, _) => Row(
+                type: MaterialType.transparency,
+                child: ValueListenableBuilder<int?>(
+                  valueListenable: widget.hovered,
+                  builder: (context, hovered, _) {
+                    if (hovered != null) _lastHover = hovered;
+                    // Where the bump sits (it stays put while it sinks).
+                    final bumpX =
+                        _TrayGeometry.pad +
+                        _TrayGeometry.item * (_lastHover ?? 0) +
+                        _TrayGeometry.item / 2;
+                    return Stack(
+                      clipBehavior: Clip.none,
                       children: [
-                        for (var i = 0; i < widget.options.length; i++)
-                          _Face(
-                            emoji: widget.options[i].$1,
-                            label: widget.options[i].$2,
-                            index: i,
-                            show: _show,
-                            hovered: hovered == i,
-                            shrunk: hovered != null && hovered != i,
-                            selected: widget.selected == i,
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-                              widget.onPick(i);
-                            },
+                        // The tray: a pill that rises in a smooth bump under
+                        // the reaction the finger is on.
+                        Positioned.fill(
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween(end: bumpX),
+                            duration: const Duration(milliseconds: 140),
+                            curve: Curves.easeOutCubic,
+                            builder: (context, x, _) =>
+                                TweenAnimationBuilder<double>(
+                                  tween: Tween(end: hovered == null ? 0 : 1),
+                                  duration: const Duration(milliseconds: 160),
+                                  curve: Curves.easeOutBack,
+                                  builder: (context, t, _) => CustomPaint(
+                                    painter: _TrayPainter(
+                                      bumpX: x,
+                                      bump: t,
+                                      fill: cs.surface,
+                                      border: cs.border,
+                                    ),
+                                  ),
+                                ),
                           ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: _TrayGeometry.pad,
+                          ),
+                          child: Row(
+                            children: [
+                              for (var i = 0; i < widget.options.length; i++)
+                                _Face(
+                                  emoji: widget.options[i].$1,
+                                  label: widget.options[i].$2,
+                                  index: i,
+                                  show: _show,
+                                  hovered: hovered == i,
+                                  shrunk: hovered != null && hovered != i,
+                                  selected: widget.selected == i,
+                                  onTap: () {
+                                    HapticFeedback.selectionClick();
+                                    widget.onPick(i);
+                                  },
+                                ),
+                            ],
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -295,6 +332,74 @@ class _TrayState extends State<_Tray> with SingleTickerProviderStateMixin {
       ],
     );
   }
+}
+
+/// The tray's shape: a pill, and a bell-shaped bump rising from its top
+/// edge at [bumpX] while a reaction is held ([bump] 0–1), so the grown
+/// emoji sits inside the tray. One outline, one shadow.
+class _TrayPainter extends CustomPainter {
+  const _TrayPainter({
+    required this.bumpX,
+    required this.bump,
+    required this.fill,
+    required this.border,
+  });
+
+  final double bumpX;
+  final double bump;
+  final Color fill;
+  final Color border;
+
+  /// How high the bump rises above the pill, and its half width.
+  static const _rise = 30.0;
+  static const _halfWidth = 30.0;
+
+  /// The flare where the bump meets the pill.
+  static const _flare = 16.0;
+
+  Path _shape(Size size) {
+    final r = size.height / 2;
+    final pill = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(r)),
+      );
+    final t = bump.clamp(0.0, 1.2);
+    if (t <= 0.01) return pill;
+    final h = _rise * t;
+    final w = _halfWidth * t.clamp(0.0, 1.0);
+    final left = bumpX - w - _flare;
+    final right = bumpX + w + _flare;
+    final bell = Path()
+      ..moveTo(left, 0)
+      ..cubicTo(left + _flare + w * 0.1, 0, bumpX - w, -h, bumpX, -h)
+      ..cubicTo(bumpX + w, -h, right - _flare - w * 0.1, 0, right, 0)
+      ..lineTo(right, r)
+      ..lineTo(left, r)
+      ..close();
+    return Path.combine(PathOperation.union, pill, bell);
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = _shape(size);
+    canvas
+      ..drawShadow(path, const Color(0xFF000000), 8, false)
+      ..drawPath(path, Paint()..color = fill)
+      ..drawPath(
+        path,
+        Paint()
+          ..color = border
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1,
+      );
+  }
+
+  @override
+  bool shouldRepaint(_TrayPainter old) =>
+      old.bumpX != bumpX ||
+      old.bump != bump ||
+      old.fill != fill ||
+      old.border != border;
 }
 
 /// One reaction in the tray: pops in after the one before it; grows and
@@ -379,7 +484,7 @@ class _Face extends StatelessWidget {
               ),
               // The name, clear above the grown emoji.
               Positioned(
-                top: -74,
+                top: -62,
                 child: IgnorePointer(
                   child: AnimatedOpacity(
                     opacity: hovered ? 1 : 0,
