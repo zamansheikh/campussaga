@@ -1894,8 +1894,8 @@
   "raceProgress": "{count}/{min} friends from other universities",
   "@raceProgress": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}, "min": {"type": "int", "format": "decimalPattern"}}},
   "raceDone": "You're in the race",
-  "campaignNotInRace": "{points} · {count, plural, =1{1 more friend} other{{count} more friends}} from other universities to enter",
-  "@campaignNotInRace": {"placeholders": {"points": {"type": "String"}, "count": {"type": "int", "format": "decimalPattern"}}},
+  "campaignNotInRace": "{points} · not in the prize race yet",
+  "@campaignNotInRace": {"placeholders": {"points": {"type": "String"}}},
   "campaignNextRace": "Next: {count, plural, =1{1 more friend} other{{count} more friends}} from another university",
   "@campaignNextRace": {"placeholders": {"count": {"type": "int", "format": "decimalPattern"}}}
 }

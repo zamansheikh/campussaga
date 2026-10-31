@@ -5217,12 +5217,8 @@ class AppLocalizationsBn extends AppLocalizations {
   String get raceDone => 'তুমি দৌড়ে আছ';
 
   @override
-  String campaignNotInRace(String points, int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    return '$points · দৌড়ে নামতে অন্য বিশ্ববিদ্যালয়ের আরও $countString জন';
+  String campaignNotInRace(String points) {
+    return '$points · এখনো দৌড়ে নেই';
   }
 
   @override

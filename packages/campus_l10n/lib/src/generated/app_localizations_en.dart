@@ -5382,18 +5382,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get raceDone => 'You\'re in the race';
 
   @override
-  String campaignNotInRace(String points, int count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString more friends',
-      one: '1 more friend',
-    );
-    return '$points · $_temp0 from other universities to enter';
+  String campaignNotInRace(String points) {
+    return '$points · not in the prize race yet';
   }
 
   @override

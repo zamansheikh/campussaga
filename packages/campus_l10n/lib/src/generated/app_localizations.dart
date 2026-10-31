@@ -8219,8 +8219,8 @@ abstract class AppLocalizations {
   /// No description provided for @campaignNotInRace.
   ///
   /// In en, this message translates to:
-  /// **'{points} · {count, plural, =1{1 more friend} other{{count} more friends}} from other universities to enter'**
-  String campaignNotInRace(String points, int count);
+  /// **'{points} · not in the prize race yet'**
+  String campaignNotInRace(String points);
 
   /// No description provided for @campaignNextRace.
   ///

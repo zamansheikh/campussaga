@@ -96,10 +96,7 @@ String? timeLeftText(AppLocalizations l10n, DateTime end, DateTime now) {
 String campaignStanding(AppLocalizations l10n, Campaign c) {
   if (c.otherCampusNeeded > 0) {
     // Points, but not in the prize race yet.
-    return l10n.campaignNotInRace(
-      l10n.campaignScore(c.myScore),
-      c.otherCampusNeeded,
-    );
+    return l10n.campaignNotInRace(l10n.campaignScore(c.myScore));
   }
   return c.myRank == null
       ? l10n.campaignNoRank

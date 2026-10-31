@@ -610,7 +610,7 @@ void main() {
       ];
       await start(tester);
       expect(
-        find.text('23 points · 1 more friend from other universities to enter'),
+        find.text('23 points · not in the prize race yet'),
         findsOneWidget,
       );
       expect(
