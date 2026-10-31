@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export function StatTiles({ totals, copies = false, className }: { totals: StatsTotals; copies?: boolean; className?: string }) {
   const tiles: { label: string; value: string }[] = [
     { label: "Views", value: formatNumber(totals.views) },
-    { label: "Students reached", value: formatNumber(totals.viewers) },
+    { label: "Students", value: formatNumber(totals.viewers) },
     { label: "Taps", value: formatNumber(totals.taps) },
     { label: "Tap rate", value: percentText(totals.ctr) },
     ...(copies ? [{ label: "Codes copied", value: formatNumber(totals.copies) }] : []),
@@ -27,7 +27,7 @@ export function StatTiles({ totals, copies = false, className }: { totals: Stats
         ))}
       </dl>
       <p className="text-xs text-muted-foreground">
-        A view is half the ad on screen for a second. Students reached counts different students. Tap rate is taps ÷ views. Hidden is “Hide this
+        A view is half the ad on screen for a second. Students is how many different students saw it. Tap rate is taps ÷ views. Hidden is “Hide this
         ad” (7 days).
       </p>
     </div>
